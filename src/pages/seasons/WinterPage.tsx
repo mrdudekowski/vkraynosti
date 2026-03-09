@@ -1,17 +1,26 @@
 import TourCard from '../../components/shared/TourCard';
+import PageMeta from '../../components/shared/PageMeta';
 import { getToursBySeason } from '../../data/toursData';
 import { UI } from '../../constants/ui';
 import { IMAGES } from '../../constants/images';
+import { ROUTES } from '../../constants/routes';
 
-const SpringPage = () => {
-  const tours = getToursBySeason('spring');
-  const season = UI.seasons.spring;
+const WinterPage = () => {
+  const tours = getToursBySeason('winter');
+  const season = UI.seasons.winter;
 
   return (
     <div>
+      <PageMeta
+        title="Зимние туры — Байкал, Хибины, Алтай | Вкрайности"
+        description="Зимние приключения в России: ледяные пещеры Байкала, фрирайд в Хибинах, экспедиции по Алтаю. Маршруты для любого уровня подготовки."
+        imageUrl={IMAGES.hero.winter}
+        path={ROUTES.WINTER}
+      />
+
       <div
         className="h-72 bg-cover bg-center flex items-end"
-        style={{ backgroundImage: `url(${IMAGES.hero.spring})` }}
+        style={{ backgroundImage: `url(${IMAGES.hero.winter})` }}
       >
         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-8 pb-8">
           <p className="text-4xl mb-2">{season.emoji}</p>
@@ -30,4 +39,4 @@ const SpringPage = () => {
   );
 };
 
-export default SpringPage;
+export default WinterPage;

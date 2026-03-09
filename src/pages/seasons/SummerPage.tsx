@@ -1,18 +1,26 @@
 import TourCard from '../../components/shared/TourCard';
+import PageMeta from '../../components/shared/PageMeta';
 import { getToursBySeason } from '../../data/toursData';
 import { UI } from '../../constants/ui';
 import { IMAGES } from '../../constants/images';
+import { ROUTES } from '../../constants/routes';
 
-const WinterPage = () => {
-  const tours = getToursBySeason('winter');
-  const season = UI.seasons.winter;
+const SummerPage = () => {
+  const tours = getToursBySeason('summer');
+  const season = UI.seasons.summer;
 
   return (
     <div>
-      {/* Hero banner */}
+      <PageMeta
+        title="Летние туры — Вулканы, тропы, сплавы | Вкрайности"
+        description="Лето в дикой природе России: вулканы Камчатки, Большая Байкальская тропа, плато Укок на Алтае, сплавы по Карелии."
+        imageUrl={IMAGES.hero.summer}
+        path={ROUTES.SUMMER}
+      />
+
       <div
         className="h-72 bg-cover bg-center flex items-end"
-        style={{ backgroundImage: `url(${IMAGES.hero.winter})` }}
+        style={{ backgroundImage: `url(${IMAGES.hero.summer})` }}
       >
         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-8 pb-8">
           <p className="text-4xl mb-2">{season.emoji}</p>
@@ -20,7 +28,6 @@ const WinterPage = () => {
         </div>
       </div>
 
-      {/* Tours grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {tours.map(tour => (
@@ -32,4 +39,4 @@ const WinterPage = () => {
   );
 };
 
-export default WinterPage;
+export default SummerPage;

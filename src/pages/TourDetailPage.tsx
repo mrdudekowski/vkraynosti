@@ -2,9 +2,10 @@ import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faArrowLeft, faClock, faChartLine, faTag } from '@fortawesome/free-solid-svg-icons';
 import { getTourById } from '../data/toursData';
-import { ROUTES } from '../constants/routes';
+import { ROUTES, buildTourDetailPath } from '../constants/routes';
 import { UI } from '../constants/ui';
 import PlaceholderImage from '../components/shared/PlaceholderImage';
+import PageMeta from '../components/shared/PageMeta';
 
 const SEASON_ROUTE: Record<string, string> = {
   winter: ROUTES.WINTER,
@@ -51,6 +52,12 @@ const TourDetailPage = () => {
 
   return (
     <div>
+      <PageMeta
+        title={`${tour.title} | Вкрайности`}
+        description={`${tour.subtitle}. ${tour.duration}, ${tour.price}. ${tour.highlights.slice(0, 3).join(', ')}.`}
+        imageUrl={tour.imageUrl}
+        path={buildTourDetailPath(tour.season, tour.id)}
+      />
       {/* Hero */}
       <div className="relative h-96">
         <PlaceholderImage src={tour.imageUrl} alt={tour.title} className="w-full h-full" />

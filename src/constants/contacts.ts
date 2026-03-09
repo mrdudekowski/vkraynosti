@@ -1,3 +1,5 @@
+export const SITE_URL = 'https://mrdudekowski.github.io/vkraynosti';
+
 export const CONTACTS = {
   PHONE_NUMBER:    '+7 (XXX) XXX-XX-XX',
   PHONE_HREF:      'tel:+7XXXXXXXXXX',

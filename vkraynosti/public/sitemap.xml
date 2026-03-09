@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Main pages -->
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/safety</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Season pages -->
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/winter</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/spring</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/summer</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/fall</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Winter tours -->
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/winter/winter-1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/winter/winter-2</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/winter/winter-3</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/winter/winter-4</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Spring tours -->
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/spring/spring-1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/spring/spring-2</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/spring/spring-3</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/spring/spring-4</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Summer tours -->
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/summer/summer-1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/summer/summer-2</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/summer/summer-3</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/summer/summer-4</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Fall tours -->
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/fall/fall-1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/fall/fall-2</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/fall/fall-3</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrdudekowski.github.io/vkraynosti/tours/fall/fall-4</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>

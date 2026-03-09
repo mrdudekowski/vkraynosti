@@ -1,17 +1,26 @@
 import TourCard from '../../components/shared/TourCard';
+import PageMeta from '../../components/shared/PageMeta';
 import { getToursBySeason } from '../../data/toursData';
 import { UI } from '../../constants/ui';
 import { IMAGES } from '../../constants/images';
+import { ROUTES } from '../../constants/routes';
 
-const FallPage = () => {
-  const tours = getToursBySeason('fall');
-  const season = UI.seasons.fall;
+const SpringPage = () => {
+  const tours = getToursBySeason('spring');
+  const season = UI.seasons.spring;
 
   return (
     <div>
+      <PageMeta
+        title="Весенние туры — Алтай, Камчатка, Байкал | Вкрайности"
+        description="Весна в России: цветение маральника на Алтае, вулканы Камчатки, ледоход на Байкале. Маршруты на любой уровень от лёгких до сложных."
+        imageUrl={IMAGES.hero.spring}
+        path={ROUTES.SPRING}
+      />
+
       <div
         className="h-72 bg-cover bg-center flex items-end"
-        style={{ backgroundImage: `url(${IMAGES.hero.fall})` }}
+        style={{ backgroundImage: `url(${IMAGES.hero.spring})` }}
       >
         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-8 pb-8">
           <p className="text-4xl mb-2">{season.emoji}</p>
@@ -30,4 +39,4 @@ const FallPage = () => {
   );
 };
 
-export default FallPage;
+export default SpringPage;

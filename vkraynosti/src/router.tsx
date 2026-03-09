@@ -9,18 +9,21 @@ import FallPage from './pages/seasons/FallPage';
 import TourDetailPage from './pages/TourDetailPage';
 import SafetyPage from './pages/SafetyPage';
 
-export const router = createBrowserRouter([
-  {
-    path: ROUTES.HOME,
-    element: <Layout />,
-    children: [
-      { index: true,              element: <Home /> },
-      { path: ROUTES.WINTER,      element: <WinterPage /> },
-      { path: ROUTES.SPRING,      element: <SpringPage /> },
-      { path: ROUTES.SUMMER,      element: <SummerPage /> },
-      { path: ROUTES.FALL,        element: <FallPage /> },
-      { path: ROUTES.TOUR_DETAIL, element: <TourDetailPage /> },
-      { path: ROUTES.SAFETY,      element: <SafetyPage /> },
-    ],
-  },
-]);
+export const router = createBrowserRouter(
+  [
+    {
+      path: ROUTES.HOME,
+      element: <Layout />,
+      children: [
+        { index: true,              element: <Home /> },
+        { path: ROUTES.WINTER,      element: <WinterPage /> },
+        { path: ROUTES.SPRING,      element: <SpringPage /> },
+        { path: ROUTES.SUMMER,      element: <SummerPage /> },
+        { path: ROUTES.FALL,        element: <FallPage /> },
+        { path: ROUTES.TOUR_DETAIL, element: <TourDetailPage /> },
+        { path: ROUTES.SAFETY,      element: <SafetyPage /> },
+      ],
+    },
+  ],
+  { basename: import.meta.env.BASE_URL }
+);

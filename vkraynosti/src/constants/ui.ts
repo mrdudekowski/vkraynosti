@@ -14,6 +14,8 @@ export const UI = {
     subtitle: 'Откройте дикую природу России',
   },
   sections: {
+    tours:      'Выберите сезон',
+    toursSub:   'Четыре сезона — четыре разных приключения',
     team:       'Команда Вкрайности',
     teamSub:    'Опытные гиды и эксперты',
     safety:     'Безопасность в наших походах',
@@ -28,10 +30,10 @@ export const UI = {
     consult:  'Консультация по турам',
   },
   seasons: {
-    winter: { label: 'Зима',  emoji: '❄️', color: 'season-winter' },
-    spring: { label: 'Весна', emoji: '🌿', color: 'season-spring' },
-    summer: { label: 'Лето',  emoji: '☀️', color: 'season-summer' },
-    fall:   { label: 'Осень', emoji: '🍂', color: 'season-fall' },
+    winter: { label: 'Зима',  emoji: '❄️', color: 'season-winter', description: 'Байкал подо льдом, Хибины, полярное сияние' },
+    spring: { label: 'Весна', emoji: '🌿', color: 'season-spring', description: 'Цветение Алтая, таяние Байкала, Камчатка' },
+    summer: { label: 'Лето',  emoji: '☀️', color: 'season-summer', description: 'Вулканы, тропы, сплавы и белые ночи' },
+    fall:   { label: 'Осень', emoji: '🍂', color: 'season-fall',   description: 'Золотой Алтай, карельский лес, горные сёла' },
   },
   footer: {
     tagline:  'Открываем дикую природу России',

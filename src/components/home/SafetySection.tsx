@@ -26,7 +26,7 @@ const SafetySection = () => (
                 className="text-brand-secondary text-xl"
               />
             </div>
-            <h3 className="font-display font-semibold text-lg mb-2">{item.title}</h3>
+            <h3 className="font-heading font-semibold text-lg mb-2">{item.title}</h3>
             <p className="text-text-inverse/70 text-sm leading-relaxed">{item.summary}</p>
           </div>
         ))}

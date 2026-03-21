@@ -93,7 +93,7 @@ const TeamMemberModal = ({ member }: TeamMemberModalProps) => {
           </div>
 
           <div className="p-8 overflow-y-auto">
-            <h2 className="font-display text-2xl font-bold text-text-primary mb-1">
+            <h2 className="font-heading text-2xl font-bold text-text-primary mb-1">
               {member.name}
             </h2>
             <p className="text-brand-primary font-medium mb-4">{member.role}</p>

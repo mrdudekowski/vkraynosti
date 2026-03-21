@@ -22,7 +22,7 @@ const cardInner = (tour: Tour, compact: boolean) => (
     </div>
     <div className="p-card-p">
       <div className="flex items-start justify-between gap-2 mb-1">
-        <h3 className="font-display font-semibold text-card text-text-primary leading-tight">
+        <h3 className="font-heading font-semibold text-card text-text-primary leading-tight">
           {tour.title}
         </h3>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${UI.difficulty.styles[tour.difficulty]}`}>

@@ -4,6 +4,7 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { useCarousel } from '../../hooks/useCarousel';
 import CarouselSlide from '../shared/CarouselSlide';
 import { UI } from '../../constants/ui';
+import { heroCarouselPhraseTypographyStyle } from '../../constants/typography';
 import { buildTourDetailPath } from '../../constants/routes';
 import { getToursBySeason } from '../../data/toursData';
 import { useSeason } from '../../context/SeasonContext';
@@ -17,28 +18,13 @@ const HeroCarousel = () => {
     resetKey: activeSeason,
   });
 
-  // #region agent log
-  fetch('http://127.0.0.1:7797/ingest/43b5f5d9-745f-43fc-b1e5-79ca29b85a5b', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '5b4664' },
-    body: JSON.stringify({
-      sessionId: '5b4664',
-      location: 'HeroCarousel.tsx:afterHooks',
-      message: 'HeroCarousel render after hooks',
-      data: { tours: tours.length, current },
-      timestamp: Date.now(),
-      hypothesisId: 'H1',
-    }),
-  }).catch(() => {});
-  // #endregion
-
   return (
     <section className="relative h-screen overflow-hidden bg-surface-dark">
       <header className="absolute top-6 right-6 z-20 max-w-md pl-4 text-right space-y-2 animate-fade-up">
-        <h1 className="font-display font-bold text-text-inverse text-section leading-tight drop-shadow-md">
+        <h1 className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md">
           {UI.hero.documentTitle}
         </h1>
-        <p className="font-display text-xl font-bold text-brand-secondary drop-shadow-md">
+        <p className="font-brand-wordmark text-xl text-brand-secondary drop-shadow-md">
           {UI.nav.brand}
         </p>
       </header>
@@ -47,16 +33,19 @@ const HeroCarousel = () => {
           <CarouselSlide key={tour.id} backgroundUrl={tour.imageUrl} isActive={idx === current}>
             <Link
               to={buildTourDetailPath(tour.season, tour.id)}
-              className="text-center group block pb-24 max-w-2xl mx-auto px-4"
+              className="text-center group flex flex-col items-center gap-hero-phrase-cta-gap pb-24 max-w-2xl mx-auto px-4"
               tabIndex={idx === current ? 0 : -1}
               aria-label={`${tour.title}. ${UI.hero.viewTour}`}
             >
-              <p className="text-text-inverse/80 text-xl mb-6 animate-fade-up">
-                {tour.heroPhrase}
-              </p>
-              <span className="btn-primary inline-block text-base animate-fade-up">
+              <span className="btn-primary inline-block text-base animate-fade-up shrink-0">
                 {UI.hero.viewTour}
               </span>
+              <p
+                className="font-hero-carousel-phrase text-text-inverse/80 hero-carousel-phrase-text-shadow animate-fade-up max-w-full"
+                style={heroCarouselPhraseTypographyStyle}
+              >
+                {tour.heroPhrase}
+              </p>
             </Link>
           </CarouselSlide>
         );

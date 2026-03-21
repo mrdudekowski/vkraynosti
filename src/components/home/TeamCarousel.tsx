@@ -21,7 +21,7 @@ const TeamCard = ({ member, onClick }: { member: TeamMember; onClick: () => void
       <PlaceholderImage src={member.imageUrl} alt={member.name} className="w-full h-full" />
     </div>
     <div className="p-card-p">
-      <h3 className="font-display font-semibold text-text-primary">{member.name}</h3>
+      <h3 className="font-heading font-semibold text-text-primary">{member.name}</h3>
       <p className="text-text-muted text-sm mt-1">{member.role}</p>
       <p className="text-text-muted text-xs mt-2">
         {member.experience} {UI.team.experienceSuffix}

@@ -68,11 +68,11 @@ const Navbar = () => {
           <div className="flex items-center gap-3 shrink-0">
             <Link
               to={ROUTES.HOME}
-              className="font-display text-xl font-bold text-text-inverse hover:text-brand-secondary transition-colors duration-hover"
+              className="font-brand-wordmark text-xl text-text-inverse hover:text-brand-secondary transition-colors duration-hover"
             >
               {UI.nav.brand}
             </Link>
-            <span className={`hidden sm:inline font-display text-sm font-semibold ${SEASON_TEXT_CLASS[activeSeason]}`}>
+            <span className={`hidden sm:inline font-heading text-sm font-semibold ${SEASON_TEXT_CLASS[activeSeason]}`}>
               {activeSeasonUi.label}
             </span>
           </div>

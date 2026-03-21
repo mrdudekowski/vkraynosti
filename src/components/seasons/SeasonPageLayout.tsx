@@ -40,7 +40,7 @@ const SeasonPageLayout = ({
       >
         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-8 pb-8">
           <p className="text-4xl mb-2">{season.emoji}</p>
-          <h1 className="font-display text-section font-bold text-white">{season.label}</h1>
+          <h1 className="font-heading text-section font-bold text-white">{season.label}</h1>
         </div>
       </div>
 

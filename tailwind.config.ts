@@ -1,9 +1,20 @@
 import type { Config } from 'tailwindcss'
+import {
+  fontFamilyBodyStack,
+  fontFamilyBrandWordmarkStack,
+  fontFamilyHeadingStack,
+  fontFamilyHeroPhraseStack,
+  fontFamilyMonoStack,
+} from './src/constants/fonts'
 
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   safelist: [
     { pattern: /^(h|min-h)-season-section(-md)?$/, variants: ['md'] },
+    // @apply в index.css не подхватывает кастомные font-*; в JSX классы нужны в билде.
+    'font-heading',
+    'font-brand-wordmark',
+    'font-hero-carousel-phrase',
   ],
   theme: {
     extend: {
@@ -43,18 +54,26 @@ const config: Config = {
         divider: '#E5E7EB',
       },
       fontFamily: {
-        display: ['"Playfair Display"', 'Georgia', 'serif'],
-        body:    ['"Source Sans 3"', 'sans-serif'],
-        mono:    ['"JetBrains Mono"', 'monospace'],
+        // Все стеки — `src/constants/fonts.ts`. `font-heading` (Geologica), `font-brand-wordmark` (Dela Gothic One).
+        heading:               [...fontFamilyHeadingStack],
+        'brand-wordmark':      [...fontFamilyBrandWordmarkStack],
+        body:                  [...fontFamilyBodyStack],
+        mono:                  [...fontFamilyMonoStack],
+        'hero-carousel-phrase': [...fontFamilyHeroPhraseStack],
       },
       fontSize: {
         'hero':    ['clamp(2.5rem, 6vw, 5rem)', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
         'section': ['clamp(1.75rem, 3vw, 2.75rem)', { lineHeight: '1.15' }],
         'card':    ['1.125rem', { lineHeight: '1.4' }],
+        'tooltip': ['0.875rem', { lineHeight: '1.25' }],
       },
       spacing: {
         'section-y': '6rem',
         'card-p':    '1.75rem',
+        'tooltip-gap': '0.375rem',
+        'tooltip-x':   '0.625rem',
+        'tooltip-y':   '0.375rem',
+        'hero-phrase-cta-gap': '2.5rem',
       },
       // Секция «В другой сезон»: высота в 2× от базового размера (база 22rem/28rem → 44rem/56rem). Mobile-first: до md — 44rem, от md — 56rem.
       height: {
@@ -66,11 +85,13 @@ const config: Config = {
         'season-section-md': '56rem',
       },
       borderRadius: {
-        'card':  '1rem',
-        'modal': '1.25rem',
+        'card':    '1rem',
+        'modal':   '1.25rem',
+        'tooltip': '0.3125rem',
       },
       zIndex: {
         'navbar':      '100',
+        'tooltip':     '150',
         'modal':       '200',
         'overlay':     '199',
         'seasonFlash': '300',

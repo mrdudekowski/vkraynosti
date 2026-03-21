@@ -14,7 +14,7 @@ const Footer = () => (
         <div>
           <Link
             to={ROUTES.HOME}
-            className="font-display text-2xl font-bold text-text-inverse hover:text-brand-secondary transition-colors duration-hover"
+            className="font-heading text-2xl font-bold text-text-inverse hover:text-brand-secondary transition-colors duration-hover"
           >
             {UI.nav.brand}
           </Link>

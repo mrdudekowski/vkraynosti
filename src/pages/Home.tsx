@@ -61,7 +61,7 @@ const Home = () => {
         )}
         <div className="relative z-10">
           <div className="pl-3 xs:pl-4 sm:pl-6 lg:pl-8 pt-2 xs:pt-3 phone:pt-4 pb-2 xs:pb-3 phone:pb-4">
-            <p className="font-display text-sm font-semibold tracking-widest uppercase text-text-inverse/80 mb-3">
+            <p className="font-heading text-sm font-semibold tracking-widest uppercase text-text-inverse/80 mb-3">
               {UI.sections.switchSeason}
             </p>
             <SeasonSwitcher variant="section" />

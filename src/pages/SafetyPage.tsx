@@ -1,3 +1,4 @@
+import { useLayoutEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShieldHalved, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
@@ -28,6 +29,10 @@ const SEASON_SAFETY_OVERRIDES: Record<Season, SafetyOverrides[]> = {
 };
 
 const SafetyPage = () => {
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   const { activeSeason } = useSeason();
   const overrides = SEASON_SAFETY_OVERRIDES[activeSeason] ?? [];
   const overrideById = new Map<string, SafetyOverrides>(
@@ -81,7 +86,7 @@ const SafetyPage = () => {
                   />
                 </div>
                 <div>
-                  <h2 className="font-display text-2xl font-semibold text-text-primary mb-2">
+                  <h2 className="font-heading text-2xl font-semibold text-text-primary mb-2">
                     {item.title}
                   </h2>
                   <p className="text-brand-primary font-medium text-sm mb-4">{item.summary}</p>

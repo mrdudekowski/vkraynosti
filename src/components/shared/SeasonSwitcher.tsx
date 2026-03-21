@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSnowflake, faSeedling, faSun, faLeaf } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { matchPath, useLocation, useNavigate } from 'react-router-dom';
+import { NAV_STATE_SKIP_SCROLL_TO_TOP } from '../../constants/navigation';
 import { ROUTES, SEASON_TO_LIST_ROUTE } from '../../constants/routes';
 import { UI } from '../../constants/ui';
 import type { Season } from '../../types';
@@ -113,7 +114,7 @@ const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps)
       if (pathname === listPath) return;
       const detailMatch = matchPath(ROUTES.TOUR_DETAIL, pathname);
       if (detailMatch?.params.season === season) return;
-      navigate(listPath);
+      navigate(listPath, { state: NAV_STATE_SKIP_SCROLL_TO_TOP });
       setFlashKey(k => k + 1);
       setFlashActive(true);
       return;
@@ -164,7 +165,7 @@ const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps)
             aria-pressed={isActive}
             aria-label={season.label}
             className={[
-              'group inline-flex flex-col items-center gap-2',
+              'group relative inline-flex flex-col items-center gap-2',
               'cursor-pointer',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:rounded-lg',
               'transition-all duration-300 ease-out',
@@ -210,6 +211,22 @@ const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps)
                 className={[iconSize, style.iconColor, 'relative z-10 transition-colors duration-300'].join(' ')}
               />
             </div>
+
+            <span
+              role="tooltip"
+              className={[
+                'pointer-events-none absolute left-1/2 top-full z-tooltip -translate-x-1/2 mt-tooltip-gap',
+                'px-tooltip-x py-tooltip-y rounded-tooltip bg-surface-dark text-text-inverse font-body text-tooltip',
+                'whitespace-nowrap shadow-lg',
+                'invisible translate-y-1 opacity-0',
+                'transition-all duration-hover ease-out',
+                'hidden md:block',
+                'md:group-hover:visible md:group-hover:translate-y-0 md:group-hover:opacity-100',
+                'md:group-focus-visible:visible md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100',
+              ].join(' ')}
+            >
+              {season.label}
+            </span>
 
           </button>
         );

@@ -53,6 +53,47 @@
     .reveal-hidden {
       @apply opacity-100 translate-y-0 visible pointer-events-auto;
     }
+    .season-dock-panel-item {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  /** Анимированный бургер (Navbar): пути и dash — как в референсе; цвет — currentColor с родителя. */
+  .hamburger-icon-svg {
+    transition: transform theme('transitionDuration.carousel') theme('transitionTimingFunction.standard');
+  }
+
+  .hamburger-line {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+    transition:
+      stroke-dasharray theme('transitionDuration.carousel') theme('transitionTimingFunction.standard'),
+      stroke-dashoffset theme('transitionDuration.carousel') theme('transitionTimingFunction.standard');
+  }
+
+  .hamburger-line-top-bottom {
+    stroke-dasharray: 12 63;
+  }
+
+  .hamburger-menu-btn[aria-expanded='true'] .hamburger-icon-svg {
+    transform: rotate(-45deg);
+  }
+
+  .hamburger-menu-btn[aria-expanded='true'] .hamburger-line-top-bottom {
+    stroke-dasharray: 20 300;
+    stroke-dashoffset: -32.42;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hamburger-icon-svg,
+    .hamburger-line {
+      transition: none !important;
+    }
   }
 }
 

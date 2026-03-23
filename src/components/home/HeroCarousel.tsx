@@ -79,7 +79,7 @@ const HeroCarousel = () => {
   const { activeSeason } = useSeason();
 
   return (
-    <section className="relative h-hero-viewport overflow-hidden bg-surface-dark">
+    <section className="relative h-hero-viewport max-[499px]:h-hero-viewport-mobile overflow-hidden bg-surface-dark">
       <header className="absolute top-6 right-6 z-20 max-w-md pl-4 text-right space-y-2 animate-fade-up">
         <h1 className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md">
           {UI.hero.documentTitle}

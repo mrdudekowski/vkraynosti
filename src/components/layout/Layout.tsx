@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
+import SeasonNavDock from './SeasonNavDock';
 import Footer from './Footer';
 import SeasonRouteSync from './SeasonRouteSync';
 import ScrollToTopOnNavigate from './ScrollToTopOnNavigate';
@@ -16,7 +17,8 @@ const Layout = () => {
       <SeasonRouteSync />
       <ScrollToTopOnNavigate />
       <Navbar />
-      <main className="flex-1 pt-16">
+      <SeasonNavDock />
+      <main className="flex-1 pt-16 max-[499px]:pt-stack-main">
         <Suspense fallback={<RouteFallback />}>
           <Outlet />
         </Suspense>

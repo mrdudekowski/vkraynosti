@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
 import { useSeason } from '../../context/useSeason';
 import SeasonSwitcher from '../shared/SeasonSwitcher';
+import AnimatedHamburgerIcon from '../shared/AnimatedHamburgerIcon';
 import type { Season } from '../../types';
 
 const SEASON_TEXT_CLASS: Record<Season, string> = {
@@ -76,12 +75,12 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
-          {/* Left: Logo + Season label */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Left: Logo + подпись сезона (текст только здесь; в SeasonNavDock — только иконки) */}
+          <div className="flex min-w-0 flex-1 items-center gap-2 xs:gap-3">
             <Link
               to={ROUTES.HOME}
               onClick={handleBrandLogoClick}
-              className="font-brand-wordmark text-brand-wordmark-nav group transition-colors duration-hover"
+              className="shrink-0 font-brand-wordmark text-brand-wordmark-nav group transition-colors duration-hover"
               prefetch="none"
             >
               <span
@@ -93,7 +92,10 @@ const Navbar = () => {
                 {brandRest}
               </span>
             </Link>
-            <span className={`hidden sm:inline font-heading text-sm font-normal ${SEASON_TEXT_CLASS[activeSeason]}`}>
+            <span
+              data-testid="season-indicator"
+              className={`hidden xs:inline min-w-0 truncate font-heading text-sm font-normal ${SEASON_TEXT_CLASS[activeSeason]}`}
+            >
               {activeSeasonUi.label}
             </span>
           </div>
@@ -113,9 +115,11 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Right: Season switcher (always visible) + CTA + Hamburger */}
+          {/* Right: Season switcher (от 500px) + CTA + Hamburger */}
           <div className="flex items-center gap-3 shrink-0">
-            <SeasonSwitcher variant="navbar" />
+            <div className="max-[499px]:hidden season-md:block">
+              <SeasonSwitcher variant="navbar" />
+            </div>
             <button
               type="button"
               onClick={handleCtaClick}
@@ -126,11 +130,16 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => setMenuOpen(open => !open)}
-              className="md:hidden text-text-inverse p-2"
+              data-testid="burger-menu"
+              className="md:hidden hamburger-menu-btn p-2 rounded-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:rounded-lg"
               aria-expanded={menuOpen}
               aria-label="Меню"
             >
-              <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} className="w-5 h-5" />
+              <span
+                className={`block transition-colors duration-season-change ${SEASON_TEXT_CLASS[activeSeason]}`}
+              >
+                <AnimatedHamburgerIcon />
+              </span>
             </button>
           </div>
         </div>

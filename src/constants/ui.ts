@@ -47,6 +47,14 @@ export const UI = {
     seasonDockToggleArrow: 'Раскрыть или свернуть выбор сезона',
     /** Свёрнутая панель раскрыта: переход к списку туров активного сезона. */
     seasonDockGoToList: 'Список туров этого сезона',
+    /** Кнопка сезона в navbar (&lt;500px): панель открыта. */
+    seasonNavMenuToggleCollapse: 'Свернуть выбор сезона',
+    /** Статичный значок сезона в navbar (&lt;500px): группа с иконкой и стрелкой. */
+    seasonNavCurrentSeasonGroup: 'Текущий сезон',
+    /** Затемнение за выезжающим меню: закрыть по нажатию. */
+    mobileMenuCloseOverlay: 'Закрыть меню',
+    /** Выезжающая панель навигации (мобильный бургер), `aria-label` для `role="dialog"`. */
+    mobileMenuDialog: 'Меню навигации',
   },
   sections: {
     tours:        'Туры по сезонам',

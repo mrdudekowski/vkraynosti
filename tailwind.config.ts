@@ -7,11 +7,13 @@ import {
   fontFamilyMonoStack,
 } from './src/constants/fontFamilyStacks'
 
+/** Длительность выезда мобильного меню (синхронно с `animation.mobile-nav-*`). */
+const MOBILE_NAV_DURATION = '320ms' as const
+
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   safelist: [
     { pattern: /^(h|min-h|w)-nav-season-(circle|icon)-(fixed|fluid)$/, variants: ['md', 'max'] },
-    'animate-season-dock-in-x',
     { pattern: /^(h|min-h)-season-section(-md)?$/, variants: ['md'] },
     // @apply в index.css не подхватывает кастомные font-*; в JSX классы нужны в билде.
     'font-heading',
@@ -75,10 +77,6 @@ const config: Config = {
       spacing: {
         /** Совпадает с `h-16` у фиксированного Navbar — для `h-hero-viewport`. */
         'navbar': '4rem',
-        /** Одна строка `SeasonNavDock` под навбаром (свернуто). */
-        'season-dock': '3.5rem',
-        /** `main`: отступ под фиксированный навбар + dock (только &lt;500px). */
-        'stack-main': 'calc(theme(spacing.navbar) + theme(spacing.season-dock))',
         'section-y': '6rem',
         'card-p':    '1.75rem',
         'tooltip-gap': '0.375rem',
@@ -90,10 +88,8 @@ const config: Config = {
       },
       // Секция «В другой сезон»: высота в 2× от базового размера (база 22rem/28rem → 44rem/56rem). Mobile-first: до md — 44rem, от md — 56rem.
       height: {
-        /** Один экран под фиксированный navbar (≥500px, без dock). */
+        /** Один экран под фиксированный navbar; `SeasonNavDock` — оверлей, высоту main не увеличивает. */
         'hero-viewport': 'calc(100vh - theme(spacing.navbar))',
-        /** Герой при &lt;500px: навбар + полоса dock. */
-        'hero-viewport-mobile': 'calc(100vh - theme(spacing.stack-main))',
         'season-section':    '44rem',
         'season-section-md': '56rem',
         /** Круги сезона в навбаре (фикс с `season-md`, 36px). */
@@ -113,12 +109,15 @@ const config: Config = {
         'nav-season-icon-fluid':
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
       },
+      maxHeight: {
+        /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
+        'season-dock-panel': '12rem',
+      },
       minHeight: {
         'season-section':    '44rem',
         'season-section-md': '56rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
         'route-fallback':    'clamp(16rem, 55vh, 40rem)',
-        'season-dock':       '3.5rem',
       },
       borderRadius: {
         'card':    '1rem',
@@ -132,7 +131,11 @@ const config: Config = {
         'tooltip':     '150',
         'modal':       '200',
         'overlay':     '199',
+        /** Вспышка при смене сезона (overlay); `seasonFlash` — то же значение. */
+        'season-flash': '300',
         'seasonFlash': '300',
+        /** Панель бургер-меню: под строкой navbar (100), над контентом и SeasonNavDock (90). */
+        mobileNav: '95',
       },
       transitionDuration: {
         'carousel':      '600ms',
@@ -141,6 +144,10 @@ const config: Config = {
         'season-change': '600ms',
         /** Scroll-reveal: opacity + transform. */
         'reveal':        '500ms',
+        /** Панель SeasonNavDock: слайд сверху вниз. */
+        'season-dock-slide': '320ms',
+        /** Мобильное меню навбара: выезд панели справа. */
+        'mobile-nav': MOBILE_NAV_DURATION,
       },
       transitionTimingFunction: {
         'reveal-out': 'ease-out',
@@ -169,14 +176,13 @@ const config: Config = {
           '40%':  { opacity: '1' },
           '100%': { opacity: '0' },
         },
-        'season-dock-in': {
-          '0%':   { opacity: '0', transform: 'translateY(0.5rem)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+        'mobile-nav-backdrop': {
+          '0%':   { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        /** Раскрытие кнопок сезонов в `SeasonNavDock` вправо. */
-        'season-dock-in-x': {
-          '0%':   { opacity: '0', transform: 'translateX(-0.5rem)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
+        'mobile-nav-panel': {
+          '0%':   { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
         },
       },
       animation: {
@@ -185,8 +191,8 @@ const config: Config = {
         'scale-in': 'scale-in 0.36s ease forwards',
         'bg-fade':       'bg-fade 600ms ease forwards',
         'season-flash':  'season-flash 900ms ease-out forwards',
-        'season-dock-in': 'season-dock-in 0.36s ease-out forwards',
-        'season-dock-in-x': 'season-dock-in-x 0.36s ease-out forwards',
+        'mobile-nav-backdrop': `mobile-nav-backdrop ${MOBILE_NAV_DURATION} ease-out forwards`,
+        'mobile-nav-panel':    `mobile-nav-panel ${MOBILE_NAV_DURATION} ease-out forwards`,
       },
       screens: {
         xs:         '360px',  // Small Androids

@@ -53,11 +53,6 @@
     .reveal-hidden {
       @apply opacity-100 translate-y-0 visible pointer-events-auto;
     }
-    .season-dock-panel-item {
-      animation: none !important;
-      opacity: 1 !important;
-      transform: none !important;
-    }
   }
 
   /** Анимированный бургер (Navbar): пути и dash — как в референсе; цвет — currentColor с родителя. */
@@ -92,6 +87,14 @@
   @media (prefers-reduced-motion: reduce) {
     .hamburger-icon-svg,
     .hamburger-line {
+      transition: none !important;
+    }
+  }
+
+  /** Мобильное меню навбара: без анимации, но смена transform/opacity мгновенная (закрытие работает). */
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav-panel,
+    .mobile-nav-backdrop {
       transition: none !important;
     }
   }

@@ -2,6 +2,14 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faSnowflake, faSeedling, faSun, faLeaf } from '@fortawesome/free-solid-svg-icons';
 import type { Season } from '../types';
 
+/** Классы цвета подписи сезона (navbar, dock). */
+export const SEASON_TEXT_CLASS: Record<Season, string> = {
+  winter: 'text-season-winter',
+  spring: 'text-season-spring',
+  summer: 'text-season-summer',
+  fall:   'text-season-fall',
+};
+
 // TODO: Replace these placeholder FA icons with more expressive season SVGs or
 //       a custom icon set that better captures the mood of each season.
 export const SEASON_ICON: Record<Season, IconDefinition> = {

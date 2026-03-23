@@ -30,15 +30,15 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
               aria-label={`${tour.title}. ${UI.hero.viewTour}`}
               prefetch="intent"
             >
-              <span className="btn-primary inline-block text-base animate-fade-up shrink-0">
-                {UI.hero.viewTour}
-              </span>
               <p
                 className="font-hero-carousel-phrase font-medium text-text-inverse/80 hero-carousel-phrase-text-shadow animate-fade-up max-w-full"
                 style={heroCarouselPhraseTypographyStyle}
               >
                 {tour.heroPhrase}
               </p>
+              <span className="btn-primary inline-block text-base animate-fade-up shrink-0">
+                {UI.hero.viewTour}
+              </span>
             </Link>
           </CarouselSlide>
         );
@@ -79,7 +79,7 @@ const HeroCarousel = () => {
   const { activeSeason } = useSeason();
 
   return (
-    <section className="relative h-hero-viewport max-[499px]:h-hero-viewport-mobile overflow-hidden bg-surface-dark">
+    <section className="relative h-hero-viewport overflow-hidden bg-surface-dark">
       <header className="absolute top-6 right-6 z-20 max-w-md pl-4 text-right space-y-2 animate-fade-up">
         <h1 className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md">
           {UI.hero.documentTitle}

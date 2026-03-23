@@ -1,39 +1,73 @@
-import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
+import { SEASON_ICON, SEASON_STYLE, SEASON_TEXT_CLASS } from '../../constants/seasonNavbarAppearance';
+import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
 import SeasonSwitcher from '../shared/SeasonSwitcher';
 import AnimatedHamburgerIcon from '../shared/AnimatedHamburgerIcon';
-import type { Season } from '../../types';
-
-const SEASON_TEXT_CLASS: Record<Season, string> = {
-  winter: 'text-season-winter',
-  spring: 'text-season-spring',
-  summer: 'text-season-summer',
-  fall:   'text-season-fall',
-};
-
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  /** Портал и выходная анимация: держим в DOM, пока transform не доедет до translateX(100%). */
+  const [panelMounted, setPanelMounted] = useState(false);
+  const [panelEnter, setPanelEnter] = useState(false);
   const prevBodyOverflow = useRef<string | null>(null);
+  const menuOpenRef = useRef(menuOpen);
+  menuOpenRef.current = menuOpen;
+
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+    setPanelEnter(false);
+  }, []);
+
+  /** Все хуки до любого useEffect — иначе при Fast Refresh ломается сопоставление хуков и массив зависимостей. */
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === ROUTES.HOME;
   const { activeSeason } = useSeason();
   const activeSeasonUi = UI.seasons[activeSeason];
+  const { open: seasonMenuOpen, setOpen: setSeasonMenuOpen, toggle: toggleSeasonMenu } =
+    useSeasonNavMenu();
+  const activeSeasonStyle = SEASON_STYLE[activeSeason];
   const brandWordmark = UI.nav.brand;
   const brandFirstLetter = brandWordmark.slice(0, 1);
   const brandRest = brandWordmark.slice(1);
 
+  const openMenu = () => {
+    setMenuOpen(true);
+    setPanelMounted(true);
+    setPanelEnter(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setPanelEnter(true));
+    });
+  };
+
+  const handleMobilePanelTransitionEnd = (event: React.TransitionEvent<HTMLDivElement>) => {
+    if (event.propertyName !== 'transform') return;
+    if (!menuOpenRef.current) {
+      setPanelMounted(false);
+    }
+  };
+
+  /** Если transitionend не пришёл (редкий случай / reduced motion), всё равно снимаем портал. */
   useEffect(() => {
-    if (!menuOpen) return;
+    if (menuOpen || panelEnter || !panelMounted) return;
+    const t = window.setTimeout(() => setPanelMounted(false), 400);
+    return () => window.clearTimeout(t);
+  }, [menuOpen, panelEnter, panelMounted]);
+
+  useEffect(() => {
+    if (!menuOpen && !panelMounted) return;
 
     prevBodyOverflow.current = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false);
+      if (event.key === 'Escape') closeMenu();
     };
     window.addEventListener('keydown', onKeyDown);
 
@@ -42,10 +76,15 @@ const Navbar = () => {
       prevBodyOverflow.current = null;
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [menuOpen]);
+  }, [menuOpen, panelMounted, closeMenu]);
+
+  const handleSeasonNavButtonClick = () => {
+    closeMenu();
+    toggleSeasonMenu();
+  };
 
   const handleCtaClick = () => {
-    setMenuOpen(false);
+    closeMenu();
     if (isHome) {
       const element = document.querySelector('#tours');
       if (element) {
@@ -98,6 +137,53 @@ const Navbar = () => {
             >
               {activeSeasonUi.label}
             </span>
+            <div
+              role="group"
+              aria-label={`${UI.nav.seasonNavCurrentSeasonGroup}: ${activeSeasonUi.label}`}
+              className="hidden max-[499px]:inline-flex shrink-0 items-center gap-0.5"
+            >
+              <span
+                aria-hidden
+                className={[
+                  'relative inline-flex shrink-0 items-center justify-center rounded-full overflow-hidden',
+                  'w-nav-season-circle-fluid h-nav-season-circle-fluid',
+                  'backdrop-blur-lg border',
+                  activeSeasonStyle.border,
+                  'bg-gradient-to-tr from-black/60 to-black/40 shadow-lg',
+                  activeSeasonStyle.activeShadow,
+                  activeSeasonStyle.activeRing,
+                  'scale-105',
+                ].join(' ')}
+              >
+                <FontAwesomeIcon
+                  icon={SEASON_ICON[activeSeason]}
+                  className={[
+                    'w-nav-season-icon-fluid h-nav-season-icon-fluid relative z-10',
+                    activeSeasonStyle.iconColor,
+                  ].join(' ')}
+                />
+              </span>
+              <button
+                type="button"
+                data-testid="season-nav-toggle"
+                data-season-nav-toggle
+                className="inline-flex shrink-0 items-center justify-center rounded-md p-1 text-text-inverse/70 hover:text-text-inverse transition-colors duration-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
+                aria-expanded={seasonMenuOpen}
+                aria-controls="season-nav-dock-panel"
+                aria-label={
+                  seasonMenuOpen ? UI.nav.seasonNavMenuToggleCollapse : UI.nav.seasonDockExpand
+                }
+                onClick={handleSeasonNavButtonClick}
+              >
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className={[
+                    'w-4 h-4 transition-transform duration-hover',
+                    seasonMenuOpen ? '-rotate-180' : '',
+                  ].join(' ')}
+                />
+              </button>
+            </div>
           </div>
 
           {/* Center: Desktop nav links */}
@@ -129,7 +215,14 @@ const Navbar = () => {
             </button>
             <button
               type="button"
-              onClick={() => setMenuOpen(open => !open)}
+              onClick={() => {
+                if (menuOpen) {
+                  closeMenu();
+                } else {
+                  setSeasonMenuOpen(false);
+                  openMenu();
+                }
+              }}
               data-testid="burger-menu"
               className="md:hidden hamburger-menu-btn p-2 rounded-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:rounded-lg"
               aria-expanded={menuOpen}
@@ -144,28 +237,53 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-white/10 py-4 animate-fade-up">
-            <ul className="flex flex-col gap-4 mb-4">
-              {UI.nav.links.map(link => (
-                <li key={link.hash}>
-                  <Link
-                    to={{ pathname: ROUTES.HOME, hash: link.hash }}
-                    onClick={() => setMenuOpen(false)}
-                    className={navLinkClassMobile}
-                    prefetch="none"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <button type="button" onClick={handleCtaClick} className="btn-primary w-full text-center">
-              {UI.nav.cta}
-            </button>
-          </div>
-        )}
+        {/* Mobile menu в portal: иначе backdrop-blur у <nav> ломает containing block для fixed */}
+        {panelMounted &&
+          createPortal(
+            <>
+              <button
+                type="button"
+                className={[
+                  'md:hidden fixed top-16 left-0 right-0 bottom-0 z-mobileNav bg-black/50',
+                  'transition-opacity duration-mobile-nav ease-out mobile-nav-backdrop',
+                  panelEnter ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                ].join(' ')}
+                aria-label={UI.nav.mobileMenuCloseOverlay}
+                onClick={closeMenu}
+              />
+              <div
+                className={[
+                  'md:hidden fixed top-16 right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10',
+                  'bg-surface-dark/95 py-4 pl-5 pr-4 shadow-xl backdrop-blur-sm mobile-nav-panel',
+                  'w-[min(100vw,theme(maxWidth.sm))] transform transition-transform duration-mobile-nav ease-out',
+                  panelEnter ? 'translate-x-0' : 'translate-x-full',
+                ].join(' ')}
+                role="dialog"
+                aria-modal="true"
+                aria-label={UI.nav.mobileMenuDialog}
+                onTransitionEnd={handleMobilePanelTransitionEnd}
+              >
+                <ul className="flex flex-col gap-3 mb-3">
+                  {UI.nav.links.map(link => (
+                    <li key={link.hash}>
+                      <Link
+                        to={{ pathname: ROUTES.HOME, hash: link.hash }}
+                        onClick={closeMenu}
+                        className={navLinkClassMobile}
+                        prefetch="none"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <button type="button" onClick={handleCtaClick} className="btn-primary w-full text-center">
+                  {UI.nav.cta}
+                </button>
+              </div>
+            </>,
+            document.body
+          )}
       </div>
     </nav>
   );

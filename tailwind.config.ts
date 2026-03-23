@@ -15,6 +15,7 @@ const config: Config = {
     'font-heading',
     'font-brand-wordmark',
     'font-hero-carousel-phrase',
+    'text-brand-wordmark-nav',
   ],
   theme: {
     extend: {
@@ -66,6 +67,8 @@ const config: Config = {
         'section': ['clamp(1.75rem, 3vw, 2.75rem)', { lineHeight: '1.15' }],
         'card':    ['1.125rem', { lineHeight: '1.4' }],
         'tooltip': ['0.875rem', { lineHeight: '1.25' }],
+        /** Словесное лого navbar: `text-xl` (1.25rem) +15%. */
+        'brand-wordmark-nav': ['1.4375rem', { lineHeight: '2.0125rem' }],
       },
       spacing: {
         /** Совпадает с `h-16` у фиксированного Navbar — для `h-hero-viewport`. */

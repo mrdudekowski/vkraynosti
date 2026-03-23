@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -62,6 +62,15 @@ const Navbar = () => {
   const navLinkClassMobile =
     'block text-text-inverse/80 hover:text-brand-secondary transition-colors duration-hover text-base font-medium';
 
+  const handleBrandLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const isPlainHome =
+      location.pathname === ROUTES.HOME && location.search === '' && location.hash === '';
+    if (isPlainHome && window.scrollY > 0) {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-navbar bg-surface-dark/95 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,7 +80,8 @@ const Navbar = () => {
           <div className="flex items-center gap-3 shrink-0">
             <Link
               to={ROUTES.HOME}
-              className="font-brand-wordmark text-xl group transition-colors duration-hover"
+              onClick={handleBrandLogoClick}
+              className="font-brand-wordmark text-brand-wordmark-nav group transition-colors duration-hover"
               prefetch="none"
             >
               <span

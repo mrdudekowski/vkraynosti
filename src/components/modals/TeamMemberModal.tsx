@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import type { TeamMember } from '../../types';
-import { useModal } from '../../context/ModalContext';
+import { useModal } from '../../context/useModal';
 import { UI } from '../../constants/ui';
 import PlaceholderImage from '../shared/PlaceholderImage';
 
@@ -93,14 +93,14 @@ const TeamMemberModal = ({ member }: TeamMemberModalProps) => {
           </div>
 
           <div className="p-8 overflow-y-auto">
-            <h2 className="font-heading text-2xl font-bold text-text-primary mb-1">
+            <h2 className="font-heading text-2xl font-normal text-text-primary mb-1">
               {member.name}
             </h2>
             <p className="text-brand-primary font-medium mb-4">{member.role}</p>
             <p className="text-text-muted text-sm leading-relaxed mb-6">{member.bio}</p>
 
             <div className="mb-4">
-              <h4 className="font-semibold text-text-primary text-sm mb-2">
+              <h4 className="font-normal text-text-primary text-sm mb-2">
                 {UI.teamModal.specialtiesHeading}
               </h4>
               <ul className="flex flex-col gap-1">

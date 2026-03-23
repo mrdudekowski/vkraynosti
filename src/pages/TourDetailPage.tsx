@@ -18,11 +18,11 @@ const TourDetailPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-heading text-section font-bold text-text-primary mb-4">
+          <h1 className="font-heading text-section font-normal text-text-primary mb-4">
             {UI.tourDetail.notFound}
           </h1>
           <p className="text-text-muted mb-6">{notFoundBody}</p>
-          <Link to={ROUTES.HOME} className="btn-primary">
+          <Link to={ROUTES.HOME} className="btn-primary" prefetch="none">
             {UI.tourDetail.homeLink}
           </Link>
         </div>
@@ -46,17 +46,24 @@ const TourDetailPage = () => {
       />
       {/* Hero */}
       <div className="relative h-96">
-        <PlaceholderImage src={tour.imageUrl} alt={tour.title} className="w-full h-full" />
+        <PlaceholderImage
+          src={tour.imageUrl}
+          alt={tour.title}
+          className="w-full h-full"
+          loading="eager"
+          fetchPriority="high"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <Link
             to={SEASON_TO_LIST_ROUTE[tour.season]}
             className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-4 transition-colors duration-hover"
+            prefetch="intent"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
             {seasonInfo.emoji} {seasonInfo.label}
           </Link>
-          <h1 className="font-heading text-section font-bold text-white">{tour.title}</h1>
+          <h1 className="font-heading text-section font-normal text-white">{tour.title}</h1>
           <p className="text-white/80 mt-1">{tour.subtitle}</p>
         </div>
       </div>
@@ -91,13 +98,13 @@ const TourDetailPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
-            <h2 className="font-heading text-2xl font-semibold text-text-primary mb-4">
+            <h2 className="font-heading text-2xl font-normal text-text-primary mb-4">
               {UI.tourDetail.about}
             </h2>
             <p className="text-text-muted leading-relaxed mb-8">{tour.description}</p>
 
             {/* Gallery */}
-            <h2 className="font-heading text-2xl font-semibold text-text-primary mb-4">
+            <h2 className="font-heading text-2xl font-normal text-text-primary mb-4">
               {UI.tourDetail.gallery}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -107,6 +114,8 @@ const TourDetailPage = () => {
                     src={img}
                     alt={`${tour.title} — фото ${idx + 1}`}
                     className="w-full h-full"
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={idx === 0 ? 'high' : undefined}
                   />
                 </div>
               ))}
@@ -116,7 +125,7 @@ const TourDetailPage = () => {
           {/* Highlights */}
           <div>
             <div className="bg-surface-light rounded-card p-card-p sticky top-24">
-              <h3 className="font-heading font-semibold text-text-primary mb-4">
+              <h3 className="font-heading font-normal text-text-primary mb-4">
                 {UI.tourDetail.highlights}
               </h3>
               <ul className="flex flex-col gap-3">

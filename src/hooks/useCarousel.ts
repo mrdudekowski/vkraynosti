@@ -3,14 +3,16 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 interface UseCarouselOptions {
   total: number;
   autoplayMs?: number;
-  resetKey?: string;
 }
 
-export const useCarousel = ({ total, autoplayMs = 0, resetKey }: UseCarouselOptions) => {
+export const useCarousel = ({ total, autoplayMs = 0 }: UseCarouselOptions) => {
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const totalRef = useRef(total);
-  totalRef.current = total;
+
+  useEffect(() => {
+    totalRef.current = total;
+  }, [total]);
 
   const clearAutoplay = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -48,13 +50,9 @@ export const useCarousel = ({ total, autoplayMs = 0, resetKey }: UseCarouselOpti
   );
 
   useEffect(() => {
-    setCurrent(0);
-  }, [resetKey]);
-
-  useEffect(() => {
     startAutoplayInterval();
     return () => clearAutoplay();
-  }, [startAutoplayInterval, resetKey]);
+  }, [startAutoplayInterval, clearAutoplay]);
 
   return { current, next, prev, goTo };
 };

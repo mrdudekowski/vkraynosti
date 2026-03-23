@@ -4,6 +4,7 @@ import { UI } from '../../constants/ui';
 import { IMAGES } from '../../constants/images';
 import Breadcrumbs from '../shared/Breadcrumbs';
 import PageMeta from '../shared/PageMeta';
+import RevealBox from '../shared/RevealBox';
 import type { Season } from '../../types';
 import { SEASON_PAGE_BG_CLASS } from '../../constants/seasonTheme';
 
@@ -40,11 +41,11 @@ const SeasonPageLayout = ({
       >
         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-8 pb-8">
           <p className="text-4xl mb-2">{season.emoji}</p>
-          <h1 className="font-heading text-section font-bold text-white">{season.label}</h1>
+          <h1 className="font-heading text-section font-normal text-white">{season.label}</h1>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <RevealBox as="div" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <Breadcrumbs
           className="mb-8"
           items={[
@@ -55,7 +56,7 @@ const SeasonPageLayout = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {children}
         </div>
-      </div>
+      </RevealBox>
     </div>
   );
 };

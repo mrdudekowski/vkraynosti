@@ -13,8 +13,8 @@ const FallPage = () => {
       metaDescription="Осень в России: золото лиственниц Алтая, грибные леса Карелии, горные сёла Кавказа. Самое живописное время года для походов."
       metaPath={ROUTES.FALL}
     >
-      {tours.map(tour => (
-        <TourCard key={tour.id} tour={tour} />
+      {tours.map((tour, index) => (
+        <TourCard key={tour.id} tour={tour} priorityImage={index === 0} />
       ))}
     </SeasonPageLayout>
   );

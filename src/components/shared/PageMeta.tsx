@@ -6,10 +6,15 @@ interface PageMetaProps {
   description: string;
   imageUrl?: string;
   path: string;
+  /** LCP: первый кадр героя / главное изображение страницы. */
+  preloadHeroImageUrl?: string;
 }
 
-const PageMeta = ({ title, description, imageUrl, path }: PageMetaProps) => (
+const PageMeta = ({ title, description, imageUrl, path, preloadHeroImageUrl }: PageMetaProps) => (
   <Helmet>
+    {preloadHeroImageUrl ? (
+      <link rel="preload" as="image" href={preloadHeroImageUrl} fetchPriority="high" />
+    ) : null}
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />

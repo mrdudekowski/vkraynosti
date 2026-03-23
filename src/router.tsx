@@ -1,15 +1,17 @@
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { ROUTES } from './constants/routes';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
-import WinterPage from './pages/seasons/WinterPage';
-import SpringPage from './pages/seasons/SpringPage';
-import SummerPage from './pages/seasons/SummerPage';
-import FallPage from './pages/seasons/FallPage';
-import TourDetailPage from './pages/TourDetailPage';
-import SafetyPage from './pages/SafetyPage';
-import PrivacyPage from './pages/PrivacyPage';
-import NotFoundPage from './pages/NotFoundPage';
+
+const WinterPage = lazy(() => import('./pages/seasons/WinterPage'));
+const SpringPage = lazy(() => import('./pages/seasons/SpringPage'));
+const SummerPage = lazy(() => import('./pages/seasons/SummerPage'));
+const FallPage = lazy(() => import('./pages/seasons/FallPage'));
+const TourDetailPage = lazy(() => import('./pages/TourDetailPage'));
+const SafetyPage = lazy(() => import('./pages/SafetyPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 export const router = createBrowserRouter(
   [

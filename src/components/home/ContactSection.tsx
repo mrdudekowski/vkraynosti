@@ -6,7 +6,7 @@ import { CONTACTS } from '../../constants/contacts';
 
 
 const ContactSection = () => (
-  <section id="contact" className="py-section-y bg-surface-dark text-text-inverse">
+  <section id="contact" className="py-section-y text-text-inverse">
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 className="section-title text-text-inverse mb-4">{UI.sections.contact}</h2>
         <p className="text-text-inverse/60 mb-12 text-lg">

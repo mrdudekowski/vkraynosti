@@ -9,7 +9,7 @@ import { NAV_STATE_SKIP_SCROLL_TO_TOP } from '../../constants/navigation';
 import { ROUTES, SEASON_TO_LIST_ROUTE } from '../../constants/routes';
 import { UI } from '../../constants/ui';
 import type { Season } from '../../types';
-import { useSeason } from '../../context/SeasonContext';
+import { useSeason } from '../../context/useSeason';
 
 // TODO: Replace these placeholder FA icons with more expressive season SVGs or
 //       a custom icon set that better captures the mood of each season.

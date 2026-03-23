@@ -1,6 +1,6 @@
 /**
  * Единственный источник размеров подписи-фразы в HeroCarousel.
- * Гарнитура этой строки: `font-hero-carousel-phrase` (WDXL). Заголовки — `font-heading` (Geologica). Вордмарк в навбаре/герое — `font-brand-wordmark` (Dela Gothic One). Всё в `src/constants/fonts.ts` + `bootstrap-fonts.ts`.
+ * Фраза тура в Hero: `font-hero-carousel-phrase` + `font-medium` (Nord 500). Заголовки — `font-heading` (Nord 400). Блок заголовка героя (документ + подпись): `font-heading` + `font-bold` (Nord 700). Лого в navbar — `font-brand-wordmark` (Dela Gothic One). Размеры фразы — ниже. Загрузка: `src/constants/fonts.ts`, `index.css` (@font-face Nord), `bootstrap-fonts.ts` (Google).
  * Размер задаётся через style в компоненте — так он не теряется из‑за порядка/конфликтов утилит `text-*` в CSS.
  */
 export const heroCarouselPhraseTypography = {

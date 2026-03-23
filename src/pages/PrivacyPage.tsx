@@ -17,10 +17,11 @@ const PrivacyPage = () => {
         <Link
           to={ROUTES.HOME}
           className="inline-block text-text-muted hover:text-brand-primary text-sm mb-8 transition-colors duration-hover"
+          prefetch="none"
         >
           {p.backLink}
         </Link>
-        <h1 className="font-heading text-section font-bold text-text-primary mb-6">
+        <h1 className="font-heading text-section font-normal text-text-primary mb-6">
           {p.title}
         </h1>
         <p className="text-text-muted leading-relaxed mb-8">{p.intro}</p>

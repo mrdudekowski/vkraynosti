@@ -7,7 +7,7 @@ import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
 
 const SafetySection = () => (
-  <section id="safety" className="py-section-y bg-brand-primary text-text-inverse">
+  <section id="safety" className="py-section-y text-text-inverse">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
         <h2 className="section-title text-text-inverse">{UI.sections.safety}</h2>
@@ -26,14 +26,14 @@ const SafetySection = () => (
                 className="text-brand-secondary text-xl"
               />
             </div>
-            <h3 className="font-heading font-semibold text-lg mb-2">{item.title}</h3>
+            <h3 className="font-heading font-normal text-lg mb-2">{item.title}</h3>
             <p className="text-text-inverse/70 text-sm leading-relaxed">{item.summary}</p>
           </div>
         ))}
       </div>
 
       <div className="text-center">
-        <Link to={ROUTES.SAFETY} className="btn-ghost text-text-inverse">
+        <Link to={ROUTES.SAFETY} className="btn-ghost text-text-inverse" prefetch="intent">
           {UI.sections.safety_cta}
         </Link>
       </div>

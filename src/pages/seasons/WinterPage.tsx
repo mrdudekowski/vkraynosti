@@ -13,8 +13,8 @@ const WinterPage = () => {
       metaDescription="Зимние приключения в России: ледяные пещеры Байкала, фрирайд в Хибинах, экспедиции по Алтаю. Маршруты для любого уровня подготовки."
       metaPath={ROUTES.WINTER}
     >
-      {tours.map(tour => (
-        <TourCard key={tour.id} tour={tour} />
+      {tours.map((tour, index) => (
+        <TourCard key={tour.id} tour={tour} priorityImage={index === 0} />
       ))}
     </SeasonPageLayout>
   );

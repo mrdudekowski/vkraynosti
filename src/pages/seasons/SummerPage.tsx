@@ -13,8 +13,8 @@ const SummerPage = () => {
       metaDescription="Лето в дикой природе России: вулканы Камчатки, Большая Байкальская тропа, плато Укок на Алтае, сплавы по Карелии."
       metaPath={ROUTES.SUMMER}
     >
-      {tours.map(tour => (
-        <TourCard key={tour.id} tour={tour} />
+      {tours.map((tour, index) => (
+        <TourCard key={tour.id} tour={tour} priorityImage={index === 0} />
       ))}
     </SeasonPageLayout>
   );

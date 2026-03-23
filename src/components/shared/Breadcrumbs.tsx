@@ -25,6 +25,7 @@ const Breadcrumbs = ({ items, className = '' }: BreadcrumbsProps) => (
             <Link
               to={item.to}
               className="hover:text-brand-primary transition-colors duration-hover"
+              prefetch="intent"
             >
               {item.label}
             </Link>

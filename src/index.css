@@ -1,4 +1,4 @@
-/* Веб-шрифты: `bootstrap-fonts.ts` + `src/constants/fonts.ts` (GOOGLE_FONTS_STYLESHEET_HREF). */
+/* Веб-шрифты: локальный Nord — `@font-face` в `bootstrap-fonts.ts` (URL с `BASE_URL`); Google — там же. */
 
 @tailwind base;
 @tailwind components;
@@ -28,11 +28,31 @@
   }
   .section-title {
     font-family: theme('fontFamily.heading');
-    @apply text-section font-semibold;
+    @apply text-section font-normal;
   }
   .card-base {
     @apply bg-white rounded-card shadow-md overflow-hidden
            transition-all duration-hover hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  /** Scroll-reveal: только opacity + transform (композитинг). */
+  .reveal-base {
+    @apply transition-[opacity,transform] duration-reveal ease-reveal-out;
+  }
+  .reveal-hidden {
+    @apply opacity-0 translate-y-reveal-y invisible pointer-events-none;
+  }
+  .reveal-visible {
+    @apply opacity-100 translate-y-0 visible pointer-events-auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-base {
+      transition: none !important;
+    }
+    .reveal-hidden {
+      @apply opacity-100 translate-y-0 visible pointer-events-auto;
+    }
   }
 }
 

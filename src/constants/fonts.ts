@@ -1,66 +1,51 @@
 /**
- * Единственный источник имён семей и URL загрузки веб-шрифтов (Google Fonts).
- * Не дублировать имена в tailwind.config или CSS — только отсюда.
+ * Имена семей и загрузка шрифтов.
  *
- * Заголовки: Geologica (wght 100–900, CRSV 0).
- * @see https://fonts.google.com/share?selection.family=Geologica:wght,CRSV@100..900,0
+ * Локально: Nord (Regular / Medium / Bold) — `public/fonts/` + `@font-face` в `src/index.css`.
+ * Google Fonts: Dela Gothic One (лого в navbar), Source Sans 3 (body).
  *
- * Вордмарк «Вкрайности» + заголовок героя: Dela Gothic One (`font-brand-wordmark`).
+ * При смене имён файлов Nord — обновить и этот файл (константы ниже), и блок `@font-face` в `index.css`.
  */
 
-export const FONT_FAMILY_HEADING = 'Geologica' as const;
-export const FONT_FAMILY_BRAND_WORDMARK = 'Dela Gothic One' as const;
-export const FONT_FAMILY_BODY = 'Source Sans 3' as const;
-export const FONT_FAMILY_HERO_PHRASE = 'WDXL Lubrifont TC' as const;
+export {
+  FONT_FAMILY_NORD,
+  FONT_FAMILY_BRAND_WORDMARK,
+  FONT_FAMILY_BODY,
+  TAILWIND_FONT_HEADING_CLASS,
+  fontFamilyHeadingStack,
+  fontFamilyHeroPhraseStack,
+  fontFamilyBrandWordmarkStack,
+  fontFamilyBodyStack,
+  fontFamilyMonoStack,
+} from './fontFamilyStacks';
 
-/** Tailwind: `font-heading` (не `font-display` — путаница с CSS-свойством font-display в @font-face). */
-export const TAILWIND_FONT_HEADING_CLASS = 'font-heading' as const;
+/** Файлы в `public/fonts/` (URL: `PUBLIC_ASSET_BASE` + `fonts/` + имя). */
+export const NORD_FONT_FILES = {
+  regular: 'nord_regular.ttf',
+  medium:  'nord_medium.ttf',
+  bold:    'nord_bold.ttf',
+} as const;
 
-export const fontFamilyHeadingStack: [string, ...string[]] = [
-  `"${FONT_FAMILY_HEADING}"`,
-  'system-ui',
-  'sans-serif',
-];
+const viteBase = import.meta.env.BASE_URL ?? '/';
 
-export const fontFamilyBrandWordmarkStack: [string, ...string[]] = [
-  `"${FONT_FAMILY_BRAND_WORDMARK}"`,
-  'system-ui',
-  'sans-serif',
-];
+export const PUBLIC_ASSET_BASE = viteBase.endsWith('/') ? viteBase : `${viteBase}/`;
 
-export const fontFamilyBodyStack: [string, ...string[]] = [
-  `"${FONT_FAMILY_BODY}"`,
-  'sans-serif',
-];
-
-export const fontFamilyHeroPhraseStack: [string, ...string[]] = [
-  `"${FONT_FAMILY_HERO_PHRASE}"`,
-  'Georgia',
-  'serif',
-];
-
-/** Моноширинный стек без несуществующего в проекте JetBrains Mono. */
-export const fontFamilyMonoStack: [string, ...string[]] = [
-  'ui-monospace',
-  'SFMono-Regular',
-  'Menlo',
-  'Monaco',
-  'Consolas',
-  'Liberation Mono',
-  'Courier New',
-  'monospace',
-];
+/** Абсолютные URL файлов Nord для `@font-face` и preload (подкаталог деплоя). */
+export const NORD_FONT_URLS = {
+  regular: `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.regular}`,
+  medium:  `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.medium}`,
+  bold:    `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.bold}`,
+} as const;
 
 const GOOGLE_FONTS_CSS2 = 'https://fonts.googleapis.com/css2';
 
-/** Один запрос: Geologica + Dela Gothic One + Source Sans 3 + WDXL. */
+/** Только веб-шрифты с Google (Nord — локально в `public/fonts`). */
+/** 400/500/600 — под `font-normal` / `font-medium` / `font-semibold` у body (Source Sans 3). */
 export const GOOGLE_FONTS_STYLESHEET_HREF =
   `${GOOGLE_FONTS_CSS2}?` +
   [
-    'family=Geologica:wght,CRSV@100..900,0',
     'family=Dela+Gothic+One',
-    'family=Source+Sans+3:wght@300;400;600',
-    'family=WDXL+Lubrifont+TC',
+    'family=Source+Sans+3:wght@400;500;600',
     'display=swap',
   ].join('&');
 

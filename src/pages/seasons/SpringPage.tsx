@@ -13,8 +13,8 @@ const SpringPage = () => {
       metaDescription="Весна в России: цветение маральника на Алтае, вулканы Камчатки, ледоход на Байкале. Маршруты на любой уровень от лёгких до сложных."
       metaPath={ROUTES.SPRING}
     >
-      {tours.map(tour => (
-        <TourCard key={tour.id} tour={tour} />
+      {tours.map((tour, index) => (
+        <TourCard key={tour.id} tour={tour} priorityImage={index === 0} />
       ))}
     </SeasonPageLayout>
   );

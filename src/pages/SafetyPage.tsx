@@ -12,7 +12,7 @@ import winterSafety from '../data/safety/winter.json';
 import springSafety from '../data/safety/spring.json';
 import summerSafety from '../data/safety/summer.json';
 import fallSafety from '../data/safety/fall.json';
-import { useSeason } from '../context/SeasonContext';
+import { useSeason } from '../context/useSeason';
 import type { Season } from '../types';
 
 type SafetyOverrides = {
@@ -70,6 +70,7 @@ const SafetyPage = () => {
         <Link
           to={ROUTES.HOME}
           className="inline-flex items-center gap-2 text-text-muted hover:text-brand-primary text-sm mb-12 transition-colors duration-hover"
+          prefetch="none"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
           {UI.tourDetail.homeLink}
@@ -86,7 +87,7 @@ const SafetyPage = () => {
                   />
                 </div>
                 <div>
-                  <h2 className="font-heading text-2xl font-semibold text-text-primary mb-2">
+                  <h2 className="font-heading text-2xl font-normal text-text-primary mb-2">
                     {item.title}
                   </h2>
                   <p className="text-brand-primary font-medium text-sm mb-4">{item.summary}</p>

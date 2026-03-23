@@ -5,7 +5,7 @@ import {
   fontFamilyHeadingStack,
   fontFamilyHeroPhraseStack,
   fontFamilyMonoStack,
-} from './src/constants/fonts'
+} from './src/constants/fontFamilyStacks'
 
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
@@ -54,7 +54,7 @@ const config: Config = {
         divider: '#E5E7EB',
       },
       fontFamily: {
-        // Все стеки — `src/constants/fonts.ts`. `font-heading` (Geologica), `font-brand-wordmark` (Dela Gothic One).
+        // Стеки — `src/constants/fonts.ts`. Nord: `font-heading` / `font-hero-carousel-phrase`; лого navbar — `font-brand-wordmark` (Dela Gothic One).
         heading:               [...fontFamilyHeadingStack],
         'brand-wordmark':      [...fontFamilyBrandWordmarkStack],
         body:                  [...fontFamilyBodyStack],
@@ -68,21 +68,29 @@ const config: Config = {
         'tooltip': ['0.875rem', { lineHeight: '1.25' }],
       },
       spacing: {
+        /** Совпадает с `h-16` у фиксированного Navbar — для `h-hero-viewport`. */
+        'navbar': '4rem',
         'section-y': '6rem',
         'card-p':    '1.75rem',
         'tooltip-gap': '0.375rem',
         'tooltip-x':   '0.625rem',
         'tooltip-y':   '0.375rem',
         'hero-phrase-cta-gap': '2.5rem',
+        /** Смещение по Y для scroll-reveal (translateY). */
+        'reveal-y': '1.25rem',
       },
       // Секция «В другой сезон»: высота в 2× от базового размера (база 22rem/28rem → 44rem/56rem). Mobile-first: до md — 44rem, от md — 56rem.
       height: {
+        /** Один экран под фиксированный navbar (`main` уже с `pt-16`). */
+        'hero-viewport': 'calc(100vh - theme(spacing.navbar))',
         'season-section':    '44rem',
         'season-section-md': '56rem',
       },
       minHeight: {
         'season-section':    '44rem',
         'season-section-md': '56rem',
+        /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
+        'route-fallback':    'clamp(16rem, 55vh, 40rem)',
       },
       borderRadius: {
         'card':    '1rem',
@@ -101,6 +109,11 @@ const config: Config = {
         'modal':         '300ms',
         'hover':         '200ms',
         'season-change': '600ms',
+        /** Scroll-reveal: opacity + transform. */
+        'reveal':        '500ms',
+      },
+      transitionTimingFunction: {
+        'reveal-out': 'ease-out',
       },
       keyframes: {
         'fade-up': {

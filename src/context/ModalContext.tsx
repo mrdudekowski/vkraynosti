@@ -1,20 +1,11 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useRef,
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
 import type { ModalState, TeamMember } from '../types';
-
-interface ModalContextValue {
-  modal: ModalState;
-  openTeamModal: (member: TeamMember) => void;
-  closeModal: () => void;
-}
-
-const ModalContext = createContext<ModalContextValue | null>(null);
+import { ModalContext } from './modal-context-definition';
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [modal, setModal] = useState<ModalState>({ type: null });
@@ -42,10 +33,4 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </ModalContext.Provider>
   );
-};
-
-export const useModal = (): ModalContextValue => {
-  const ctx = useContext(ModalContext);
-  if (!ctx) throw new Error('useModal must be used within ModalProvider');
-  return ctx;
 };

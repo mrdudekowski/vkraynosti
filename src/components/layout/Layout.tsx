@@ -1,10 +1,12 @@
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import SeasonRouteSync from './SeasonRouteSync';
 import ScrollToTopOnNavigate from './ScrollToTopOnNavigate';
-import { useModal } from '../../context/ModalContext';
+import { useModal } from '../../context/useModal';
 import TeamMemberModal from '../modals/TeamMemberModal';
+import RouteFallback from '../shared/RouteFallback';
 
 const Layout = () => {
   const { modal } = useModal();
@@ -15,7 +17,9 @@ const Layout = () => {
       <ScrollToTopOnNavigate />
       <Navbar />
       <main className="flex-1 pt-16">
-        <Outlet />
+        <Suspense fallback={<RouteFallback />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
       {modal.type === 'teamMember' && modal.payload && (

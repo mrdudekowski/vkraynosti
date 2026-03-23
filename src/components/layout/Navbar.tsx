@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
-import { useSeason } from '../../context/SeasonContext';
+import { useSeason } from '../../context/useSeason';
 import SeasonSwitcher from '../shared/SeasonSwitcher';
 import type { Season } from '../../types';
 
@@ -69,10 +69,11 @@ const Navbar = () => {
             <Link
               to={ROUTES.HOME}
               className="font-brand-wordmark text-xl text-text-inverse hover:text-brand-secondary transition-colors duration-hover"
+              prefetch="none"
             >
               {UI.nav.brand}
             </Link>
-            <span className={`hidden sm:inline font-heading text-sm font-semibold ${SEASON_TEXT_CLASS[activeSeason]}`}>
+            <span className={`hidden sm:inline font-heading text-sm font-normal ${SEASON_TEXT_CLASS[activeSeason]}`}>
               {activeSeasonUi.label}
             </span>
           </div>
@@ -84,6 +85,7 @@ const Navbar = () => {
                 <Link
                   to={{ pathname: ROUTES.HOME, hash: link.hash }}
                   className={navLinkClass}
+                  prefetch="none"
                 >
                   {link.label}
                 </Link>
@@ -123,6 +125,7 @@ const Navbar = () => {
                     to={{ pathname: ROUTES.HOME, hash: link.hash }}
                     onClick={() => setMenuOpen(false)}
                     className={navLinkClassMobile}
+                    prefetch="none"
                   >
                     {link.label}
                   </Link>

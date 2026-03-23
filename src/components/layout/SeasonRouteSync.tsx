@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import { useSeason } from '../../context/SeasonContext';
+import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
 
 const isSeason = (value: string): value is Season =>

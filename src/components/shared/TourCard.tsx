@@ -9,20 +9,24 @@ interface TourCardProps {
   tour: Tour;
   onClick?: () => void;
   compact?: boolean;
+  /** Первый ряд сетки на главной — приоритет LCP. */
+  priorityImage?: boolean;
 }
 
-const cardInner = (tour: Tour, compact: boolean) => (
+const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => (
   <>
     <div className={compact ? 'h-32' : 'h-48'}>
       <PlaceholderImage
         src={tour.imageUrl}
         alt={tour.title}
         className="w-full h-full"
+        loading={priorityImage ? 'eager' : 'lazy'}
+        fetchPriority={priorityImage ? 'high' : undefined}
       />
     </div>
     <div className="p-card-p">
       <div className="flex items-start justify-between gap-2 mb-1">
-        <h3 className="font-heading font-semibold text-card text-text-primary leading-tight">
+        <h3 className="font-heading font-normal text-card text-text-primary leading-tight">
           {tour.title}
         </h3>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${UI.difficulty.styles[tour.difficulty]}`}>
@@ -38,14 +42,15 @@ const cardInner = (tour: Tour, compact: boolean) => (
   </>
 );
 
-const TourCard = ({ tour, onClick, compact = false }: TourCardProps) => {
+const TourCard = ({ tour, onClick, compact = false, priorityImage = false }: TourCardProps) => {
   if (!onClick) {
     return (
       <Link
         to={buildTourDetailPath(tour.season, tour.id)}
         className="card-base block cursor-pointer no-underline text-inherit"
+        prefetch="intent"
       >
-        {cardInner(tour, compact)}
+        {cardInner(tour, compact, priorityImage)}
       </Link>
     );
   }
@@ -65,7 +70,7 @@ const TourCard = ({ tour, onClick, compact = false }: TourCardProps) => {
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
-      {cardInner(tour, compact)}
+      {cardInner(tour, compact, priorityImage)}
     </div>
   );
 };

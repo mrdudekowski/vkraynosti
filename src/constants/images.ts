@@ -1,11 +1,9 @@
+import { PUBLIC_ASSET_BASE } from './fonts';
+
 const BASE = 'https://placehold.co';
 
-// Vite injects the correct base path (e.g. /vkraynosti/) so public assets
-// resolve correctly in both dev and production regardless of the deploy sub-path.
-const ASSET = import.meta.env.BASE_URL;
-
 /** Папка `public/spring tours/` — пробел в URL кодируется. */
-const SPRING_TOUR_PUBLIC = `${ASSET}spring%20tours`;
+const SPRING_TOUR_PUBLIC = `${PUBLIC_ASSET_BASE}spring%20tours`;
 
 /** Обложки весенних туров в `public/spring tours/` (сейчас все `.webp`). */
 export const SPRING_TOUR_COVERS = {
@@ -23,10 +21,10 @@ export const IMAGES = {
     fall:   `${BASE}/1920x1080/C8622A/ffffff?text=Осень+·+Вкрайности`,
   },
   seasonSection: {
-    winter: `${ASSET}imagesraw/winter.png`,
-    spring: `${ASSET}imagesraw/spring.png`,
-    summer: `${ASSET}imagesraw/Summer.png`,
-    fall:   `${ASSET}imagesraw/fall.png`,
+    winter: `${PUBLIC_ASSET_BASE}imagesraw/winter.png`,
+    spring: `${PUBLIC_ASSET_BASE}imagesraw/spring.png`,
+    summer: `${PUBLIC_ASSET_BASE}imagesraw/Summer.png`,
+    fall:   `${PUBLIC_ASSET_BASE}imagesraw/fall.png`,
   },
   team: {
     placeholder: `${BASE}/400x500/1A3C2E/C8A96E?text=Эксперт`,

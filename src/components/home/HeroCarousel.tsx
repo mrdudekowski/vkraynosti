@@ -80,13 +80,10 @@ const HeroCarousel = () => {
 
   return (
     <section className="relative h-hero-viewport overflow-hidden bg-surface-dark">
-      <header className="absolute top-6 right-6 z-20 max-w-md pl-4 text-right space-y-2 animate-fade-up">
+      <header className="absolute top-6 right-6 z-20 max-w-md pl-4 text-right animate-fade-up">
         <h1 className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md">
           {UI.hero.documentTitle}
         </h1>
-        <p className="font-heading font-bold text-xl text-brand-secondary drop-shadow-md">
-          {UI.nav.brand}
-        </p>
       </header>
       <HeroCarouselSlides key={activeSeason} activeSeason={activeSeason} />
     </section>

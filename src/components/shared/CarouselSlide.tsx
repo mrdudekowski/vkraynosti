@@ -22,7 +22,7 @@ const CarouselSlide = ({ backgroundUrl, isActive, children }: CarouselSlideProps
     inert={!isActive}
   >
     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
-    <div className="relative z-10 h-full flex flex-col items-center justify-center text-text-inverse px-4">
+    <div className="relative z-10 h-full flex flex-col items-center justify-end text-text-inverse px-4">
       {children}
     </div>
   </div>

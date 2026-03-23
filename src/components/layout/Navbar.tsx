@@ -23,6 +23,9 @@ const Navbar = () => {
   const isHome = location.pathname === ROUTES.HOME;
   const { activeSeason } = useSeason();
   const activeSeasonUi = UI.seasons[activeSeason];
+  const brandWordmark = UI.nav.brand;
+  const brandFirstLetter = brandWordmark.slice(0, 1);
+  const brandRest = brandWordmark.slice(1);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -68,10 +71,17 @@ const Navbar = () => {
           <div className="flex items-center gap-3 shrink-0">
             <Link
               to={ROUTES.HOME}
-              className="font-brand-wordmark text-xl text-text-inverse hover:text-brand-secondary transition-colors duration-hover"
+              className="font-brand-wordmark text-xl group transition-colors duration-hover"
               prefetch="none"
             >
-              {UI.nav.brand}
+              <span
+                className={`transition-colors duration-season-change group-hover:text-brand-secondary ${SEASON_TEXT_CLASS[activeSeason]}`}
+              >
+                {brandFirstLetter}
+              </span>
+              <span className="text-text-inverse transition-colors duration-hover group-hover:text-brand-secondary">
+                {brandRest}
+              </span>
             </Link>
             <span className={`hidden sm:inline font-heading text-sm font-normal ${SEASON_TEXT_CLASS[activeSeason]}`}>
               {activeSeasonUi.label}

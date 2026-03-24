@@ -100,7 +100,7 @@ const SeasonNavDock = () => {
       data-testid="season-nav-dock"
       data-expanded={open ? '' : undefined}
       className={[
-        'hidden max-[499px]:block fixed top-16 left-0 right-0 z-season-dock',
+        'block season-md:hidden fixed top-16 left-0 right-0 z-season-dock',
         'overflow-hidden will-change-transform',
         slideTransition,
         open

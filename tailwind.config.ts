@@ -10,6 +10,25 @@ import {
 /** Длительность выезда мобильного меню (синхронно с `animation.mobile-nav-*`). */
 const MOBILE_NAV_DURATION = '320ms' as const
 
+/** Согласовано с `spacing.keyframe-fade-up-y` и keyframes `fade-up`. */
+const KEYFRAME_FADE_UP_Y = '1.5rem' as const
+/** Согласовано с `spacing.keyframe-slide-in-x` и keyframes `slide-in`. */
+const KEYFRAME_SLIDE_IN_X = '-1.25rem' as const
+
+const FADE_UP_DURATION = '720ms' as const
+const SLIDE_IN_DURATION = '480ms' as const
+const SCALE_IN_DURATION = '360ms' as const
+const SEASON_FLASH_DURATION = '900ms' as const
+
+/** SVG-бургер: значения синхронны с `.hamburger-*` в `index.css` (`theme('hamburger.*')`). */
+const hamburgerTheme = {
+  stroke: '3',
+  dashCollapsed: '12 63',
+  dashExpanded: '20 300',
+  dashOffset: '-32.42',
+  rotate: '-45deg',
+} as const
+
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   safelist: [
@@ -83,8 +102,14 @@ const config: Config = {
         'tooltip-x':   '0.625rem',
         'tooltip-y':   '0.375rem',
         'hero-phrase-cta-gap': '2.5rem',
+        /** Зазор между списком ссылок (`nav-desktop:flex`) и блоком SeasonSwitcher+CTA в Navbar. */
+        'navbar-nav-to-season': 'clamp(1rem, 2vw, 2rem)',
         /** Смещение по Y для scroll-reveal (translateY). */
         'reveal-y': '1.25rem',
+        /** Keyframe `fade-up`: см. `KEYFRAME_FADE_UP_Y` в `tailwind.config.ts`. */
+        'keyframe-fade-up-y': KEYFRAME_FADE_UP_Y,
+        /** Keyframe `slide-in`: см. `KEYFRAME_SLIDE_IN_X` в `tailwind.config.ts`. */
+        'keyframe-slide-in-x': KEYFRAME_SLIDE_IN_X,
       },
       // Секция «В другой сезон»: высота в 2× от базового размера (база 22rem/28rem → 44rem/56rem). Mobile-first: до md — 44rem, от md — 56rem.
       height: {
@@ -154,13 +179,14 @@ const config: Config = {
         /** Иконка меню (SVG stroke-dash): Material standard easing. */
         standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
+      hamburger: hamburgerTheme,
       keyframes: {
         'fade-up': {
-          '0%':   { opacity: '0', transform: 'translateY(24px)' },
+          '0%':   { opacity: '0', transform: `translateY(${KEYFRAME_FADE_UP_Y})` },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'slide-in': {
-          '0%':   { opacity: '0', transform: 'translateX(-20px)' },
+          '0%':   { opacity: '0', transform: `translateX(${KEYFRAME_SLIDE_IN_X})` },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         'scale-in': {
@@ -186,11 +212,11 @@ const config: Config = {
         },
       },
       animation: {
-        'fade-up':  'fade-up 0.72s ease forwards',
-        'slide-in': 'slide-in 0.48s ease forwards',
-        'scale-in': 'scale-in 0.36s ease forwards',
+        'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
+        'slide-in': `slide-in ${SLIDE_IN_DURATION} ease forwards`,
+        'scale-in': `scale-in ${SCALE_IN_DURATION} ease forwards`,
         'bg-fade':       'bg-fade 600ms ease forwards',
-        'season-flash':  'season-flash 900ms ease-out forwards',
+        'season-flash':  `season-flash ${SEASON_FLASH_DURATION} ease-out forwards`,
         'mobile-nav-backdrop': `mobile-nav-backdrop ${MOBILE_NAV_DURATION} ease-out forwards`,
         'mobile-nav-panel':    `mobile-nav-panel ${MOBILE_NAV_DURATION} ease-out forwards`,
       },
@@ -199,8 +225,15 @@ const config: Config = {
         phone:      '375px',  // iPhone SE 2nd gen / mini class
         'phone-lg': '390px',  // iPhone 14 Pro / Pixel 6
         tablet:     '428px',  // iPhone Pro Max class
+        /**
+         * Дополняет `season-md` (min 500px): компактный dock, иконка сезона в navbar.
+         * Не дублировать как `max-[499px]` — один порог задаётся здесь и в `season-md`.
+         */
+        'season-below-md': { max: '499px' },
         /** Подпись сезона в шапке и полный `SeasonSwitcher` в строке навбара. */
         'season-md': '500px',
+        /** Ссылки Туры…Контакты, CTA в строке и бургер: ниже этого порога — мобильный режим навбара. */
+        'nav-desktop': '950px',
       },
     },
   },

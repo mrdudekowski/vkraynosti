@@ -140,7 +140,7 @@ const Navbar = () => {
             <div
               role="group"
               aria-label={`${UI.nav.seasonNavCurrentSeasonGroup}: ${activeSeasonUi.label}`}
-              className="hidden max-[499px]:inline-flex shrink-0 items-center gap-0.5"
+              className="inline-flex season-md:hidden shrink-0 items-center gap-0.5"
             >
               <span
                 aria-hidden
@@ -187,7 +187,7 @@ const Navbar = () => {
           </div>
 
           {/* Center: Desktop nav links */}
-          <ul className="hidden md:flex items-center gap-8">
+          <ul className="hidden nav-desktop:flex items-center gap-8">
             {UI.nav.links.map(link => (
               <li key={link.hash}>
                 <Link
@@ -202,14 +202,14 @@ const Navbar = () => {
           </ul>
 
           {/* Right: Season switcher (от 500px) + CTA + Hamburger */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="max-[499px]:hidden season-md:block">
+          <div className="flex items-center gap-3 shrink-0 nav-desktop:ml-navbar-nav-to-season">
+            <div className="hidden season-md:block">
               <SeasonSwitcher variant="navbar" />
             </div>
             <button
               type="button"
               onClick={handleCtaClick}
-              className="hidden md:block btn-primary text-sm"
+              className="hidden nav-desktop:block btn-primary text-sm"
             >
               {UI.nav.cta}
             </button>
@@ -224,7 +224,7 @@ const Navbar = () => {
                 }
               }}
               data-testid="burger-menu"
-              className="md:hidden hamburger-menu-btn p-2 rounded-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:rounded-lg"
+              className="nav-desktop:hidden hamburger-menu-btn p-2 rounded-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:rounded-lg"
               aria-expanded={menuOpen}
               aria-label="Меню"
             >
@@ -244,7 +244,7 @@ const Navbar = () => {
               <button
                 type="button"
                 className={[
-                  'md:hidden fixed top-16 left-0 right-0 bottom-0 z-mobileNav bg-black/50',
+                  'nav-desktop:hidden fixed top-16 left-0 right-0 bottom-0 z-mobileNav bg-black/50',
                   'transition-opacity duration-mobile-nav ease-out mobile-nav-backdrop',
                   panelEnter ? 'opacity-100' : 'opacity-0 pointer-events-none',
                 ].join(' ')}
@@ -253,7 +253,7 @@ const Navbar = () => {
               />
               <div
                 className={[
-                  'md:hidden fixed top-16 right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10',
+                  'nav-desktop:hidden fixed top-16 right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10',
                   'bg-surface-dark/95 py-4 pl-5 pr-4 shadow-xl backdrop-blur-sm mobile-nav-panel',
                   'w-[min(100vw,theme(maxWidth.sm))] transform transition-transform duration-mobile-nav ease-out',
                   panelEnter ? 'translate-x-0' : 'translate-x-full',

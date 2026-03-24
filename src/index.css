@@ -65,23 +65,23 @@
     stroke: currentColor;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-width: 3;
+    stroke-width: theme('hamburger.stroke');
     transition:
       stroke-dasharray theme('transitionDuration.carousel') theme('transitionTimingFunction.standard'),
       stroke-dashoffset theme('transitionDuration.carousel') theme('transitionTimingFunction.standard');
   }
 
   .hamburger-line-top-bottom {
-    stroke-dasharray: 12 63;
+    stroke-dasharray: theme('hamburger.dashCollapsed');
   }
 
   .hamburger-menu-btn[aria-expanded='true'] .hamburger-icon-svg {
-    transform: rotate(-45deg);
+    transform: rotate(theme('hamburger.rotate'));
   }
 
   .hamburger-menu-btn[aria-expanded='true'] .hamburger-line-top-bottom {
-    stroke-dasharray: 20 300;
-    stroke-dashoffset: -32.42;
+    stroke-dasharray: theme('hamburger.dashExpanded');
+    stroke-dashoffset: theme('hamburger.dashOffset');
   }
 
   @media (prefers-reduced-motion: reduce) {

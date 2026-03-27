@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import PlaceholderImage from '../shared/PlaceholderImage';
 import { TOUR_WINTER_1_REST4_IMAGE, TOUR_WINTER_1_TOP_IMAGE } from '../../constants/images';
 import { UI } from '../../constants/ui';
@@ -27,6 +27,8 @@ const TourDetailGallery = ({
 }: TourDetailGalleryProps) => {
   if (images.length === 0) return null;
 
+  let staggerCount = 0;
+
   /** `aspect-gallery-hero-lifted` ≈ +30% высоты к `gallery-hero` (см. tailwind). */
   const tileClassesWithWinterHeroLift = (tileClassName: string, imageSrc: string) => {
     if (imageSrc === TOUR_WINTER_1_REST4_IMAGE) {
@@ -38,17 +40,15 @@ const TourDetailGallery = ({
   const imgClassesForWinterFraming = (imageSrc: string) =>
     imageSrc === TOUR_WINTER_1_REST4_IMAGE ? 'object-gallery-winter-rest4' : '';
 
-  const renderTileButton = (
-    src: string,
-    indexInGrid: number,
-    tileClassName: string,
-    loading: 'lazy' | 'eager',
-    fetchPriority?: 'high'
-  ) => {
+  const renderTileButton = (src: string, indexInGrid: number, tileClassName: string) => {
     const idxInTour = firstImageIndexInTourGallery + indexInGrid;
     const humanN = String(idxInTour + 1);
     const resolvedTileClass = tileClassesWithWinterHeroLift(tileClassName, src);
     const imgExtra = imgClassesForWinterFraming(src);
+    const staggerIndex = staggerCount++;
+    const isFirstTile = staggerIndex === 0;
+    const deferSrcUntilVisible = !isFirstTile;
+
     return (
       <button
         key={`${src}-${indexInGrid}`}
@@ -62,8 +62,9 @@ const TourDetailGallery = ({
           alt={`${tourTitle} — фото ${humanN}`}
           className="h-full w-full"
           imgClassName={imgExtra}
-          loading={loading}
-          fetchPriority={fetchPriority}
+          loading={isFirstTile ? 'eager' : 'lazy'}
+          fetchPriority={isFirstTile ? 'high' : undefined}
+          deferSrcUntilVisible={deferSrcUntilVisible}
         />
       </button>
     );
@@ -74,12 +75,7 @@ const TourDetailGallery = ({
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-gallery-gap">
         {rest.map((src, i) =>
-          renderTileButton(
-            src,
-            indexOffset + i,
-            'aspect-square w-full',
-            i === 0 ? 'eager' : 'lazy'
-          )
+          renderTileButton(src, indexOffset + i, 'aspect-square w-full')
         )}
       </div>
     );
@@ -89,16 +85,16 @@ const TourDetailGallery = ({
   const renderIzubrinayaRestSixA = (rest: string[], indexOffset: number) => (
     <div className="flex flex-col gap-gallery-gap">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-gallery-gap">
-        {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full', 'eager')}
-        {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full', 'lazy')}
+        {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full')}
+        {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full')}
       </div>
       <div className="grid grid-cols-2 gap-gallery-gap">
-        {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full', 'lazy')}
-        {renderTileButton(rest[3], indexOffset + 3, 'aspect-square w-full', 'lazy')}
+        {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full')}
+        {renderTileButton(rest[3], indexOffset + 3, 'aspect-square w-full')}
       </div>
       <div className="grid grid-cols-2 gap-gallery-gap">
-        {renderTileButton(rest[4], indexOffset + 4, 'aspect-square w-full', 'lazy')}
-        {renderTileButton(rest[5], indexOffset + 5, 'aspect-square w-full', 'lazy')}
+        {renderTileButton(rest[4], indexOffset + 4, 'aspect-square w-full')}
+        {renderTileButton(rest[5], indexOffset + 5, 'aspect-square w-full')}
       </div>
     </div>
   );
@@ -107,15 +103,15 @@ const TourDetailGallery = ({
   const renderIzubrinayaRestSixB = (rest: string[], indexOffset: number) => (
     <div className="flex flex-col gap-gallery-gap">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-gallery-gap">
-        {renderTileButton(rest[0], indexOffset, 'aspect-square w-full', 'eager')}
-        {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full', 'lazy')}
-        {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full', 'lazy')}
+        {renderTileButton(rest[0], indexOffset, 'aspect-square w-full')}
+        {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full')}
+        {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full')}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-gallery-gap">
-        {renderTileButton(rest[3], indexOffset + 3, 'sm:col-span-2 aspect-gallery-hero w-full', 'lazy')}
-        {renderTileButton(rest[4], indexOffset + 4, 'aspect-square w-full', 'lazy')}
+        {renderTileButton(rest[3], indexOffset + 3, 'sm:col-span-2 aspect-gallery-hero w-full')}
+        {renderTileButton(rest[4], indexOffset + 4, 'aspect-square w-full')}
       </div>
-      {renderTileButton(rest[5], indexOffset + 5, 'aspect-gallery-hero w-full', 'lazy')}
+      {renderTileButton(rest[5], indexOffset + 5, 'aspect-gallery-hero w-full')}
     </div>
   );
 
@@ -129,14 +125,14 @@ const TourDetailGallery = ({
     if (n === 0) return null;
 
     if (n === 1) {
-      return renderTileButton(rest[0], indexOffset, 'aspect-gallery-hero w-full', 'eager');
+      return renderTileButton(rest[0], indexOffset, 'aspect-gallery-hero w-full');
     }
 
     if (n === 2) {
       return (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-gallery-gap">
-          {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full', 'eager')}
-          {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full', 'lazy')}
+          {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full')}
+          {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full')}
         </div>
       );
     }
@@ -145,10 +141,10 @@ const TourDetailGallery = ({
       return (
         <div className="flex flex-col gap-gallery-gap">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-gallery-gap">
-            {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full', 'eager')}
-            {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full', 'lazy')}
+            {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full')}
+            {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full')}
           </div>
-          {renderTileButton(rest[2], indexOffset + 2, 'aspect-gallery-hero w-full', 'lazy')}
+          {renderTileButton(rest[2], indexOffset + 2, 'aspect-gallery-hero w-full')}
         </div>
       );
     }
@@ -162,27 +158,26 @@ const TourDetailGallery = ({
               {renderTileButton(
                 rest[0],
                 indexOffset,
-                'w-full max-w-md sm:max-w-lg aspect-gallery-portrait mx-auto shrink-0',
-                'eager'
+                'w-full max-w-md sm:max-w-lg aspect-gallery-portrait mx-auto shrink-0'
               )}
             </div>
             <div className="grid grid-cols-2 gap-gallery-gap">
-              {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full', 'lazy')}
-              {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full', 'lazy')}
+              {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full')}
+              {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full')}
             </div>
-            {renderTileButton(rest[3], indexOffset + 3, 'aspect-gallery-hero w-full', 'lazy')}
+            {renderTileButton(rest[3], indexOffset + 3, 'aspect-gallery-hero w-full')}
           </div>
         );
       }
       return (
         <div className="flex flex-col gap-gallery-gap">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-gallery-gap">
-            {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full', 'eager')}
-            {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full', 'lazy')}
+            {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full')}
+            {renderTileButton(rest[1], indexOffset + 1, 'aspect-square w-full')}
           </div>
           <div className="grid grid-cols-2 gap-gallery-gap">
-            {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full', 'lazy')}
-            {renderTileButton(rest[3], indexOffset + 3, 'aspect-square w-full', 'lazy')}
+            {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full')}
+            {renderTileButton(rest[3], indexOffset + 3, 'aspect-square w-full')}
           </div>
         </div>
       );
@@ -195,21 +190,20 @@ const TourDetailGallery = ({
           <div
             className={`grid grid-cols-1 sm:grid-cols-3 gap-gallery-gap${firstRowTopStretch ? ' sm:items-stretch' : ''}`}
           >
-            {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full', 'eager')}
+            {renderTileButton(rest[0], indexOffset, 'sm:col-span-2 aspect-gallery-hero w-full')}
             {renderTileButton(
               rest[1],
               indexOffset + 1,
               firstRowTopStretch
                 ? 'sm:col-span-1 min-h-0 h-full w-full sm:aspect-auto sm:self-stretch aspect-gallery-portrait'
-                : 'aspect-square w-full',
-              'lazy'
+                : 'aspect-square w-full'
             )}
           </div>
           <div className="grid grid-cols-2 gap-gallery-gap">
-            {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full', 'lazy')}
-            {renderTileButton(rest[3], indexOffset + 3, 'aspect-square w-full', 'lazy')}
+            {renderTileButton(rest[2], indexOffset + 2, 'aspect-square w-full')}
+            {renderTileButton(rest[3], indexOffset + 3, 'aspect-square w-full')}
           </div>
-          {renderTileButton(rest[4], indexOffset + 4, 'aspect-gallery-hero w-full', 'lazy')}
+          {renderTileButton(rest[4], indexOffset + 4, 'aspect-gallery-hero w-full')}
         </div>
       );
     }
@@ -233,33 +227,26 @@ const TourDetailGallery = ({
   if (layoutVariant === 'izubrinaya') {
     return (
       <div className="flex flex-col gap-gallery-gap">
-        {renderTileButton(
-          images[0],
-          0,
-          'aspect-gallery-portrait w-full',
-          'eager',
-          'high'
-        )}
+        {renderTileButton(images[0], 0, 'aspect-gallery-portrait w-full')}
 
         {images.length >= 4 && (
           <div className="grid grid-cols-2 gap-gallery-gap">
             {renderTileButton(
               images[1],
               1,
-              'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full',
-              'eager'
+              'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full'
             )}
-            {renderTileButton(images[2], 2, 'col-start-2 row-start-1 aspect-square w-full', 'lazy')}
-            {renderTileButton(images[3], 3, 'col-start-2 row-start-2 aspect-square w-full', 'lazy')}
+            {renderTileButton(images[2], 2, 'col-start-2 row-start-1 aspect-square w-full')}
+            {renderTileButton(images[3], 3, 'col-start-2 row-start-2 aspect-square w-full')}
           </div>
         )}
 
         {images.length === 2 &&
-          renderTileButton(images[1], 1, 'aspect-gallery-hero w-full', 'eager')}
+          renderTileButton(images[1], 1, 'aspect-gallery-hero w-full')}
         {images.length === 3 && (
           <div className="grid grid-cols-2 gap-gallery-gap">
-            {renderTileButton(images[1], 1, 'aspect-square w-full', 'eager')}
-            {renderTileButton(images[2], 2, 'aspect-square w-full', 'lazy')}
+            {renderTileButton(images[1], 1, 'aspect-square w-full')}
+            {renderTileButton(images[2], 2, 'aspect-square w-full')}
           </div>
         )}
 
@@ -271,7 +258,7 @@ const TourDetailGallery = ({
   if (images.length === 1) {
     return (
       <div className="flex flex-col gap-gallery-gap">
-        {renderTileButton(images[0], 0, 'aspect-gallery-hero w-full', 'eager', 'high')}
+        {renderTileButton(images[0], 0, 'aspect-gallery-hero w-full')}
       </div>
     );
   }
@@ -281,7 +268,7 @@ const TourDetailGallery = ({
 
   return (
     <div className="flex flex-col gap-gallery-gap">
-      {renderTileButton(heroSrc, 0, 'aspect-gallery-hero w-full', 'eager', 'high')}
+      {renderTileButton(heroSrc, 0, 'aspect-gallery-hero w-full')}
       {renderRestGrid(rest, 1)}
     </div>
   );

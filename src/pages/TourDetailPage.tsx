@@ -31,6 +31,9 @@ const TourDetailPage = () => {
   const { openTourRequestModal } = useModal();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  const galleryGridImages =
+    tour && tour.galleryImages.length > 1 ? tour.galleryImages.slice(1) : [];
+
   const handleOpenTourRequest = useCallback(() => {
     if (!tour) return;
     openTourRequestModal({
@@ -67,9 +70,6 @@ const TourDetailPage = () => {
     .slice(0, 3)
     .map((s) => s.description)
     .join(", ");
-
-  const galleryGridImages =
-    tour.galleryImages.length > 1 ? tour.galleryImages.slice(1) : [];
 
   return (
     <div className={SEASON_PAGE_BG_CLASS[tour.season]}>
@@ -145,6 +145,10 @@ const TourDetailPage = () => {
                     {UI.tourDetail.about}
                   </h2>
                   <p className="text-tour-detail-prose text-text-muted max-w-prose">
+                    {tour.descriptionLeadBold != null &&
+                      tour.descriptionLeadBold.length > 0 && (
+                        <strong className="font-bold">{tour.descriptionLeadBold}</strong>
+                      )}
                     {tour.description}
                   </p>
                   <div className="mt-8 max-w-prose">

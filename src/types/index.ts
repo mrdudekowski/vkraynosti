@@ -20,7 +20,10 @@ export interface Tour {
   duration: string;
   difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert';
   price: string;
+  /** Основной текст блока «О туре». */
   description: string;
+  /** Необязательный вводной фрагмент перед `description` (жирный, напр. название с высотой). */
+  descriptionLeadBold?: string;
   program: TourProgramStep[];
   includedInPrice: TourIncludedItem[];
   imageUrl: string;

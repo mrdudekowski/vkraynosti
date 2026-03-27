@@ -20,6 +20,13 @@ const SLIDE_IN_DURATION = '480ms' as const
 const SCALE_IN_DURATION = '360ms' as const
 const SEASON_FLASH_DURATION = '900ms' as const
 
+/** CTA: зелёный sweep поверх светло-оранжевого (согласовано с `.btn-cta-tour`). */
+const CTA_SWEEP_DURATION = '400ms' as const
+const CTA_TEXT_SCALE_DURATION = '300ms' as const
+/** Появление букв «Вкрайности» + стрелки в такт `cta-sweep`. */
+const CTA_LETTER_STAGGER_MS = '32ms' as const
+const CTA_LETTER_POP_DURATION = '100ms' as const
+
 /** SVG-бургер: значения синхронны с `.hamburger-*` в `index.css` (`theme('hamburger.*')`). */
 const hamburgerTheme = {
   stroke: '3',
@@ -39,6 +46,15 @@ const config: Config = {
     'font-brand-wordmark',
     'font-hero-carousel-phrase',
     'text-brand-wordmark-nav',
+    'text-tour-detail-section',
+    'text-tour-detail-prose',
+    'text-tour-detail-hero-subtitle',
+    'text-tour-detail-program-heading',
+    'text-tour-detail-program-body',
+    'text-tour-detail-meta',
+    { pattern: /^object-tour-detail-hero-desktop$/, variants: ['lg'] },
+    /** Чтобы `@keyframes cta-letter-pop` попали в бандл (используются из `index.css`, не из утилит). */
+    'animate-cta-letter-pop',
   ],
   theme: {
     extend: {
@@ -76,6 +92,20 @@ const config: Config = {
           fall:   '#C8622A',
         },
         divider: '#E5E7EB',
+        /** Тонкая линия под заголовками «О туре» / «Что включено» (см. `.tour-detail-section-heading`). */
+        'tour-detail-heading-rule': 'color-mix(in srgb, #1A1A1A 11%, transparent)',
+        /**
+         * CTA тура (TourRequestCtaButton): тёплый абрикос на фоне сезона + фирменный зелёный sweep.
+         * fill: контраст с `text.primary` ≥ ~7:1, отделим от winter `#D6E8F5`.
+         * sweep: совпадает с `brand.primary` — единый «якорь» бренда на hover.
+         */
+        cta: {
+          fill:  '#F0A878',
+          sweep: '#1A3C2E',
+        },
+        /** Лайтбокс галереи: полупрозрачные кнопки навигации (см. `colors.surface.dark`). */
+        'lightbox-nav-arrow':       'rgba(13, 13, 13, 0.45)',
+        'lightbox-nav-arrow-hover': 'rgba(13, 13, 13, 0.62)',
       },
       fontFamily: {
         // Стеки — `src/constants/fonts.ts`. Nord: `font-heading` / `font-hero-carousel-phrase`; лого navbar — `font-brand-wordmark` (Dela Gothic One).
@@ -92,8 +122,51 @@ const config: Config = {
         'tooltip': ['0.875rem', { lineHeight: '1.25' }],
         /** Словесное лого navbar: `text-xl` (1.25rem) +15%. */
         'brand-wordmark-nav': ['1.4375rem', { lineHeight: '2.0125rem' }],
+        /** Заголовки секций «О туре» / «Что включено» на странице тура. */
+        'tour-detail-section': ['1.875rem', { lineHeight: '1.25' }],
+        /** Основной текст этих блоков (абзац и пункты списка). */
+        'tour-detail-prose': ['1.25rem', { lineHeight: '1.6' }],
+        /** Подзаголовок под заголовком тура в hero. */
+        'tour-detail-hero-subtitle': ['1.125rem', { lineHeight: '1.5' }],
+        /** Заголовок карточки «Программа тура» (сайдбар). */
+        'tour-detail-program-heading': ['1.5rem', { lineHeight: '1.25' }],
+        /** Текст шагов программы (описание этапа). */
+        'tour-detail-program-body': ['1rem', { lineHeight: '1.5' }],
+        /** Бейджи длительности / сложности / цены под hero. */
+        'tour-detail-meta': ['1rem', { lineHeight: '1.5' }],
+      },
+      letterSpacing: {
+        /** CTA: чуть уже, чем 0.3em в референсе — читаемость длинных русских подписей. */
+        cta: '0.12em',
+      },
+      aspectRatio: {
+        /** Первый ряд фотогалереи тура (широкий кадр под героем страницы). */
+        'gallery-hero': '21 / 9',
+        /**
+         * То же поле по ширине, высота блока ≈ +30% к `gallery-hero` (21/9 ÷ 1,3).
+         * Кадрирование по вертикали задаётся `object-position` (`gallery-winter-rest4`).
+         */
+        'gallery-hero-lifted': '359 / 200',
+        /** Вертикальный акцент (первый кадр «Изюбриная» и др.) — выше широкого 21:9. */
+        'gallery-portrait': '3 / 4',
+      },
+      objectPosition: {
+        /** Кадр `iz.rest4`: якорь обрезки при `object-cover` — верхняя часть кадра (лица). */
+        'gallery-winter-rest4': '50% 28%',
+        /**
+         * Hero страницы тура (lg+): вертикальный якорь `calc(36% + 100px)` (на 200px ниже прежнего `36% - 100px`).
+         */
+        'tour-detail-hero-desktop': 'center calc(36% + 100px)',
       },
       spacing: {
+        /** Зазор между ячейками сетки фотогалереи на странице тура. */
+        'gallery-gap': '0.75rem',
+        /** Между стрелками навигации и сценой в лайтбоксе галереи. */
+        'lightbox-nav-gap': 'clamp(0.5rem, 2vw, 1.25rem)',
+        /** «Воздух» между контентом и вертикальным разделителем до сайдбара (страница тура). */
+        'tour-detail-col-divider-gap': '3rem',
+        /** Высота вертикального акцента у заголовка секции галереи. */
+        'tour-gallery-heading-accent': '1.25rem',
         /** Совпадает с `h-16` у фиксированного Navbar — для `h-hero-viewport`. */
         'navbar': '4rem',
         'section-y': '6rem',
@@ -125,6 +198,8 @@ const config: Config = {
         'nav-season-icon-fixed': '1rem',
         'nav-season-icon-fluid':
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
+        /** Hero страницы тура (карусель фото + градиент под заголовок). */
+        'tour-detail-hero': 'clamp(28rem, 58vh, 48rem)',
       },
       width: {
         'nav-season-circle-fixed': '2.25rem',
@@ -137,6 +212,16 @@ const config: Config = {
       maxHeight: {
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
+        /** Полноэкранный просмотр фото в лайтбоксе галереи. */
+        'lightbox-slide': '100dvh',
+        /** Панель лайтбокса на десктопе (внутри отступов экрана). */
+        'lightbox-panel': 'min(90vh, 56rem)',
+        /** Единая «сцена» кадра: вписывание без обрезки (`object-contain`). */
+        'lightbox-stage': 'min(75vh, 52rem)',
+      },
+      maxWidth: {
+        /** Основная колонка страницы тура: как у сайтового контейнера (`max-w-7xl`), шире прежнего `5xl`. */
+        tourDetail: '80rem',
       },
       minHeight: {
         'season-section':    '44rem',
@@ -144,10 +229,19 @@ const config: Config = {
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
         'route-fallback':    'clamp(16rem, 55vh, 40rem)',
       },
+      boxShadow: {
+        /**
+         * CTA: лёгкая тень с оттенком `colors.cta.sweep` — визуальная связка с hover-заливкой.
+         * Дублирование hex намеренно (Tailwind не резолвит theme() внутри значения).
+         */
+        cta: '0 6px 22px color-mix(in srgb, #1A3C2E 18%, #0D0D0D 14%, transparent)',
+      },
       borderRadius: {
         'card':    '1rem',
         'modal':   '1.25rem',
         'tooltip': '0.3125rem',
+        /** Кнопка CTA (прямоугольная, не pill). */
+        cta: '0.3125rem',
       },
       zIndex: {
         'navbar':      '100',
@@ -173,6 +267,14 @@ const config: Config = {
         'season-dock-slide': '320ms',
         /** Мобильное меню навбара: выезд панели справа. */
         'mobile-nav': MOBILE_NAV_DURATION,
+        /** CTA: зелёный слой `::after` (sweep). */
+        'cta-sweep': CTA_SWEEP_DURATION,
+        /** CTA: лёгкий scale у подписи при hover (не dual). */
+        'cta-text': CTA_TEXT_SCALE_DURATION,
+        /** CTA dual: шаг задержки букв относительно sweep. */
+        'cta-letter-stagger': CTA_LETTER_STAGGER_MS,
+        /** CTA dual: длительность появления одной буквы/иконки. */
+        'cta-letter-pop': CTA_LETTER_POP_DURATION,
       },
       transitionTimingFunction: {
         'reveal-out': 'ease-out',
@@ -210,6 +312,15 @@ const config: Config = {
           '0%':   { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(0)' },
         },
+        'scale-up-cta': {
+          '0%':   { transform: 'scale(1)' },
+          '50%':  { transform: 'scale(0.95)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        'cta-letter-pop': {
+          '0%':   { opacity: '0', transform: 'translateY(0.15em)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -219,6 +330,8 @@ const config: Config = {
         'season-flash':  `season-flash ${SEASON_FLASH_DURATION} ease-out forwards`,
         'mobile-nav-backdrop': `mobile-nav-backdrop ${MOBILE_NAV_DURATION} ease-out forwards`,
         'mobile-nav-panel':    `mobile-nav-panel ${MOBILE_NAV_DURATION} ease-out forwards`,
+        'scale-up-cta':        `scale-up-cta ${CTA_TEXT_SCALE_DURATION} ease-in-out`,
+        'cta-letter-pop':      `cta-letter-pop ${CTA_LETTER_POP_DURATION} ease forwards`,
       },
       screens: {
         xs:         '360px',  // Small Androids

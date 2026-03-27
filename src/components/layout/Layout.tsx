@@ -8,6 +8,7 @@ import SeasonRouteSync from './SeasonRouteSync';
 import ScrollToTopOnNavigate from './ScrollToTopOnNavigate';
 import { useModal } from '../../context/useModal';
 import TeamMemberModal from '../modals/TeamMemberModal';
+import TourRequestModal from '../modals/TourRequestModal';
 import RouteFallback from '../shared/RouteFallback';
 
 const Layout = () => {
@@ -27,8 +28,11 @@ const Layout = () => {
         </Suspense>
       </main>
       <Footer />
-      {modal.type === 'teamMember' && modal.payload && (
+      {modal.type === 'teamMember' && (
         <TeamMemberModal member={modal.payload} />
+      )}
+      {modal.type === 'tourRequest' && (
+        <TourRequestModal key={modal.payload.tourId} payload={modal.payload} />
       )}
     </div>
   );

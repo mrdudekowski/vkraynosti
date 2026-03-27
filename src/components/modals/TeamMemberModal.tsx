@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -6,60 +6,22 @@ import type { TeamMember } from '../../types';
 import { useModal } from '../../context/useModal';
 import { UI } from '../../constants/ui';
 import PlaceholderImage from '../shared/PlaceholderImage';
+import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 
 interface TeamMemberModalProps {
   member: TeamMember;
 }
-
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-const getFocusableIn = (root: HTMLElement): HTMLElement[] =>
-  Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(el => {
-    const t = el.getAttribute('tabindex');
-    if (t === '-1') return false;
-    return el.offsetParent !== null || el.getClientRects().length > 0;
-  });
 
 const TeamMemberModal = ({ member }: TeamMemberModalProps) => {
   const { closeModal } = useModal();
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  useModalFocusTrap(panelRef, closeModal);
+
   useLayoutEffect(() => {
     closeBtnRef.current?.focus();
   }, [member.id]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        closeModal();
-        return;
-      }
-      if (event.key !== 'Tab' || !panelRef.current) return;
-
-      const nodes = getFocusableIn(panelRef.current);
-      if (nodes.length === 0) return;
-
-      const first = nodes[0];
-      const last = nodes[nodes.length - 1];
-      const active = document.activeElement as HTMLElement | null;
-
-      if (event.shiftKey) {
-        if (active === first || (active && !panelRef.current.contains(active))) {
-          event.preventDefault();
-          last.focus();
-        }
-      } else if (active === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener('keydown', onKeyDown, true);
-    return () => document.removeEventListener('keydown', onKeyDown, true);
-  }, [closeModal]);
 
   return createPortal(
     <>

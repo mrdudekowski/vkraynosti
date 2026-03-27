@@ -17,7 +17,10 @@ const Navbar = () => {
   const [panelEnter, setPanelEnter] = useState(false);
   const prevBodyOverflow = useRef<string | null>(null);
   const menuOpenRef = useRef(menuOpen);
-  menuOpenRef.current = menuOpen;
+
+  useEffect(() => {
+    menuOpenRef.current = menuOpen;
+  }, [menuOpen]);
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);

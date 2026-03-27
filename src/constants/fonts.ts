@@ -1,10 +1,10 @@
 /**
  * Имена семей и загрузка шрифтов.
  *
- * Локально: Nord (Regular / Medium / Bold) — `public/fonts/` + `@font-face` в `src/index.css`.
+ * Локально: Nord (Light / Regular / Medium / Bold) — `public/fonts/` + `@font-face` в `bootstrap-fonts.ts`.
  * Google Fonts: Dela Gothic One (лого в navbar), Source Sans 3 (body).
  *
- * При смене имён файлов Nord — обновить и этот файл (константы ниже), и блок `@font-face` в `index.css`.
+ * При смене имён файлов Nord — обновить и этот файл (константы ниже), и `bootstrap-fonts.ts`.
  */
 
 export {
@@ -21,6 +21,7 @@ export {
 
 /** Файлы в `public/fonts/` (URL: `PUBLIC_ASSET_BASE` + `fonts/` + имя). */
 export const NORD_FONT_FILES = {
+  light:   'nord_light.ttf',
   regular: 'nord_regular.ttf',
   medium:  'nord_medium.ttf',
   bold:    'nord_bold.ttf',
@@ -32,6 +33,7 @@ export const PUBLIC_ASSET_BASE = viteBase.endsWith('/') ? viteBase : `${viteBase
 
 /** Абсолютные URL файлов Nord для `@font-face` и preload (подкаталог деплоя). */
 export const NORD_FONT_URLS = {
+  light:   `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.light}`,
   regular: `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.regular}`,
   medium:  `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.medium}`,
   bold:    `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.bold}`,

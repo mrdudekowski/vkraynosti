@@ -1,13 +1,9 @@
-import { useState } from 'react';
 import type { MouseEvent } from 'react';
-import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { UI } from '../../constants/ui';
 import { SEASON_ICON, SEASON_ORDER, SEASON_STYLE } from '../../constants/seasonNavbarAppearance';
 import type { Season } from '../../types';
 import { useSeason } from '../../context/useSeason';
-import { navigateSeasonFromNavbar } from '../../utils/navigateSeasonFromNavbar';
 
 type SeasonSwitcherVariant = 'navbar' | 'section';
 
@@ -17,21 +13,10 @@ interface SeasonSwitcherProps {
 }
 
 const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps) => {
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
   const { activeSeason, setActiveSeason } = useSeason();
-  const [flashActive, setFlashActive] = useState(false);
-  const [flashKey, setFlashKey] = useState(0);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>, season: Season) => {
     event.preventDefault();
-    if (variant === 'navbar') {
-      if (navigateSeasonFromNavbar(navigate, pathname, season)) {
-        setFlashKey(k => k + 1);
-        setFlashActive(true);
-      }
-      return;
-    }
     if (season === activeSeason) return;
     setActiveSeason(season);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -48,14 +33,6 @@ const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps)
         className ?? '',
       ].join(' ')}
     >
-      {flashActive && createPortal(
-        <div
-          key={flashKey}
-          className="fixed inset-0 pointer-events-none z-season-flash bg-surface-light/90 animate-season-flash"
-          onAnimationEnd={() => setFlashActive(false)}
-        />,
-        document.body
-      )}
       {SEASON_ORDER.map(seasonKey => {
         const season = UI.seasons[seasonKey];
         const isActive = activeSeason === seasonKey;

@@ -5,7 +5,57 @@
 @tailwind utilities;
 
 @layer base {
-  html { scroll-behavior: smooth; }
+  /**
+   * Полоса прокрутки: тонкая, цвет бегунка = `colors.season.*` по `data-season` на `<html>`
+   * (ставит `SeasonProvider`). Работает для страницы и для `overflow-y-auto` в модалках.
+   */
+  html {
+    --scrollbar-thumb: theme('colors.season.spring');
+    --scrollbar-track: color-mix(in srgb, theme('colors.surface.light') 94%, theme('colors.divider'));
+    scroll-behavior: smooth;
+  }
+  html[data-season='winter'] {
+    --scrollbar-thumb: theme('colors.season.winter');
+  }
+  html[data-season='spring'] {
+    --scrollbar-thumb: theme('colors.season.spring');
+  }
+  html[data-season='summer'] {
+    --scrollbar-thumb: theme('colors.season.summer');
+  }
+  html[data-season='fall'] {
+    --scrollbar-thumb: theme('colors.season.fall');
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  *::-webkit-scrollbar {
+    width: theme('spacing.1.5');
+    height: theme('spacing.1.5');
+  }
+  *::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: theme('borderRadius.full');
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: theme('borderRadius.full');
+    transition: background-color theme('transitionDuration.season-change')
+      theme('transitionTimingFunction.standard');
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    filter: brightness(0.9);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *::-webkit-scrollbar-thumb {
+      transition: none;
+    }
+  }
+
   body {
     @apply font-body text-text-primary bg-surface-light;
     -webkit-font-smoothing: antialiased;
@@ -18,9 +68,239 @@
 }
 
 @layer components {
+  /** Заголовок «Фотогалерея»: линия снизу + вертикальный акцент (токены темы). */
+  .tour-gallery-section-heading {
+    @apply flex items-stretch gap-4 border-b border-divider pb-4 mb-gallery-gap;
+  }
+
+  .tour-gallery-section-heading-accent {
+    @apply hidden sm:block w-px shrink-0 self-center rounded-full bg-brand-secondary min-h-tour-gallery-heading-accent;
+  }
+
+  /**
+   * Страница тура: горизонтальный gutter как у Navbar/Footer (`px-4 sm:px-6 lg:px-8`).
+   * Внешний слой на всю ширину viewport — нужен для левого выравнивания от `xl` без «центрированного» padding.
+   */
+  .tour-detail-page-gutter {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /** Ширина колонки контента + центрирование до `xl`, с `xl` — прижатие влево внутри gutter. */
+  .tour-detail-page-measure {
+    @apply w-full max-w-tourDetail mx-auto xl:mx-0 xl:mr-auto;
+  }
+
+  /** Тело страницы тура под hero: measure + вертикальные отступы секции. */
+  .tour-detail-page-inner {
+    @apply w-full max-w-tourDetail mx-auto py-12 xl:mx-0 xl:mr-auto;
+  }
+
+  /** Основная колонка страницы тура: разделитель до сайдбара с программой (только lg+). */
+  .tour-detail-main-column {
+    @apply lg:border-r lg:border-divider lg:pr-tour-detail-col-divider-gap;
+  }
+
+  /** Крошки + бейджи: нижняя линия зонирования до основного контента. */
+  .tour-detail-page-meta-zone {
+    @apply border-b border-divider pb-8 mb-10;
+  }
+
+  /**
+   * Две колонки «О туре» + «Что включено»: с `xl` — 2×1 grid и тонкая вертикаль между колонками
+   * (`divide-tour-detail-heading-rule`; на одной колонке divide не включается).
+   */
+  .tour-detail-about-included-grid {
+    @apply grid grid-cols-1 xl:grid-cols-2 xl:gap-x-0 gap-y-10 mb-10 xl:items-start xl:divide-x xl:divide-tour-detail-heading-rule;
+  }
+
+  /** Колонка «О туре»: справа отступ к линии только от xl. */
+  .tour-detail-about-column {
+    @apply xl:pr-12;
+  }
+
+  /** Колонка «Что включено»: отступ слева от вертикали только от xl. */
+  .tour-detail-included-column {
+    @apply xl:pl-12;
+  }
+
+  /** Заголовки «О туре» и «Что включено»: тонкая линия (`colors.tour-detail-heading-rule`). */
+  .tour-detail-section-heading {
+    @apply font-heading text-tour-detail-section font-normal text-text-primary mb-4 pb-2 border-b border-tour-detail-heading-rule;
+  }
+
+  /** Карточка «Программа тура»: контур на фоне страницы. */
+  .tour-detail-program-card {
+    @apply border border-divider bg-surface-light rounded-card p-card-p sticky top-24;
+  }
+
   .btn-primary {
     @apply bg-brand-secondary text-surface-dark font-semibold px-6 py-3 rounded-full
            transition-all duration-hover hover:brightness-110 hover:scale-105 active:scale-95;
+  }
+
+  /**
+   * CTA страницы тура: абрикосовый `cta.fill` + `cta.sweep` (= brand.primary); контент над `::after`.
+   * Dual: Nord Bold (`font-heading` + `font-bold`), подписи и буквы «Вкрайности» в такт sweep.
+   */
+  .btn-cta-tour {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: theme('borderRadius.cta');
+    background-color: theme('colors.cta.fill');
+    box-shadow: theme('boxShadow.cta');
+    letter-spacing: theme('letterSpacing.cta');
+    @apply inline-flex items-center justify-center gap-3 px-6 py-3
+           text-left no-underline border-0 cursor-pointer
+           transition-shadow duration-hover ease-standard
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cta-sweep
+           focus-visible:ring-offset-2 focus-visible:ring-offset-cta-fill;
+  }
+
+  .btn-cta-tour:not(.btn-cta-tour--dual) {
+    @apply font-body font-semibold;
+  }
+
+  .btn-cta-tour::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    width: 0%;
+    height: 100%;
+    background-color: theme('colors.cta.sweep');
+    transition:
+      width theme('transitionDuration.cta-sweep') ease-in-out,
+      left theme('transitionDuration.cta-sweep') ease-in-out,
+      right theme('transitionDuration.cta-sweep') ease-in-out;
+  }
+
+  .btn-cta-tour:hover:not(:disabled):not([aria-disabled='true'])::after,
+  .btn-cta-tour:focus-visible:not(:disabled):not([aria-disabled='true'])::after {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+
+  .btn-cta-tour:not(.btn-cta-tour--dual) > * {
+    position: relative;
+    z-index: 10;
+    color: theme('colors.text.primary');
+    transition: color theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+  }
+
+  .btn-cta-tour:not(.btn-cta-tour--dual):hover:not(:disabled):not([aria-disabled='true']) > *,
+  .btn-cta-tour:not(.btn-cta-tour--dual):focus-visible:not(:disabled):not([aria-disabled='true']) > * {
+    color: theme('colors.text.inverse');
+    animation: theme('animation.scale-up-cta');
+  }
+
+  .btn-cta-tour--dual {
+    @apply font-heading font-bold;
+    --cta-letter-stagger-duration: theme('transitionDuration.cta-letter-stagger');
+    --cta-letter-pop-duration: theme('transitionDuration.cta-letter-pop');
+  }
+
+  .btn-cta-tour--dual > .btn-cta-tour__layer {
+    position: relative;
+    z-index: 1;
+    display: inline-grid;
+    place-items: center;
+    min-width: max-content;
+  }
+
+  .btn-cta-tour__default,
+  .btn-cta-tour__hover {
+    grid-area: 1 / 1;
+  }
+
+  .btn-cta-tour__default {
+    color: theme('colors.text.primary');
+    transition: opacity theme('transitionDuration.cta-sweep') ease-in-out;
+  }
+
+  .btn-cta-tour__hover {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity theme('transitionDuration.cta-sweep') ease-in-out;
+  }
+
+  .btn-cta-tour__hover-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: theme('spacing.2');
+    color: theme('colors.text.inverse');
+  }
+
+  .btn-cta-tour__letter,
+  .btn-cta-tour__arrow {
+    opacity: 0;
+  }
+
+  .btn-cta-tour__arrow {
+    @apply inline-flex shrink-0 items-center justify-center;
+  }
+
+  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__default,
+  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__default {
+    opacity: 0;
+  }
+
+  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__hover,
+  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__hover {
+    opacity: 1;
+    transition-duration: 0ms;
+  }
+
+  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
+  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow,
+  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
+  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow {
+    animation-name: cta-letter-pop;
+    animation-duration: var(--cta-letter-pop-duration);
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    animation-delay: calc(var(--cta-letter-index) * var(--cta-letter-stagger-duration));
+  }
+
+  .btn-cta-tour:disabled,
+  .btn-cta-tour[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .btn-cta-tour:disabled::after,
+  .btn-cta-tour[aria-disabled='true']::after {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-cta-tour::after {
+      transition: none;
+    }
+
+    .btn-cta-tour:hover:not(:disabled):not([aria-disabled='true'])::after,
+    .btn-cta-tour:focus-visible:not(:disabled):not([aria-disabled='true'])::after {
+      right: auto;
+      left: 0;
+      width: 100%;
+    }
+
+    .btn-cta-tour:not(.btn-cta-tour--dual):hover:not(:disabled):not([aria-disabled='true']) > *,
+    .btn-cta-tour:not(.btn-cta-tour--dual):focus-visible:not(:disabled):not([aria-disabled='true']) > * {
+      animation: none;
+    }
+
+    .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
+    .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow,
+    .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
+    .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow {
+      animation: none;
+      opacity: 1;
+    }
   }
   .btn-ghost {
     @apply border border-current px-6 py-3 rounded-full
@@ -101,6 +381,17 @@
 }
 
 @layer utilities {
+  /** Галерея тура (лайтбокс): горизонтальный скролл без видимой полосы — навигация точками и свайпом. */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
   /* Фраза тура в HeroCarousel: читаемость на светлых участках фона (цвет тени = surface.dark из темы). */
   .hero-carousel-phrase-text-shadow {
     text-shadow:

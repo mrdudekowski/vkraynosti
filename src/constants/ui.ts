@@ -96,6 +96,32 @@ export const UI = {
   modal: {
     close: 'Закрыть',
   },
+  tourRequestModal: {
+    title: 'Заявка на тур',
+    nameLabel: 'Имя',
+    nameHint: 'Как к вам обращаться?',
+    emailLabel: 'Email',
+    emailHint: 'Необязательно',
+    phoneLabel: 'Телефон',
+    /** Плейсхолдер-маска без привязки к коду страны. */
+    phonePlaceholder: '+7 (___) ___-__-__',
+    tourLabel: 'Выбранный тур',
+    questionLabel: 'Ваш вопрос',
+    questionHint: 'С каким вопросом мы можем вам помочь?',
+    privacyPrefix: 'Я согласен с ',
+    privacyLink: 'политикой конфиденциальности',
+    privacySuffix: ' и обработкой персональных данных',
+    submit: 'Отправить заявку',
+    sending: 'Отправка…',
+    success: 'Заявка отправлена. Мы свяжемся с вами.',
+    errors: {
+      nameRequired: 'Укажите имя',
+      emailInvalid: 'Некорректный email',
+      phoneRequired: 'Укажите телефон',
+      questionRequired: 'Напишите вопрос',
+      privacyRequired: 'Нужно согласие с политикой',
+    },
+  },
   difficulty: {
     labels: {
       Easy:   'Лёгкий',
@@ -113,10 +139,31 @@ export const UI = {
   tourDetail: {
     about:      'Об этом туре',
     gallery:    'Фотогалерея',
-    highlights: 'Что вас ждёт',
+    programHeading: 'Программа тура',
+    programTimeDisclaimer:
+      '*Время указано примерно и может меняться из-за погодных или иных условий',
+    includedHeading: 'Что включено в стоимость тура',
+    requestTourCta:  'Оставить заявку на тур',
+    /** Подпись при наведении на CTA заявки (буквы + стрелка в `.btn-cta-tour--dual`). */
+    requestTourCtaHoverWordmark: 'Вкрайности',
+    /** Нижний CTA страницы тура: стиль `btn-primary`, модальное окно заявки на тур. */
+    askQuestionCta: 'Уточнить про тур',
     notFound:        'Тур не найден',
     notFoundWithId:  'Тур с ID «{id}» не существует.',
     homeLink:   'На главную',
+    galleryLightbox: {
+      closeAria: 'Закрыть просмотр фотографий',
+      dialogAriaLabel: 'Галерея фотографий тура',
+      openHeroAria: 'Открыть галерею фотографий',
+      /** Подставить `{n}` — номер фото по порядку. */
+      openPhotoAria: 'Открыть фото {n} в полном размере',
+      /** Подставить `{n}` — номер слайда. */
+      slideDotAria: 'Перейти к слайду {n}',
+      /** Подставить `{current}` и `{total}` — текущий слайд и всего слайдов. */
+      slideCounter: 'Фото {current} из {total}',
+      prevSlideAria: 'Предыдущее фото',
+      nextSlideAria: 'Следующее фото',
+    },
   },
   errorFallback: {
     title:       'Что-то пошло не так',

@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import { locationStateSkipsScrollToTop } from '../../constants/navigation';
 
 const routeSignature = (pathname: string, search: string, hash: string) =>
   `${pathname}${search}${hash}`;
@@ -10,7 +9,6 @@ const routeSignature = (pathname: string, search: string, hash: string) =>
  * При первой загрузке/перезагрузке — мгновенно вверх, кроме главной с #якорем (секции в Home).
  * После смены маршрута плавно поднимает окно к верху.
  * Не срабатывает при переходе на главную с якорем (скролл к секции — в Home).
- * Не срабатывает при смене сезона из navbar (state из constants/navigation).
  */
 const ScrollToTopOnNavigate = () => {
   const location = useLocation();
@@ -30,8 +28,6 @@ const ScrollToTopOnNavigate = () => {
     }
     if (prevSignatureRef.current === signature) return;
     prevSignatureRef.current = signature;
-
-    if (locationStateSkipsScrollToTop(location.state)) return;
 
     const isHomeWithSectionHash =
       location.pathname === ROUTES.HOME && location.hash.length > 1;

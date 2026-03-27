@@ -19,6 +19,13 @@ function injectNordFontFaces(): void {
   style.textContent = `
 @font-face {
   font-family: 'Nord';
+  src: url('${NORD_FONT_URLS.light}') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nord';
   src: url('${NORD_FONT_URLS.regular}') format('truetype');
   font-weight: 400;
   font-style: normal;

@@ -5,6 +5,32 @@ const BASE = 'https://placehold.co';
 /** Папка `public/spring tours/` — пробел в URL кодируется. */
 const SPRING_TOUR_PUBLIC = `${PUBLIC_ASSET_BASE}spring%20tours`;
 
+/** Папки туров: `public/tours/{tourId}/` — обложка и галерея одного маршрута. */
+const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours`;
+
+const TOUR_WINTER_1 = `${TOURS_ASSET_BASE}/winter-1`;
+
+/** Кадр с посадкой / людьми — отдельное кадрирование в `TourDetailGallery`. */
+export const TOUR_WINTER_1_REST4_IMAGE = `${TOUR_WINTER_1}/iz.rest4.webp` as const;
+
+/** Верхний ряд рядом с панорамой — растягивание по высоте строки (`sm+`). */
+export const TOUR_WINTER_1_TOP_IMAGE = `${TOUR_WINTER_1}/iz.top.webp` as const;
+
+/** Галерея «Восхождение на Изюбриную» — [0] = обложка (iz.ava); [1] = первый кадр в сетке (iz.close); далее bento + остальные. */
+export const TOUR_WINTER_1_GALLERY = [
+  `${TOUR_WINTER_1}/iz.ava.webp`,
+  `${TOUR_WINTER_1}/iz.close.webp`,
+  `${TOUR_WINTER_1}/iz.peoplewalk.webp`,
+  `${TOUR_WINTER_1}/trees2.webp`,
+  `${TOUR_WINTER_1}/trees.webp`,
+  TOUR_WINTER_1_TOP_IMAGE,
+  `${TOUR_WINTER_1}/iz.rest2.webp`,
+  `${TOUR_WINTER_1}/iz.pan2.webp`,
+  TOUR_WINTER_1_REST4_IMAGE,
+] as const;
+
+export const TOUR_WINTER_1_COVER = TOUR_WINTER_1_GALLERY[0];
+
 /** Обложки весенних туров в `public/spring tours/` (сейчас все `.webp`). */
 export const SPRING_TOUR_COVERS = {
   'spring-1': `${SPRING_TOUR_PUBLIC}/spring-1.webp`,

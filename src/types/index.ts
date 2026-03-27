@@ -1,3 +1,16 @@
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+
+export interface TourProgramStep {
+  timeLabel: string;
+  description: string;
+}
+
+/** Пункт блока «Что включено»: текст и иконка Font Awesome (`@fortawesome/free-solid-svg-icons`). */
+export interface TourIncludedItem {
+  text: string;
+  icon: IconDefinition;
+}
+
 export interface Tour {
   id: string;
   season: 'winter' | 'spring' | 'summer' | 'fall';
@@ -8,7 +21,8 @@ export interface Tour {
   difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert';
   price: string;
   description: string;
-  highlights: string[];
+  program: TourProgramStep[];
+  includedInPrice: TourIncludedItem[];
   imageUrl: string;
   galleryImages: string[];
 }
@@ -33,9 +47,15 @@ export interface SafetyItem {
 
 export type Season = 'winter' | 'spring' | 'summer' | 'fall';
 
-export type ModalType = 'teamMember' | null;
-
-export interface ModalState {
-  type: ModalType;
-  payload?: TeamMember | null;
+/** Данные тура для формы заявки (без полного объекта Tour). */
+export interface TourRequestModalPayload {
+  tourId: string;
+  title: string;
+  subtitle?: string;
+  season?: Season;
 }
+
+export type ModalState =
+  | { type: null }
+  | { type: 'teamMember'; payload: TeamMember }
+  | { type: 'tourRequest'; payload: TourRequestModalPayload };

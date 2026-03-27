@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { UI } from '../../constants/ui';
 import {
   SEASON_ICON,
@@ -11,16 +9,10 @@ import {
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
-import { navigateSeasonFromNavbar } from '../../utils/navigateSeasonFromNavbar';
 
 const SeasonNavDock = () => {
-  const [flashActive, setFlashActive] = useState(false);
-  const [flashKey, setFlashKey] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const { activeSeason } = useSeason();
+  const { activeSeason, setActiveSeason } = useSeason();
   const { open, setOpen } = useSeasonNavMenu();
 
   const otherSeasons = SEASON_ORDER.filter(s => s !== activeSeason);
@@ -78,15 +70,9 @@ const SeasonNavDock = () => {
     }
   }, [open]);
 
-  const triggerFlash = () => {
-    setFlashKey(k => k + 1);
-    setFlashActive(true);
-  };
-
   const handleSeasonPick = (season: Season) => {
-    if (navigateSeasonFromNavbar(navigate, pathname, season)) {
-      triggerFlash();
-    }
+    setActiveSeason(season);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setOpen(false);
   };
 
@@ -96,7 +82,6 @@ const SeasonNavDock = () => {
 
   return (
     <div
-      ref={rootRef}
       data-testid="season-nav-dock"
       data-expanded={open ? '' : undefined}
       className={[
@@ -147,16 +132,6 @@ const SeasonNavDock = () => {
           })}
         </div>
       </div>
-
-      {flashActive &&
-        createPortal(
-          <div
-            key={flashKey}
-            className="fixed inset-0 pointer-events-none z-season-flash bg-surface-light/90 animate-season-flash"
-            onAnimationEnd={() => setFlashActive(false)}
-          />,
-          document.body,
-        )}
     </div>
   );
 };

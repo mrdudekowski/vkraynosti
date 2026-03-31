@@ -8,6 +8,11 @@ const e = UI.tourRequestModal.errors;
  */
 export const tourRequestFormSchema = z.object({
   name: z.string().trim().min(1, { message: e.nameRequired }),
+  preferredMessenger: z
+    .union([z.literal(''), z.enum(['whatsapp', 'telegram', 'max'])])
+    .refine((v): v is 'whatsapp' | 'telegram' | 'max' => v !== '', {
+      message: e.messengerRequired,
+    }),
   email: z
     .string()
     .transform(s => s.trim())
@@ -29,6 +34,7 @@ export type TourRequestFormInput = z.input<typeof tourRequestFormSchema>;
 
 export const defaultTourRequestFormValues: TourRequestFormInput = {
   name: '',
+  preferredMessenger: '',
   email: '',
   phone: '',
   question: '',

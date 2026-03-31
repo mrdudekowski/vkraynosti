@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLenis } from 'lenis/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UI } from '../../constants/ui';
 import {
@@ -9,9 +10,11 @@ import {
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
+import { scrollWindowToTopSmooth } from '../../constants/smoothScroll';
 
 const SeasonNavDock = () => {
   const [reducedMotion, setReducedMotion] = useState(false);
+  const lenis = useLenis();
   const { activeSeason, setActiveSeason } = useSeason();
   const { open, setOpen } = useSeasonNavMenu();
 
@@ -72,7 +75,7 @@ const SeasonNavDock = () => {
 
   const handleSeasonPick = (season: Season) => {
     setActiveSeason(season);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollWindowToTopSmooth(lenis);
     setOpen(false);
   };
 

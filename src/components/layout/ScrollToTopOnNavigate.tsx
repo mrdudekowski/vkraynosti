@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useLenis } from 'lenis/react';
 import { ROUTES } from '../../constants/routes';
+import { scrollWindowToTopImmediate, scrollWindowToTopSmooth } from '../../constants/smoothScroll';
 
 const routeSignature = (pathname: string, search: string, hash: string) =>
   `${pathname}${search}${hash}`;
@@ -12,6 +14,7 @@ const routeSignature = (pathname: string, search: string, hash: string) =>
  */
 const ScrollToTopOnNavigate = () => {
   const location = useLocation();
+  const lenis = useLenis();
   const prevSignatureRef = useRef<string | null>(null);
 
   useLayoutEffect(() => {
@@ -22,7 +25,7 @@ const ScrollToTopOnNavigate = () => {
       const isHomeWithSectionHash =
         location.pathname === ROUTES.HOME && location.hash.length > 1;
       if (!isHomeWithSectionHash) {
-        window.scrollTo(0, 0);
+        scrollWindowToTopImmediate(lenis);
       }
       return;
     }
@@ -33,8 +36,8 @@ const ScrollToTopOnNavigate = () => {
       location.pathname === ROUTES.HOME && location.hash.length > 1;
     if (isHomeWithSectionHash) return;
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [location]);
+    scrollWindowToTopSmooth(lenis);
+  }, [location, lenis]);
 
   return null;
 };

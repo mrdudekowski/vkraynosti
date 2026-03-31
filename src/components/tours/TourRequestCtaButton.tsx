@@ -15,7 +15,7 @@ function ctaLetterIndexStyle(index: number): CSSProperties {
 }
 
 /**
- * CTA заявки на тур: светло-оранжевый фон → зелёный sweep; при наведении —
+ * CTA заявки на тур: апельсиновый фон, светлый текст (`text.inverse`) → зелёный sweep; при наведении —
  * слово «Вкрайности» и стрелка появляются по буквам в такт заливке (см. `.btn-cta-tour--dual`).
  */
 const TourRequestCtaButton = ({

@@ -39,7 +39,7 @@ const TeamCarousel = () => {
   );
 
   return (
-    <section id="team" className="pt-4 pb-section-y">
+    <section id="team" className="pt-home-section-top pb-section-y">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="section-title text-text-primary">{UI.sections.team}</h2>

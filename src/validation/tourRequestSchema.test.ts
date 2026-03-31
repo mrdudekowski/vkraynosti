@@ -5,6 +5,7 @@ describe('tourRequestFormSchema', () => {
   it('rejects empty required fields', () => {
     const r = tourRequestFormSchema.safeParse({
       name: '',
+      preferredMessenger: '',
       email: '',
       phone: '',
       question: '',
@@ -16,6 +17,7 @@ describe('tourRequestFormSchema', () => {
   it('accepts valid payload without email', () => {
     const r = tourRequestFormSchema.safeParse({
       name: 'Иван',
+      preferredMessenger: 'telegram',
       email: '',
       phone: '+7 900 000-00-00',
       question: 'Когда старт?',
@@ -27,6 +29,7 @@ describe('tourRequestFormSchema', () => {
   it('rejects invalid email when provided', () => {
     const r = tourRequestFormSchema.safeParse({
       name: 'Иван',
+      preferredMessenger: 'whatsapp',
       email: 'not-an-email',
       phone: '+1',
       question: 'Вопрос',

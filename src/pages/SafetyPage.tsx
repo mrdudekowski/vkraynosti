@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react';
+import { useLenis } from 'lenis/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShieldHalved, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
@@ -14,6 +15,7 @@ import summerSafety from '../data/safety/summer.json';
 import fallSafety from '../data/safety/fall.json';
 import { useSeason } from '../context/useSeason';
 import type { Season } from '../types';
+import { scrollWindowToTopSmooth } from '../constants/smoothScroll';
 
 type SafetyOverrides = {
   id: string;
@@ -29,9 +31,11 @@ const SEASON_SAFETY_OVERRIDES: Record<Season, SafetyOverrides[]> = {
 };
 
 const SafetyPage = () => {
+  const lenis = useLenis();
+
   useLayoutEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    scrollWindowToTopSmooth(lenis);
+  }, [lenis]);
 
   const { activeSeason } = useSeason();
   const overrides = SEASON_SAFETY_OVERRIDES[activeSeason] ?? [];

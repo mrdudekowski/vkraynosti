@@ -13,35 +13,27 @@ interface PlaceholderImageProps {
   deferSrcUntilVisible?: boolean;
 }
 
-const PlaceholderImage = ({
+/** `key={src}` на уровне вызывающего не обязателен — сброс при смене `src` через remount здесь. */
+const DeferredPlaceholderImage = ({
   src,
   alt,
   className = '',
   imgClassName = '',
   loading = 'lazy',
   fetchPriority,
-  deferSrcUntilVisible = false,
-}: PlaceholderImageProps) => {
-  const [showSrc, setShowSrc] = useState(!deferSrcUntilVisible);
+}: Omit<PlaceholderImageProps, 'deferSrcUntilVisible'>) => {
+  const [showSrc, setShowSrc] = useState(() =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   const observerTargetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!deferSrcUntilVisible) {
-      setShowSrc(true);
-      return;
-    }
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setShowSrc(true);
-      return;
-    }
-    setShowSrc(false);
-  }, [src, deferSrcUntilVisible]);
-
-  useEffect(() => {
-    if (!deferSrcUntilVisible || showSrc) return;
+    if (showSrc) return;
     if (typeof IntersectionObserver === 'undefined') {
-      setShowSrc(true);
+      queueMicrotask(() => {
+        setShowSrc(true);
+      });
       return;
     }
     const el = observerTargetRef.current;
@@ -57,9 +49,9 @@ const PlaceholderImage = ({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [deferSrcUntilVisible, showSrc, src]);
+  }, [showSrc, src]);
 
-  if (deferSrcUntilVisible && !showSrc) {
+  if (!showSrc) {
     return (
       <div
         ref={observerTargetRef}
@@ -74,6 +66,40 @@ const PlaceholderImage = ({
       src={src}
       alt={alt}
       className={`object-cover ${imgClassName} ${className}`.trim()}
+      loading={loading}
+      fetchPriority={fetchPriority}
+    />
+  );
+};
+
+const PlaceholderImage = ({
+  src,
+  alt,
+  className = '',
+  imgClassName = '',
+  loading = 'lazy',
+  fetchPriority,
+  deferSrcUntilVisible = false,
+}: PlaceholderImageProps) => {
+  if (!deferSrcUntilVisible) {
+    return (
+      <img
+        src={src}
+        alt={alt}
+        className={`object-cover ${imgClassName} ${className}`.trim()}
+        loading={loading}
+        fetchPriority={fetchPriority}
+      />
+    );
+  }
+
+  return (
+    <DeferredPlaceholderImage
+      key={src}
+      src={src}
+      alt={alt}
+      className={className}
+      imgClassName={imgClassName}
       loading={loading}
       fetchPriority={fetchPriority}
     />

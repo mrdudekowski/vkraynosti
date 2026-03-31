@@ -17,7 +17,7 @@ import Breadcrumbs from "../components/shared/Breadcrumbs";
 import PageMeta from "../components/shared/PageMeta";
 import TourDetailHero from "../components/tours/TourDetailHero";
 import TourDetailGallery from "../components/tours/TourDetailGallery";
-import TourGalleryLightbox from "../components/tours/TourGalleryLightbox";
+import TourPhotoViewer from "../components/tours/TourPhotoViewer";
 import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
 import { SEASON_PAGE_BG_CLASS } from "../constants/seasonTheme";
 import { useModal } from "../context/useModal";
@@ -29,7 +29,11 @@ const TourDetailPage = () => {
   }>();
   const tour = getTourById(tourId);
   const { openTourRequestModal } = useModal();
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [photoViewer, setPhotoViewer] = useState<{
+    images: string[];
+    initialIndex: number;
+    tourTitle: string;
+  } | null>(null);
 
   const galleryGridImages =
     tour && tour.galleryImages.length > 1 ? tour.galleryImages.slice(1) : [];
@@ -87,18 +91,26 @@ const TourDetailPage = () => {
         subtitle={tour.subtitle}
         backLinkTo={SEASON_TO_LIST_ROUTE[tour.season]}
         backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
-        onOpenGallery={
-          tour.galleryImages.length > 0 ? () => setLightboxIndex(0) : undefined
+        onOpenPhoto={
+          tour.galleryImages.length > 0
+            ? () =>
+                setPhotoViewer({
+                  images: tour.galleryImages,
+                  initialIndex: 0,
+                  tourTitle: tour.title,
+                })
+            : undefined
         }
-        openGalleryAriaLabel={UI.tourDetail.galleryLightbox.openHeroAria}
+        openPhotoAriaLabel={UI.tourDetail.galleryPhoto.openHeroAria}
       />
 
-      {lightboxIndex !== null && tour.galleryImages.length > 0 && (
-        <TourGalleryLightbox
-          images={tour.galleryImages}
-          initialIndex={lightboxIndex}
-          onClose={() => setLightboxIndex(null)}
-          tourTitle={tour.title}
+      {photoViewer != null && (
+        <TourPhotoViewer
+          key={photoViewer.initialIndex}
+          images={photoViewer.images}
+          initialIndex={photoViewer.initialIndex}
+          tourTitle={photoViewer.tourTitle}
+          onClose={() => setPhotoViewer(null)}
         />
       )}
 
@@ -194,7 +206,13 @@ const TourDetailPage = () => {
                     images={galleryGridImages}
                     firstImageIndexInTourGallery={1}
                     tourTitle={tour.title}
-                    onOpenPhoto={setLightboxIndex}
+                    onOpenPhoto={(idx) =>
+                      setPhotoViewer({
+                        images: tour.galleryImages,
+                        initialIndex: idx,
+                        tourTitle: tour.title,
+                      })
+                    }
                     layoutVariant={
                       tour.id === "winter-1" ? "izubrinaya" : "default"
                     }

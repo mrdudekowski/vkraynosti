@@ -20,7 +20,7 @@ const SLIDE_IN_DURATION = '480ms' as const
 const SCALE_IN_DURATION = '360ms' as const
 const SEASON_FLASH_DURATION = '900ms' as const
 
-/** CTA: зелёный sweep поверх светло-оранжевого (согласовано с `.btn-cta-tour`). */
+/** CTA: зелёный sweep поверх апельсинового `cta.fill` (согласовано с `.btn-cta-tour`). */
 const CTA_SWEEP_DURATION = '400ms' as const
 const CTA_TEXT_SCALE_DURATION = '300ms' as const
 /** Появление букв «Вкрайности» + стрелки в такт `cta-sweep`. */
@@ -52,6 +52,7 @@ const config: Config = {
     'text-tour-detail-program-heading',
     'text-tour-detail-program-body',
     'text-tour-detail-meta',
+    'text-home-season-strip-label',
     { pattern: /^object-tour-detail-hero-desktop$/, variants: ['lg'] },
     /** Чтобы `@keyframes cta-letter-pop` попали в бандл (используются из `index.css`, не из утилит). */
     'animate-cta-letter-pop',
@@ -92,20 +93,28 @@ const config: Config = {
           fall:   '#C8622A',
         },
         divider: '#E5E7EB',
+        /** Иконки выбора мессенджера в модалке заявки (hover / выбранное состояние). */
+        messenger: {
+          whatsapp: '#25D366',
+          telegram: '#229ED9',
+          max: '#6BAEF7',
+          /** Фиолетово-синий для свечения выбранного MAX (см. `drop-shadow-messenger-max-selected`). */
+          maxGlow: '#6366F1',
+        },
         /** Тонкая линия под заголовками «О туре» / «Что включено» (см. `.tour-detail-section-heading`). */
         'tour-detail-heading-rule': 'color-mix(in srgb, #1A1A1A 11%, transparent)',
         /**
-         * CTA тура (TourRequestCtaButton): тёплый абрикос на фоне сезона + фирменный зелёный sweep.
-         * fill: контраст с `text.primary` ≥ ~7:1, отделим от winter `#D6E8F5`.
-         * sweep: совпадает с `brand.primary` — единый «якорь» бренда на hover.
+         * CTA тура (TourRequestCtaButton): насыщенный оранжевый «как апельсин» + зелёный sweep при hover/focus.
+         * Начальный текст — `text.inverse` (см. `.btn-cta-tour__default` в `index.css`).
+         * sweep: совпадает с `brand.primary`.
          */
         cta: {
-          fill:  '#F0A878',
+          fill:  '#F97316',
           sweep: '#1A3C2E',
         },
-        /** Лайтбокс галереи: полупрозрачные кнопки навигации (см. `colors.surface.dark`). */
-        'lightbox-nav-arrow':       'rgba(13, 13, 13, 0.45)',
-        'lightbox-nav-arrow-hover': 'rgba(13, 13, 13, 0.62)',
+        /** Кнопки «назад/вперёд» в полноэкранном просмотре фото (`TourPhotoViewer`). */
+        'photo-viewer-nav':       'rgba(13, 13, 13, 0.45)',
+        'photo-viewer-nav-hover': 'rgba(13, 13, 13, 0.62)',
       },
       fontFamily: {
         // Стеки — `src/constants/fonts.ts`. Nord: `font-heading` / `font-hero-carousel-phrase`; лого navbar — `font-brand-wordmark` (Dela Gothic One).
@@ -134,6 +143,8 @@ const config: Config = {
         'tour-detail-program-body': ['1rem', { lineHeight: '1.5' }],
         /** Бейджи длительности / сложности / цены под hero. */
         'tour-detail-meta': ['1rem', { lineHeight: '1.5' }],
+        /** Подпись «В другой сезон» над переключателем на главной (полоса с фоном). */
+        'home-season-strip-label': ['1.125rem', { lineHeight: '1.35', letterSpacing: '0.1em' }],
       },
       letterSpacing: {
         /** CTA: чуть уже, чем 0.3em в референсе — читаемость длинных русских подписей. */
@@ -161,14 +172,23 @@ const config: Config = {
       spacing: {
         /** Зазор между ячейками сетки фотогалереи на странице тура. */
         'gallery-gap': '0.75rem',
-        /** Между стрелками навигации и сценой в лайтбоксе галереи. */
-        'lightbox-nav-gap': 'clamp(0.5rem, 2vw, 1.25rem)',
+        /** Между стрелками и областью кадра в `TourPhotoViewer` (десктоп). */
+        'photo-viewer-nav-gap': 'clamp(0.5rem, 2vw, 1.25rem)',
         /** «Воздух» между контентом и вертикальным разделителем до сайдбара (страница тура). */
         'tour-detail-col-divider-gap': '3rem',
         /** Высота вертикального акцента у заголовка секции галереи. */
         'tour-gallery-heading-accent': '1.25rem',
         /** Совпадает с `h-16` у фиксированного Navbar — для `h-hero-viewport`. */
         'navbar': '4rem',
+        /**
+         * Home: top padding for first content in sections after hero (#tours, #team).
+         * Less than `section-y` to avoid doubling vertical rhythm with the hero.
+         */
+        'home-section-top': '4rem',
+        /** Home: gap between tours block and season switcher strip. */
+        'home-stack-gap': '2.5rem',
+        /** Home: top padding on the season background strip section. */
+        'home-season-strip-pt': '3rem',
         'section-y': '6rem',
         'card-p':    '1.75rem',
         'tooltip-gap': '0.375rem',
@@ -212,12 +232,8 @@ const config: Config = {
       maxHeight: {
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
-        /** Полноэкранный просмотр фото в лайтбоксе галереи. */
-        'lightbox-slide': '100dvh',
-        /** Панель лайтбокса на десктопе (внутри отступов экрана). */
-        'lightbox-panel': 'min(90vh, 56rem)',
-        /** Единая «сцена» кадра: вписывание без обрезки (`object-contain`). */
-        'lightbox-stage': 'min(75vh, 52rem)',
+        /** Полноэкранный просмотр фото тура (`TourPhotoViewer`, `object-contain`). */
+        'photo-viewer': 'min(90dvh, 90vh)',
       },
       maxWidth: {
         /** Основная колонка страницы тура: как у сайтового контейнера (`max-w-7xl`), шире прежнего `5xl`. */
@@ -235,6 +251,18 @@ const config: Config = {
          * Дублирование hex намеренно (Tailwind не резолвит theme() внутри значения).
          */
         cta: '0 6px 22px color-mix(in srgb, #1A3C2E 18%, #0D0D0D 14%, transparent)',
+      },
+      dropShadow: {
+        /**
+         * Компактное свечение у выбранной иконки мессенджера (после клика), от контура иконки.
+         * Цвета = `colors.messenger.*` / `messenger.maxGlow`.
+         */
+        'messenger-whatsapp-selected':
+          '0 0 4px rgba(37, 211, 102, 0.55), 0 0 10px rgba(37, 211, 102, 0.22)',
+        'messenger-telegram-selected':
+          '0 0 4px rgba(34, 158, 217, 0.55), 0 0 10px rgba(34, 158, 217, 0.22)',
+        'messenger-max-selected':
+          '0 0 4px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.2)',
       },
       borderRadius: {
         'card':    '1rem',

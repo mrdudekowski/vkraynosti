@@ -10,20 +10,23 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ModalProvider } from './context/ModalContext';
 import { SeasonProvider } from './context/SeasonContext';
 import ErrorBoundary from './components/errors/ErrorBoundary';
+import AppLenis from './components/layout/AppLenis';
 import { router } from './router';
 import './bootstrap-fonts';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary>
-      <HelmetProvider>
-        <SeasonProvider>
-          <ModalProvider>
-            <RouterProvider router={router} />
-          </ModalProvider>
-        </SeasonProvider>
-      </HelmetProvider>
-    </ErrorBoundary>
+    <AppLenis>
+      <ErrorBoundary>
+        <HelmetProvider>
+          <SeasonProvider>
+            <ModalProvider>
+              <RouterProvider router={router} />
+            </ModalProvider>
+          </SeasonProvider>
+        </HelmetProvider>
+      </ErrorBoundary>
+    </AppLenis>
   </StrictMode>
 );

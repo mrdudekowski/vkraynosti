@@ -3,8 +3,14 @@ import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLenis } from 'lenis/react';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
+import {
+  NAVBAR_SCROLL_OFFSET_PX,
+  scrollElementIntoViewAnchored,
+  scrollWindowToTopSmooth,
+} from '../../constants/smoothScroll';
 import { SEASON_ICON, SEASON_STYLE, SEASON_TEXT_CLASS } from '../../constants/seasonNavbarAppearance';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
@@ -30,6 +36,7 @@ const Navbar = () => {
   /** Все хуки до любого useEffect — иначе при Fast Refresh ломается сопоставление хуков и массив зависимостей. */
   const location = useLocation();
   const navigate = useNavigate();
+  const lenis = useLenis();
   const isHome = location.pathname === ROUTES.HOME;
   const { activeSeason } = useSeason();
   const activeSeasonUi = UI.seasons[activeSeason];
@@ -90,8 +97,8 @@ const Navbar = () => {
     closeMenu();
     if (isHome) {
       const element = document.querySelector('#tours');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (element instanceof HTMLElement) {
+        scrollElementIntoViewAnchored(lenis, element, NAVBAR_SCROLL_OFFSET_PX);
       }
       return;
     }
@@ -108,7 +115,7 @@ const Navbar = () => {
       location.pathname === ROUTES.HOME && location.search === '' && location.hash === '';
     if (isPlainHome && window.scrollY > 0) {
       event.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollWindowToTopSmooth(lenis);
     }
   };
 

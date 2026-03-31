@@ -4,6 +4,7 @@
  */
 export const TOUR_REQUEST_FORM_FIELD_KEYS = [
   'name',
+  'preferredMessenger',
   'email',
   'phone',
   'question',

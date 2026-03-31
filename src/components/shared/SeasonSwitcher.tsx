@@ -1,9 +1,11 @@
 import type { MouseEvent } from 'react';
+import { useLenis } from 'lenis/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UI } from '../../constants/ui';
 import { SEASON_ICON, SEASON_ORDER, SEASON_STYLE } from '../../constants/seasonNavbarAppearance';
 import type { Season } from '../../types';
 import { useSeason } from '../../context/useSeason';
+import { scrollWindowToTopSmooth } from '../../constants/smoothScroll';
 
 type SeasonSwitcherVariant = 'navbar' | 'section';
 
@@ -14,12 +16,13 @@ interface SeasonSwitcherProps {
 
 const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps) => {
   const { activeSeason, setActiveSeason } = useSeason();
+  const lenis = useLenis();
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>, season: Season) => {
     event.preventDefault();
     if (season === activeSeason) return;
     setActiveSeason(season);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollWindowToTopSmooth(lenis);
   };
 
   const isNavbar = variant === 'navbar';

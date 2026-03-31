@@ -59,6 +59,7 @@ describe('TourRequestModal', () => {
     await user.type(screen.getByLabelText(UI.tourRequestModal.nameLabel), 'Иван');
     await user.type(screen.getByLabelText(UI.tourRequestModal.phoneLabel), '+79991234567');
     await user.type(screen.getByLabelText(UI.tourRequestModal.questionLabel), 'Вопрос по туру');
+    await user.click(screen.getByRole('radio', { name: UI.tourRequestModal.messengerTelegramAria }));
     await user.click(screen.getByRole('checkbox'));
     await user.click(screen.getByRole('button', { name: UI.tourRequestModal.submit }));
 
@@ -74,6 +75,7 @@ describe('TourRequestModal', () => {
     expect(logged?.[1]).toMatchObject({
       tourId: 'winter-1',
       name: 'Иван',
+      preferredMessenger: 'telegram',
       question: 'Вопрос по туру',
     });
 

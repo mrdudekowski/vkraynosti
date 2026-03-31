@@ -12,7 +12,6 @@
   html {
     --scrollbar-thumb: theme('colors.season.spring');
     --scrollbar-track: color-mix(in srgb, theme('colors.surface.light') 94%, theme('colors.divider'));
-    scroll-behavior: smooth;
   }
   html[data-season='winter'] {
     --scrollbar-thumb: theme('colors.season.winter');
@@ -43,6 +42,8 @@
   *::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
     border-radius: theme('borderRadius.full');
+    /** Обводка вокруг бегунка: `surface.dark` из темы, толщина `spacing.px`. */
+    box-shadow: 0 0 0 theme('spacing.px') theme('colors.surface.dark');
     transition: background-color theme('transitionDuration.season-change')
       theme('transitionTimingFunction.standard');
   }
@@ -139,8 +140,8 @@
   }
 
   /**
-   * CTA страницы тура: абрикосовый `cta.fill` + `cta.sweep` (= brand.primary); контент над `::after`.
-   * Dual: Nord Bold (`font-heading` + `font-bold`), подписи и буквы «Вкрайности» в такт sweep.
+   * CTA страницы тура: апельсиновый `cta.fill`, начальный текст — `text.inverse` (кремовый белый: читаемо на оранжевом).
+   * `cta.sweep` при hover; dual — те же правила.
    */
   .btn-cta-tour {
     position: relative;
@@ -186,7 +187,7 @@
   .btn-cta-tour:not(.btn-cta-tour--dual) > * {
     position: relative;
     z-index: 10;
-    color: theme('colors.text.primary');
+    color: theme('colors.text.inverse');
     transition: color theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
   }
 
@@ -197,7 +198,7 @@
   }
 
   .btn-cta-tour--dual {
-    @apply font-heading font-bold;
+    @apply font-heading font-normal;
     --cta-letter-stagger-duration: theme('transitionDuration.cta-letter-stagger');
     --cta-letter-pop-duration: theme('transitionDuration.cta-letter-pop');
   }
@@ -216,7 +217,7 @@
   }
 
   .btn-cta-tour__default {
-    color: theme('colors.text.primary');
+    color: theme('colors.text.inverse');
     transition: opacity theme('transitionDuration.cta-sweep') ease-in-out;
   }
 

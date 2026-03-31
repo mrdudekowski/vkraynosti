@@ -2,6 +2,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp, faTelegram } from '@fortawesome/free-brands-svg-icons';
 import { faTimes, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import type { TourRequestModalPayload } from '../../types';
 import { useModal } from '../../context/useModal';
@@ -12,6 +13,7 @@ import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 import FormField from '../form/FormField';
 import TextInput from '../form/TextInput';
 import TextArea from '../form/TextArea';
+import MaxMessengerIcon from '../icons/MaxMessengerIcon';
 import {
   tourRequestFormSchema,
   defaultTourRequestFormValues,
@@ -149,6 +151,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                 id="tour-request-name"
                 label={UI.tourRequestModal.nameLabel}
                 hint={UI.tourRequestModal.nameHint}
+                hintBelow
                 error={fieldErrors.name}
               >
                 <TextInput
@@ -221,6 +224,87 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                   }
                 />
               </FormField>
+
+              <fieldset
+                className="flex flex-col gap-2 border-0 p-0 m-0 min-w-0"
+                aria-describedby={
+                  fieldErrors.preferredMessenger ? 'tour-request-messenger-error' : undefined
+                }
+              >
+                <legend className="text-sm font-medium text-text-primary mb-1">
+                  {UI.tourRequestModal.messengerLabel}
+                </legend>
+                <div className="flex flex-wrap gap-4">
+                  <label
+                    htmlFor="tour-request-messenger-whatsapp"
+                    className="group inline-flex cursor-pointer items-center justify-center p-1"
+                  >
+                    <input
+                      id="tour-request-messenger-whatsapp"
+                      type="radio"
+                      name="preferredMessenger"
+                      value="whatsapp"
+                      checked={values.preferredMessenger === 'whatsapp'}
+                      onChange={() => updateField('preferredMessenger', 'whatsapp')}
+                      className="peer sr-only"
+                      aria-label={UI.tourRequestModal.messengerWhatsappAria}
+                      aria-invalid={!!fieldErrors.preferredMessenger}
+                    />
+                    <FontAwesomeIcon
+                      icon={faWhatsapp}
+                      className="h-6 w-6 text-text-muted transition-[filter,colors] duration-hover drop-shadow-none peer-checked:drop-shadow-messenger-whatsapp-selected peer-checked:text-messenger-whatsapp group-hover:text-messenger-whatsapp"
+                      aria-hidden
+                    />
+                  </label>
+                  <label
+                    htmlFor="tour-request-messenger-telegram"
+                    className="group inline-flex cursor-pointer items-center justify-center p-1"
+                  >
+                    <input
+                      id="tour-request-messenger-telegram"
+                      type="radio"
+                      name="preferredMessenger"
+                      value="telegram"
+                      checked={values.preferredMessenger === 'telegram'}
+                      onChange={() => updateField('preferredMessenger', 'telegram')}
+                      className="peer sr-only"
+                      aria-label={UI.tourRequestModal.messengerTelegramAria}
+                      aria-invalid={!!fieldErrors.preferredMessenger}
+                    />
+                    <FontAwesomeIcon
+                      icon={faTelegram}
+                      className="h-6 w-6 text-text-muted transition-[filter,colors] duration-hover drop-shadow-none peer-checked:drop-shadow-messenger-telegram-selected peer-checked:text-messenger-telegram group-hover:text-messenger-telegram"
+                      aria-hidden
+                    />
+                  </label>
+                  <label
+                    htmlFor="tour-request-messenger-max"
+                    className="group inline-flex cursor-pointer items-center justify-center p-1"
+                  >
+                    <input
+                      id="tour-request-messenger-max"
+                      type="radio"
+                      name="preferredMessenger"
+                      value="max"
+                      checked={values.preferredMessenger === 'max'}
+                      onChange={() => updateField('preferredMessenger', 'max')}
+                      className="peer sr-only"
+                      aria-label={UI.tourRequestModal.messengerMaxAria}
+                      aria-invalid={!!fieldErrors.preferredMessenger}
+                    />
+                    <MaxMessengerIcon className="h-6 w-6 object-contain opacity-60 transition-[filter,opacity] duration-hover drop-shadow-none peer-checked:opacity-100 peer-checked:drop-shadow-messenger-max-selected group-hover:opacity-100" />
+                  </label>
+                </div>
+                {fieldErrors.preferredMessenger ? (
+                  <p
+                    id="tour-request-messenger-error"
+                    role="alert"
+                    className="text-tooltip text-difficulty-hard-fg"
+                  >
+                    {fieldErrors.preferredMessenger}
+                  </p>
+                ) : null}
+              </fieldset>
 
               <div className="flex flex-col gap-2">
                 <label className="flex items-start gap-3 cursor-pointer">

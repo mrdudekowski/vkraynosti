@@ -26,7 +26,9 @@ export const SeasonProvider = ({ children }: { children: ReactNode }) => {
     }
     if (prevSeasonRef.current !== activeSeason) {
       prevSeasonRef.current = activeSeason;
-      setFlashNonce(n => n + 1);
+      queueMicrotask(() => {
+        setFlashNonce(n => n + 1);
+      });
     }
   }, [activeSeason]);
 

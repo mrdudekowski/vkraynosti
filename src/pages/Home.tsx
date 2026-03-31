@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useLenis } from 'lenis/react';
 import HeroCarousel from '../components/home/HeroCarousel';
 import TeamCarousel from '../components/home/TeamCarousel';
 import SafetySection from '../components/home/SafetySection';
@@ -14,9 +15,11 @@ import { UI } from '../constants/ui';
 import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
 import { SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
+import { NAVBAR_SCROLL_OFFSET_PX, scrollElementIntoViewAnchored } from '../constants/smoothScroll';
 
 const Home = () => {
   const location = useLocation();
+  const lenis = useLenis();
   const { activeSeason } = useSeason();
   const tours = getToursBySeason(activeSeason);
 
@@ -24,8 +27,8 @@ const Home = () => {
     if (location.pathname !== ROUTES.HOME || !location.hash) return;
     const id = location.hash.slice(1);
     const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [location.pathname, location.hash]);
+    if (el) scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
+  }, [location.pathname, location.hash, lenis]);
   const seasonBgClass = SEASON_PAGE_BG_CLASS[activeSeason];
   const seasonSectionImage = IMAGES.seasonSection[activeSeason];
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
@@ -40,7 +43,7 @@ const Home = () => {
       />
       <HeroCarousel />
 
-      <section id="tours" className="relative isolate pt-section-y pb-3">
+      <section id="tours" className="relative isolate pt-home-section-top pb-home-stack-gap">
         <div
           className={`absolute inset-0 -z-10 transition-colors duration-season-change ${seasonBgClass}`}
           aria-hidden
@@ -59,7 +62,7 @@ const Home = () => {
         </RevealBox>
       </section>
 
-      <section className="relative isolate overflow-hidden min-h-season-section h-season-section md:min-h-season-section-md md:h-season-section-md pt-8">
+      <section className="relative isolate overflow-hidden min-h-season-section h-season-section md:min-h-season-section-md md:h-season-section-md pt-home-season-strip-pt">
         <div
           className={`absolute inset-0 z-0 transition-colors duration-season-change ${seasonBgClass}`}
           aria-hidden
@@ -72,8 +75,8 @@ const Home = () => {
           />
         )}
         <RevealBox as="div" className="relative z-20 h-full min-h-0">
-          <div className="pl-3 xs:pl-4 sm:pl-6 lg:pl-8 pt-2 xs:pt-3 phone:pt-4 pb-2 xs:pb-3 phone:pb-4">
-            <p className="font-heading text-sm font-normal tracking-widest uppercase text-text-inverse/80 mb-3">
+          <div className="pl-3 xs:pl-4 sm:pl-6 lg:pl-8 pt-2 xs:pt-3 phone:pt-3 pb-1 xs:pb-2 phone:pb-2">
+            <p className="font-heading text-home-season-strip-label font-normal uppercase text-text-inverse/80 mb-2">
               {UI.sections.switchSeason}
             </p>
             <SeasonSwitcher variant="section" />

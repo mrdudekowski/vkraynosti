@@ -108,6 +108,10 @@ export const UI = {
     tourLabel: 'Выбранный тур',
     questionLabel: 'Ваш вопрос',
     questionHint: 'С каким вопросом мы можем вам помочь?',
+    messengerLabel: 'В каком мессенджере вам удобнее общаться?',
+    messengerWhatsappAria: 'WhatsApp',
+    messengerTelegramAria: 'Telegram',
+    messengerMaxAria: 'MAX',
     privacyPrefix: 'Я согласен с ',
     privacyLink: 'политикой конфиденциальности',
     privacySuffix: ' и обработкой персональных данных',
@@ -119,6 +123,7 @@ export const UI = {
       emailInvalid: 'Некорректный email',
       phoneRequired: 'Укажите телефон',
       questionRequired: 'Напишите вопрос',
+      messengerRequired: 'Выберите мессенджер',
       privacyRequired: 'Нужно согласие с политикой',
     },
   },
@@ -151,18 +156,16 @@ export const UI = {
     notFound:        'Тур не найден',
     notFoundWithId:  'Тур с ID «{id}» не существует.',
     homeLink:   'На главную',
-    galleryLightbox: {
-      closeAria: 'Закрыть просмотр фотографий',
-      dialogAriaLabel: 'Галерея фотографий тура',
-      openHeroAria: 'Открыть галерею фотографий',
-      /** Подставить `{n}` — номер фото по порядку. */
-      openPhotoAria: 'Открыть фото {n} в полном размере',
-      /** Подставить `{n}` — номер слайда. */
-      slideDotAria: 'Перейти к слайду {n}',
-      /** Подставить `{current}` и `{total}` — текущий слайд и всего слайдов. */
-      slideCounter: 'Фото {current} из {total}',
-      prevSlideAria: 'Предыдущее фото',
-      nextSlideAria: 'Следующее фото',
+    /** Полноэкранный просмотр фото: клик по затемнению вне кадра закрывает просмотр. */
+    galleryPhoto: {
+      openHeroAria: 'Открыть первое фото тура',
+      /** Подставить `{n}` — номер фото по порядку на странице. */
+      openPhotoAria: 'Открыть фото {n}',
+      viewerDialogAria: 'Просмотр фотографии тура',
+      viewerPrevAria: 'Предыдущее фото',
+      viewerNextAria: 'Следующее фото',
+      /** Подставить `{current}` и `{total}`. */
+      viewerCounter: 'Фото {current} из {total}',
     },
   },
   errorFallback: {

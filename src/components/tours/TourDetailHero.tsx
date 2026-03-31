@@ -10,9 +10,9 @@ interface TourDetailHeroProps {
   subtitle: string;
   backLinkTo: string;
   backLinkLabel: string;
-  /** Открыть полноэкранную галерею с первого кадра. */
-  onOpenGallery?: () => void;
-  openGalleryAriaLabel?: string;
+  /** Первое фото галереи — полноэкранный просмотр (закрытие по клику вне кадра). */
+  onOpenPhoto?: () => void;
+  openPhotoAriaLabel?: string;
 }
 
 const TourDetailHero = ({
@@ -22,8 +22,8 @@ const TourDetailHero = ({
   subtitle,
   backLinkTo,
   backLinkLabel,
-  onOpenGallery,
-  openGalleryAriaLabel = '',
+  onOpenPhoto,
+  openPhotoAriaLabel = '',
 }: TourDetailHeroProps) => (
   <div className="relative h-tour-detail-hero overflow-hidden">
     <PlaceholderImage
@@ -34,12 +34,12 @@ const TourDetailHero = ({
       loading="eager"
       fetchPriority="high"
     />
-    {onOpenGallery && (
+    {onOpenPhoto != null && (
       <button
         type="button"
-        className="absolute inset-0 z-20 cursor-pointer bg-transparent"
-        aria-label={openGalleryAriaLabel}
-        onClick={onOpenGallery}
+        className="absolute inset-0 z-20 cursor-pointer bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+        aria-label={openPhotoAriaLabel}
+        onClick={onOpenPhoto}
       />
     )}
     <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />

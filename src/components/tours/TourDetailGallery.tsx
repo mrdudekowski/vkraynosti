@@ -11,12 +11,13 @@ export interface TourDetailGalleryProps {
   /** Индекс в полном `tour.galleryImages` для `images[0]` (обычно `1`). */
   firstImageIndexInTourGallery: number;
   tourTitle: string;
+  /** Индекс в полном `tour.galleryImages` (для полноэкранного просмотра и стрелок). */
   onOpenPhoto: (indexInFullGallery: number) => void;
   layoutVariant?: TourGalleryLayoutVariant;
 }
 
 const openAriaForHumanNumber = (humanNumber: string) =>
-  UI.tourDetail.galleryLightbox.openPhotoAria.replace('{n}', humanNumber);
+  UI.tourDetail.galleryPhoto.openPhotoAria.replace('{n}', humanNumber);
 
 const TourDetailGallery = ({
   images,
@@ -49,6 +50,8 @@ const TourDetailGallery = ({
     const isFirstTile = staggerIndex === 0;
     const deferSrcUntilVisible = !isFirstTile;
 
+    const tileAlt = `${tourTitle} — фото ${humanN}`;
+
     return (
       <button
         key={`${src}-${indexInGrid}`}
@@ -59,7 +62,7 @@ const TourDetailGallery = ({
       >
         <PlaceholderImage
           src={src}
-          alt={`${tourTitle} — фото ${humanN}`}
+          alt={tileAlt}
           className="h-full w-full"
           imgClassName={imgExtra}
           loading={isFirstTile ? 'eager' : 'lazy'}

@@ -1,9 +1,14 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
+  faBed,
+  faChalkboardTeacher,
   faCheck,
+  faHelmetSafety,
+  faHotTubPerson,
   faMugHot,
   faPersonHiking,
   faShuttleVan,
+  faSocks,
   faSnowboarding,
   faUserTie,
 } from '@fortawesome/free-solid-svg-icons';
@@ -16,7 +21,7 @@ const inc = (text: string, icon: IconDefinition = faCheck): TourIncludedItem => 
 });
 
 export const TOURS: Tour[] = [
-  // WINTER — 1 tour
+  // WINTER — 3 tours
   {
     id: 'winter-1',
     season: 'winter',
@@ -54,6 +59,134 @@ export const TOURS: Tour[] = [
     ],
     imageUrl: TOUR_WINTER_1_COVER,
     galleryImages: [...TOUR_WINTER_1_GALLERY],
+  },
+  {
+    id: 'winter-2',
+    season: 'winter',
+    title: 'Восхождение на г. Голец',
+    subtitle: 'Настоящее путешествие в зимнюю сказку!',
+    heroPhrase:
+      'Сказочный заснеженный лес и невероятные виды на Сихотэ-Алиньский хребет',
+    duration: '16,5 часов',
+    difficulty: 'Medium',
+    price: '6 500 ₽',
+    descriptionLeadBold: 'Гора Голец (1604 м)',
+    description:
+      ' — входит в десятку Приморского Барса. Путь к ней восхищает своей заснеженной сказочностью, где за каждым поворотом открываются новые красоты. Это путешествие для тех, кто ищет не просто прогулку, а настоящее зимнее приключение, где можно почувствовать себя покорителем вершины, с которой вам откроется восхитительный вид на высочайшие горы края!',
+    program: [
+      { timeLabel: '04:00', description: 'Выезд из Владивостока' },
+      { timeLabel: '10:30', description: 'Прибытие к подножию' },
+      {
+        timeLabel: '11:00–14:30',
+        description:
+          'В приятном темпе совершаем восхождение, по пути обязательно много фотографируемся и созерцаем красоту!',
+      },
+      {
+        timeLabel: '14:30–15:30',
+        description: 'Отдых на вершине, фото-, видео-фиксация нашего успеха!',
+      },
+      {
+        timeLabel: '15:30–16:30',
+        description: 'Весёлый спуск с горы на ледянках',
+      },
+      {
+        timeLabel: '16:30–17:30',
+        description: 'Горячий перекус и согревающий глинтвейн у подножья',
+      },
+      { timeLabel: '17:30–22:30', description: 'Возвращение во Владивосток' },
+    ],
+    includedInPrice: [
+      inc('Трансфер от точки сбора и обратно во Владивосток', faShuttleVan),
+      inc('Горячее питание и согревающий глинтвейн', faMugHot),
+      inc('Ледоступы/кошки (при необходимости)', faPersonHiking),
+      inc('Гамаши, чтобы ноги оставались в тепле (при необходимости)', faSocks),
+      inc('Ледянки/хобы для весёлой прокатки', faSnowboarding),
+      inc('Гид-проводник и захватывающие истории о крае и местности', faUserTie),
+    ],
+    imageUrl: IMAGES.tours.placeholder,
+    galleryImages: [
+      IMAGES.tours.placeholder,
+      IMAGES.tours.gallery,
+      IMAGES.tours.gallery,
+    ],
+  },
+  {
+    id: 'winter-3',
+    season: 'winter',
+    title: 'Горнолыжный уикенд: Фалаза х Грибановка',
+    subtitle:
+      '2 снежных дня у подножья Фалазы. Для новичков и опытных райдеров',
+    heroPhrase: 'Тур для влюблённых в горы во всех смыслах!',
+    duration: '2 дня',
+    difficulty: 'Medium',
+    price: '10 000 ₽',
+    descriptionLeadBold: '2 дня чистого горного вайба',
+    description:
+      ' — у подножья Фалазы! Посетим самую известную вершину Приморского края и раскатаемся на горнолыжной базе у её подножья! Выезд для искателей приключений, горнолыжников, сноубордистов и всех, кто любит горы!',
+    program: [
+      {
+        timeLabel: 'День 1 · 8:00',
+        description: 'Выезд из г. Владивостока навстречу приключениям',
+      },
+      {
+        timeLabel: 'День 1 · 10:30',
+        description: 'Прибытие к подножью Фалазы, подготовка к восхождению',
+      },
+      {
+        timeLabel: 'День 1 · 11:00–15:00',
+        description: 'Восхождение на вершину',
+      },
+      {
+        timeLabel: 'День 1 · 15:00',
+        description:
+          'На вершине: перекус из своих продуктов, фото-, видео-фиксация нашего успеха',
+      },
+      {
+        timeLabel: 'День 1 · 15:30–17:30',
+        description: 'Спуск к горнолыжной базе, заселение в комфортабельные номера',
+      },
+      { timeLabel: 'День 1 · 18:30', description: 'Ужин в общем зале' },
+      {
+        timeLabel: 'День 1 · 19:00',
+        description:
+          'Релакс-вечер в чане: общение, музыка, настолки, отдых',
+      },
+      {
+        timeLabel: 'День 2 · 9:30',
+        description: 'Завтрак и сборы / выселение',
+      },
+      {
+        timeLabel: 'День 2 · 11:00–13:00',
+        description: 'Занятие по сноуборду с инструктором',
+      },
+      {
+        timeLabel: 'День 2 · 11:00–17:00',
+        description: 'Катание / прогулки по территории базы и окрестностям',
+      },
+      {
+        timeLabel: 'День 2 · 17:30–20:00',
+        description: 'Возвращение во Владивосток',
+      },
+    ],
+    includedInPrice: [
+      inc('Трансфер от точки сбора и обратно во Владивосток', faShuttleVan),
+      inc(
+        'Ледянки, ледоступы, гамаши для восхождения и весёлого спуска (при необходимости)',
+        faPersonHiking
+      ),
+      inc('Проживание у самого склона в комфортабельных номерах (1 ночь)', faBed),
+      inc('Питание: сытный ужин и завтрак', faMugHot),
+      inc('Сопровождение гида-проводника на вершину', faUserTie),
+      inc('Горячий чан на весь вечер', faHotTubPerson),
+      inc('2 часа группового занятия с сертифицированным инструктором', faChalkboardTeacher),
+      inc('Помощь в подборе и аренде снаряжения для новичков', faHelmetSafety),
+    ],
+    imageUrl: IMAGES.tours.placeholder,
+    galleryImages: [
+      IMAGES.tours.placeholder,
+      IMAGES.tours.gallery,
+      IMAGES.tours.gallery,
+    ],
   },
 
   // SPRING — 4 tours

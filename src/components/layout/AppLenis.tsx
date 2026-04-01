@@ -1,8 +1,7 @@
 import { useMemo, type ReactNode } from 'react';
 import { ReactLenis } from 'lenis/react';
 import 'lenis/dist/lenis.css';
-import { BREAKPOINT_MD_PX, getLenisRootOptions } from '../../constants/smoothScroll';
-import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
+import { getLenisRootOptions } from '../../constants/smoothScroll';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 type AppLenisProps = {
@@ -11,8 +10,7 @@ type AppLenisProps = {
 
 const AppLenis = ({ children }: AppLenisProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const isDesktop = useMatchMinWidth(BREAKPOINT_MD_PX);
-  const options = useMemo(() => getLenisRootOptions(isDesktop), [isDesktop]);
+  const options = useMemo(() => getLenisRootOptions(), []);
 
   if (prefersReducedMotion) {
     return <>{children}</>;

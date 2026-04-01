@@ -22,24 +22,19 @@ const shared: Pick<
   autoRaf: true,
 };
 
-/** Десктоп: мягче (ниже lerp). */
-const lenisDesktop: LenisOptions = {
+/** Интерполяция позиции скролла (Lenis): меньше — плавнее и «вязче»; одинаково на десктопе и мобильных. */
+const LENIS_ROOT_LERP = 0.075 as const;
+
+const lenisRoot: LenisOptions = {
   ...shared,
-  lerp: 0.075,
+  lerp: LENIS_ROOT_LERP,
   wheelMultiplier: 1,
   touchMultiplier: 1,
 };
 
-/** Мобильные: чуть отзывчивее, чтобы не казалось «тяжёлым» на таче. */
-const lenisMobile: LenisOptions = {
-  ...shared,
-  lerp: 0.11,
-  wheelMultiplier: 1,
-  touchMultiplier: 1,
-};
-
-export function getLenisRootOptions(isDesktop: boolean): LenisOptions {
-  return isDesktop ? lenisDesktop : lenisMobile;
+/** Один конфиг для всех ширин; ранее на мобильных был больший `lerp` (0.11) — сейчас та же плавность, что на десктопе. */
+export function getLenisRootOptions(): LenisOptions {
+  return lenisRoot;
 }
 
 export function scrollWindowToTopImmediate(lenis: Lenis | undefined): void {

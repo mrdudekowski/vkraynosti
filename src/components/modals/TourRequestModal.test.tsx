@@ -56,9 +56,9 @@ describe('TourRequestModal', () => {
 
     render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
 
-    await user.type(screen.getByLabelText(UI.tourRequestModal.nameLabel), 'Иван');
-    await user.type(screen.getByLabelText(UI.tourRequestModal.phoneLabel), '+79991234567');
-    await user.type(screen.getByLabelText(UI.tourRequestModal.questionLabel), 'Вопрос по туру');
+    await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`)), 'Иван');
+    await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.phoneLabel}`)), '+79991234567');
+    await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.questionLabel}`)), 'Вопрос по туру');
     await user.click(screen.getByRole('radio', { name: UI.tourRequestModal.messengerTelegramAria }));
     await user.click(screen.getByRole('checkbox'));
     await user.click(screen.getByRole('button', { name: UI.tourRequestModal.submit }));

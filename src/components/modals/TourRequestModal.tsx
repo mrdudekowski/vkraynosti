@@ -150,6 +150,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
               <FormField
                 id="tour-request-name"
                 label={UI.tourRequestModal.nameLabel}
+                required
                 hint={UI.tourRequestModal.nameHint}
                 hintBelow
                 error={fieldErrors.name}
@@ -189,7 +190,12 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                 />
               </FormField>
 
-              <FormField id="tour-request-phone" label={UI.tourRequestModal.phoneLabel} error={fieldErrors.phone}>
+              <FormField
+                id="tour-request-phone"
+                label={UI.tourRequestModal.phoneLabel}
+                required
+                error={fieldErrors.phone}
+              >
                 <TextInput
                   id="tour-request-phone"
                   type="tel"
@@ -207,6 +213,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
               <FormField
                 id="tour-request-question"
                 label={UI.tourRequestModal.questionLabel}
+                required
                 hint={UI.tourRequestModal.questionHint}
                 error={fieldErrors.question}
               >
@@ -233,6 +240,10 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
               >
                 <legend className="text-sm font-medium text-text-primary mb-1">
                   {UI.tourRequestModal.messengerLabel}
+                  <span className="text-difficulty-hard-fg" aria-hidden>
+                    {' '}
+                    *
+                  </span>
                 </legend>
                 <div className="flex flex-wrap gap-4">
                   <label
@@ -299,7 +310,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                   <p
                     id="tour-request-messenger-error"
                     role="alert"
-                    className="text-tooltip text-difficulty-hard-fg"
+                    className="sr-only text-tooltip"
                   >
                     {fieldErrors.preferredMessenger}
                   </p>
@@ -317,6 +328,9 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                     aria-describedby={fieldErrors.privacyAccepted ? 'tour-request-privacy-error' : undefined}
                   />
                   <span className="text-sm text-text-muted leading-relaxed">
+                    <span className="text-difficulty-hard-fg" aria-hidden>
+                      *
+                    </span>{' '}
                     {UI.tourRequestModal.privacyPrefix}
                     <Link
                       to={ROUTES.PRIVACY}
@@ -331,7 +345,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                   </span>
                 </label>
                 {fieldErrors.privacyAccepted ? (
-                  <p id="tour-request-privacy-error" role="alert" className="text-tooltip text-difficulty-hard-fg">
+                  <p id="tour-request-privacy-error" role="alert" className="sr-only text-tooltip">
                     {fieldErrors.privacyAccepted}
                   </p>
                 ) : null}

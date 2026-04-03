@@ -130,16 +130,15 @@
   }
 
   /**
-   * Подложка ряда иконок: один ряд (`flex-nowrap` в JSX), не шире плашки (`max-w-full` + `min-w-0` в цепочке flex/grid).
-   * При нехватке ширины колонки — горизонтальный скролл внутри полосы (на десктопе с широкой колонкой скролл не появляется).
+   * Подложка ряда иконок: `flex-wrap` + `justify-center` в JSX — перенос на следующий ряд при нехватке ширины, без горизонтального скролла.
    */
   .tour-included-icon-strip {
-    @apply w-full max-w-full min-w-0 overflow-x-auto overflow-y-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
+    @apply w-full max-w-full min-w-0 overflow-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
   }
 
   /**
-   * Кнопка-иконка в горизонтальном ряду «Что включено» (`TourIncludedIconList`).
-   * Квадрат хит-лейбла; без `w-full`, чтобы иконки шли в ряд.
+   * Кнопка-иконка в сетке «Что включено» (`TourIncludedIconList`, перенос по рядам).
+   * Квадрат хит-лейбла; без `w-full`, чтобы flex-wrap раскладывал иконки по строкам.
    */
   .tour-included-icon-btn {
     @apply inline-flex h-tour-included-row-min-h w-tour-included-row-min-h shrink-0 items-center justify-center rounded-lg p-1;

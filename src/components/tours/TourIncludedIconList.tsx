@@ -166,7 +166,7 @@ const TourIncludedIconList = ({
       <div className="tour-included-icon-strip">
         <ul
           role="list"
-          className="mx-auto flex w-max min-w-0 list-none flex-row flex-nowrap justify-center gap-x-tour-included-icon-row-horizontal-gap p-0"
+          className="flex min-w-0 w-full list-none flex-row flex-wrap justify-center gap-x-tour-included-icon-row-horizontal-gap gap-y-tour-included-icon-row-horizontal-gap p-0"
         >
           {items.map((item, idx) => (
             <TourIncludedIconButton

@@ -17,19 +17,26 @@ export function useTourIncludedDescriptionFade(
   const [displayText, setDisplayText] = useState<string | null>(targetText);
   const [isVisible, setIsVisible] = useState(() => targetText !== null);
   const targetRef = useRef(targetText);
-  targetRef.current = targetText;
+
+  useEffect(() => {
+    targetRef.current = targetText;
+  }, [targetText]);
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      setDisplayText(targetText);
-      setIsVisible(targetText !== null);
+      queueMicrotask(() => {
+        setDisplayText(targetText);
+        setIsVisible(targetText !== null);
+      });
       return;
     }
     if (targetText === displayText) return;
 
     if (displayText === null && targetText !== null) {
-      setDisplayText(targetText);
-      setIsVisible(false);
+      queueMicrotask(() => {
+        setDisplayText(targetText);
+        setIsVisible(false);
+      });
       const id = requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setDisplayText(targetRef.current);
@@ -39,7 +46,9 @@ export function useTourIncludedDescriptionFade(
       return () => cancelAnimationFrame(id);
     }
 
-    setIsVisible(false);
+    queueMicrotask(() => {
+      setIsVisible(false);
+    });
   }, [targetText, displayText, prefersReducedMotion]);
 
   const handleTransitionEnd = useCallback(

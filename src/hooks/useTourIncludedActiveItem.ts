@@ -95,18 +95,15 @@ export function useTourIncludedActiveItem(
   useEffect(() => () => clearExitTimer(), [clearExitTimer]);
 
   useEffect(() => {
-    setActiveIndex((prev) => {
-      if (itemCount === 0) return null;
-      if (prev === null) return prev;
-      if (prev >= itemCount) return prev % itemCount;
-      return prev;
+    queueMicrotask(() => {
+      setActiveIndex((prev) => {
+        if (itemCount === 0) return null;
+        if (prev !== null && prev >= itemCount) return prev % itemCount;
+        if (prev === null && autoRotateEnabled && itemCount >= 2) return 0;
+        return prev;
+      });
     });
-  }, [itemCount]);
-
-  useEffect(() => {
-    if (!autoRotateEnabled || itemCount < 2) return;
-    setActiveIndex((prev) => (prev === null ? 0 : prev));
-  }, [autoRotateEnabled, itemCount]);
+  }, [itemCount, autoRotateEnabled]);
 
   useEffect(() => {
     if (!autoRotateEnabled || itemCount < 2 || isInteractionPaused) return;

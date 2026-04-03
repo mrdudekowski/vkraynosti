@@ -11,6 +11,7 @@ import { ROUTES } from '../../constants/routes';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 import FormField from '../form/FormField';
+import FormCheckbox from '../form/FormCheckbox';
 import TextInput from '../form/TextInput';
 import TextArea from '../form/TextArea';
 import MaxMessengerIcon from '../icons/MaxMessengerIcon';
@@ -318,16 +319,19 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
               </fieldset>
 
               <div className="flex flex-col gap-2">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
+                <div className="flex items-start gap-3">
+                  <FormCheckbox
+                    id="tour-request-privacy"
+                    className="mt-1"
                     checked={values.privacyAccepted}
                     onChange={e => updateField('privacyAccepted', e.target.checked)}
-                    className="mt-1 h-4 w-4 shrink-0 rounded border-divider text-brand-primary focus:ring-2 focus:ring-brand-primary/30"
                     aria-invalid={!!fieldErrors.privacyAccepted}
                     aria-describedby={fieldErrors.privacyAccepted ? 'tour-request-privacy-error' : undefined}
                   />
-                  <span className="text-sm text-text-muted leading-relaxed">
+                  <label
+                    htmlFor="tour-request-privacy"
+                    className="text-sm text-text-muted leading-relaxed cursor-pointer"
+                  >
                     <span className="text-difficulty-hard-fg" aria-hidden>
                       *
                     </span>{' '}
@@ -342,8 +346,8 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                       {UI.tourRequestModal.privacyLink}
                     </Link>
                     {UI.tourRequestModal.privacySuffix}
-                  </span>
-                </label>
+                  </label>
+                </div>
                 {fieldErrors.privacyAccepted ? (
                   <p id="tour-request-privacy-error" role="alert" className="sr-only text-tooltip">
                     {fieldErrors.privacyAccepted}

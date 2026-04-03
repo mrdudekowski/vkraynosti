@@ -124,6 +124,24 @@
     @apply xl:pl-12;
   }
 
+  /** Полупрозрачная плашка блока «Что включено» (`RevealBox` на странице тура): градиент + тень. */
+  .tour-detail-included-panel {
+    @apply rounded-card bg-tour-included-panel p-card-p shadow-tourIncludedPanel;
+  }
+
+  /** Подложка горизонтального ряда иконок (панель над фоном градиента плашки). Один ряд, ширина по контенту — без переноса и без горизонтального скролла. */
+  .tour-included-icon-strip {
+    @apply w-fit min-w-max overflow-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
+  }
+
+  /**
+   * Кнопка-иконка в горизонтальном ряду «Что включено» (`TourIncludedIconList`).
+   * Квадрат хит-лейбла; без `w-full`, чтобы иконки шли в ряд.
+   */
+  .tour-included-icon-btn {
+    @apply inline-flex h-tour-included-row-min-h w-tour-included-row-min-h shrink-0 items-center justify-center rounded-lg p-1;
+  }
+
   /** Заголовки «О туре» и «Что включено»: тонкая линия (`colors.tour-detail-heading-rule`). */
   .tour-detail-section-heading {
     @apply font-heading text-tour-detail-section font-normal text-text-primary mb-4 pb-2 border-b border-tour-detail-heading-rule;
@@ -302,6 +320,7 @@
       animation: none;
       opacity: 1;
     }
+
   }
   .btn-ghost {
     @apply border border-current px-6 py-3 rounded-full
@@ -369,6 +388,84 @@
     .hamburger-icon-svg,
     .hamburger-line {
       transition: none !important;
+    }
+  }
+
+  /**
+   * Анимированный чекбокс заявки (`FormCheckbox`): круглый ripple, галочка и круг — stroke-dash.
+   * Цвет обводки — `currentColor` с `text-*` на label; числа dash — `theme('formCheckbox.*')`.
+   */
+  .form-checkbox-visual {
+    @apply relative flex h-4 w-4 cursor-pointer items-center justify-center;
+    -webkit-tap-highlight-color: transparent;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .form-checkbox-visual::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: theme('spacing.form-checkbox-ripple-inset');
+    left: theme('spacing.form-checkbox-ripple-inset');
+    width: theme('spacing.form-checkbox-ripple-size');
+    height: theme('spacing.form-checkbox-ripple-size');
+    border-radius: theme('borderRadius.full');
+    background: color-mix(in srgb, theme('colors.brand.primary') 10%, transparent);
+    opacity: 0;
+    transition: opacity theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+  }
+
+  .form-checkbox-visual:hover::before {
+    opacity: 1;
+  }
+
+  .form-checkbox-svg {
+    position: relative;
+    z-index: 1;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke: currentColor;
+    stroke-width: theme('formCheckbox.strokeWidth');
+    transform: translate3d(0, 0, 0);
+    transition: stroke theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+  }
+
+  .form-checkbox-svg path {
+    stroke-dasharray: theme('formCheckbox.pathDashArray');
+    stroke-dashoffset: 0;
+  }
+
+  .form-checkbox-svg polyline {
+    stroke-dasharray: theme('formCheckbox.polylineDashArray');
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetIdle');
+  }
+
+  .peer:checked + .form-checkbox-visual .form-checkbox-svg path {
+    stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+    transition: all 300ms linear;
+  }
+
+  .peer:checked + .form-checkbox-visual .form-checkbox-svg polyline {
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetChecked');
+    transition: all 200ms linear;
+    transition-delay: 150ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .form-checkbox-svg,
+    .form-checkbox-svg path,
+    .form-checkbox-svg polyline {
+      transition: none !important;
+    }
+
+    .peer:checked + .form-checkbox-visual .form-checkbox-svg path {
+      stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+    }
+
+    .peer:checked + .form-checkbox-visual .form-checkbox-svg polyline {
+      stroke-dashoffset: theme('formCheckbox.polylineDashOffsetChecked');
+      transition-delay: 0ms;
     }
   }
 

@@ -2,6 +2,9 @@
  * Scroll-reveal: IntersectionObserver и CSS из темы (`duration-reveal`, `spacing.reveal-y`).
  */
 
+/** Совпадает с брейкпоинтом `lg` Tailwind по умолчанию (1024px). */
+export const BREAKPOINT_LG_PX = 1024 as const;
+
 /** Чуть раньше нижней границы вьюпорта — меньше «опозданий». */
 export const REVEAL_ROOT_MARGIN = '0px 0px -8% 0px' as const;
 

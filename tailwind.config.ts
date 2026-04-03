@@ -1,11 +1,21 @@
 import type { Config } from 'tailwindcss'
 import {
+  TOUR_INCLUDED_DESCRIPTION_FADE_MS,
+  TOUR_INCLUDED_MOTOR_DURATION_MS,
+} from './src/constants/tourIncludedHover'
+import {
   fontFamilyBodyStack,
   fontFamilyBrandWordmarkStack,
   fontFamilyHeadingStack,
   fontFamilyHeroPhraseStack,
   fontFamilyMonoStack,
 } from './src/constants/fontFamilyStacks'
+
+/** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
+const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
+
+/** Синхронно с `TOUR_INCLUDED_DESCRIPTION_FADE_MS` и fade подписи «Что включено». */
+const TOUR_INCLUDED_DESCRIPTION_FADE = `${TOUR_INCLUDED_DESCRIPTION_FADE_MS}ms` as const
 
 /** Длительность выезда мобильного меню (синхронно с `animation.mobile-nav-*`). */
 const MOBILE_NAV_DURATION = '320ms' as const
@@ -52,8 +62,13 @@ const config: Config = {
     'text-tour-detail-program-heading',
     'text-tour-detail-program-body',
     'text-tour-detail-meta',
+    'text-tour-detail-included-icon-idle-horizontal',
+    'text-tour-detail-included-icon-active-horizontal',
     'text-home-season-strip-label',
     { pattern: /^object-tour-detail-hero-desktop$/, variants: ['lg'] },
+    { pattern: /^animate-tour-included-/ },
+    { pattern: /^drop-shadow-tour-included-hover-/ },
+    { pattern: /^text-tourIncludedIcon-active-/ },
     /** Чтобы `@keyframes cta-letter-pop` попали в бандл (используются из `index.css`, не из утилит). */
     'animate-cta-letter-pop',
   ],
@@ -71,6 +86,18 @@ const config: Config = {
           summer: '#FDEBC8',
           fall:   '#F5D5C0',
         },
+        /**
+         * Полупрозрачная плашка колонки «Что включено» на фоне сезона (`RevealBox` на TourDetailPage).
+         * База — `surface.light` (#F7F5F0), смешивание с прозрачностью.
+         */
+        tourIncludedColumnPanel:
+          'color-mix(in srgb, #F7F5F0 62%, transparent)',
+        /**
+         * Подложка горизонтального ряда иконок «Что включено» (полупрозрачный «колодец»).
+         * Чуть плотнее среднего тона градиента плашки `bg-tour-included-panel`.
+         */
+        tourIncludedIconStrip:
+          'color-mix(in srgb, #F7F5F0 58%, transparent)',
         surface: {
           dark:  '#0D0D0D',
           light: '#F7F5F0',
@@ -100,6 +127,18 @@ const config: Config = {
           max: '#6BAEF7',
           /** Фиолетово-синий для свечения выбранного MAX (см. `drop-shadow-messenger-max-selected`). */
           maxGlow: '#6366F1',
+        },
+        /**
+         * Активная иконка в «Что включено» (`TourIncludedIconList`): насыщенный акцент в триаде к `seasonBg.*`.
+         * Утилиты: `text-tourIncludedIcon-active-{winter|spring|summer|fall}`.
+         */
+        tourIncludedIcon: {
+          active: {
+            winter: '#B45309',
+            spring: '#9D174D',
+            summer: '#0E7490',
+            fall:   '#14532D',
+          },
         },
         /** Тонкая линия под заголовками «О туре» / «Что включено» (см. `.tour-detail-section-heading`). */
         'tour-detail-heading-rule': 'color-mix(in srgb, #1A1A1A 11%, transparent)',
@@ -145,10 +184,28 @@ const config: Config = {
         'tour-detail-meta': ['1rem', { lineHeight: '1.5' }],
         /** Подпись «В другой сезон» над переключателем на главной (полоса с фоном). */
         'home-season-strip-label': ['1.125rem', { lineHeight: '1.35', letterSpacing: '0.1em' }],
+        /** Крупная иконка в списке «Что включено» до hover/tap (страница тура). */
+        'tour-detail-included-icon-idle': ['2.25rem', { lineHeight: '1' }],
+        /**
+         * Активная строка: уменьшение на 15% от idle (2.25rem × 0.85), не до `text-base`.
+         */
+        'tour-detail-included-icon-active': ['1.9125rem', { lineHeight: '1' }],
+        /** Горизонтальный ряд иконок «Что включено» (масштаб от базы 1.5rem, два шага +20%). */
+        'tour-detail-included-icon-idle-horizontal': ['2.16rem', { lineHeight: '1' }],
+        /** 2.16rem × 0.85 — согласовано с активным размером вертикального режима. */
+        'tour-detail-included-icon-active-horizontal': ['1.836rem', { lineHeight: '1' }],
       },
       letterSpacing: {
         /** CTA: чуть уже, чем 0.3em в референсе — читаемость длинных русских подписей. */
         cta: '0.12em',
+      },
+      backgroundImage: {
+        /**
+         * Вертикальный градиент плашки «Что включено»: сверху светлее (заголовок), снизу глубже.
+         * База — `surface.light` (#F7F5F0), см. `tourIncludedColumnPanel`.
+         */
+        'tour-included-panel':
+          'linear-gradient(180deg, color-mix(in srgb, #F7F5F0 75%, transparent) 0%, color-mix(in srgb, #F7F5F0 52%, transparent) 100%)',
       },
       aspectRatio: {
         /** Первый ряд фотогалереи тура (широкий кадр под героем страницы). */
@@ -199,6 +256,27 @@ const config: Config = {
         'navbar-nav-to-season': 'clamp(1rem, 2vw, 2rem)',
         /** Смещение по Y для scroll-reveal (translateY). */
         'reveal-y': '1.25rem',
+        /** Мин. высота строки интерактивного списка «Что включено» (~44px). */
+        'tour-included-row-min-h': '2.75rem',
+        /** Вертикальный зазор между пунктами списка «Что включено» (`TourIncludedIconList`). */
+        'tour-included-list-gap': '1.5rem',
+        /** Между горизонтальным рядом иконок и блоком текста. */
+        'tour-included-horizontal-stack': '1rem',
+        /** Между текстом подписи и логотипом в плашке «Что включено» (desktop). */
+        'tour-included-panel-logo-gap': '1rem',
+        /** Между кнопками-иконками в горизонтальном ряду. */
+        'tour-included-icon-row-horizontal-gap': '1rem',
+        /** Внутренние отступы подложки `.tour-included-icon-strip`. */
+        'tour-included-icon-strip-padding': '0.75rem',
+        /** Квадрат под иконку в «Что включено»: совпадает с `fontSize.tour-detail-included-icon-idle`, чтобы flex не сдвигал текст при смене размера иконки. */
+        'tour-included-icon-slot': '2.25rem',
+        /** Слот под иконку в горизонтальном ряду (`tour-detail-included-icon-idle-horizontal`). */
+        'tour-included-icon-slot-horizontal': '2.52rem',
+        /** Сдвиг иконки вправо в keyframes `tour-included-motor-*` (внутри слота). */
+        'tour-included-motor-shift-x': '0.625rem',
+        /** Круг хит-области у `.form-checkbox-visual` (масштаб 16px от референса 18px). */
+        'form-checkbox-ripple-inset': '-0.833333rem',
+        'form-checkbox-ripple-size': '2.6667rem',
         /** Keyframe `fade-up`: см. `KEYFRAME_FADE_UP_Y` в `tailwind.config.ts`. */
         'keyframe-fade-up-y': KEYFRAME_FADE_UP_Y,
         /** Keyframe `slide-in`: см. `KEYFRAME_SLIDE_IN_X` в `tailwind.config.ts`. */
@@ -230,6 +308,8 @@ const config: Config = {
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
       },
       maxHeight: {
+        /** Логотип внизу плашки «Что включено» (desktop): вписывается в остаток колонки без перегруза. */
+        'tour-included-panel-logo': '8.5rem',
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
         /** Полноэкранный просмотр фото тура (`TourPhotoViewer`, `object-contain`). */
@@ -244,6 +324,8 @@ const config: Config = {
         'season-section-md': '56rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
         'route-fallback':    'clamp(16rem, 55vh, 40rem)',
+        /** Область описания под горизонтальными иконками «Что включено» (стабильная высота при смене текста). */
+        'tour-included-description': '5rem',
       },
       boxShadow: {
         /**
@@ -251,6 +333,12 @@ const config: Config = {
          * Дублирование hex намеренно (Tailwind не резолвит theme() внутри значения).
          */
         cta: '0 6px 22px color-mix(in srgb, #1A3C2E 18%, #0D0D0D 14%, transparent)',
+        /**
+         * Плашка «Что включено»: мягче, чем `boxShadow.cta`, чтобы блок «парил» над `seasonBg`.
+         * Второй слой — акцент тени снизу (глубина без «ореола» со всех сторон).
+         */
+        tourIncludedPanel:
+          '0 4px 18px color-mix(in srgb, #1A3C2E 10%, #0D0D0D 8%, transparent), 0 10px 26px -8px color-mix(in srgb, #0D0D0D 14%, transparent)',
       },
       dropShadow: {
         /**
@@ -263,6 +351,18 @@ const config: Config = {
           '0 0 4px rgba(34, 158, 217, 0.55), 0 0 10px rgba(34, 158, 217, 0.22)',
         'messenger-max-selected':
           '0 0 4px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.2)',
+        /**
+         * Нижняя тень иконки «Что включено» при активации — оттенок согласован с фоном сезона
+         * (`seasonBg.*`). Весна: контраст к мятному фону (`seasonBg.spring` + `brand.primary`).
+         */
+        'tour-included-hover-winter':
+          '0 5px 10px color-mix(in srgb, #1A1A1A 22%, #7BA7BC 16%, transparent)',
+        'tour-included-hover-spring':
+          '0 5px 12px color-mix(in srgb, #1A3C2E 38%, #0D0D0D 14%, transparent)',
+        'tour-included-hover-summer':
+          '0 5px 10px color-mix(in srgb, #1A1A1A 20%, #E8A838 18%, transparent)',
+        'tour-included-hover-fall':
+          '0 5px 10px color-mix(in srgb, #1A1A1A 24%, #C8622A 14%, transparent)',
       },
       borderRadius: {
         'card':    '1rem',
@@ -303,6 +403,10 @@ const config: Config = {
         'cta-letter-stagger': CTA_LETTER_STAGGER_MS,
         /** CTA dual: длительность появления одной буквы/иконки. */
         'cta-letter-pop': CTA_LETTER_POP_DURATION,
+        /** Масштаб иконки и появление текста в «Что включено» (см. `TOUR_INCLUDED_MOTOR_DURATION_MS`). */
+        'tour-included': TOUR_INCLUDED_MOTOR_DURATION,
+        /** Fade подписи под рядом иконок (см. `TOUR_INCLUDED_DESCRIPTION_FADE_MS`). */
+        'tour-included-description-fade': TOUR_INCLUDED_DESCRIPTION_FADE,
       },
       transitionTimingFunction: {
         'reveal-out': 'ease-out',
@@ -310,6 +414,15 @@ const config: Config = {
         standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       hamburger: hamburgerTheme,
+      /** SVG-чекбокс формы заявки (`FormCheckbox`): stroke и dash — как в референсе, размер бокса 16px. */
+      formCheckbox: {
+        strokeWidth: '1.5',
+        pathDashArray: '60',
+        polylineDashArray: '22',
+        polylineDashOffsetIdle: '66',
+        polylineDashOffsetChecked: '42',
+        pathDashOffsetChecked: '60',
+      },
       keyframes: {
         'fade-up': {
           '0%':   { opacity: '0', transform: `translateY(${KEYFRAME_FADE_UP_Y})` },
@@ -349,6 +462,49 @@ const config: Config = {
           '0%':   { opacity: '0', transform: 'translateY(0.15em)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        /**
+         * «Что включено»: иконка сдвигается вправо в слоте, затем уменьшается (scale 0.85 = −15% к idle).
+         * Сдвиг по X совпадает с `spacing.tour-included-motor-shift-x`.
+         */
+        'tour-included-motor-enter': {
+          '0%': {
+            transform: 'translateX(0) scale(1)',
+            filter: 'brightness(0.88) saturate(1.05)',
+          },
+          '35%': {
+            transform: 'translateX(0.625rem) scale(1)',
+            filter: 'brightness(1.08) saturate(1.12)',
+          },
+          '100%': {
+            transform: 'translateX(0.625rem) scale(0.85)',
+            filter: 'brightness(1) saturate(1)',
+          },
+        },
+        'tour-included-motor-exit': {
+          '0%': {
+            transform: 'translateX(0.625rem) scale(0.85)',
+            filter: 'brightness(1) saturate(1)',
+          },
+          '40%': {
+            transform: 'translateX(0.625rem) scale(1)',
+            filter: 'brightness(1.08) saturate(1.12)',
+          },
+          '100%': {
+            transform: 'translateX(0) scale(1)',
+            filter: 'brightness(0.88) saturate(1.05)',
+          },
+        },
+        'tour-included-text-enter': {
+          '0%': { clipPath: 'inset(0 100% 0 0)', opacity: '0' },
+          '28%': { clipPath: 'inset(0 100% 0 0)', opacity: '0' },
+          '38%': { clipPath: 'inset(0 0 0 0)', opacity: '1' },
+          '100%': { clipPath: 'inset(0 0 0 0)', opacity: '1' },
+        },
+        'tour-included-text-exit': {
+          '0%': { clipPath: 'inset(0 0 0 0)', opacity: '1' },
+          '32%': { clipPath: 'inset(0 100% 0 0)', opacity: '0' },
+          '100%': { clipPath: 'inset(0 100% 0 0)', opacity: '0' },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -360,6 +516,10 @@ const config: Config = {
         'mobile-nav-panel':    `mobile-nav-panel ${MOBILE_NAV_DURATION} ease-out forwards`,
         'scale-up-cta':        `scale-up-cta ${CTA_TEXT_SCALE_DURATION} ease-in-out`,
         'cta-letter-pop':      `cta-letter-pop ${CTA_LETTER_POP_DURATION} ease forwards`,
+        'tour-included-motor-enter': `tour-included-motor-enter ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+        'tour-included-motor-exit': `tour-included-motor-exit ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+        'tour-included-text-enter': `tour-included-text-enter ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+        'tour-included-text-exit': `tour-included-text-exit ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
       },
       screens: {
         xs:         '360px',  // Small Androids

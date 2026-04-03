@@ -1,8 +1,5 @@
 import { PUBLIC_ASSET_BASE } from './fonts';
 
-/** Логотип «Вкрайности» в плашке «Что включено» (файл в `public/vkrai-logo.png`). */
-export const VKRAINOSTI_INCLUDED_PANEL_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.png` as const;
-
 const BASE = 'https://placehold.co';
 
 /** Папка `public/spring tours/` — пробел в URL кодируется. */

@@ -163,10 +163,10 @@ const TourIncludedIconList = ({
       onFocus={handleContainerFocus}
       onBlur={handleContainerBlur}
     >
-      <div className="tour-included-icon-strip mx-auto">
+      <div className="tour-included-icon-strip">
         <ul
           role="list"
-          className="flex list-none flex-row flex-nowrap gap-x-tour-included-icon-row-horizontal-gap p-0"
+          className="mx-auto flex w-max min-w-0 list-none flex-row flex-nowrap justify-center gap-x-tour-included-icon-row-horizontal-gap p-0"
         >
           {items.map((item, idx) => (
             <TourIncludedIconButton

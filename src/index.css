@@ -129,9 +129,12 @@
     @apply rounded-card bg-tour-included-panel p-card-p shadow-tourIncludedPanel;
   }
 
-  /** Подложка горизонтального ряда иконок (панель над фоном градиента плашки). Один ряд, ширина по контенту — без переноса и без горизонтального скролла. */
+  /**
+   * Подложка ряда иконок: один ряд (`flex-nowrap` в JSX), не шире плашки (`max-w-full` + `min-w-0` в цепочке flex/grid).
+   * При нехватке ширины колонки — горизонтальный скролл внутри полосы (на десктопе с широкой колонкой скролл не появляется).
+   */
   .tour-included-icon-strip {
-    @apply w-fit min-w-max overflow-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
+    @apply w-full max-w-full min-w-0 overflow-x-auto overflow-y-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
   }
 
   /**

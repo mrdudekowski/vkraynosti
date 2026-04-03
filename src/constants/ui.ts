@@ -148,8 +148,6 @@ export const UI = {
     programTimeDisclaimer:
       '*Время указано примерно и может меняться из-за погодных или иных условий',
     includedHeading: 'Что включено в стоимость тура',
-    /** Alt у декоративного логотипа внизу плашки «Что включено» (desktop). */
-    includedPanelLogoAlt: 'Вкрайности',
     requestTourCta:  'Оставить заявку на тур',
     /** Подпись при наведении на CTA заявки (буквы + стрелка в `.btn-cta-tour--dual`). */
     requestTourCtaHoverWordmark: 'Вкрайности',

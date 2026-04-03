@@ -262,8 +262,6 @@ const config: Config = {
         'tour-included-list-gap': '1.5rem',
         /** Между горизонтальным рядом иконок и блоком текста. */
         'tour-included-horizontal-stack': '1rem',
-        /** Между текстом подписи и логотипом в плашке «Что включено» (desktop). */
-        'tour-included-panel-logo-gap': '1rem',
         /** Между кнопками-иконками в горизонтальном ряду. */
         'tour-included-icon-row-horizontal-gap': '1rem',
         /** Внутренние отступы подложки `.tour-included-icon-strip`. */
@@ -308,8 +306,6 @@ const config: Config = {
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
       },
       maxHeight: {
-        /** Логотип внизу плашки «Что включено» (desktop): вписывается в остаток колонки без перегруза. */
-        'tour-included-panel-logo': '8.5rem',
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
         /** Полноэкранный просмотр фото тура (`TourPhotoViewer`, `object-contain`). */

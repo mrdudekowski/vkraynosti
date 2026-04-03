@@ -21,7 +21,6 @@ import TourPhotoViewer from "../components/tours/TourPhotoViewer";
 import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
 import TourIncludedIconList from "../components/tours/TourIncludedIconList";
 import RevealBox from "../components/shared/RevealBox";
-import { VKRAINOSTI_INCLUDED_PANEL_LOGO } from "../constants/images";
 import { SEASON_PAGE_BG_CLASS } from "../constants/seasonTheme";
 import { BREAKPOINT_LG_PX } from "../constants/reveal";
 import { useMatchMinWidth } from "../hooks/useMatchMinWidth";
@@ -173,33 +172,22 @@ const TourDetailPage = () => {
                     <TourRequestCtaButton onClick={handleOpenTourRequest} />
                   </div>
                 </div>
-                <div className="tour-detail-included-column flex min-w-0 flex-col gap-tour-included-panel-logo-gap">
-                  <RevealBox
-                    as="div"
-                    className="tour-detail-included-panel min-w-0"
-                    disabled={isLgOrAbove}
-                  >
-                    <div className="min-w-0">
-                      <h2 className="tour-detail-section-heading">
-                        {UI.tourDetail.includedHeading}
-                      </h2>
-                      <TourIncludedIconList
-                        tourId={tour.id}
-                        season={tour.season}
-                        items={tour.includedInPrice}
-                      />
-                    </div>
-                  </RevealBox>
-                  <div className="hidden justify-center lg:flex">
-                    <img
-                      src={VKRAINOSTI_INCLUDED_PANEL_LOGO}
-                      alt={UI.tourDetail.includedPanelLogoAlt}
-                      className="h-auto max-h-tour-included-panel-logo w-auto max-w-full object-contain opacity-90"
-                      decoding="async"
-                      loading="lazy"
+                <RevealBox
+                  as="div"
+                  className="tour-detail-included-column tour-detail-included-panel min-w-0"
+                  disabled={isLgOrAbove}
+                >
+                  <div className="min-w-0">
+                    <h2 className="tour-detail-section-heading">
+                      {UI.tourDetail.includedHeading}
+                    </h2>
+                    <TourIncludedIconList
+                      tourId={tour.id}
+                      season={tour.season}
+                      items={tour.includedInPrice}
                     />
                   </div>
-                </div>
+                </RevealBox>
               </div>
 
               {galleryGridImages.length > 0 && (

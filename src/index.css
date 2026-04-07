@@ -69,13 +69,16 @@
 }
 
 @layer components {
-  /** Заголовок «Фотогалерея»: линия снизу + вертикальный акцент (токены темы). */
-  .tour-gallery-section-heading {
-    @apply flex items-stretch gap-4 border-b border-divider pb-4 mb-gallery-gap;
+  /**
+   * Строка заголовка секций страницы тура (`TourDetailSectionHeading`):
+   * `border-divider` как у бывшей «Фотогалерее»; акцент — сезонный градиент в JSX.
+   */
+  .tour-detail-section-heading-row {
+    @apply flex items-stretch gap-4 border-b border-divider pb-4;
   }
 
-  .tour-gallery-section-heading-accent {
-    @apply hidden sm:block w-px shrink-0 self-center rounded-full bg-brand-secondary min-h-tour-gallery-heading-accent;
+  .tour-detail-section-heading-accent {
+    @apply hidden sm:block shrink-0 self-stretch rounded-full w-tour-detail-heading-accent;
   }
 
   /**
@@ -93,17 +96,20 @@
 
   /** Тело страницы тура под hero: measure + вертикальные отступы секции. */
   .tour-detail-page-inner {
-    @apply w-full max-w-tourDetail mx-auto py-12 xl:mx-0 xl:mr-auto;
+    @apply w-full max-w-tourDetail mx-auto pt-tour-detail-page-inner-pt pb-tour-detail-page-inner-pb xl:mx-0 xl:mr-auto;
+  }
+
+  /**
+   * Мета-факты между hero и блоком `tour-detail-preface-bg` (фон сезона, не скрим).
+   * Вертикальный зазор до префейса — `mb-tour-detail-meta-to-preface` в JSX.
+   */
+  .tour-detail-meta-below-hero {
+    @apply min-w-0 max-w-full;
   }
 
   /** Основная колонка страницы тура: разделитель до сайдбара с программой (только lg+). */
   .tour-detail-main-column {
     @apply lg:border-r lg:border-divider lg:pr-tour-detail-col-divider-gap;
-  }
-
-  /** Крошки + бейджи: нижняя линия зонирования до основного контента. */
-  .tour-detail-page-meta-zone {
-    @apply border-b border-divider pb-8 mb-10;
   }
 
   /**
@@ -112,6 +118,70 @@
    */
   .tour-detail-about-included-grid {
     @apply grid grid-cols-1 xl:grid-cols-2 xl:gap-x-0 gap-y-10 mb-10 xl:items-start xl:divide-x xl:divide-tour-detail-heading-rule;
+  }
+
+  /**
+   * Первый кадр галереи (после обложки) — фон блока до секции «Наши Подвиги»; контент на скриме.
+   * Горизонтальное раскрытие на ширину gutter (`tour-detail-page-gutter` даёт px).
+   */
+  .tour-detail-preface-bg {
+    @apply relative isolate -mx-4 mb-10 overflow-hidden rounded-card px-4 pb-10 pt-tour-detail-preface-pt sm:-mx-6 sm:px-6 sm:pb-12 sm:pt-tour-detail-preface-pt-sm lg:-mx-8 lg:px-8;
+  }
+
+  .tour-detail-preface-bg__image {
+    @apply absolute inset-0 z-0 bg-cover bg-center bg-no-repeat;
+  }
+
+  .tour-detail-preface-bg__scrim {
+    @apply absolute inset-0 z-[1] bg-surface-dark/40;
+  }
+
+  .tour-detail-preface-bg__content {
+    @apply relative z-10 min-w-0;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-included-grid {
+    @apply mb-0 xl:divide-white/25;
+  }
+
+  .tour-detail-preface-bg .tour-detail-section-heading-row {
+    @apply border-white/25;
+  }
+
+  .tour-detail-preface-bg .tour-detail-section-heading-row .text-tour-detail-section {
+    @apply text-text-inverse;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-column p {
+    @apply text-text-inverse/90;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-column strong {
+    @apply text-text-inverse;
+  }
+
+  /**
+   * «Что включено» на фото-префейсе: отдельный класс вместо `.tour-detail-included-panel`
+   * (без `bg-tour-included-panel` / тени). Палитра: светлый текст, акцент `brand.secondary`.
+   */
+  .tour-detail-preface-bg .tour-detail-included-on-preface {
+    @apply bg-transparent shadow-none;
+  }
+
+  .tour-detail-preface-bg .tour-detail-included-on-preface .tour-detail-section-heading-accent {
+    @apply bg-brand-secondary;
+  }
+
+  .tour-detail-preface-bg .tour-included-icon-strip {
+    @apply rounded-lg bg-tourIncludedIconStripPreface p-tour-included-icon-strip-padding;
+  }
+
+  .tour-detail-preface-bg .tour-included-icon-btn .text-text-primary {
+    @apply text-text-inverse;
+  }
+
+  .tour-detail-preface-bg .min-h-tour-included-description .text-text-muted {
+    @apply text-text-inverse/90;
   }
 
   /** Колонка «О туре»: справа отступ к линии только от xl. */
@@ -144,9 +214,66 @@
     @apply inline-flex h-tour-included-row-min-h w-tour-included-row-min-h shrink-0 items-center justify-center rounded-lg p-1;
   }
 
-  /** Заголовки «О туре» и «Что включено»: тонкая линия (`colors.tour-detail-heading-rule`). */
-  .tour-detail-section-heading {
-    @apply font-heading text-tour-detail-section font-normal text-text-primary mb-4 pb-2 border-b border-tour-detail-heading-rule;
+  /**
+   * Срок и уровень над текстом тура (`TourDetailMetaFacts`): сетка без рамки,
+   * нижняя граница отделяет от абзаца; появление по очереди (`animate-tour-meta-stagger-in`).
+   * Ниже 320px — один столбец; от `meta-min` (320px) — две колонки в ряд.
+   */
+  .tour-detail-key-facts {
+    @apply mb-6 grid grid-cols-1 gap-6 border-b border-divider pb-6 meta-min:grid-cols-2 meta-min:gap-8;
+  }
+
+  /** Акцентный блок стоимости (под галереей или под программой на мобильных). */
+  .tour-detail-price-highlight {
+    @apply rounded-card border border-divider bg-surface-light p-card-p shadow-tourIncludedPanel;
+  }
+
+  .tour-detail-price-highlight__accent {
+    @apply mx-auto mb-4 h-1 w-12 rounded-full sm:mx-0;
+  }
+
+  .tour-detail-key-facts__item {
+    @apply flex min-w-0 flex-col gap-1.5 opacity-0 animate-tour-meta-stagger-in;
+  }
+
+  .tour-detail-key-facts__item--delay-0 {
+    @apply delay-tour-meta-0;
+  }
+
+  .tour-detail-key-facts__item--delay-1 {
+    @apply delay-tour-meta-1;
+  }
+
+  .tour-detail-key-facts__item--delay-2 {
+    @apply delay-tour-meta-2;
+  }
+
+  /**
+   * Подписи над длительностью и сложностью (`TourDetailMetaFacts`):
+   * полупрозрачный текст и тонкая линия под заголовком на ширину колонки.
+   */
+  .tour-detail-key-facts__meta-title {
+    @apply w-full border-b border-divider pb-1.5 text-tooltip font-medium text-text-muted opacity-70;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-detail-key-facts__item {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
+  /** Нижний блок CTA страницы тура (не конкурирует с `.btn-cta-tour`). */
+  .tour-detail-footer-cta-block {
+    @apply mt-10 rounded-card border border-divider bg-surface-light p-card-p shadow-tourIncludedPanel;
+  }
+
+  .btn-tour-detail-footer-cta {
+    @apply inline-flex max-w-full min-w-48 items-center justify-center gap-2 rounded-cta border-2 border-brand-primary
+           bg-transparent px-8 py-3 font-semibold text-brand-primary transition-all duration-hover
+           hover:bg-brand-primary hover:text-text-inverse
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary
+           active:scale-95;
   }
 
   /** Карточка «Программа тура»: контур на фоне страницы. */
@@ -354,6 +481,26 @@
     }
     .reveal-hidden {
       @apply opacity-100 translate-y-0 visible pointer-events-auto;
+    }
+  }
+
+  /** Этапы программы тура: только opacity + translate (без `invisible`), текст остаётся в дереве доступности. */
+  .reveal-program-step-base {
+    @apply transition-[opacity,transform] duration-reveal ease-reveal-out;
+  }
+  .reveal-program-step-hidden {
+    @apply opacity-0 translate-y-reveal-y;
+  }
+  .reveal-program-step-visible {
+    @apply opacity-100 translate-y-0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-program-step-base {
+      transition: none !important;
+    }
+    .reveal-program-step-hidden {
+      @apply opacity-100 translate-y-0;
     }
   }
 

@@ -19,15 +19,31 @@ export interface Tour {
   heroPhrase: string;
   duration: string;
   difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert';
+  /**
+   * Если задано, на карточке и в мета-блоке страницы тура показывается этот текст
+   * вместо уровня сложности (например, «для новичков и опытных»).
+   */
+  metaAudienceLabel?: string;
   price: string;
+  /** Зачёркнутая «старая» цена под основной (например, до обновления прайса). */
+  pricePrevious?: string;
+  /** Подпись под блоком стоимости вместо стандартной из `UI.tourDetail.priceHighlightNote`. */
+  priceFootnote?: string;
   /** Основной текст блока «О туре». */
   description: string;
   /** Необязательный вводной фрагмент перед `description` (жирный, напр. название с высотой). */
   descriptionLeadBold?: string;
   program: TourProgramStep[];
+  /** Доп. примечания под программой (после общего дисклеймера о времени). */
+  programAdditionalNotes?: string[];
   includedInPrice: TourIncludedItem[];
   imageUrl: string;
   galleryImages: string[];
+  /**
+   * Если задано — фон блока «О туре» (`tour-detail-preface-bg`) вместо `galleryImages[1]`.
+   * URL из `src/constants/images.ts` или того же массива, что и `galleryImages`.
+   */
+  prefaceBackgroundImageUrl?: string;
 }
 
 export interface TeamMember {

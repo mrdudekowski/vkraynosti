@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /** Соответствует `base` в `vite.config.ts` и `basename` роутера. */
-const DEV_ORIGIN = 'http://127.0.0.1:5173/vkraynosti';
+/** Завершающий `/` нужен, чтобы относительные `goto('tours/...')` не «съедали» сегмент basename. */
+const DEV_ORIGIN = 'http://127.0.0.1:5173/vkraynosti/';
 
 export default defineConfig({
   testDir: './e2e',

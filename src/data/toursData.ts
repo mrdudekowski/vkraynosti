@@ -3,6 +3,7 @@ import {
   faBed,
   faChalkboardTeacher,
   faCheck,
+  faDog,
   faHelmetSafety,
   faHotTubPerson,
   faMugHot,
@@ -13,7 +14,22 @@ import {
   faUserTie,
 } from '@fortawesome/free-solid-svg-icons';
 import type { Tour, TourIncludedItem } from '../types';
-import { IMAGES, SPRING_TOUR_COVERS, TOUR_WINTER_1_COVER, TOUR_WINTER_1_GALLERY } from '../constants/images';
+import {
+  IMAGES,
+  SPRING_TOUR_COVERS,
+  TOUR_WINTER_1_COVER,
+  TOUR_WINTER_1_GALLERY,
+  TOUR_WINTER_2_COVER,
+  TOUR_WINTER_2_GALLERY,
+  TOUR_WINTER_3_COVER,
+  TOUR_WINTER_3_GALLERY,
+  TOUR_WINTER_3_PREFACE_BACKGROUND,
+  TOUR_WINTER_4_COVER,
+  TOUR_WINTER_4_GALLERY,
+  TOUR_WINTER_5_COVER,
+  TOUR_WINTER_5_GALLERY,
+} from '../constants/images';
+import { UI } from '../constants/ui';
 
 const inc = (text: string, icon: IconDefinition = faCheck): TourIncludedItem => ({
   text,
@@ -21,7 +37,7 @@ const inc = (text: string, icon: IconDefinition = faCheck): TourIncludedItem => 
 });
 
 export const TOURS: Tour[] = [
-  // WINTER — 3 tours
+  // WINTER — 5 tours
   {
     id: 'winter-1',
     season: 'winter',
@@ -103,12 +119,8 @@ export const TOURS: Tour[] = [
       inc('Ледянки/хобы для весёлой прокатки', faSnowboarding),
       inc('Гид-проводник и захватывающие истории о крае и местности', faUserTie),
     ],
-    imageUrl: IMAGES.tours.placeholder,
-    galleryImages: [
-      IMAGES.tours.placeholder,
-      IMAGES.tours.gallery,
-      IMAGES.tours.gallery,
-    ],
+    imageUrl: TOUR_WINTER_2_COVER,
+    galleryImages: [...TOUR_WINTER_2_GALLERY],
   },
   {
     id: 'winter-3',
@@ -181,12 +193,135 @@ export const TOURS: Tour[] = [
       inc('2 часа группового занятия с сертифицированным инструктором', faChalkboardTeacher),
       inc('Помощь в подборе и аренде снаряжения для новичков', faHelmetSafety),
     ],
-    imageUrl: IMAGES.tours.placeholder,
-    galleryImages: [
-      IMAGES.tours.placeholder,
-      IMAGES.tours.gallery,
-      IMAGES.tours.gallery,
+    imageUrl: TOUR_WINTER_3_COVER,
+    galleryImages: [...TOUR_WINTER_3_GALLERY],
+    prefaceBackgroundImageUrl: TOUR_WINTER_3_PREFACE_BACKGROUND,
+  },
+  {
+    id: 'winter-4',
+    season: 'winter',
+    title: 'Хаски-тур',
+    subtitle:
+      'Знакомство с дружелюбными хаски и историей Приморского края — и всё это в один день!',
+    heroPhrase: 'Катания в собачьих упряжках в зимнем лесу',
+    duration: '12,5 ч (день целиком), активная часть — 6,5 ч',
+    difficulty: 'Easy',
+    price: UI.tourCard.winterPriceLead,
+    pricePrevious: '6 500 ₽',
+    priceFootnote: 'Актуальную стоимость сообщим по запросу.',
+    description:
+      'Почувствуете настоящий драйв, управляя собачьей упряжкой, ощутите всё величие скальных комплексов Приморского края, а также погрузитесь в историю и недра Екатериновских пещер — и всё это за один день!',
+    program: [
+      { timeLabel: '7:00', description: 'Выезд из г. Владивосток' },
+      { timeLabel: '9:00', description: 'Остановка в кафе «Ущелье Дарданеллы»' },
+      {
+        timeLabel: '10:00–12:30',
+        description:
+          'Прибытие к пушистикам: катание на собачьих упряжках, а также возможность пообщаться и поиграть с животными',
+      },
+      { timeLabel: '12:30–13:00', description: 'Горячий обед' },
+      { timeLabel: '13:00', description: 'Выезд в сторону Екатериновки' },
+      {
+        timeLabel: '14:00–16:30',
+        description:
+          'Прибытие на скалу Пржевальского: прогулка по окрестностям, посещение пещер (с учётом уровня подготовки туристов и погодных условий), фотосессия с гигантскими сосульками (при наличии), посещение смотровой площадки с панорамными видами',
+      },
+      { timeLabel: '16:30', description: 'Отправление в город' },
+      { timeLabel: '19:30', description: 'Прибытие в г. Владивосток' },
     ],
+    includedInPrice: [
+      inc('Трансфер от точки сбора и обратно во Владивосток', faShuttleVan),
+      inc('Горячее питание', faMugHot),
+      inc('Катание в собачьих упряжках', faDog),
+      inc('Гид-проводник и захватывающие истории о крае и местности', faUserTie),
+    ],
+    imageUrl: TOUR_WINTER_4_COVER,
+    galleryImages: [...TOUR_WINTER_4_GALLERY],
+  },
+  {
+    id: 'winter-5',
+    season: 'winter',
+    title: 'Горнолыжный уикенд: АрсГора',
+    subtitle: '2 дня снежного склона на обновлённых трассах Арсеньева',
+    heroPhrase:
+      'Горнолыжный склон в Арсеньеве ждёт приморских райдеров!',
+    duration: '2 дня',
+    difficulty: 'Medium',
+    metaAudienceLabel: 'Для новичков и опытных райдеров',
+    price: UI.tourCard.winterPricePlaceholderNoListing,
+    pricePrevious: '13 000 ₽',
+    priceFootnote: 'Актуальную стоимость сообщим по запросу.',
+    descriptionLeadBold: '2 дня чистого горного вайба на АрсГоре!',
+    description:
+      ' — приглашаем провести уикенд в нашей тёплой компании! Тур как для опытных райдеров, так и для новичков. Будем кататься, общаться и расслабляться!',
+    program: [
+      {
+        timeLabel: 'День 1 · 6:30',
+        description: 'Выезд из г. Владивосток',
+      },
+      {
+        timeLabel: 'День 1 · 10:00',
+        description: 'Прибытие в г. Арсеньев',
+      },
+      {
+        timeLabel: 'День 1 · 10:00–11:00',
+        description:
+          'Покупка ски-пассов, аренда оборудования, экипировка',
+      },
+      {
+        timeLabel: 'День 1 · 11:00–17:00',
+        description:
+          'Время на склоне: лыжи, сноуборд, прогулки; 2 часа группового занятия с сертифицированным инструктором по сноуборду или лыжам',
+      },
+      {
+        timeLabel: 'День 1 · 17:30–18:00',
+        description: 'Заселение в общий дом, свободное время',
+      },
+      { timeLabel: 'День 1 · 18:00', description: 'Ужин-барбекю' },
+      {
+        timeLabel: 'День 1 · 19:00',
+        description:
+          'Баня и парение (по желанию), общение, музыка, настолки, отдых',
+      },
+      { timeLabel: 'День 2 · 8:30', description: 'Завтрак' },
+      { timeLabel: 'День 2 · 9:50', description: 'Выезд на склон' },
+      {
+        timeLabel: 'День 2 · 10:00–17:00',
+        description:
+          'Время на склоне: лыжи, сноуборд, прогулки; 2 часа группового занятия с сертифицированным инструктором по сноуборду или лыжам',
+      },
+      {
+        timeLabel: 'День 2 · 17:30',
+        description: 'Сдача оборудования, ски-пассов, выезд в город',
+      },
+      {
+        timeLabel: 'День 2 · 22:00',
+        description:
+          'Прибытие в г. Владивосток, сдача оборудования (при необходимости)',
+      },
+    ],
+    programAdditionalNotes: [
+      'В программу включены ужин первого дня и завтрак второго дня; перекусы возьмите с собой или приобретите в местном кафе на средней станции.',
+    ],
+    includedInPrice: [
+      inc('Трансфер от точки сбора и обратно во Владивосток', faShuttleVan),
+      inc(
+        'Проживание у самого склона в большом доме с огороженной территорией (1 ночь)',
+        faBed
+      ),
+      inc('Питание: сытный ужин-барбекю и завтрак', faMugHot),
+      inc('Баня и парение на весь вечер 1-го дня', faHotTubPerson),
+      inc(
+        '2 часа группового занятия с сертифицированным инструктором',
+        faChalkboardTeacher
+      ),
+      inc(
+        'Помощь в подборе и аренде снаряжения для новичков',
+        faHelmetSafety
+      ),
+    ],
+    imageUrl: TOUR_WINTER_5_COVER,
+    galleryImages: [...TOUR_WINTER_5_GALLERY],
   },
 
   // SPRING — 4 tours

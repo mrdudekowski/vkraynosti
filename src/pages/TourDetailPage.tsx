@@ -1,29 +1,30 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faClock,
-  faChartLine,
-  faTag,
-} from "@fortawesome/free-solid-svg-icons";
+import { faClock, faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
 import { getTourById } from "../data/toursData";
 import {
   ROUTES,
   SEASON_TO_LIST_ROUTE,
   buildTourDetailPath,
 } from "../constants/routes";
+import { TOUR_WINTER_3_PREFACE_BACKGROUND } from "../constants/images";
 import { UI } from "../constants/ui";
-import Breadcrumbs from "../components/shared/Breadcrumbs";
 import PageMeta from "../components/shared/PageMeta";
 import TourDetailHero from "../components/tours/TourDetailHero";
 import TourDetailGallery from "../components/tours/TourDetailGallery";
 import TourPhotoViewer from "../components/tours/TourPhotoViewer";
 import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
+import TourDetailSectionHeading from "../components/tours/TourDetailSectionHeading";
+import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
+import TourDetailPriceHighlight from "../components/tours/TourDetailPriceHighlight";
 import TourIncludedIconList from "../components/tours/TourIncludedIconList";
 import RevealBox from "../components/shared/RevealBox";
-import { SEASON_PAGE_BG_CLASS } from "../constants/seasonTheme";
+import SeasonPageBackdrop from "../components/seasons/SeasonPageBackdrop";
 import { BREAKPOINT_LG_PX } from "../constants/reveal";
 import { useMatchMinWidth } from "../hooks/useMatchMinWidth";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
+import { useTourProgramScrollReveal } from "../hooks/useTourProgramScrollReveal";
 import { useModal } from "../context/useModal";
 
 const TourDetailPage = () => {
@@ -34,14 +35,30 @@ const TourDetailPage = () => {
   const tour = getTourById(tourId);
   const { openTourRequestModal } = useModal();
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const programRevealEnabled =
+    isLgOrAbove && !prefersReducedMotion && tour != null;
+  const mainColumnRef = useRef<HTMLDivElement>(null);
+  const { revealedCount } = useTourProgramScrollReveal({
+    stepCount: tour?.program.length ?? 0,
+    enabled: programRevealEnabled,
+    mainColumnRef,
+  });
   const [photoViewer, setPhotoViewer] = useState<{
     images: string[];
     initialIndex: number;
     tourTitle: string;
   } | null>(null);
 
+  /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе `galleryImages[1]` при длине галереи > 1. */
+  const prefaceBackgroundUrl =
+    tour == null
+      ? null
+      : (tour.prefaceBackgroundImageUrl ??
+        (tour.galleryImages.length > 1 ? tour.galleryImages[1] : null));
   const galleryGridImages =
-    tour && tour.galleryImages.length > 1 ? tour.galleryImages.slice(1) : [];
+    tour && tour.galleryImages.length > 2 ? tour.galleryImages.slice(2) : [];
+  const galleryFirstIndexInFullTour = 2;
 
   const handleOpenTourRequest = useCallback(() => {
     if (!tour) return;
@@ -80,8 +97,35 @@ const TourDetailPage = () => {
     .map((s) => s.description)
     .join(", ");
 
+  const includedRevealClassName =
+    prefaceBackgroundUrl != null
+      ? "tour-detail-included-column tour-detail-included-on-preface min-w-0"
+      : "tour-detail-included-column tour-detail-included-panel min-w-0";
+
+  const includedPanel = (
+    <RevealBox
+      as="div"
+      className={includedRevealClassName}
+      disabled={isLgOrAbove}
+    >
+      <div className="min-w-0">
+        <TourDetailSectionHeading
+          title={UI.tourDetail.includedHeading}
+          season={tour.season}
+          className="mb-4"
+        />
+        <TourIncludedIconList
+          tourId={tour.id}
+          season={tour.season}
+          items={tour.includedInPrice}
+        />
+      </div>
+    </RevealBox>
+  );
+
   return (
-    <div className={SEASON_PAGE_BG_CLASS[tour.season]}>
+    <div className="relative" data-testid="tour-detail-main">
+      <SeasonPageBackdrop season={tour.season} />
       <PageMeta
         title={`${tour.title} | Вкрайности`}
         description={`${tour.subtitle}. ${tour.duration}, ${tour.price}. ${metaSnippet}.`}
@@ -96,17 +140,9 @@ const TourDetailPage = () => {
         subtitle={tour.subtitle}
         backLinkTo={SEASON_TO_LIST_ROUTE[tour.season]}
         backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
-        onOpenPhoto={
-          tour.galleryImages.length > 0
-            ? () =>
-                setPhotoViewer({
-                  images: tour.galleryImages,
-                  initialIndex: 0,
-                  tourTitle: tour.title,
-                })
-            : undefined
+        desktopHeroImgClassName={
+          tour.id === 'winter-4' ? 'lg:object-tour-detail-hero-desktop-winter-4' : undefined
         }
-        openPhotoAriaLabel={UI.tourDetail.galleryPhoto.openHeroAria}
       />
 
       {photoViewer != null && (
@@ -121,89 +157,90 @@ const TourDetailPage = () => {
 
       <div className="tour-detail-page-gutter">
         <div className="tour-detail-page-inner">
-          <div className="tour-detail-page-meta-zone">
-            <Breadcrumbs
-              className="mb-6"
-              items={[
-                { label: UI.breadcrumbs.home, to: ROUTES.HOME },
-                {
-                  label: `${seasonInfo.emoji} ${seasonInfo.label}`,
-                  to: SEASON_TO_LIST_ROUTE[tour.season],
-                },
-                { label: tour.title },
-              ]}
-            />
-            <div className="flex flex-wrap gap-3">
-              <span className="flex items-center gap-2 bg-surface-light px-4 py-2 rounded-full text-tour-detail-meta text-text-muted">
-                <FontAwesomeIcon
-                  icon={faClock}
-                  className="text-brand-primary shrink-0"
-                />
-                {tour.duration}
-              </span>
-              <span
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-tour-detail-meta font-semibold ${UI.difficulty.styles[tour.difficulty]}`}
-              >
-                <FontAwesomeIcon icon={faChartLine} />
-                {UI.difficulty.labels[tour.difficulty]}
-              </span>
-              <span className="flex items-center gap-2 bg-brand-primary text-text-inverse px-4 py-2 rounded-full text-tour-detail-meta font-semibold">
-                <FontAwesomeIcon icon={faTag} />
-                {tour.price}
-              </span>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-x-0">
-            <div className="lg:col-span-2 tour-detail-main-column min-w-0">
-              <div className="tour-detail-about-included-grid">
-                <div className="tour-detail-about-column min-w-0">
-                  <h2 className="tour-detail-section-heading">
-                    {UI.tourDetail.about}
-                  </h2>
-                  <p className="text-tour-detail-prose text-text-muted max-w-prose">
-                    {tour.descriptionLeadBold != null &&
-                      tour.descriptionLeadBold.length > 0 && (
-                        <strong className="font-bold">{tour.descriptionLeadBold}</strong>
-                      )}
-                    {tour.description}
-                  </p>
-                  <div className="mt-8 max-w-prose">
-                    <TourRequestCtaButton onClick={handleOpenTourRequest} />
+            <div
+              ref={mainColumnRef}
+              className="lg:col-span-2 tour-detail-main-column min-w-0"
+            >
+              {prefaceBackgroundUrl != null && (
+                <div className="tour-detail-meta-below-hero mb-tour-detail-meta-to-preface">
+                  <TourDetailMetaFacts
+                    size="prominent"
+                    duration={tour.duration}
+                    difficulty={tour.difficulty}
+                    metaAudienceLabel={tour.metaAudienceLabel}
+                  />
+                </div>
+              )}
+              {prefaceBackgroundUrl != null ? (
+                <div className="tour-detail-preface-bg">
+                  <div
+                    className={
+                      prefaceBackgroundUrl === TOUR_WINTER_3_PREFACE_BACKGROUND
+                        ? "tour-detail-preface-bg__image bg-preface-winter-3-boarder"
+                        : "tour-detail-preface-bg__image"
+                    }
+                    style={{ backgroundImage: `url(${prefaceBackgroundUrl})` }}
+                    aria-hidden
+                  />
+                  <div className="tour-detail-preface-bg__scrim" aria-hidden />
+                  <div className="tour-detail-preface-bg__content">
+                    <div className="tour-detail-about-included-grid">
+                      <div className="tour-detail-about-column min-w-0">
+                        <p className="text-tour-detail-prose max-w-prose">
+                          {tour.descriptionLeadBold != null &&
+                            tour.descriptionLeadBold.length > 0 && (
+                              <strong className="font-bold">
+                                {tour.descriptionLeadBold}
+                              </strong>
+                            )}
+                          {tour.description}
+                        </p>
+                        <div className="mt-8 max-w-prose">
+                          <TourRequestCtaButton
+                            onClick={handleOpenTourRequest}
+                          />
+                        </div>
+                      </div>
+                      {includedPanel}
+                    </div>
                   </div>
                 </div>
-                <RevealBox
-                  as="div"
-                  className="tour-detail-included-column tour-detail-included-panel min-w-0"
-                  disabled={isLgOrAbove}
-                >
-                  <div className="min-w-0">
-                    <h2 className="tour-detail-section-heading">
-                      {UI.tourDetail.includedHeading}
-                    </h2>
-                    <TourIncludedIconList
-                      tourId={tour.id}
-                      season={tour.season}
-                      items={tour.includedInPrice}
+              ) : (
+                <div className="tour-detail-about-included-grid">
+                  <div className="tour-detail-about-column min-w-0">
+                    <TourDetailMetaFacts
+                      duration={tour.duration}
+                      difficulty={tour.difficulty}
+                      metaAudienceLabel={tour.metaAudienceLabel}
                     />
+                    <p className="text-tour-detail-prose text-text-muted max-w-prose">
+                      {tour.descriptionLeadBold != null &&
+                        tour.descriptionLeadBold.length > 0 && (
+                          <strong className="font-bold">
+                            {tour.descriptionLeadBold}
+                          </strong>
+                        )}
+                      {tour.description}
+                    </p>
+                    <div className="mt-8 max-w-prose">
+                      <TourRequestCtaButton onClick={handleOpenTourRequest} />
+                    </div>
                   </div>
-                </RevealBox>
-              </div>
+                  {includedPanel}
+                </div>
+              )}
 
               {galleryGridImages.length > 0 && (
                 <div className="w-full min-w-0">
-                  <div className="tour-gallery-section-heading">
-                    <span
-                      className="tour-gallery-section-heading-accent"
-                      aria-hidden
-                    />
-                    <h2 className="font-heading text-tour-detail-section font-normal text-text-primary">
-                      {UI.tourDetail.gallery}
-                    </h2>
-                  </div>
+                  <TourDetailSectionHeading
+                    title={UI.tourDetail.gallery}
+                    season={tour.season}
+                    className="mb-gallery-gap"
+                  />
                   <TourDetailGallery
                     images={galleryGridImages}
-                    firstImageIndexInTourGallery={1}
+                    firstImageIndexInTourGallery={galleryFirstIndexInFullTour}
                     tourTitle={tour.title}
                     onOpenPhoto={(idx) =>
                       setPhotoViewer({
@@ -213,21 +250,44 @@ const TourDetailPage = () => {
                       })
                     }
                     layoutVariant={
-                      tour.id === "winter-1" ? "izubrinaya" : "default"
+                      tour.id === "winter-1"
+                        ? "izubrinaya"
+                        : tour.id === "winter-5"
+                          ? "arsgora"
+                          : "default"
                     }
                   />
                 </div>
               )}
+              <div className="hidden lg:mt-10 lg:block">
+                <TourDetailPriceHighlight
+                  price={tour.price}
+                  pricePrevious={tour.pricePrevious}
+                  footnote={tour.priceFootnote}
+                  season={tour.season}
+                  ariaHidden={!isLgOrAbove}
+                />
+              </div>
             </div>
 
             <div>
               <div className="tour-detail-program-card">
-                <h2 className="font-heading text-tour-detail-program-heading font-normal text-text-primary mb-4">
-                  {UI.tourDetail.programHeading}
-                </h2>
+                <TourDetailSectionHeading
+                  title={UI.tourDetail.programHeading}
+                  season={tour.season}
+                  size="program"
+                  className="mb-4"
+                />
                 <ol className="border-l border-divider pl-4 ml-2 space-y-6">
                   {tour.program.map((step, idx) => (
-                    <li key={`${step.timeLabel}-${idx}`} className="flex gap-3">
+                    <li
+                      key={`${step.timeLabel}-${idx}`}
+                      className={`flex gap-3 reveal-program-step-base ${
+                        !programRevealEnabled || idx < revealedCount
+                          ? "reveal-program-step-visible"
+                          : "reveal-program-step-hidden"
+                      }`}
+                    >
                       <FontAwesomeIcon
                         icon={faClock}
                         className="text-brand-primary mt-1 shrink-0"
@@ -247,18 +307,42 @@ const TourDetailPage = () => {
                 <p className="text-tooltip text-text-muted mt-8 lg:mt-10 leading-relaxed">
                   {UI.tourDetail.programTimeDisclaimer}
                 </p>
+                {tour.programAdditionalNotes?.map((note, noteIdx) => (
+                  <p
+                    key={`program-note-${noteIdx}`}
+                    className="text-tooltip text-text-muted mt-4 leading-relaxed"
+                  >
+                    {note}
+                  </p>
+                ))}
               </div>
             </div>
           </div>
 
-          <div className="mt-10 pt-8 border-t border-divider">
-            <button
-              type="button"
-              onClick={handleOpenTourRequest}
-              className="btn-primary inline-flex items-center justify-center text-center"
-            >
-              {UI.tourDetail.askQuestionCta}
-            </button>
+          <div className="mt-10 lg:hidden">
+            <TourDetailPriceHighlight
+              price={tour.price}
+              pricePrevious={tour.pricePrevious}
+              footnote={tour.priceFootnote}
+              season={tour.season}
+              ariaHidden={isLgOrAbove}
+            />
+          </div>
+
+          <div className="mt-10 border-t border-divider pt-8">
+            <div className="tour-detail-footer-cta-block flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-prose text-tour-detail-prose text-text-muted">
+                {UI.tourDetail.askQuestionFooterLead}
+              </p>
+              <button
+                type="button"
+                onClick={handleOpenTourRequest}
+                className="btn-tour-detail-footer-cta shrink-0"
+              >
+                <FontAwesomeIcon icon={faCircleQuestion} className="shrink-0" aria-hidden />
+                {UI.tourDetail.askQuestionCta}
+              </button>
+            </div>
           </div>
         </div>
       </div>

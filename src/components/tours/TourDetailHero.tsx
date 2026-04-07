@@ -10,6 +10,8 @@ interface TourDetailHeroProps {
   subtitle: string;
   backLinkTo: string;
   backLinkLabel: string;
+  /** Классы `object-position` на `lg+` (токены `object-tour-detail-hero-desktop*` из темы). */
+  desktopHeroImgClassName?: string;
   /** Первое фото галереи — полноэкранный просмотр (закрытие по клику вне кадра). */
   onOpenPhoto?: () => void;
   openPhotoAriaLabel?: string;
@@ -22,6 +24,7 @@ const TourDetailHero = ({
   subtitle,
   backLinkTo,
   backLinkLabel,
+  desktopHeroImgClassName,
   onOpenPhoto,
   openPhotoAriaLabel = '',
 }: TourDetailHeroProps) => (
@@ -30,7 +33,7 @@ const TourDetailHero = ({
       src={imageUrl}
       alt={imageAlt}
       className="h-full w-full min-h-0"
-      imgClassName="object-center lg:object-tour-detail-hero-desktop"
+      imgClassName={`object-center ${desktopHeroImgClassName ?? 'lg:object-tour-detail-hero-desktop'}`}
       loading="eager"
       fetchPriority="high"
     />
@@ -43,7 +46,7 @@ const TourDetailHero = ({
       />
     )}
     <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
-    <div className="absolute bottom-0 left-0 right-0 z-30 tour-detail-page-gutter py-8">
+    <div className="absolute bottom-0 left-0 right-0 z-30 tour-detail-page-gutter py-tour-detail-hero-overlay-y">
       <div className="tour-detail-page-measure flex flex-col gap-4">
         <Link
           to={backLinkTo}

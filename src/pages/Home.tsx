@@ -14,7 +14,7 @@ import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
-import { SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
+import SeasonPageBackdrop from '../components/seasons/SeasonPageBackdrop';
 import { NAVBAR_SCROLL_OFFSET_PX, scrollElementIntoViewAnchored } from '../constants/smoothScroll';
 
 const Home = () => {
@@ -29,7 +29,6 @@ const Home = () => {
     const el = document.getElementById(id);
     if (el) scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
   }, [location.pathname, location.hash, lenis]);
-  const seasonBgClass = SEASON_PAGE_BG_CLASS[activeSeason];
   const seasonSectionImage = IMAGES.seasonSection[activeSeason];
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
   return (
@@ -44,10 +43,7 @@ const Home = () => {
       <HeroCarousel />
 
       <section id="tours" className="relative isolate pt-home-section-top pb-home-stack-gap">
-        <div
-          className={`absolute inset-0 -z-10 transition-colors duration-season-change ${seasonBgClass}`}
-          aria-hidden
-        />
+        <SeasonPageBackdrop season={activeSeason} className="absolute inset-0 -z-10 overflow-hidden" />
         <RevealBox as="div" className="relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -63,10 +59,7 @@ const Home = () => {
       </section>
 
       <section className="relative isolate overflow-hidden min-h-season-section h-season-section md:min-h-season-section-md md:h-season-section-md pt-home-season-strip-pt">
-        <div
-          className={`absolute inset-0 z-0 transition-colors duration-season-change ${seasonBgClass}`}
-          aria-hidden
-        />
+        <SeasonPageBackdrop season={activeSeason} className="absolute inset-0 z-0 overflow-hidden" />
         {seasonSectionImage && (
           <div
             key={activeSeason}
@@ -85,10 +78,7 @@ const Home = () => {
       </section>
 
       <section className="relative isolate">
-        <div
-          className={`absolute inset-0 -z-10 transition-colors duration-season-change ${seasonBgClass}`}
-          aria-hidden
-        />
+        <SeasonPageBackdrop season={activeSeason} className="absolute inset-0 -z-10 overflow-hidden" />
         <RevealBox as="div" className="relative z-10">
           <TeamCarousel />
         </RevealBox>

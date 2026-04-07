@@ -6,7 +6,7 @@ import Breadcrumbs from '../shared/Breadcrumbs';
 import PageMeta from '../shared/PageMeta';
 import RevealBox from '../shared/RevealBox';
 import type { Season } from '../../types';
-import { SEASON_PAGE_BG_CLASS } from '../../constants/seasonTheme';
+import SeasonPageBackdrop from './SeasonPageBackdrop';
 
 interface SeasonPageLayoutProps {
   seasonKey: Season;
@@ -27,7 +27,8 @@ const SeasonPageLayout = ({
   const heroImageUrl = IMAGES.hero[seasonKey];
 
   return (
-    <div className={`min-h-screen ${SEASON_PAGE_BG_CLASS[seasonKey]}`}>
+    <div className="relative min-h-screen">
+      <SeasonPageBackdrop season={seasonKey} />
       <PageMeta
         title={metaTitle}
         description={metaDescription}

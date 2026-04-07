@@ -141,18 +141,43 @@ export const UI = {
       Expert: 'bg-difficulty-expert-bg text-difficulty-expert-fg',
     },
   },
+  tourCard: {
+    /** Чип на карточке, когда у тура задан `metaAudienceLabel`. */
+    audienceChipClasses: 'bg-brand-accent text-brand-primary',
+    /** Карточка тура на главной (сезон «зима»): основная строка цены; ниже — зачёркнутая ранее указанная сумма. */
+    winterPriceLead: 'Уточняйте стоимость',
+    /** Значение `Tour.price`, когда вместо суммы — заглушка; на карточке не дублируем её в зачёркнутой строке. */
+    winterPricePlaceholderNoListing: 'БЕЗ ЦЕНЫ',
+  },
   tourDetail: {
     about:      'Об этом туре',
-    gallery:    'Фотогалерея',
+    gallery:    'Наши Подвиги',
     programHeading: 'Программа тура',
     programTimeDisclaimer:
       '*Время указано примерно и может меняться из-за погодных или иных условий',
     includedHeading: 'Что включено в стоимость тура',
+    tourMetaFactsAriaLabel: 'Срок и сведения о туре',
+    metaLabelDuration: 'Срок',
+    metaLabelDifficulty: 'Сложность',
+    /** Над значением длительности в `TourDetailMetaFacts` (полупрозрачная подпись). */
+    metaDurationTitleAbove: 'Длительность',
+    /** Над значением сложности в `TourDetailMetaFacts` (полупрозрачная подпись). */
+    metaDifficultyTitleAbove: 'Уровень сложности',
+    /** Подпись и `aria-label` для блока аудитории, если задан `Tour.metaAudienceLabel`. */
+    metaAudienceTitleAbove: 'Для кого',
+    metaLabelPrice: 'Стоимость',
+    /** Блок цены под галереей (десктоп) или под программой (мобильные). */
+    priceHighlightLead: 'Стоимость участия',
+    priceHighlightNote: 'Указана на одного участника, в рублях.',
+    priceHighlightAriaLabel: 'Стоимость тура',
     requestTourCta:  'Оставить заявку на тур',
     /** Подпись при наведении на CTA заявки (буквы + стрелка в `.btn-cta-tour--dual`). */
     requestTourCtaHoverWordmark: 'Вкрайности',
     /** Нижний CTA страницы тура: стиль `btn-primary`, модальное окно заявки на тур. */
     askQuestionCta: 'Уточнить про тур',
+    /** Текст перед нижним CTA «Уточнить про тур». */
+    askQuestionFooterLead:
+      'Остались вопросы по маршруту, датам или условиям — напишите, ответим.',
     notFound:        'Тур не найден',
     notFoundWithId:  'Тур с ID «{id}» не существует.',
     homeLink:   'На главную',

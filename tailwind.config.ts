@@ -27,6 +27,8 @@ const KEYFRAME_SLIDE_IN_X = '-1.25rem' as const
 
 const FADE_UP_DURATION = '720ms' as const
 const SLIDE_IN_DURATION = '480ms' as const
+/** Keyframe `tour-meta-stagger-in` (мета-блок страницы тура). */
+const KEYFRAME_TOUR_META_STAGGER_Y = '0.375rem' as const
 const SCALE_IN_DURATION = '360ms' as const
 const SEASON_FLASH_DURATION = '900ms' as const
 
@@ -46,6 +48,32 @@ const hamburgerTheme = {
   rotate: '-45deg',
 } as const
 
+/**
+ * Пастельные остановки фона страницы по сезону (вертикальный градиент `bg-season-page-*`).
+ * Середина тона визуально близка к `colors.seasonBg.*`.
+ */
+const SEASON_PAGE_GRADIENT_STOPS = {
+  winter: { top: '#EEF6FC', bottom: '#C5DFF0' },
+  spring: { top: '#E4F7EE', bottom: '#B2E4C8' },
+  summer: { top: '#FFF5E6', bottom: '#F3DFB0' },
+  fall: { top: '#FAE8DC', bottom: '#E8C4A8' },
+} as const
+
+/**
+ * Радиальный «ореол» для слоя размытия (`bg-season-page-atmosphere-*` + `blur-season-page-soft`).
+ * База сезона — те же hex, что у `colors.seasonBg.*`.
+ */
+const SEASON_PAGE_ATMOSPHERE = {
+  winter:
+    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #D6E8F5 38%, transparent) 42%, transparent 72%)',
+  spring:
+    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #C8EDD8 38%, transparent) 42%, transparent 72%)',
+  summer:
+    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.5) 0%, color-mix(in srgb, #FDEBC8 40%, transparent) 42%, transparent 72%)',
+  fall:
+    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.46) 0%, color-mix(in srgb, #F5D5C0 42%, transparent) 42%, transparent 72%)',
+} as const
+
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   safelist: [
@@ -62,15 +90,28 @@ const config: Config = {
     'text-tour-detail-program-heading',
     'text-tour-detail-program-body',
     'text-tour-detail-meta',
+    'text-tour-detail-meta-prominent',
+    'text-tour-detail-meta-price-prominent',
     'text-tour-detail-included-icon-idle-horizontal',
     'text-tour-detail-included-icon-active-horizontal',
     'text-home-season-strip-label',
-    { pattern: /^object-tour-detail-hero-desktop$/, variants: ['lg'] },
+    { pattern: /^object-tour-detail-hero-desktop(-winter-4)?$/, variants: ['lg'] },
+    'object-gallery-winter-4-gora',
+    'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
     { pattern: /^drop-shadow-tour-included-hover-/ },
     { pattern: /^text-tourIncludedIcon-active-/ },
     /** Чтобы `@keyframes cta-letter-pop` попали в бандл (используются из `index.css`, не из утилит). */
     'animate-cta-letter-pop',
+    'animate-tour-meta-stagger-in',
+    'delay-tour-meta-0',
+    'delay-tour-meta-1',
+    'delay-tour-meta-2',
+    /** `SEASON_PAGE_*` в `seasonTheme.ts` — только строковая подстановка по сезону. */
+    { pattern: /^bg-season-page-(winter|spring|summer|fall)$/ },
+    { pattern: /^bg-season-page-atmosphere-(winter|spring|summer|fall)$/ },
+    'blur-season-page-soft',
+    'opacity-season-page-atmosphere',
   ],
   theme: {
     extend: {
@@ -98,6 +139,12 @@ const config: Config = {
          */
         tourIncludedIconStrip:
           'color-mix(in srgb, #F7F5F0 58%, transparent)',
+        /**
+         * Ряд иконок «Что включено» на фото-префейсе: тёмный полупрозрачный фон на скриме.
+         * База — `surface.dark` (#0D0D0D).
+         */
+        tourIncludedIconStripPreface:
+          'color-mix(in srgb, #0D0D0D 55%, transparent)',
         surface: {
           dark:  '#0D0D0D',
           light: '#F7F5F0',
@@ -182,6 +229,14 @@ const config: Config = {
         'tour-detail-program-body': ['1rem', { lineHeight: '1.5' }],
         /** Бейджи длительности / сложности / цены под hero. */
         'tour-detail-meta': ['1rem', { lineHeight: '1.5' }],
+        /**
+         * Крупный ряд под hero: от базового `tour-detail-meta` ×2, затем −35% (×0.65) ≈ 1.3rem.
+         */
+        'tour-detail-meta-prominent': ['1.3rem', { lineHeight: '1.5' }],
+        /**
+         * Цена в том же ряду: от 2× `text-xl` (1.25rem), затем −35% ≈ 1.625rem.
+         */
+        'tour-detail-meta-price-prominent': ['1.625rem', { lineHeight: '1.2' }],
         /** Подпись «В другой сезон» над переключателем на главной (полоса с фоном). */
         'home-season-strip-label': ['1.125rem', { lineHeight: '1.35', letterSpacing: '0.1em' }],
         /** Крупная иконка в списке «Что включено» до hover/tap (страница тура). */
@@ -206,6 +261,24 @@ const config: Config = {
          */
         'tour-included-panel':
           'linear-gradient(180deg, color-mix(in srgb, #F7F5F0 75%, transparent) 0%, color-mix(in srgb, #F7F5F0 52%, transparent) 100%)',
+        /** Фон страницы сезона: пастельный вертикальный градиент. Остановки — `SEASON_PAGE_GRADIENT_STOPS`. */
+        'season-page-winter': `linear-gradient(180deg, ${SEASON_PAGE_GRADIENT_STOPS.winter.top} 0%, ${SEASON_PAGE_GRADIENT_STOPS.winter.bottom} 100%)`,
+        'season-page-spring': `linear-gradient(180deg, ${SEASON_PAGE_GRADIENT_STOPS.spring.top} 0%, ${SEASON_PAGE_GRADIENT_STOPS.spring.bottom} 100%)`,
+        'season-page-summer': `linear-gradient(180deg, ${SEASON_PAGE_GRADIENT_STOPS.summer.top} 0%, ${SEASON_PAGE_GRADIENT_STOPS.summer.bottom} 100%)`,
+        'season-page-fall': `linear-gradient(180deg, ${SEASON_PAGE_GRADIENT_STOPS.fall.top} 0%, ${SEASON_PAGE_GRADIENT_STOPS.fall.bottom} 100%)`,
+        /** Размываемый слой «мягкости» поверх `season-page-*` (см. `SeasonPageBackdrop`). */
+        'season-page-atmosphere-winter': SEASON_PAGE_ATMOSPHERE.winter,
+        'season-page-atmosphere-spring': SEASON_PAGE_ATMOSPHERE.spring,
+        'season-page-atmosphere-summer': SEASON_PAGE_ATMOSPHERE.summer,
+        'season-page-atmosphere-fall': SEASON_PAGE_ATMOSPHERE.fall,
+      },
+      blur: {
+        /** Декоративный слой сезонного фона (`SeasonPageBackdrop`). */
+        'season-page-soft': '64px',
+      },
+      opacity: {
+        /** Непрозрачность радиального слоя перед `blur-season-page-soft`. */
+        'season-page-atmosphere': '0.42',
       },
       aspectRatio: {
         /** Первый ряд фотогалереи тура (широкий кадр под героем страницы). */
@@ -218,13 +291,23 @@ const config: Config = {
         /** Вертикальный акцент (первый кадр «Изюбриная» и др.) — выше широкого 21:9. */
         'gallery-portrait': '3 / 4',
       },
+      backgroundPosition: {
+        /**
+         * Фон блока «О туре» winter-3 (`gr.boarder`): якорь выше центра, чтобы в кадре оставалось лицо райдера при `bg-cover`.
+         */
+        'preface-winter-3-boarder': 'center 26%',
+      },
       objectPosition: {
         /** Кадр `iz.rest4`: якорь обрезки при `object-cover` — верхняя часть кадра (лица). */
         'gallery-winter-rest4': '50% 28%',
+        /** Галерея хаски-тур: кадр `hs.gora` (квадрат внизу сетки) — якорь при `object-cover`. */
+        'gallery-winter-4-gora': 'center 58%',
         /**
          * Hero страницы тура (lg+): вертикальный якорь `calc(36% + 100px)` (на 200px ниже прежнего `36% - 100px`).
          */
         'tour-detail-hero-desktop': 'center calc(36% + 100px)',
+        /** Хаски-тур (winter-4): чуть ниже дефолтного hero, без обрезки голов (см. `tour-detail-hero-desktop`). */
+        'tour-detail-hero-desktop-winter-4': 'center 43%',
       },
       spacing: {
         /** Зазор между ячейками сетки фотогалереи на странице тура. */
@@ -235,6 +318,18 @@ const config: Config = {
         'tour-detail-col-divider-gap': '3rem',
         /** Высота вертикального акцента у заголовка секции галереи. */
         'tour-gallery-heading-accent': '1.25rem',
+        /** Ширина вертикального акцента у заголовков секций страницы тура. */
+        'tour-detail-heading-accent': '0.25rem',
+        /** Нижняя зона `TourDetailHero` (название, подзаголовок): вертикальный паддинг. */
+        'tour-detail-hero-overlay-y': '1.25rem',
+        /** Верхний отступ `tour-detail-page-inner` под hero (нижний — `tour-detail-page-inner-pb`). */
+        'tour-detail-page-inner-pt': '2rem',
+        'tour-detail-page-inner-pb': '3rem',
+        /** Между мета-блоком и `tour-detail-preface-bg`. */
+        'tour-detail-meta-to-preface': '1.5rem',
+        /** Верхний паддинг контента `tour-detail-preface-bg`. */
+        'tour-detail-preface-pt': '1.5rem',
+        'tour-detail-preface-pt-sm': '2rem',
         /** Совпадает с `h-16` у фиксированного Navbar — для `h-hero-viewport`. */
         'navbar': '4rem',
         /**
@@ -501,6 +596,13 @@ const config: Config = {
           '32%': { clipPath: 'inset(0 100% 0 0)', opacity: '0' },
           '100%': { clipPath: 'inset(0 100% 0 0)', opacity: '0' },
         },
+        'tour-meta-stagger-in': {
+          '0%': {
+            opacity: '0',
+            transform: `translateY(${KEYFRAME_TOUR_META_STAGGER_Y})`,
+          },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -516,8 +618,18 @@ const config: Config = {
         'tour-included-motor-exit': `tour-included-motor-exit ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         'tour-included-text-enter': `tour-included-text-enter ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         'tour-included-text-exit': `tour-included-text-exit ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+        'tour-meta-stagger-in': `tour-meta-stagger-in ${SLIDE_IN_DURATION} ease forwards`,
+      },
+      transitionDelay: {
+        'tour-meta-0': '0ms',
+        'tour-meta-1': '80ms',
+        'tour-meta-2': '160ms',
       },
       screens: {
+        /**
+         * Ряд «Срок / Сложность» (`TourDetailMetaFacts`): ниже 320px — столбец, от 320px — две колонки.
+         */
+        'meta-min': '320px',
         xs:         '360px',  // Small Androids
         phone:      '375px',  // iPhone SE 2nd gen / mini class
         'phone-lg': '390px',  // iPhone 14 Pro / Pixel 6

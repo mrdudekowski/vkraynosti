@@ -1,9 +1,22 @@
 import { type ReactNode } from 'react';
 import PlaceholderImage from '../shared/PlaceholderImage';
-import { TOUR_WINTER_1_REST4_IMAGE, TOUR_WINTER_1_TOP_IMAGE } from '../../constants/images';
+import {
+  TOUR_WINTER_1_REST4_IMAGE,
+  TOUR_WINTER_1_TOP_IMAGE,
+  TOUR_WINTER_2_PEAK_IMAGE,
+  TOUR_WINTER_3_CLIP1_VIDEO,
+  TOUR_WINTER_3_CLIP2_VIDEO,
+  TOUR_WINTER_3_CLIP3_VIDEO,
+  TOUR_WINTER_3_LIFT_IMAGE,
+  TOUR_WINTER_4_CLIP1_VIDEO,
+  TOUR_WINTER_4_DOGGO_IMAGE,
+  TOUR_WINTER_4_DOGGOS_IMAGE,
+  TOUR_WINTER_4_GORA_IMAGE,
+} from '../../constants/images';
 import { UI } from '../../constants/ui';
+import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';
 
-export type TourGalleryLayoutVariant = 'default' | 'izubrinaya';
+export type TourGalleryLayoutVariant = 'default' | 'izubrinaya' | 'arsgora';
 
 export interface TourDetailGalleryProps {
   /** Кадры для сетки (без главного фото hero страницы). */
@@ -38,25 +51,56 @@ const TourDetailGallery = ({
     return tileClassName;
   };
 
-  const imgClassesForWinterFraming = (imageSrc: string) =>
-    imageSrc === TOUR_WINTER_1_REST4_IMAGE ? 'object-gallery-winter-rest4' : '';
+  const imgClassesForWinterFraming = (imageSrc: string) => {
+    if (imageSrc === TOUR_WINTER_1_REST4_IMAGE) return 'object-gallery-winter-rest4';
+    if (imageSrc === TOUR_WINTER_4_GORA_IMAGE) return 'object-gallery-winter-4-gora';
+    return '';
+  };
 
-  const renderTileButton = (src: string, indexInGrid: number, tileClassName: string) => {
+  const renderTileButton = (
+    src: string,
+    indexInGrid: number,
+    tileClassName: string,
+    additionalImgClass = ''
+  ) => {
     const idxInTour = firstImageIndexInTourGallery + indexInGrid;
     const humanN = String(idxInTour + 1);
     const resolvedTileClass = tileClassesWithWinterHeroLift(tileClassName, src);
-    const imgExtra = imgClassesForWinterFraming(src);
+    const imgExtra = [imgClassesForWinterFraming(src), additionalImgClass]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
     const staggerIndex = staggerCount++;
     const isFirstTile = staggerIndex === 0;
     const deferSrcUntilVisible = !isFirstTile;
 
     const tileAlt = `${tourTitle} — фото ${humanN}`;
 
+    if (isVideoAssetUrl(src)) {
+      return (
+        <div
+          key={`${src}-${indexInGrid}`}
+          className={`overflow-hidden rounded-card border-0 bg-transparent ${resolvedTileClass}`}
+          aria-hidden
+        >
+          <video
+            className="min-h-0 h-full w-full object-cover pointer-events-none"
+            src={src}
+            muted
+            loop
+            autoPlay
+            playsInline
+            preload={isFirstTile ? 'auto' : 'metadata'}
+          />
+        </div>
+      );
+    }
+
     return (
       <button
         key={`${src}-${indexInGrid}`}
         type="button"
-        className={`cursor-pointer overflow-hidden rounded-card border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary ${resolvedTileClass}`}
+        className={`cursor-pointer overflow-hidden rounded-card border-0 p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary bg-transparent ${resolvedTileClass}`}
         aria-label={openAriaForHumanNumber(humanN)}
         onClick={() => onOpenPhoto(idxInTour)}
       >
@@ -227,6 +271,31 @@ const TourDetailGallery = ({
     );
   };
 
+  /**
+   * АрсГора (winter-5): портрет; bento — doggie и clip1 по два квадрата по вертикали; нижний bento — clip2 слева на 2 ряда, справа trans-tail и team.
+   * Ровно 6 URL после `slice(2)` в `TourDetailPage`: lift, doggie, clip1, clip2, trans-tail, team.
+   */
+  if (layoutVariant === 'arsgora' && images.length === 6) {
+    const arsgoraBentoTallTile =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const arsgoraBentoTallTileRight =
+      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        {renderTileButton(images[0], 0, 'aspect-gallery-portrait w-full')}
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[1], 1, arsgoraBentoTallTile)}
+          {renderTileButton(images[2], 2, arsgoraBentoTallTileRight)}
+        </div>
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[3], 3, arsgoraBentoTallTile)}
+          {renderTileButton(images[4], 4, 'col-start-2 row-start-1 aspect-square w-full')}
+          {renderTileButton(images[5], 5, 'col-start-2 row-start-2 aspect-square w-full')}
+        </div>
+      </div>
+    );
+  }
+
   if (layoutVariant === 'izubrinaya') {
     return (
       <div className="flex flex-col gap-gallery-gap">
@@ -254,6 +323,105 @@ const TourDetailGallery = ({
         )}
 
         {images.length > 4 && renderIzubrinayaRemainder(images.slice(4), 4)}
+      </div>
+    );
+  }
+
+  /**
+   * Голец (winter-2): первый ряд — les2 слева, les3 справа; далее les4 и peak; перекусы внизу.
+   * Порядок в `images`: les2, les3, les4, peak, kushat, kushat2.
+   */
+  if (
+    layoutVariant === 'default' &&
+    images.length === 6 &&
+    images[3] === TOUR_WINTER_2_PEAK_IMAGE
+  ) {
+    const golecTile = 'aspect-square w-full min-h-0';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, `${golecTile} col-start-1`)}
+          {renderTileButton(images[1], 1, `${golecTile} col-start-2`)}
+        </div>
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[2], 2, `${golecTile} col-start-1`)}
+          {renderTileButton(images[3], 3, `${golecTile} col-start-2`)}
+        </div>
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[4], 4, `${golecTile} col-start-1`)}
+          {renderTileButton(images[5], 5, `${golecTile} col-start-2`)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Хаски-тур (winter-4): без верхней панорамы — сразу ролик слева на две строки сетки, справа doggo и doggos; ниже сетка clip2 / gora2 / `hs.gora.png`.
+   * Порядок в `images` после `slice(2)`: clip1, doggo, doggos, clip2, gora2, gora.
+   */
+  if (
+    layoutVariant === 'default' &&
+    images.length === 6 &&
+    images[0] === TOUR_WINTER_4_CLIP1_VIDEO &&
+    images[1] === TOUR_WINTER_4_DOGGO_IMAGE &&
+    images[2] === TOUR_WINTER_4_DOGGOS_IMAGE
+  ) {
+    const huskyBentoTile =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, huskyBentoTile)}
+          {renderTileButton(images[1], 1, 'col-start-2 row-start-1 aspect-square w-full')}
+          {renderTileButton(images[2], 2, 'col-start-2 row-start-2 aspect-square w-full')}
+        </div>
+        {renderRestGrid(images.slice(3), 3)}
+      </div>
+    );
+  }
+
+  /**
+   * Фалаза × Грибановка (winter-3): сверху bento — clip2 и clip3 по два квадрата по вертикали; под ними lift в сетке `grid-cols-4`, кадр на всю ширину (`col-span-4`) и `aspect-square` (1:1); два фото склона (board, board2; `gr.boarder` только в префейсе); elya/instr; clip1 и bbq; clip4/clip5.
+   * Порядок в `images` после `slice(2)`: lift, clip1, board, board2, clip2, elya, instr, clip3, bbq, clip4, clip5.
+   */
+  if (
+    layoutVariant === 'default' &&
+    images.length === 11 &&
+    images[0] === TOUR_WINTER_3_LIFT_IMAGE &&
+    images[1] === TOUR_WINTER_3_CLIP1_VIDEO &&
+    images[4] === TOUR_WINTER_3_CLIP2_VIDEO &&
+    images[7] === TOUR_WINTER_3_CLIP3_VIDEO
+  ) {
+    const falazaBentoTallLeft =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const falazaBentoTallRight =
+      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const squareTile = 'aspect-square w-full min-h-0';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[4], 4, falazaBentoTallLeft)}
+          {renderTileButton(images[7], 7, falazaBentoTallRight)}
+        </div>
+        <div className="grid grid-cols-4 gap-gallery-gap">
+          {renderTileButton(images[0], 0, 'col-span-4 aspect-square w-full min-h-0')}
+        </div>
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[2], 2, squareTile)}
+          {renderTileButton(images[3], 3, squareTile)}
+        </div>
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[5], 5, squareTile)}
+          {renderTileButton(images[6], 6, squareTile)}
+        </div>
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[1], 1, squareTile)}
+          {renderTileButton(images[8], 8, squareTile)}
+        </div>
+        <div className="grid grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[9], 9, squareTile)}
+          {renderTileButton(images[10], 10, squareTile)}
+        </div>
       </div>
     );
   }

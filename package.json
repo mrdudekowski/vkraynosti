@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:perf": "playwright test e2e/tour-detail-performance.spec.ts",
     "preview": "vite preview"
   },
   "dependencies": {

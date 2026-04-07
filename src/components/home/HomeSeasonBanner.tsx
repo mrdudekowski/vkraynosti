@@ -358,7 +358,6 @@ const HomeSeasonBanner = ({ season }: HomeSeasonBannerProps) => {
   const letters = useMemo(() => [...UI.homeSeasonBannerWordmark], []);
 
   if (import.meta.env.DEV && letters.length !== 10) {
-    // eslint-disable-next-line no-console -- контроль длины слова
     console.error('UI.homeSeasonBannerWordmark must contain exactly 10 characters');
   }
 

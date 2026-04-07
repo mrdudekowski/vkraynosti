@@ -56,26 +56,27 @@ export function useHomeSeasonBannerWhiteVeil({
   enabled,
 }: UseHomeSeasonBannerWhiteVeilOptions): { veilOpacity: number } {
   const lenis = useLenis();
-  const [veilOpacity, setVeilOpacity] = useState(0);
+  const [veilOpacityInternal, setVeilOpacityInternal] = useState(0);
   const rafIdRef = useRef<number | null>(null);
+  const veilOpacity = enabled ? veilOpacityInternal : 0;
 
   const runCompute = useCallback(() => {
     if (!enabled) {
-      setVeilOpacity((prev) => (prev === 0 ? prev : 0));
+      setVeilOpacityInternal((prev) => (prev === 0 ? prev : 0));
       return;
     }
     if (
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
-      setVeilOpacity((prev) => (prev === 0 ? prev : 0));
+      setVeilOpacityInternal((prev) => (prev === 0 ? prev : 0));
       return;
     }
     const next = computeHomeSeasonVeilOpacity(
       seasonStripSectionRef.current,
       teamSectionRef.current
     );
-    setVeilOpacity((prev) =>
+    setVeilOpacityInternal((prev) =>
       Math.abs(prev - next) < OPACITY_UPDATE_EPSILON ? prev : next
     );
   }, [enabled, seasonStripSectionRef, teamSectionRef]);
@@ -90,7 +91,6 @@ export function useHomeSeasonBannerWhiteVeil({
 
   useLayoutEffect(() => {
     if (!enabled) {
-      setVeilOpacity(0);
       return;
     }
 
@@ -108,7 +108,7 @@ export function useHomeSeasonBannerWhiteVeil({
     if (sectionEl) resizeObserver.observe(sectionEl);
     if (teamEl) resizeObserver.observe(teamEl);
 
-    runCompute();
+    scheduleCompute();
 
     return () => {
       unsubscribeLenis?.();

@@ -64,7 +64,7 @@ export function useTourProgramScrollReveal({
     const scrollY = lenis?.scroll ?? window.scrollY;
     const nextCount = computeRevealedCount(el, stepCount, scrollY);
     setScrollRevealedCount(nextCount);
-  }, [enabled, lenis, mainColumnRef, stepCount]);
+  }, [lenis, mainColumnRef, stepCount]);
 
   const scheduleCompute = useCallback(() => {
     if (rafIdRef.current != null) return;

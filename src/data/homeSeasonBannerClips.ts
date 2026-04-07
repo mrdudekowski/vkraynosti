@@ -123,7 +123,6 @@ const CLIPS_BY_SEASON: Record<Season, HomeSeasonBannerClip[]> = {
 export function getHomeSeasonBannerClips(season: Season): HomeSeasonBannerClip[] {
   const clips = CLIPS_BY_SEASON[season];
   if (import.meta.env.DEV && clips.length !== 10) {
-    // eslint-disable-next-line no-console -- отладка рассинхрона данных
     console.error('HomeSeasonBanner: expected 10 clip slots per season');
   }
   return clips;

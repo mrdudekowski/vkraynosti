@@ -8,6 +8,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { UI } from '../../constants/ui';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
+import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';
 
 interface TourPhotoViewerProps {
   images: string[];
@@ -122,14 +123,27 @@ const TourPhotoViewer = ({
             className="flex w-full shrink-0 justify-center p-4 md:max-h-full md:max-w-full md:items-center"
             onClick={e => e.stopPropagation()}
           >
-            <img
-              key={activeSrc}
-              src={activeSrc}
-              alt={alt}
-              className="h-auto w-auto max-w-none object-contain md:max-h-photo-viewer md:max-w-full"
-              loading="eager"
-              decoding="async"
-            />
+            {isVideoAssetUrl(activeSrc) ? (
+              <video
+                key={activeSrc}
+                className="h-auto w-auto max-w-none object-contain md:max-h-photo-viewer md:max-w-full"
+                src={activeSrc}
+                controls
+                playsInline
+                preload="metadata"
+              >
+                {alt}
+              </video>
+            ) : (
+              <img
+                key={activeSrc}
+                src={activeSrc}
+                alt={alt}
+                className="h-auto w-auto max-w-none object-contain md:max-h-photo-viewer md:max-w-full"
+                loading="eager"
+                decoding="async"
+              />
+            )}
           </div>
         </div>
 

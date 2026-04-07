@@ -13,7 +13,7 @@ import type { Season } from '../../types';
 /** Смонтирован с `key={activeSeason}` в родителе — сброс индекса слайда без setState в эффекте. */
 function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
   const tours = getToursBySeason(activeSeason);
-  const { current, next, prev, goTo } = useCarousel({
+  const { current, next, prev, goTo, visitedSlideIndices } = useCarousel({
     total: tours.length,
     autoplayMs: UI.hero.autoplayIntervalMs,
   });
@@ -21,8 +21,15 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
   return (
     <>
       {tours.map((tour, idx) => {
+        const isActive = idx === current;
+        const shouldLoadBackground = visitedSlideIndices.has(idx);
         return (
-          <CarouselSlide key={tour.id} backgroundUrl={tour.imageUrl} isActive={idx === current}>
+          <CarouselSlide
+            key={tour.id}
+            backgroundUrl={tour.imageUrl}
+            isActive={isActive}
+            shouldLoadBackground={shouldLoadBackground}
+          >
             <Link
               to={buildTourDetailPath(tour.season, tour.id)}
               className="text-center group flex flex-col items-center gap-hero-phrase-cta-gap pb-24 max-w-2xl mx-auto px-4"

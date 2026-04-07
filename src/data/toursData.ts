@@ -18,16 +18,21 @@ import {
   IMAGES,
   SPRING_TOUR_COVERS,
   TOUR_WINTER_1_COVER,
-  TOUR_WINTER_1_GALLERY,
+  TOUR_WINTER_1_GALLERY_GRID,
+  TOUR_WINTER_1_GALLERY_VIEWER,
   TOUR_WINTER_2_COVER,
-  TOUR_WINTER_2_GALLERY,
+  TOUR_WINTER_2_GALLERY_GRID,
+  TOUR_WINTER_2_GALLERY_VIEWER,
   TOUR_WINTER_3_COVER,
-  TOUR_WINTER_3_GALLERY,
+  TOUR_WINTER_3_GALLERY_GRID,
+  TOUR_WINTER_3_GALLERY_VIEWER,
   TOUR_WINTER_3_PREFACE_BACKGROUND,
   TOUR_WINTER_4_COVER,
-  TOUR_WINTER_4_GALLERY,
+  TOUR_WINTER_4_GALLERY_GRID,
+  TOUR_WINTER_4_GALLERY_VIEWER,
   TOUR_WINTER_5_COVER,
-  TOUR_WINTER_5_GALLERY,
+  TOUR_WINTER_5_GALLERY_GRID,
+  TOUR_WINTER_5_GALLERY_VIEWER,
 } from '../constants/images';
 import { UI } from '../constants/ui';
 
@@ -74,7 +79,8 @@ export const TOURS: Tour[] = [
       inc('Ледянки/хобы для весёлой прокатки', faSnowboarding),
     ],
     imageUrl: TOUR_WINTER_1_COVER,
-    galleryImages: [...TOUR_WINTER_1_GALLERY],
+    galleryImages: [...TOUR_WINTER_1_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_WINTER_1_GALLERY_GRID],
   },
   {
     id: 'winter-2',
@@ -120,7 +126,8 @@ export const TOURS: Tour[] = [
       inc('Гид-проводник и захватывающие истории о крае и местности', faUserTie),
     ],
     imageUrl: TOUR_WINTER_2_COVER,
-    galleryImages: [...TOUR_WINTER_2_GALLERY],
+    galleryImages: [...TOUR_WINTER_2_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_WINTER_2_GALLERY_GRID],
   },
   {
     id: 'winter-3',
@@ -194,7 +201,8 @@ export const TOURS: Tour[] = [
       inc('Помощь в подборе и аренде снаряжения для новичков', faHelmetSafety),
     ],
     imageUrl: TOUR_WINTER_3_COVER,
-    galleryImages: [...TOUR_WINTER_3_GALLERY],
+    galleryImages: [...TOUR_WINTER_3_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_WINTER_3_GALLERY_GRID],
     prefaceBackgroundImageUrl: TOUR_WINTER_3_PREFACE_BACKGROUND,
   },
   {
@@ -236,7 +244,8 @@ export const TOURS: Tour[] = [
       inc('Гид-проводник и захватывающие истории о крае и местности', faUserTie),
     ],
     imageUrl: TOUR_WINTER_4_COVER,
-    galleryImages: [...TOUR_WINTER_4_GALLERY],
+    galleryImages: [...TOUR_WINTER_4_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_WINTER_4_GALLERY_GRID],
   },
   {
     id: 'winter-5',
@@ -321,7 +330,8 @@ export const TOURS: Tour[] = [
       ),
     ],
     imageUrl: TOUR_WINTER_5_COVER,
-    galleryImages: [...TOUR_WINTER_5_GALLERY],
+    galleryImages: [...TOUR_WINTER_5_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_WINTER_5_GALLERY_GRID],
   },
 
   // SPRING — 4 tours

@@ -8,8 +8,17 @@ import {
   SEASON_TO_LIST_ROUTE,
   buildTourDetailPath,
 } from "../constants/routes";
-import { TOUR_WINTER_3_PREFACE_BACKGROUND } from "../constants/images";
+import {
+  TOUR_WINTER_3_GRID_VIDEO_POSTERS,
+  TOUR_WINTER_3_PREFACE_BACKGROUND,
+  TOUR_WINTER_4_GRID_VIDEO_POSTERS,
+  TOUR_WINTER_5_GRID_VIDEO_POSTERS,
+} from "../constants/images";
 import { UI } from "../constants/ui";
+import {
+  getTourGalleryGridUrls,
+  getTourGalleryViewerUrls,
+} from "../utils/tourGalleryUrls";
 import PageMeta from "../components/shared/PageMeta";
 import TourDetailHero from "../components/tours/TourDetailHero";
 import TourDetailGallery from "../components/tours/TourDetailGallery";
@@ -50,14 +59,17 @@ const TourDetailPage = () => {
     tourTitle: string;
   } | null>(null);
 
-  /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе `galleryImages[1]` при длине галереи > 1. */
+  const viewerGalleryUrls = tour == null ? [] : getTourGalleryViewerUrls(tour);
+  const gridGalleryUrls = tour == null ? [] : getTourGalleryGridUrls(tour);
+
+  /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе второй кадр viewer-галереи. */
   const prefaceBackgroundUrl =
     tour == null
       ? null
       : (tour.prefaceBackgroundImageUrl ??
-        (tour.galleryImages.length > 1 ? tour.galleryImages[1] : null));
+        (viewerGalleryUrls.length > 1 ? viewerGalleryUrls[1] : null));
   const galleryGridImages =
-    tour && tour.galleryImages.length > 2 ? tour.galleryImages.slice(2) : [];
+    tour && gridGalleryUrls.length > 2 ? gridGalleryUrls.slice(2) : [];
   const galleryFirstIndexInFullTour = 2;
 
   const handleOpenTourRequest = useCallback(() => {
@@ -129,7 +141,7 @@ const TourDetailPage = () => {
       <PageMeta
         title={`${tour.title} | Вкрайности`}
         description={`${tour.subtitle}. ${tour.duration}, ${tour.price}. ${metaSnippet}.`}
-        imageUrl={tour.imageUrl}
+        imageUrl={viewerGalleryUrls[0] ?? tour.imageUrl}
         path={buildTourDetailPath(tour.season, tour.id)}
       />
       <TourDetailHero
@@ -141,7 +153,11 @@ const TourDetailPage = () => {
         backLinkTo={SEASON_TO_LIST_ROUTE[tour.season]}
         backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
         desktopHeroImgClassName={
-          tour.id === 'winter-4' ? 'lg:object-tour-detail-hero-desktop-winter-4' : undefined
+          tour.id === 'winter-3'
+            ? 'lg:object-tour-detail-hero-desktop-winter-3'
+            : tour.id === 'winter-4'
+              ? 'lg:object-tour-detail-hero-desktop-winter-4'
+              : undefined
         }
       />
 
@@ -244,10 +260,20 @@ const TourDetailPage = () => {
                     tourTitle={tour.title}
                     onOpenPhoto={(idx) =>
                       setPhotoViewer({
-                        images: tour.galleryImages,
+                        images: getTourGalleryViewerUrls(tour),
                         initialIndex: idx,
                         tourTitle: tour.title,
                       })
+                    }
+                    prefersReducedMotion={prefersReducedMotion}
+                    getVideoPosterForGridSrc={
+                      tour.id === "winter-3"
+                        ? (src) => TOUR_WINTER_3_GRID_VIDEO_POSTERS[src]
+                        : tour.id === "winter-4"
+                          ? (src) => TOUR_WINTER_4_GRID_VIDEO_POSTERS[src]
+                          : tour.id === "winter-5"
+                            ? (src) => TOUR_WINTER_5_GRID_VIDEO_POSTERS[src]
+                            : undefined
                     }
                     layoutVariant={
                       tour.id === "winter-1"

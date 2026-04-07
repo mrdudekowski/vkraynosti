@@ -95,7 +95,7 @@ const config: Config = {
     'text-tour-detail-included-icon-idle-horizontal',
     'text-tour-detail-included-icon-active-horizontal',
     'text-home-season-strip-label',
-    { pattern: /^object-tour-detail-hero-desktop(-winter-4)?$/, variants: ['lg'] },
+    { pattern: /^object-tour-detail-hero-desktop(-winter-[34])?$/, variants: ['lg'] },
     'object-gallery-winter-4-gora',
     'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
@@ -299,15 +299,19 @@ const config: Config = {
       },
       objectPosition: {
         /** Кадр `iz.rest4`: якорь обрезки при `object-cover` — верхняя часть кадра (лица). */
-        'gallery-winter-rest4': '50% 28%',
+        'gallery-winter-rest4': '50% 43%',
         /** Галерея хаски-тур: кадр `hs.gora` (квадрат внизу сетки) — якорь при `object-cover`. */
-        'gallery-winter-4-gora': 'center 58%',
+        'gallery-winter-4-gora': 'center 73%',
         /**
-         * Hero страницы тура (lg+): вертикальный якорь `calc(36% + 100px)` (на 200px ниже прежнего `36% - 100px`).
+         * Hero страницы тура (lg+): вертикальный якорь `calc(51% + 100px)` (база 36%+100px + 15 п.п. по вертикали).
          */
-        'tour-detail-hero-desktop': 'center calc(36% + 100px)',
+        'tour-detail-hero-desktop': 'center calc(51% + 100px)',
+        /**
+         * Фалаза × Грибановка (winter-3): якорь ниже центра кадра (lg+), чтобы в обрезке hero оставались люди.
+         */
+        'tour-detail-hero-desktop-winter-3': 'center 77%',
         /** Хаски-тур (winter-4): чуть ниже дефолтного hero, без обрезки голов (см. `tour-detail-hero-desktop`). */
-        'tour-detail-hero-desktop-winter-4': 'center 43%',
+        'tour-detail-hero-desktop-winter-4': 'center 58%',
       },
       spacing: {
         /** Зазор между ячейками сетки фотогалереи на странице тура. */

@@ -1,24 +1,36 @@
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 /** Слайд героя: неактивные — `inert` (не `aria-hidden` на предке с фокусом у Link при смене слайда). */
 
 interface CarouselSlideProps {
   backgroundUrl: string;
   isActive: boolean;
+  /** Фон подгружается для активного слайда и для уже посещённых (родитель хранит множество индексов). */
+  shouldLoadBackground: boolean;
   children: ReactNode;
 }
 
-const CarouselSlide = ({ backgroundUrl, isActive, children }: CarouselSlideProps) => (
+const CarouselSlide = ({
+  backgroundUrl,
+  isActive,
+  shouldLoadBackground,
+  children,
+}: CarouselSlideProps) => {
+  return (
   <div
     className={`absolute inset-0 transition-opacity duration-carousel ${
       isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
     }`}
-    style={{
-      backgroundImage: `url(${backgroundUrl})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-    }}
+    style={
+      shouldLoadBackground
+        ? {
+            backgroundImage: `url(${backgroundUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }
+        : undefined
+    }
     inert={!isActive}
   >
     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
@@ -26,6 +38,7 @@ const CarouselSlide = ({ backgroundUrl, isActive, children }: CarouselSlideProps
       {children}
     </div>
   </div>
-);
+  );
+};
 
 export default CarouselSlide;

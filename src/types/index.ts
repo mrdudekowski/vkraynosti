@@ -38,7 +38,20 @@ export interface Tour {
   programAdditionalNotes?: string[];
   includedInPrice: TourIncludedItem[];
   imageUrl: string;
+  /**
+   * Канонический порядок медиа: полное качество для просмотрщика и префейса по индексу.
+   * Длина совпадает с `galleryGridUrls`, если он задан.
+   */
   galleryImages: string[];
+  /**
+   * Оптимизированные URL для сетки страницы тура и карточек (webp / низкий mp4).
+   * При отсутствии для сетки используется `galleryImages`.
+   */
+  galleryGridUrls?: string[];
+  /**
+   * Явный список URL для полноэкранного просмотра; иначе — `galleryImages`.
+   */
+  galleryViewerUrls?: string[];
   /**
    * Если задано — фон блока «О туре» (`tour-detail-preface-bg`) вместо `galleryImages[1]`.
    * URL из `src/constants/images.ts` или того же массива, что и `galleryImages`.

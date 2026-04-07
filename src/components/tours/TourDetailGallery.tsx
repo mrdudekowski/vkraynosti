@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import PlaceholderImage from '../shared/PlaceholderImage';
+import GalleryGridVideo from './GalleryGridVideo';
 import {
   TOUR_WINTER_1_REST4_IMAGE,
   TOUR_WINTER_1_TOP_IMAGE,
@@ -27,6 +28,10 @@ export interface TourDetailGalleryProps {
   /** Индекс в полном `tour.galleryImages` (для полноэкранного просмотра и стрелок). */
   onOpenPhoto: (indexInFullGallery: number) => void;
   layoutVariant?: TourGalleryLayoutVariant;
+  /** Уменьшить движение: в сетке только постер для видео. */
+  prefersReducedMotion?: boolean;
+  /** Постер webp для grid-mp4 по URL сетки (например winter-3). */
+  getVideoPosterForGridSrc?: (gridSrc: string) => string | undefined;
 }
 
 const openAriaForHumanNumber = (humanNumber: string) =>
@@ -38,6 +43,8 @@ const TourDetailGallery = ({
   tourTitle,
   onOpenPhoto,
   layoutVariant = 'default',
+  prefersReducedMotion = false,
+  getVideoPosterForGridSrc,
 }: TourDetailGalleryProps) => {
   if (images.length === 0) return null;
 
@@ -77,22 +84,15 @@ const TourDetailGallery = ({
     const tileAlt = `${tourTitle} — фото ${humanN}`;
 
     if (isVideoAssetUrl(src)) {
+      const poster = getVideoPosterForGridSrc?.(src);
       return (
-        <div
+        <GalleryGridVideo
           key={`${src}-${indexInGrid}`}
-          className={`overflow-hidden rounded-card border-0 bg-transparent ${resolvedTileClass}`}
-          aria-hidden
-        >
-          <video
-            className="min-h-0 h-full w-full object-cover pointer-events-none"
-            src={src}
-            muted
-            loop
-            autoPlay
-            playsInline
-            preload={isFirstTile ? 'auto' : 'metadata'}
-          />
-        </div>
+          gridSrc={src}
+          posterSrc={poster}
+          className={resolvedTileClass}
+          prefersReducedMotion={prefersReducedMotion}
+        />
       );
     }
 

@@ -1,0 +1,70 @@
+# Требуется ffmpeg в PATH (или запуск без PATH: `npm run generate:banner-loops` — node + ffmpeg-static).
+# Нарезает короткие лупы для баннера «В другой сезон» из существующих *.grid.mp4.
+#
+# Синхронизировать таблицу $Cuts с `src/data/homeSeasonBannerClips.ts` (WINTER_CLIPS: startSec, источник).
+# После генерации: пути к выходам — `HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS` и постеры в `images.ts`.
+#
+# Seek: по умолчанию -ss ПОСЛЕ -i (точная отсечка по времени; медленнее на длинных файлах).
+# Для ускорения можно перенести первый -ss перед -i (привязка к ключевым кадрам).
+param(
+  [switch]$DryRun,
+  # Сгенерировать *.banner-loop.poster.webp из первого кадра каждого лупа
+  [switch]$Posters
+)
+
+$ErrorActionPreference = "Stop"
+$repoRoot = Join-Path $PSScriptRoot ".." | Resolve-Path
+$publicTours = Join-Path $repoRoot "public\tours" | Resolve-Path
+. (Join-Path $PSScriptRoot "media\Invoke-Ffmpeg.ps1")
+
+$DurationSec = 2.4
+
+# Колонка баннера 0..9: подпапка tours, входной grid mp4, секунда старта в исходнике, имя выхода
+$Cuts = @(
+  @{ Subdir = "winter-3"; In = "gr.clip1.grid.mp4"; StartSec = 3;  Out = "gr.clip1.banner-loop.mp4" },
+  @{ Subdir = "winter-3"; In = "gr.clip3.grid.mp4"; StartSec = 0;  Out = "gr.clip3.banner-loop.mp4" },
+  @{ Subdir = "winter-3"; In = "gr.clip4.grid.mp4"; StartSec = 16; Out = "gr.clip4.banner-loop.mp4" },
+  @{ Subdir = "winter-3"; In = "gr.clip5.grid.mp4"; StartSec = 1;  Out = "gr.clip5.banner-loop.mp4" },
+  @{ Subdir = "winter-4"; In = "hs.clip1.grid.mp4"; StartSec = 5; Out = "hs.clip1.banner-loop.mp4" },
+  @{ Subdir = "winter-5"; In = "ars.clip1.grid.mp4"; StartSec = 2; Out = "ars.clip1.banner-loop.mp4" },
+  @{ Subdir = "winter-5"; In = "ars.clip2.grid.mp4"; StartSec = 7; Out = "ars.clip2.banner-loop.mp4" },
+  @{ Subdir = "winter-3"; In = "gr.board.grid.mp4"; StartSec = 0; Out = "gr.board.banner-loop.mp4" },
+  @{ Subdir = "winter-3"; In = "gr.elya.grid.mp4"; StartSec = 0; Out = "gr.elya.banner-loop.mp4" },
+  @{ Subdir = "winter-3"; In = "gr.bbq.grid.mp4"; StartSec = 0; Out = "gr.bbq.banner-loop.mp4" }
+)
+
+foreach ($row in $Cuts) {
+  $dir = Join-Path $publicTours $row.Subdir
+  $inPath = Join-Path $dir $row.In
+  $outPath = Join-Path $dir $row.Out
+  if (-not (Test-Path $inPath)) {
+    Write-Warning "Skip missing input: $inPath"
+    continue
+  }
+
+  $ffArgs = @(
+    '-y', '-i', $inPath,
+    '-ss', ([string]$row.StartSec).Replace(',', '.'),
+    '-t', ([string]$DurationSec).Replace(',', '.'),
+    '-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-crf', '28',
+    '-vf', "scale='min(854,iw)':-2",
+    '-an', '-movflags', '+faststart',
+    $outPath
+  )
+
+  if ($DryRun) {
+    Write-Host "ffmpeg $($ffArgs -join ' ')"
+    continue
+  }
+
+  Write-Host "-> $outPath"
+  Invoke-Ffmpeg $ffArgs
+
+  if ($Posters) {
+    $base = [System.IO.Path]::GetFileNameWithoutExtension($row.Out)
+    $posterPath = Join-Path $dir "${base}.poster.webp"
+    Invoke-Ffmpeg @('-y', '-i', $outPath, '-vframes', '1', '-q:v', '80', $posterPath)
+  }
+}
+
+Write-Host "Done. При смене нарезок обновите таблицу в скрипте и константы `HOME_SEASON_BANNER_WINTER_LOOP_*` в `src/constants/images.ts`."

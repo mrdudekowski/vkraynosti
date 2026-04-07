@@ -239,6 +239,38 @@ export const TOUR_WINTER_5_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_WINTER_5_GALLERY_GRID[5]]: `${TOUR_WINTER_5}/ars.clip2.poster.webp`,
 };
 
+/**
+ * Короткие лупы для баннера главной (колонки 0…9 ↔ `UI.homeSeasonBannerWordmark`).
+ * Генерация: `scripts/generate-home-season-banner-loop-videos.ps1` (флаг `-Posters` — кадр-постер из первого кадра лупа).
+ * Синхронизировать с таблицей `$Cuts` в том скрипте и с `src/data/homeSeasonBannerClips.ts`.
+ */
+export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS = [
+  `${TOUR_WINTER_3}/gr.clip1.banner-loop.mp4`,
+  `${TOUR_WINTER_3}/gr.clip3.banner-loop.mp4`,
+  `${TOUR_WINTER_3}/gr.clip4.banner-loop.mp4`,
+  `${TOUR_WINTER_3}/gr.clip5.banner-loop.mp4`,
+  `${TOUR_WINTER_4}/hs.clip1.banner-loop.mp4`,
+  `${TOUR_WINTER_5}/ars.clip1.banner-loop.mp4`,
+  `${TOUR_WINTER_5}/ars.clip2.banner-loop.mp4`,
+  `${TOUR_WINTER_3}/gr.board.banner-loop.mp4`,
+  `${TOUR_WINTER_3}/gr.elya.banner-loop.mp4`,
+  `${TOUR_WINTER_3}/gr.bbq.banner-loop.mp4`,
+] as const;
+
+/** Постеры для `<video poster>` лупов баннера (первый кадр нарезки). */
+export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS: Record<string, string> = {
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[0]]: `${TOUR_WINTER_3}/gr.clip1.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[1]]: `${TOUR_WINTER_3}/gr.clip3.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[2]]: `${TOUR_WINTER_3}/gr.clip4.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[3]]: `${TOUR_WINTER_3}/gr.clip5.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[4]]: `${TOUR_WINTER_4}/hs.clip1.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[5]]: `${TOUR_WINTER_5}/ars.clip1.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[6]]: `${TOUR_WINTER_5}/ars.clip2.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[7]]: `${TOUR_WINTER_3}/gr.board.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[8]]: `${TOUR_WINTER_3}/gr.elya.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[9]]: `${TOUR_WINTER_3}/gr.bbq.banner-loop.poster.webp`,
+};
+
 /** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */
 export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-logo.svg` as const;
 

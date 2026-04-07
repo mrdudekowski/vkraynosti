@@ -108,6 +108,54 @@ function buildHomeSeasonBannerWordmarkGradient(
   ].join(', ')
 }
 
+/** Текст навбара / dock: мягкий объём (`bg-clip-text`), см. `SEASON_TEXT_CLASS`. */
+function buildSeasonChromeTextGradient(season: keyof typeof SEASON_ACCENT_HEX): string {
+  const c = SEASON_ACCENT_HEX[season]
+  const hi = `color-mix(in srgb, ${c} 62%, #ffffff 38%)`
+  const deep = `color-mix(in srgb, ${c} 40%, ${SURFACE_DARK_HEX} 60%)`
+  return `linear-gradient(148deg, ${hi} 0%, ${c} 46%, ${deep} 100%)`
+}
+
+/** Вертикальная полоска-акцент у заголовков тура и блока цены. */
+function buildSeasonAccentBarGradient(season: keyof typeof SEASON_ACCENT_HEX): string {
+  const c = SEASON_ACCENT_HEX[season]
+  const top = `color-mix(in srgb, ${c} 85%, #ffffff 15%)`
+  const bot = `color-mix(in srgb, ${c} 32%, ${SURFACE_DARK_HEX} 68%)`
+  return `linear-gradient(180deg, ${top} 0%, ${c} 50%, ${bot} 100%)`
+}
+
+/** Разделитель над «Команда» на главной: мягкое свечение по центру. */
+function buildTeamSectionDividerGradient(season: keyof typeof SEASON_ACCENT_HEX): string {
+  const c = SEASON_ACCENT_HEX[season]
+  return `linear-gradient(90deg, transparent 0%, color-mix(in srgb, ${c} 58%, transparent) 50%, transparent 100%)`
+}
+
+function buildSeasonChromeIconDropShadow(season: keyof typeof SEASON_ACCENT_HEX): string {
+  const c = SEASON_ACCENT_HEX[season]
+  return [
+    `0 1px 0 color-mix(in srgb, #ffffff 38%, transparent)`,
+    `0 2px 6px color-mix(in srgb, ${c} 48%, ${SURFACE_DARK_HEX} 32%, transparent)`,
+  ].join(', ')
+}
+
+/** Активные иконки «Что включено» — те же hex, что `colors.tourIncludedIcon.active.*`. */
+const TOUR_INCLUDED_ICON_ACTIVE_HEX = {
+  winter: '#B45309',
+  spring: '#861C44',
+  summer: '#0E7490',
+  fall: '#14532D',
+} as const
+
+function buildTourIncludedActiveVolumeShadow(
+  season: keyof typeof TOUR_INCLUDED_ICON_ACTIVE_HEX
+): string {
+  const c = TOUR_INCLUDED_ICON_ACTIVE_HEX[season]
+  return [
+    `0 1px 0 color-mix(in srgb, #ffffff 32%, transparent)`,
+    `0 5px 12px color-mix(in srgb, #1A1A1A 22%, ${c} 20%, transparent)`,
+  ].join(', ')
+}
+
 /**
  * Нижний акцент «неба» главной по сезону (пастель `SEASON_PAGE_GRADIENT_STOPS.*` → интенсивный тон).
  * Синхронно с `colors.home-page-sky-intense.*`; зима — прежний насыщенный синий.
@@ -265,8 +313,11 @@ const config: Config = {
     { pattern: /^bg-season-page-(winter|spring|summer|fall)$/ },
     { pattern: /^bg-season-page-atmosphere-(winter|spring|summer|fall)$/ },
     { pattern: /^bg-home-page-sky-(winter|spring|summer|fall)$/ },
-    /** `TEAM_SECTION_DIVIDER_CLASS` — `bg-season-*` + opacity. */
-    { pattern: /^bg-season-(winter|spring|summer|fall)\/35$/ },
+    /** `TEAM_SECTION_DIVIDER_CLASS` — градиентная линия над «Команда». */
+    { pattern: /^bg-team-section-divider-(winter|spring|summer|fall)$/ },
+    { pattern: /^bg-season-chrome-text-(winter|spring|summer|fall)$/ },
+    { pattern: /^bg-season-accent-bar-(winter|spring|summer|fall)$/ },
+    { pattern: /^drop-shadow-season-chrome-icon-(winter|spring|summer|fall)$/ },
     'max-w-team-section-divider',
     'bg-home-safety-section',
     'blur-season-page-soft',
@@ -363,11 +414,11 @@ const config: Config = {
          */
         tourIncludedIcon: {
           active: {
-            winter: '#B45309',
+            winter: TOUR_INCLUDED_ICON_ACTIVE_HEX.winter,
             /** Контраст к персиково-розовому `seasonBg.spring`. */
-            spring: '#861C44',
-            summer: '#0E7490',
-            fall:   '#14532D',
+            spring: TOUR_INCLUDED_ICON_ACTIVE_HEX.spring,
+            summer: TOUR_INCLUDED_ICON_ACTIVE_HEX.summer,
+            fall: TOUR_INCLUDED_ICON_ACTIVE_HEX.fall,
           },
         },
         /** Тонкая линия под заголовками «О туре» / «Что включено» (см. `.tour-detail-section-heading`). */
@@ -477,6 +528,21 @@ const config: Config = {
         'home-season-banner-wordmark-spring': buildHomeSeasonBannerWordmarkGradient('spring'),
         'home-season-banner-wordmark-summer': buildHomeSeasonBannerWordmarkGradient('summer'),
         'home-season-banner-wordmark-fall': buildHomeSeasonBannerWordmarkGradient('fall'),
+        /** Текст сезона в navbar / SeasonNavDock (`SEASON_TEXT_CLASS`, `bg-clip-text`). */
+        'season-chrome-text-winter': buildSeasonChromeTextGradient('winter'),
+        'season-chrome-text-spring': buildSeasonChromeTextGradient('spring'),
+        'season-chrome-text-summer': buildSeasonChromeTextGradient('summer'),
+        'season-chrome-text-fall': buildSeasonChromeTextGradient('fall'),
+        /** Полоска слева у заголовков секций тура и у блока цены. */
+        'season-accent-bar-winter': buildSeasonAccentBarGradient('winter'),
+        'season-accent-bar-spring': buildSeasonAccentBarGradient('spring'),
+        'season-accent-bar-summer': buildSeasonAccentBarGradient('summer'),
+        'season-accent-bar-fall': buildSeasonAccentBarGradient('fall'),
+        /** Линия над секцией «Команда» на главной. */
+        'team-section-divider-winter': buildTeamSectionDividerGradient('winter'),
+        'team-section-divider-spring': buildTeamSectionDividerGradient('spring'),
+        'team-section-divider-summer': buildTeamSectionDividerGradient('summer'),
+        'team-section-divider-fall': buildTeamSectionDividerGradient('fall'),
       },
       backgroundSize: {
         /**
@@ -692,14 +758,15 @@ const config: Config = {
          * Нижняя тень иконки «Что включено» при активации — оттенок согласован с фоном сезона
          * (`seasonBg.*`). Весна: оттенок розы к персиково-розовому фону.
          */
-        'tour-included-hover-winter':
-          `0 5px 10px color-mix(in srgb, #1A1A1A 22%, ${SEASON_ACCENT_HEX.winter} 16%, transparent)`,
-        'tour-included-hover-spring':
-          `0 5px 12px color-mix(in srgb, #1A1A1A 22%, ${SEASON_ACCENT_HEX.spring} 22%, transparent)`,
-        'tour-included-hover-summer':
-          `0 5px 10px color-mix(in srgb, #1A1A1A 20%, ${SEASON_ACCENT_HEX.summer} 18%, transparent)`,
-        'tour-included-hover-fall':
-          `0 5px 10px color-mix(in srgb, #1A1A1A 24%, ${SEASON_ACCENT_HEX.fall} 14%, transparent)`,
+        'tour-included-hover-winter': buildTourIncludedActiveVolumeShadow('winter'),
+        'tour-included-hover-spring': buildTourIncludedActiveVolumeShadow('spring'),
+        'tour-included-hover-summer': buildTourIncludedActiveVolumeShadow('summer'),
+        'tour-included-hover-fall': buildTourIncludedActiveVolumeShadow('fall'),
+        /** Иконки сезона (navbar, переключатель, dock): блик + глубина без градиентной заливки SVG. */
+        'season-chrome-icon-winter': buildSeasonChromeIconDropShadow('winter'),
+        'season-chrome-icon-spring': buildSeasonChromeIconDropShadow('spring'),
+        'season-chrome-icon-summer': buildSeasonChromeIconDropShadow('summer'),
+        'season-chrome-icon-fall': buildSeasonChromeIconDropShadow('fall'),
         /** Читаемость букв баннера на сменяющемся видео. */
         'home-season-banner-letter':
           '0 1px 2px color-mix(in srgb, #0D0D0D 55%, transparent), 0 0 20px color-mix(in srgb, #0D0D0D 25%, transparent)',

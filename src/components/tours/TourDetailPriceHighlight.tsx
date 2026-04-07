@@ -2,10 +2,10 @@ import type { Season } from "../../types";
 import { UI } from "../../constants/ui";
 
 const ACCENT_BG: Record<Season, string> = {
-  winter: "bg-season-winter",
-  spring: "bg-season-spring",
-  summer: "bg-season-summer",
-  fall: "bg-season-fall",
+  winter: "bg-season-accent-bar-winter",
+  spring: "bg-season-accent-bar-spring",
+  summer: "bg-season-accent-bar-summer",
+  fall: "bg-season-accent-bar-fall",
 };
 
 export interface TourDetailPriceHighlightProps {

@@ -5,6 +5,7 @@ import { UI } from '../../constants/ui';
 import {
   SEASON_ICON,
   SEASON_ORDER,
+  SEASON_STYLE,
   SEASON_TEXT_CLASS,
 } from '../../constants/seasonNavbarAppearance';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
@@ -112,7 +113,8 @@ const SeasonNavDock = () => {
         >
           {otherSeasons.map(seasonKey => {
             const season = UI.seasons[seasonKey];
-            const textClass = SEASON_TEXT_CLASS[seasonKey];
+            const labelGradientClass = SEASON_TEXT_CLASS[seasonKey];
+            const iconVolumeClass = SEASON_STYLE[seasonKey].iconColor;
             return (
               <button
                 key={seasonKey}
@@ -127,9 +129,11 @@ const SeasonNavDock = () => {
               >
                 <FontAwesomeIcon
                   icon={SEASON_ICON[seasonKey]}
-                  className={['w-nav-season-icon-fluid h-nav-season-icon-fluid', textClass].join(' ')}
+                  className={['w-nav-season-icon-fluid h-nav-season-icon-fluid', iconVolumeClass].join(' ')}
                 />
-                <span className={`text-xs font-heading font-normal ${textClass}`}>{season.label}</span>
+                <span className={`text-xs font-heading font-normal transition-all duration-season-change ${labelGradientClass}`}>
+                  {season.label}
+                </span>
               </button>
             );
           })}

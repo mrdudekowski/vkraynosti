@@ -2,12 +2,19 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faSnowflake, faSeedling, faSun, faLeaf } from '@fortawesome/free-solid-svg-icons';
 import type { Season } from '../types';
 
-/** Классы цвета подписи сезона (navbar, dock). */
+/**
+ * Подписи сезона (navbar, dock): мягкий градиент + `bg-clip-text`;
+ * при `prefers-reduced-motion` — сплошной `text-season-*`.
+ */
 export const SEASON_TEXT_CLASS: Record<Season, string> = {
-  winter: 'text-season-winter',
-  spring: 'text-season-spring',
-  summer: 'text-season-summer',
-  fall:   'text-season-fall',
+  winter:
+    'bg-season-chrome-text-winter bg-clip-text text-transparent motion-reduce:bg-none motion-reduce:text-season-winter',
+  spring:
+    'bg-season-chrome-text-spring bg-clip-text text-transparent motion-reduce:bg-none motion-reduce:text-season-spring',
+  summer:
+    'bg-season-chrome-text-summer bg-clip-text text-transparent motion-reduce:bg-none motion-reduce:text-season-summer',
+  fall:
+    'bg-season-chrome-text-fall bg-clip-text text-transparent motion-reduce:bg-none motion-reduce:text-season-fall',
 };
 
 // TODO: Replace these placeholder FA icons with more expressive season SVGs or
@@ -46,7 +53,7 @@ export const SEASON_STYLE: Record<
     hoverFrom: 'group-hover:from-season-winter/10',
     sectionHoverGlow: 'group-hover:shadow-season-strip-hover-winter',
     shimmer: 'via-season-winter/20',
-    iconColor: 'text-season-winter',
+    iconColor: 'text-season-winter drop-shadow-season-chrome-icon-winter',
     activeRing: 'ring-2 ring-season-winter/50',
     rotate: 'group-hover:rotate-3',
     hoverUnderline: 'group-hover:border-season-winter',
@@ -60,7 +67,7 @@ export const SEASON_STYLE: Record<
     hoverFrom: 'group-hover:from-season-spring/10',
     sectionHoverGlow: 'group-hover:shadow-season-strip-hover-spring',
     shimmer: 'via-season-spring/20',
-    iconColor: 'text-season-spring',
+    iconColor: 'text-season-spring drop-shadow-season-chrome-icon-spring',
     activeRing: 'ring-2 ring-season-spring/50',
     rotate: 'group-hover:rotate-2',
     hoverUnderline: 'group-hover:border-season-spring',
@@ -74,7 +81,7 @@ export const SEASON_STYLE: Record<
     hoverFrom: 'group-hover:from-season-summer/10',
     sectionHoverGlow: 'group-hover:shadow-season-strip-hover-summer',
     shimmer: 'via-season-summer/20',
-    iconColor: 'text-season-summer',
+    iconColor: 'text-season-summer drop-shadow-season-chrome-icon-summer',
     activeRing: 'ring-2 ring-season-summer/50',
     rotate: 'group-hover:-rotate-2',
     hoverUnderline: 'group-hover:border-season-summer',
@@ -88,7 +95,7 @@ export const SEASON_STYLE: Record<
     hoverFrom: 'group-hover:from-season-fall/10',
     sectionHoverGlow: 'group-hover:shadow-season-strip-hover-fall',
     shimmer: 'via-season-fall/20',
-    iconColor: 'text-season-fall',
+    iconColor: 'text-season-fall drop-shadow-season-chrome-icon-fall',
     activeRing: 'ring-2 ring-season-fall/50',
     rotate: 'group-hover:rotate-2',
     hoverUnderline: 'group-hover:border-season-fall',

@@ -133,7 +133,7 @@ const Navbar = () => {
               prefetch="none"
             >
               <span
-                className={`transition-colors duration-season-change group-hover:text-brand-secondary ${SEASON_TEXT_CLASS[activeSeason]}`}
+                className={`transition-all duration-season-change ${SEASON_TEXT_CLASS[activeSeason]} group-hover:!bg-none group-hover:!text-brand-secondary`}
               >
                 {brandFirstLetter}
               </span>
@@ -143,7 +143,7 @@ const Navbar = () => {
             </Link>
             <span
               data-testid="season-indicator"
-              className={`hidden xs:inline min-w-0 truncate font-heading text-sm font-normal ${SEASON_TEXT_CLASS[activeSeason]}`}
+              className={`hidden xs:inline min-w-0 truncate font-heading text-sm font-normal transition-all duration-season-change ${SEASON_TEXT_CLASS[activeSeason]}`}
             >
               {activeSeasonUi.label}
             </span>
@@ -239,7 +239,7 @@ const Navbar = () => {
               aria-label="Меню"
             >
               <span
-                className={`block transition-colors duration-season-change ${SEASON_TEXT_CLASS[activeSeason]}`}
+                className={`block transition-[color,filter] duration-season-change ${activeSeasonStyle.iconColor}`}
               >
                 <AnimatedHamburgerIcon />
               </span>

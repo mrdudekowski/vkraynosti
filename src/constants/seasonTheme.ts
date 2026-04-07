@@ -25,13 +25,13 @@ export const HOME_PAGE_SKY_BG_CLASS: Record<Season, string> = {
 };
 
 /**
- * Капсула-разделитель над заголовком «Команда» на главной (`colors.season.*`, непрозрачность 35%).
+ * Разделитель над заголовком «Команда» на главной: мягкий горизонтальный градиент (`tailwind.config.ts`).
  */
 export const TEAM_SECTION_DIVIDER_CLASS: Record<Season, string> = {
-  winter: 'bg-season-winter/35',
-  spring: 'bg-season-spring/35',
-  summer: 'bg-season-summer/35',
-  fall:   'bg-season-fall/35',
+  winter: 'bg-team-section-divider-winter',
+  spring: 'bg-team-section-divider-spring',
+  summer: 'bg-team-section-divider-summer',
+  fall:   'bg-team-section-divider-fall',
 };
 
 /**

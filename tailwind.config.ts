@@ -165,22 +165,30 @@ const BRAND_PRIMARY_HEX = '#1A3C2E' as const
 /** Синхронно с `colors.brand.accent`. */
 const BRAND_ACCENT_HEX = '#E8F4F0' as const
 
-/** Тёмная база перед финальным осветлением accent (как раньше по primary/dark). */
-const HOME_SAFETY_INNER_DARK = `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 84%, ${SURFACE_DARK_HEX} 16%)`
+/**
+ * Секция «Безопасность» на главной: синий с лёгким фиолетовым оттенком (фиолетовый — 5% в `color-mix`).
+ * Светлый стоп финала — холодный подсвет к `text-text-inverse`.
+ */
+const HOME_SAFETY_SECTION_BLUE_HEX = '#1E4D7A' as const
+const HOME_SAFETY_SECTION_PURPLE_HEX = '#4A3D6E' as const
+const HOME_SAFETY_SECTION_LIGHT_HEX = '#E4EBF5' as const
 
-/** Финал: доля тёмной базы и accent задаётся `HOME_PAGE_SKY_FINAL_INTENSE_RATIO`. */
-const HOME_SAFETY_SECTION_GRADIENT_FINAL = `color-mix(in srgb, ${HOME_SAFETY_INNER_DARK} ${HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%, ${BRAND_ACCENT_HEX} ${100 - HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%)`
+const HOME_SAFETY_BLUE_PURPLE_5 = `color-mix(in srgb, ${HOME_SAFETY_SECTION_BLUE_HEX} 95%, ${HOME_SAFETY_SECTION_PURPLE_HEX} 5%)`
 
-/** Секция «Безопасность в походах»: плавный спуск accent → primary → тень → финальный микс. */
+const HOME_SAFETY_INNER_DARK = `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 84%, ${SURFACE_DARK_HEX} 16%)`
+
+const HOME_SAFETY_SECTION_GRADIENT_FINAL = `color-mix(in srgb, ${HOME_SAFETY_INNER_DARK} ${HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%, ${HOME_SAFETY_SECTION_LIGHT_HEX} ${100 - HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%)`
+
+/** Секция «Безопасность в походах»: вертикальный синий градиент с 5% фиолетового в базовом миксе. */
 const HOME_SAFETY_SECTION_GRADIENT = [
   'linear-gradient(180deg',
-  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 72%, ${BRAND_ACCENT_HEX} 28%) 0%`,
-  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 78%, ${BRAND_ACCENT_HEX} 22%) 14%`,
-  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 84%, ${BRAND_ACCENT_HEX} 16%) 28%`,
-  `${BRAND_PRIMARY_HEX} 42%`,
-  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 94%, ${SURFACE_DARK_HEX} 6%) 55%`,
-  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 88%, ${SURFACE_DARK_HEX} 12%) 68%`,
-  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 86%, ${SURFACE_DARK_HEX} 14%) 80%`,
+  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 78%, ${HOME_SAFETY_SECTION_LIGHT_HEX} 22%) 0%`,
+  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 84%, ${HOME_SAFETY_SECTION_LIGHT_HEX} 16%) 14%`,
+  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 90%, ${HOME_SAFETY_SECTION_LIGHT_HEX} 10%) 28%`,
+  `${HOME_SAFETY_BLUE_PURPLE_5} 42%`,
+  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 94%, ${SURFACE_DARK_HEX} 6%) 55%`,
+  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 88%, ${SURFACE_DARK_HEX} 12%) 68%`,
+  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 86%, ${SURFACE_DARK_HEX} 14%) 80%`,
   `${HOME_SAFETY_INNER_DARK} 90%`,
   `${HOME_SAFETY_SECTION_GRADIENT_FINAL} 100%)`,
 ].join(', ')
@@ -236,6 +244,7 @@ const config: Config = {
     'bg-home-season-banner-wordmark-grid',
     'aspect-home-season-banner-inner',
     'min-h-home-season-banner-inner',
+    'min-h-home-safety-hero',
     'bg-home-season-banner-stage',
     'from-home-season-strip-btn-from',
     'to-home-season-strip-btn-to',
@@ -311,7 +320,7 @@ const config: Config = {
         },
         /** Подложка сетки баннера «В другой сезон» (md+), до появления полосок. */
         'home-season-banner-stage': '#000000',
-        /** Слой-вуаль над «небом» главной при скролле секции сезона / до блока команды (`useHomeSeasonBannerWhiteVeil`); совпадает с `home-season-banner-stage`. */
+        /** Слой-вуаль над «небом» главной при скролле секции сезона (`useHomeSeasonBannerWhiteVeil`, якорь выхода — ряд переключателя внутри полосы); совпадает с `home-season-banner-stage`. */
         'home-season-banner-veil': '#000000',
         /**
          * Градиент кругов `SeasonSwitcher` в секции главной (на светлой полосе под баннером):
@@ -459,7 +468,7 @@ const config: Config = {
         'home-page-sky-spring': HOME_PAGE_SKY_GRADIENT_SPRING,
         'home-page-sky-summer': HOME_PAGE_SKY_GRADIENT_SUMMER,
         'home-page-sky-fall': HOME_PAGE_SKY_GRADIENT_FALL,
-        /** Блок «Безопасность в походах» на главной: `brand.primary` + `brand.accent`, см. `HOME_SAFETY_SECTION_GRADIENT`. */
+        /** Блок «Безопасность» на главной: синий + 5% фиолетового в mix, см. `HOME_SAFETY_SECTION_GRADIENT`. */
         'home-safety-section': HOME_SAFETY_SECTION_GRADIENT,
         /**
          * Буквы «Вкрайности»: градиент под `background-clip: text` (виден только в глифах), тона от `SEASON_ACCENT_HEX.*`.
@@ -578,6 +587,11 @@ const config: Config = {
         'tour-included-list-gap': '1.5rem',
         /** Между горизонтальным рядом иконок и блоком текста. */
         'tour-included-horizontal-stack': '1rem',
+        /**
+         * Фиксированная высота слота описания под иконками «Что включено» (~3 строки `fontSize.tour-detail-prose`);
+         * без CLS при переносе. Текст может визуально выходить ниже (`overflow-visible` у слота).
+         */
+        'tour-included-description': '6.5rem',
         /** Между кнопками-иконками в горизонтальном ряду. */
         'tour-included-icon-row-horizontal-gap': '1rem',
         /** Внутренние отступы подложки `.tour-included-icon-strip`. */
@@ -631,12 +645,12 @@ const config: Config = {
         'team-section-divider': '28rem',
       },
       minHeight: {
+        /** Герой секции «Безопасность» на главной (фото + градиент и текст). */
+        'home-safety-hero': 'clamp(17rem, 52vw, 26rem)',
         /** Минимальная высота прямоугольника баннера внутри контейнера (md+). */
         'home-season-banner-inner': '11rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
         'route-fallback':    'clamp(16rem, 55vh, 40rem)',
-        /** Область описания под горизонтальными иконками «Что включено» (стабильная высота при смене текста). */
-        'tour-included-description': '5rem',
       },
       boxShadow: {
         /**

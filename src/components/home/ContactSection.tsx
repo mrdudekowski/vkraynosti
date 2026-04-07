@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone } from '@fortawesome/free-solid-svg-icons';
 import { faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
@@ -5,13 +6,12 @@ import { UI } from '../../constants/ui';
 import { CONTACTS } from '../../constants/contacts';
 import { HOME_SECTION_CONTACT } from '../../constants/routes';
 
-const ContactSection = () => (
-  <section id={HOME_SECTION_CONTACT} className="py-section-y text-text-inverse">
+const ContactSection = forwardRef<HTMLElement>(function ContactSection(_, ref) {
+  return (
+  <section ref={ref} id={HOME_SECTION_CONTACT} className="py-section-y text-text-inverse">
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 className="section-title text-text-inverse mb-4">{UI.sections.contact}</h2>
-        <p className="text-text-inverse/60 mb-12 text-lg">
-          {UI.contact.subtitle}
-        </p>
+      <p className="text-text-inverse/60 mb-12 text-lg">{UI.contact.subtitle}</p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
         <a
@@ -44,6 +44,7 @@ const ContactSection = () => (
       </div>
     </div>
   </section>
-);
+  );
+});
 
 export default ContactSection;

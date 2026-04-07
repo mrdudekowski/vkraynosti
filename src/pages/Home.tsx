@@ -17,7 +17,6 @@ import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
 import { HOME_PAGE_SKY_BG_CLASS } from '../constants/seasonTheme';
 import { NAVBAR_SCROLL_OFFSET_PX, scrollElementIntoViewAnchored } from '../constants/smoothScroll';
-import { homeSeasonStripLabelColor } from '../constants/themeTextColors';
 import { useHomeSeasonBannerWhiteVeil } from '../hooks/useHomeSeasonBannerWhiteVeil';
 
 const Home = () => {
@@ -26,10 +25,12 @@ const Home = () => {
   const { activeSeason } = useSeason();
   const tours = getToursBySeason(activeSeason);
   const homeSeasonStripSectionRef = useRef<HTMLElement | null>(null);
-  const homeTeamSectionRef = useRef<HTMLElement | null>(null);
+  const homeVeilExitAnchorRef = useRef<HTMLDivElement | null>(null);
+  const homeVeilEnterContactRef = useRef<HTMLElement | null>(null);
   const { veilOpacity } = useHomeSeasonBannerWhiteVeil({
     seasonStripSectionRef: homeSeasonStripSectionRef,
-    teamSectionRef: homeTeamSectionRef,
+    veilExitAnchorRef: homeVeilExitAnchorRef,
+    veilEnterContactRef: homeVeilEnterContactRef,
     enabled: true,
   });
 
@@ -78,6 +79,18 @@ const Home = () => {
             </RevealBox>
           </section>
 
+          <RevealBox as="div" className="relative w-full">
+            <SafetySection />
+          </RevealBox>
+
+          <RevealBox as="div" className="relative w-full">
+            <TeamCarousel />
+          </RevealBox>
+
+          <RevealBox as="div" className="relative w-full">
+            <ContactSection ref={homeVeilEnterContactRef} />
+          </RevealBox>
+
           <section
             ref={homeSeasonStripSectionRef}
             className="flex w-full flex-col overflow-hidden pt-home-season-strip-pt"
@@ -87,29 +100,19 @@ const Home = () => {
             </div>
             <RevealBox
               as="div"
-              className="relative z-20 w-full shrink-0 pt-home-season-banner-foot-gap pb-home-season-banner-foot-gap"
+              className="relative z-20 w-full shrink-0 bg-home-season-banner-stage pt-home-season-banner-foot-gap pb-home-season-banner-foot-gap"
             >
-              <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-home-season-banner-foot-gap px-4 sm:px-6 lg:px-8">
-                <p
-                  className="text-center font-heading text-home-season-strip-label font-normal uppercase transition-colors duration-home-season-banner-veil ease-out"
-                  style={{ color: homeSeasonStripLabelColor(veilOpacity) }}
-                >
+              <div
+                ref={homeVeilExitAnchorRef}
+                className="mx-auto flex w-full max-w-7xl flex-col items-center gap-home-season-banner-foot-gap px-4 sm:px-6 lg:px-8"
+              >
+                <p className="text-center font-heading text-home-season-strip-label font-normal uppercase text-text-inverse">
                   {UI.sections.switchSeason}
                 </p>
                 <SeasonSwitcher variant="section" />
               </div>
             </RevealBox>
-            <RevealBox as="div" className="relative z-10 w-full">
-              <TeamCarousel ref={homeTeamSectionRef} />
-            </RevealBox>
           </section>
-
-          <RevealBox as="div" className="relative w-full">
-            <SafetySection />
-          </RevealBox>
-          <RevealBox as="div" className="relative w-full">
-            <ContactSection />
-          </RevealBox>
         </div>
       </div>
     </>

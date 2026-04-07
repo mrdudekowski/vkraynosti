@@ -184,7 +184,7 @@ const TourIncludedIconList = ({
         </ul>
       </div>
       <div
-        className="min-h-tour-included-description w-full"
+        className="h-tour-included-description min-h-0 shrink-0 overflow-visible w-full"
         aria-live="polite"
         aria-atomic="true"
       >

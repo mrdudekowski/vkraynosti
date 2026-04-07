@@ -105,19 +105,21 @@ export const TOUR_WINTER_3_GALLERY_VIEWER = [
 
 /**
  * Те же индексы, что у `TOUR_WINTER_3_GALLERY_VIEWER`: сетка страницы / карточка (webp ≤900px, mp4 H.264 низкий битрейт).
+ * Кадры склона, Эли и барбекю — только фото (`*.webp`); `*.grid.mp4` для них ошибочно попадали в сетку как `GalleryGridVideo`
+ * (сами файлы остаются в `public` — входы скриптов баннера главной).
  */
 export const TOUR_WINTER_3_GALLERY_GRID = [
   `${TOUR_WINTER_3}/gr.falaza.grid.webp`,
   `${TOUR_WINTER_3}/gr.griba.grid.webp`,
   `${TOUR_WINTER_3}/gr.lift.grid.webp`,
   `${TOUR_WINTER_3}/gr.clip1.grid.mp4`,
-  `${TOUR_WINTER_3}/gr.board.grid.mp4`,
+  `${TOUR_WINTER_3}/gr.board.webp`,
   `${TOUR_WINTER_3}/gr.board2.grid.webp`,
   `${TOUR_WINTER_3}/gr.clip2.grid.mp4`,
-  `${TOUR_WINTER_3}/gr.elya.grid.mp4`,
+  `${TOUR_WINTER_3}/gr.elya.webp`,
   `${TOUR_WINTER_3}/gr.instr.grid.webp`,
   `${TOUR_WINTER_3}/gr.clip3.grid.mp4`,
-  `${TOUR_WINTER_3}/gr.bbq.grid.mp4`,
+  `${TOUR_WINTER_3}/gr.bbq.webp`,
   `${TOUR_WINTER_3}/gr.clip4.grid.mp4`,
   `${TOUR_WINTER_3}/gr.clip5.grid.mp4`,
 ] as const;
@@ -132,18 +134,18 @@ export const TOUR_WINTER_3_COVER = TOUR_WINTER_3_COVER_GRID;
 
 /** После `galleryGridUrls.slice(2)` — ветка `TourDetailGallery` сравнивает с этими **grid**-URL. */
 export const TOUR_WINTER_3_LIFT_IMAGE = TOUR_WINTER_3_GALLERY_GRID[2];
+
+/** Главная: секция «Безопасность» — герой (инструктаж в кадре, `gr.instr` сетки). */
+export const HOME_SAFETY_SECTION_HERO_IMAGE = TOUR_WINTER_3_GALLERY_GRID[8];
 export const TOUR_WINTER_3_CLIP1_VIDEO = TOUR_WINTER_3_GALLERY_GRID[3];
 export const TOUR_WINTER_3_CLIP2_VIDEO = TOUR_WINTER_3_GALLERY_GRID[6];
 export const TOUR_WINTER_3_CLIP3_VIDEO = TOUR_WINTER_3_GALLERY_GRID[9];
 
-/** Кадр-постер для ленивого `<video>` в сетке (grid mp4 → webp). */
+/** Кадр-постер для ленивого `<video>` в сетке (grid mp4 → webp). Только ролики clip1–clip5. */
 export const TOUR_WINTER_3_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_WINTER_3_GALLERY_GRID[3]]: `${TOUR_WINTER_3}/gr.clip1.poster.webp`,
-  [TOUR_WINTER_3_GALLERY_GRID[4]]: `${TOUR_WINTER_3}/gr.board.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[6]]: `${TOUR_WINTER_3}/gr.clip2.poster.webp`,
-  [TOUR_WINTER_3_GALLERY_GRID[7]]: `${TOUR_WINTER_3}/gr.elya.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[9]]: `${TOUR_WINTER_3}/gr.clip3.poster.webp`,
-  [TOUR_WINTER_3_GALLERY_GRID[10]]: `${TOUR_WINTER_3}/gr.bbq.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[11]]: `${TOUR_WINTER_3}/gr.clip4.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[12]]: `${TOUR_WINTER_3}/gr.clip5.poster.webp`,
 };

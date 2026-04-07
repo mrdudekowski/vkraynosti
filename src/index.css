@@ -185,7 +185,7 @@
     @apply text-text-inverse;
   }
 
-  .tour-detail-preface-bg .min-h-tour-included-description .text-text-muted {
+  .tour-detail-preface-bg .h-tour-included-description .text-text-muted {
     @apply text-text-inverse/90;
   }
 

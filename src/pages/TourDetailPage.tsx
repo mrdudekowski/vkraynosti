@@ -45,13 +45,14 @@ const TourDetailPage = () => {
   const { openTourRequestModal } = useModal();
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const programRevealEnabled =
-    isLgOrAbove && !prefersReducedMotion && tour != null;
+  const programRevealEnabled = !prefersReducedMotion && tour != null;
   const mainColumnRef = useRef<HTMLDivElement>(null);
+  const programCardRef = useRef<HTMLDivElement>(null);
+  const revealProgressRef = isLgOrAbove ? mainColumnRef : programCardRef;
   const { revealedCount } = useTourProgramScrollReveal({
     stepCount: tour?.program.length ?? 0,
     enabled: programRevealEnabled,
-    mainColumnRef,
+    mainColumnRef: revealProgressRef,
   });
   const [photoViewer, setPhotoViewer] = useState<{
     images: string[];
@@ -297,7 +298,7 @@ const TourDetailPage = () => {
             </div>
 
             <div>
-              <div className="tour-detail-program-card">
+              <div ref={programCardRef} className="tour-detail-program-card">
                 <TourDetailSectionHeading
                   title={UI.tourDetail.programHeading}
                   season={tour.season}

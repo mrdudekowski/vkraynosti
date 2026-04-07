@@ -111,13 +111,13 @@ export const TOUR_WINTER_3_GALLERY_GRID = [
   `${TOUR_WINTER_3}/gr.griba.grid.webp`,
   `${TOUR_WINTER_3}/gr.lift.grid.webp`,
   `${TOUR_WINTER_3}/gr.clip1.grid.mp4`,
-  `${TOUR_WINTER_3}/gr.board.grid.webp`,
+  `${TOUR_WINTER_3}/gr.board.grid.mp4`,
   `${TOUR_WINTER_3}/gr.board2.grid.webp`,
   `${TOUR_WINTER_3}/gr.clip2.grid.mp4`,
-  `${TOUR_WINTER_3}/gr.elya.grid.webp`,
+  `${TOUR_WINTER_3}/gr.elya.grid.mp4`,
   `${TOUR_WINTER_3}/gr.instr.grid.webp`,
   `${TOUR_WINTER_3}/gr.clip3.grid.mp4`,
-  `${TOUR_WINTER_3}/gr.bbq.grid.webp`,
+  `${TOUR_WINTER_3}/gr.bbq.grid.mp4`,
   `${TOUR_WINTER_3}/gr.clip4.grid.mp4`,
   `${TOUR_WINTER_3}/gr.clip5.grid.mp4`,
 ] as const;
@@ -139,8 +139,11 @@ export const TOUR_WINTER_3_CLIP3_VIDEO = TOUR_WINTER_3_GALLERY_GRID[9];
 /** Кадр-постер для ленивого `<video>` в сетке (grid mp4 → webp). */
 export const TOUR_WINTER_3_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_WINTER_3_GALLERY_GRID[3]]: `${TOUR_WINTER_3}/gr.clip1.poster.webp`,
+  [TOUR_WINTER_3_GALLERY_GRID[4]]: `${TOUR_WINTER_3}/gr.board.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[6]]: `${TOUR_WINTER_3}/gr.clip2.poster.webp`,
+  [TOUR_WINTER_3_GALLERY_GRID[7]]: `${TOUR_WINTER_3}/gr.elya.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[9]]: `${TOUR_WINTER_3}/gr.clip3.poster.webp`,
+  [TOUR_WINTER_3_GALLERY_GRID[10]]: `${TOUR_WINTER_3}/gr.bbq.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[11]]: `${TOUR_WINTER_3}/gr.clip4.poster.webp`,
   [TOUR_WINTER_3_GALLERY_GRID[12]]: `${TOUR_WINTER_3}/gr.clip5.poster.webp`,
 };
@@ -250,7 +253,8 @@ export const SPRING_TOUR_COVERS = {
 export const IMAGES = {
   hero: {
     winter: `${BASE}/1920x1080/7BA7BC/ffffff?text=Зима+·+Вкрайности`,
-    spring: `${BASE}/1920x1080/7DBF8C/ffffff?text=Весна+·+Вкрайности`,
+    /** Фон плейсхолдера — `colors.season.spring` (без `#`). */
+    spring: `${BASE}/1920x1080/C76B7E/ffffff?text=Весна+·+Вкрайности`,
     summer: `${BASE}/1920x1080/E8A838/ffffff?text=Лето+·+Вкрайности`,
     fall:   `${BASE}/1920x1080/C8622A/ffffff?text=Осень+·+Вкрайности`,
   },

@@ -7,7 +7,10 @@ import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
 
 const SafetySection = () => (
-  <section id="safety" className="py-section-y text-text-inverse">
+  <section
+    id="safety"
+    className="relative isolate overflow-hidden bg-home-safety-section py-section-y text-text-inverse"
+  >
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
         <h2 className="section-title text-text-inverse">{UI.sections.safety}</h2>

@@ -1,10 +1,13 @@
+import { forwardRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { useCarousel } from '../../hooks/useCarousel';
 import { useModal } from '../../context/useModal';
 import PlaceholderImage from '../shared/PlaceholderImage';
 import { TEAM } from '../../data/teamData';
+import { TEAM_SECTION_DIVIDER_CLASS } from '../../constants/seasonTheme';
 import { UI } from '../../constants/ui';
+import { useSeason } from '../../context/useSeason';
 import type { TeamMember } from '../../types';
 
 const VISIBLE_COUNT = 3;
@@ -30,7 +33,8 @@ const TeamCard = ({ member, onClick }: { member: TeamMember; onClick: () => void
   </div>
 );
 
-const TeamCarousel = () => {
+const TeamCarousel = forwardRef<HTMLElement>(function TeamCarousel(_, ref) {
+  const { activeSeason } = useSeason();
   const { current, next, prev } = useCarousel({ total: TEAM.length });
   const { openTeamModal } = useModal();
 
@@ -39,8 +43,18 @@ const TeamCarousel = () => {
   );
 
   return (
-    <section id="team" className="pt-home-section-top pb-section-y">
+    <section ref={ref} id="team" className="pt-home-section-top pb-section-y">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex w-full justify-center">
+          <div
+            className={[
+              'h-px w-full max-w-team-section-divider shrink-0 rounded-full',
+              TEAM_SECTION_DIVIDER_CLASS[activeSeason],
+              'mb-team-section-divider-to-heading',
+            ].join(' ')}
+            aria-hidden={true}
+          />
+        </div>
         <div className="text-center mb-12">
           <h2 className="section-title text-text-primary">{UI.sections.team}</h2>
           <p className="text-text-muted mt-3">{UI.sections.teamSub}</p>
@@ -75,6 +89,6 @@ const TeamCarousel = () => {
       </div>
     </section>
   );
-};
+});
 
 export default TeamCarousel;

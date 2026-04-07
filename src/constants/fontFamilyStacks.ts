@@ -5,6 +5,8 @@
 
 export const FONT_FAMILY_NORD = 'Nord' as const;
 export const FONT_FAMILY_BRAND_WORDMARK = 'Dela Gothic One' as const;
+/** Баннер «В другой сезон» на главной (md+), не подменяет лого в navbar. */
+export const FONT_FAMILY_HOME_SEASON_BANNER = 'Satyr SP Basic' as const;
 export const FONT_FAMILY_BODY = 'Source Sans 3' as const;
 
 export const TAILWIND_FONT_HEADING_CLASS = 'font-heading' as const;
@@ -23,6 +25,12 @@ export const fontFamilyHeroPhraseStack: [string, ...string[]] = [
 
 export const fontFamilyBrandWordmarkStack: [string, ...string[]] = [
   `"${FONT_FAMILY_BRAND_WORDMARK}"`,
+  'system-ui',
+  'sans-serif',
+];
+
+export const fontFamilyHomeSeasonBannerStack: [string, ...string[]] = [
+  `"${FONT_FAMILY_HOME_SEASON_BANNER}"`,
   'system-ui',
   'sans-serif',
 ];

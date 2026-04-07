@@ -1,7 +1,8 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import HeroCarousel from '../components/home/HeroCarousel';
+import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import TeamCarousel from '../components/home/TeamCarousel';
 import SafetySection from '../components/home/SafetySection';
 import ContactSection from '../components/home/ContactSection';
@@ -14,14 +15,23 @@ import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
-import SeasonPageBackdrop from '../components/seasons/SeasonPageBackdrop';
+import { HOME_PAGE_SKY_BG_CLASS } from '../constants/seasonTheme';
 import { NAVBAR_SCROLL_OFFSET_PX, scrollElementIntoViewAnchored } from '../constants/smoothScroll';
+import { homeSeasonStripLabelColor } from '../constants/themeTextColors';
+import { useHomeSeasonBannerWhiteVeil } from '../hooks/useHomeSeasonBannerWhiteVeil';
 
 const Home = () => {
   const location = useLocation();
   const lenis = useLenis();
   const { activeSeason } = useSeason();
   const tours = getToursBySeason(activeSeason);
+  const homeSeasonStripSectionRef = useRef<HTMLElement | null>(null);
+  const homeTeamSectionRef = useRef<HTMLElement | null>(null);
+  const { veilOpacity } = useHomeSeasonBannerWhiteVeil({
+    seasonStripSectionRef: homeSeasonStripSectionRef,
+    teamSectionRef: homeTeamSectionRef,
+    enabled: true,
+  });
 
   useLayoutEffect(() => {
     if (location.pathname !== ROUTES.HOME || !location.hash) return;
@@ -29,7 +39,6 @@ const Home = () => {
     const el = document.getElementById(id);
     if (el) scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
   }, [location.pathname, location.hash, lenis]);
-  const seasonSectionImage = IMAGES.seasonSection[activeSeason];
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
   return (
     <>
@@ -42,59 +51,66 @@ const Home = () => {
       />
       <HeroCarousel />
 
-      <section id="tours" className="relative isolate pt-home-section-top pb-home-stack-gap">
-        <SeasonPageBackdrop season={activeSeason} className="absolute inset-0 -z-10 overflow-hidden" />
-        <RevealBox as="div" className="relative z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="section-title text-text-primary">{toursSectionTitle}</h2>
+      <div className="relative isolate flex w-full flex-col overflow-hidden">
+        <div
+          className={`pointer-events-none absolute inset-0 z-0 overflow-hidden ${HOME_PAGE_SKY_BG_CLASS[activeSeason]}`}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-home-season-banner-veil bg-home-season-banner-veil transition-opacity duration-home-season-banner-veil ease-out"
+          style={{ opacity: veilOpacity }}
+          aria-hidden
+        />
+
+        <div className="relative z-10 flex w-full flex-col">
+          <section id="tours" className="pt-home-section-top pb-home-stack-gap">
+            <RevealBox as="div" className="relative">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                  <h2 className="section-title text-text-primary">{toursSectionTitle}</h2>
+                </div>
+                <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  {tours.map((tour, index) => (
+                    <TourCard key={tour.id} tour={tour} priorityImage={index === 0} />
+                  ))}
+                </div>
+              </div>
+            </RevealBox>
+          </section>
+
+          <section
+            ref={homeSeasonStripSectionRef}
+            className="flex w-full flex-col overflow-hidden pt-home-season-strip-pt"
+          >
+            <div className="relative w-full shrink-0">
+              <HomeSeasonBanner season={activeSeason} />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {tours.map((tour, index) => (
-                <TourCard key={tour.id} tour={tour} priorityImage={index === 0} />
-              ))}
-            </div>
-          </div>
-        </RevealBox>
-      </section>
+            <RevealBox
+              as="div"
+              className="relative z-20 w-full shrink-0 pt-home-season-banner-foot-gap pb-home-season-banner-foot-gap"
+            >
+              <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-home-season-banner-foot-gap px-4 sm:px-6 lg:px-8">
+                <p
+                  className="text-center font-heading text-home-season-strip-label font-normal uppercase transition-colors duration-home-season-banner-veil ease-out"
+                  style={{ color: homeSeasonStripLabelColor(veilOpacity) }}
+                >
+                  {UI.sections.switchSeason}
+                </p>
+                <SeasonSwitcher variant="section" />
+              </div>
+            </RevealBox>
+            <RevealBox as="div" className="relative z-10 w-full">
+              <TeamCarousel ref={homeTeamSectionRef} />
+            </RevealBox>
+          </section>
 
-      <section className="relative isolate overflow-hidden min-h-season-section h-season-section md:min-h-season-section-md md:h-season-section-md pt-home-season-strip-pt">
-        <SeasonPageBackdrop season={activeSeason} className="absolute inset-0 z-0 overflow-hidden" />
-        {seasonSectionImage && (
-          <div
-            key={activeSeason}
-            className="absolute inset-0 z-10 bg-cover bg-center animate-bg-fade"
-            style={{ backgroundImage: `url(${seasonSectionImage})` }}
-          />
-        )}
-        <RevealBox as="div" className="relative z-20 h-full min-h-0">
-          <div className="pl-3 xs:pl-4 sm:pl-6 lg:pl-8 pt-2 xs:pt-3 phone:pt-3 pb-1 xs:pb-2 phone:pb-2">
-            <p className="font-heading text-home-season-strip-label font-normal uppercase text-text-inverse/80 mb-2">
-              {UI.sections.switchSeason}
-            </p>
-            <SeasonSwitcher variant="section" />
-          </div>
-        </RevealBox>
-      </section>
-
-      <section className="relative isolate">
-        <SeasonPageBackdrop season={activeSeason} className="absolute inset-0 -z-10 overflow-hidden" />
-        <RevealBox as="div" className="relative z-10">
-          <TeamCarousel />
-        </RevealBox>
-      </section>
-
-      <div className="relative isolate w-full">
-        <div className="absolute inset-0 -z-10 bg-brand-primary" aria-hidden />
-        <RevealBox as="div" className="relative z-10 w-full">
-          <SafetySection />
-        </RevealBox>
-      </div>
-      <div className="relative isolate w-full">
-        <div className="absolute inset-0 -z-10 bg-surface-dark" aria-hidden />
-        <RevealBox as="div" className="relative z-10 w-full">
-          <ContactSection />
-        </RevealBox>
+          <RevealBox as="div" className="relative w-full">
+            <SafetySection />
+          </RevealBox>
+          <RevealBox as="div" className="relative w-full">
+            <ContactSection />
+          </RevealBox>
+        </div>
       </div>
     </>
   );

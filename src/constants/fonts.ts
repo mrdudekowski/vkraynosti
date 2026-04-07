@@ -1,7 +1,7 @@
 /**
  * Имена семей и загрузка шрифтов.
  *
- * Локально: Nord (Light / Regular / Medium / Bold) — `public/fonts/` + `@font-face` в `bootstrap-fonts.ts`.
+ * Локально: Nord (Light / Regular / Medium / Bold), Satyr SP Basic (баннер главной) — `public/fonts/` + `@font-face` в `bootstrap-fonts.ts`.
  * Google Fonts: Dela Gothic One (лого в navbar), Source Sans 3 (body).
  *
  * При смене имён файлов Nord — обновить и этот файл (константы ниже), и `bootstrap-fonts.ts`.
@@ -11,10 +11,12 @@ export {
   FONT_FAMILY_NORD,
   FONT_FAMILY_BRAND_WORDMARK,
   FONT_FAMILY_BODY,
+  FONT_FAMILY_HOME_SEASON_BANNER,
   TAILWIND_FONT_HEADING_CLASS,
   fontFamilyHeadingStack,
   fontFamilyHeroPhraseStack,
   fontFamilyBrandWordmarkStack,
+  fontFamilyHomeSeasonBannerStack,
   fontFamilyBodyStack,
   fontFamilyMonoStack,
 } from './fontFamilyStacks';
@@ -27,6 +29,9 @@ export const NORD_FONT_FILES = {
   bold:    'nord_bold.ttf',
 } as const;
 
+/** Баннер «В другой сезон»: один начертание, `public/fonts/satyr-sp-basic.otf`. */
+export const SATYR_SP_BASIC_FONT_FILE = 'satyr-sp-basic.otf' as const;
+
 const viteBase = import.meta.env.BASE_URL ?? '/';
 
 export const PUBLIC_ASSET_BASE = viteBase.endsWith('/') ? viteBase : `${viteBase}/`;
@@ -38,6 +43,8 @@ export const NORD_FONT_URLS = {
   medium:  `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.medium}`,
   bold:    `${PUBLIC_ASSET_BASE}fonts/${NORD_FONT_FILES.bold}`,
 } as const;
+
+export const SATYR_SP_BASIC_FONT_URL = `${PUBLIC_ASSET_BASE}fonts/${SATYR_SP_BASIC_FONT_FILE}` as const;
 
 const GOOGLE_FONTS_CSS2 = 'https://fonts.googleapis.com/css2';
 

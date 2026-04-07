@@ -3,6 +3,7 @@ import {
   GOOGLE_FONTS_PRECONNECT_STATIC,
   GOOGLE_FONTS_STYLESHEET_HREF,
   NORD_FONT_URLS,
+  SATYR_SP_BASIC_FONT_URL,
 } from './constants/fonts';
 
 const VK_FONTS_ATTR = 'data-vk-fonts';
@@ -49,12 +50,31 @@ function injectNordFontFaces(): void {
   document.head.prepend(style);
 }
 
+function injectSatyrBannerFontFace(): void {
+  if (typeof document === 'undefined') return;
+  if (document.head.querySelector('style[data-vk-satyr-banner-font-face]')) return;
+
+  const style = document.createElement('style');
+  style.setAttribute('data-vk-satyr-banner-font-face', '');
+  style.textContent = `
+@font-face {
+  font-family: 'Satyr SP Basic';
+  src: url('${SATYR_SP_BASIC_FONT_URL}') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+`.trim();
+  document.head.prepend(style);
+}
+
 /**
  * Подключает Google Fonts из `constants/fonts.ts` до основного CSS (без второго @import в bundle).
  * Preload критичного Nord Regular — быстрее первый текст в `font-heading`.
  */
 if (typeof document !== 'undefined') {
   injectNordFontFaces();
+  injectSatyrBannerFontFace();
 
   if (!document.head.querySelector(`link[${VK_FONTS_ATTR}]`)) {
     const head = document.head;

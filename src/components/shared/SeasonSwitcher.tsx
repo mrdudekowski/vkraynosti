@@ -48,6 +48,47 @@ const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps)
           ? 'w-nav-season-icon-fixed h-nav-season-icon-fixed'
           : 'w-3.5 h-3.5 xs:w-4 xs:h-4 phone-lg:w-5 phone-lg:h-5';
 
+        const sectionCircleClasses = [
+          'relative overflow-hidden flex items-center justify-center',
+          'rounded-full',
+          circleSize,
+          'backdrop-blur-lg border',
+          style.border,
+          'bg-gradient-to-tr from-home-season-strip-btn-from to-home-season-strip-btn-to',
+          'group-hover:from-surface-dark group-hover:to-surface-dark',
+          'shadow-lg',
+          style.hoverBorder,
+          'group-hover:scale-105',
+          ...(isActive ? [] : [style.sectionHoverGlow]),
+          style.rotate,
+          'group-active:scale-95 group-active:rotate-0',
+          'transition-all duration-300 ease-out',
+          isActive
+            ? `shadow-xl ${style.activeShadow} scale-105 ${style.activeRing}`
+            : 'opacity-70 group-hover:opacity-100',
+        ].join(' ');
+
+        const navbarCircleClasses = [
+          'relative overflow-hidden flex items-center justify-center',
+          'rounded-full',
+          circleSize,
+          'backdrop-blur-lg border',
+          style.border,
+          'bg-gradient-to-tr from-black/60 to-black/40',
+          'shadow-lg',
+          style.hoverShadow,
+          'group-hover:shadow-2xl',
+          style.hoverBorder,
+          style.hoverFrom,
+          'group-hover:scale-110',
+          style.rotate,
+          'group-active:scale-95 group-active:rotate-0',
+          'transition-all duration-300 ease-out',
+          isActive
+            ? `shadow-xl ${style.activeShadow} scale-105 ${style.activeRing}`
+            : 'opacity-70 group-hover:opacity-100',
+        ].join(' ');
+
         return (
           <button
             key={seasonKey}
@@ -62,38 +103,19 @@ const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps)
               'transition-all duration-300 ease-out',
             ].join(' ')}
           >
-            <div
-              className={[
-                'relative overflow-hidden flex items-center justify-center',
-                'rounded-full',
-                circleSize,
-                'backdrop-blur-lg border',
-                style.border,
-                'bg-gradient-to-tr from-black/60 to-black/40',
-                'shadow-lg',
-                style.hoverShadow,
-                'group-hover:shadow-2xl',
-                style.hoverBorder,
-                style.hoverFrom,
-                'group-hover:scale-110',
-                style.rotate,
-                'group-active:scale-95 group-active:rotate-0',
-                'transition-all duration-300 ease-out',
-                isActive
-                  ? `shadow-xl ${style.activeShadow} scale-105 ${style.activeRing}`
-                  : 'opacity-70 group-hover:opacity-100',
-              ].join(' ')}
-            >
-              <div
-                className={[
-                  'absolute inset-0 pointer-events-none',
-                  'bg-gradient-to-r from-transparent',
-                  style.shimmer,
-                  'to-transparent',
-                  '-translate-x-full group-hover:translate-x-full',
-                  'transition-transform duration-700 ease-out',
-                ].join(' ')}
-              />
+            <div className={isNavbar ? navbarCircleClasses : sectionCircleClasses}>
+              {isNavbar ? (
+                <div
+                  className={[
+                    'absolute inset-0 pointer-events-none',
+                    'bg-gradient-to-r from-transparent',
+                    style.shimmer,
+                    'to-transparent',
+                    '-translate-x-full group-hover:translate-x-full',
+                    'transition-transform duration-700 ease-out',
+                  ].join(' ')}
+                />
+              ) : null}
 
               <FontAwesomeIcon
                 icon={SEASON_ICON[seasonKey]}

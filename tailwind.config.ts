@@ -4,10 +4,23 @@ import {
   TOUR_INCLUDED_MOTOR_DURATION_MS,
 } from './src/constants/tourIncludedHover'
 import {
+  HOME_SEASON_BANNER_CROSSFADE_MS,
+  HOME_SEASON_BANNER_LETTER_EXIT_MS,
+  HOME_SEASON_BANNER_LETTER_FADE_IN_MS,
+  HOME_SEASON_BANNER_STRIP_FADE_IN_MS,
+  HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS,
+} from './src/constants/homeSeasonBannerAnimation'
+import { HOME_SEASON_BANNER_WHITE_VEIL_TRANSITION_MS } from './src/constants/homeSeasonBannerWhiteVeil'
+import {
+  THEME_TEXT_INVERSE_HEX,
+  THEME_TEXT_PRIMARY_HEX,
+} from './src/constants/themeTextColors'
+import {
   fontFamilyBodyStack,
   fontFamilyBrandWordmarkStack,
   fontFamilyHeadingStack,
   fontFamilyHeroPhraseStack,
+  fontFamilyHomeSeasonBannerStack,
   fontFamilyMonoStack,
 } from './src/constants/fontFamilyStacks'
 
@@ -54,7 +67,11 @@ const hamburgerTheme = {
  */
 const SEASON_PAGE_GRADIENT_STOPS = {
   winter: { top: '#EEF6FC', bottom: '#C5DFF0' },
-  spring: { top: '#E4F7EE', bottom: '#B2E4C8' },
+  /**
+   * Весна: аналоговая смесь персикового и розового (верх — тёплый персик, низ — дымчато-розовый).
+   * Такой дуэт часто используют для «цветения» / мягкой энергии без кислотности.
+   */
+  spring: { top: '#FFF0E8', bottom: '#F0CCD8' },
   summer: { top: '#FFF5E6', bottom: '#F3DFB0' },
   fall: { top: '#FAE8DC', bottom: '#E8C4A8' },
 } as const
@@ -63,11 +80,116 @@ const SEASON_PAGE_GRADIENT_STOPS = {
  * Радиальный «ореол» для слоя размытия (`bg-season-page-atmosphere-*` + `blur-season-page-soft`).
  * База сезона — те же hex, что у `colors.seasonBg.*`.
  */
+
+/** Синхронно с `colors.surface.dark`. */
+const SURFACE_DARK_HEX = '#0D0D0D' as const
+
+/**
+ * Единый акцент сезона в UI (`colors.season.*`, тени переключателя, градиент букв баннера).
+ */
+const SEASON_ACCENT_HEX = {
+  winter: '#7BA7BC',
+  spring: '#C76B7E',
+  summer: '#E8A838',
+  fall:   '#C8622A',
+} as const
+
+function buildHomeSeasonBannerWordmarkGradient(
+  season: keyof typeof SEASON_ACCENT_HEX
+): string {
+  const c = SEASON_ACCENT_HEX[season]
+  return [
+    'linear-gradient(102deg',
+    `color-mix(in srgb, ${c} 26%, #ffffff 74%) 0%`,
+    `color-mix(in srgb, ${c} 58%, ${SURFACE_DARK_HEX} 42%) 24%`,
+    `${c} 48%`,
+    `color-mix(in srgb, ${c} 34%, #ffffff 66%) 72%`,
+    `color-mix(in srgb, ${c} 62%, ${SURFACE_DARK_HEX} 38%) 100%)`,
+  ].join(', ')
+}
+
+/**
+ * Нижний акцент «неба» главной по сезону (пастель `SEASON_PAGE_GRADIENT_STOPS.*` → интенсивный тон).
+ * Синхронно с `colors.home-page-sky-intense.*`; зима — прежний насыщенный синий.
+ */
+const HOME_PAGE_SKY_INTENSE_HEX = {
+  winter: '#0E4D7A',
+  /** Весна: глубокий розово-терракотовый к пастели «персик + роза». */
+  spring: '#8E3E52',
+  /** Тёплый янтарь к `colors.season.summer`. */
+  summer: '#A16207',
+  /** Терракотовый ржавый к `colors.season.fall`. */
+  fall: '#9C2F0E',
+} as const
+
+/**
+ * Доля интенсивного тона на нижнем стопе «неба» / финале безопасности (остальное — пастель / accent).
+ * Ниже — мягче общая насыщенность.
+ */
+const HOME_PAGE_SKY_FINAL_INTENSE_RATIO = 58
+
+function buildHomePageSkyGradient(
+  season: keyof typeof SEASON_PAGE_GRADIENT_STOPS
+): string {
+  const { top, bottom } = SEASON_PAGE_GRADIENT_STOPS[season]
+  const intense = HOME_PAGE_SKY_INTENSE_HEX[season]
+  const m = (b: number, i: number) =>
+    `color-mix(in srgb, ${bottom} ${b}%, ${intense} ${i}%)`
+  const r = HOME_PAGE_SKY_FINAL_INTENSE_RATIO
+  const fin = `color-mix(in srgb, ${intense} ${r}%, ${bottom} ${100 - r}%)`
+  return [
+    'linear-gradient(180deg',
+    `${top} 0%`,
+    `${bottom} 8%`,
+    `${m(94, 6)} 21%`,
+    `${m(86, 14)} 31%`,
+    `${m(76, 24)} 41%`,
+    `${m(66, 34)} 50%`,
+    `${m(58, 42)} 58%`,
+    `${m(52, 48)} 65%`,
+    `${m(48, 52)} 71%`,
+    `${m(45, 55)} 77%`,
+    `${m(43, 57)} 83%`,
+    `${m(42, 58)} 90%`,
+    `${fin} 100%)`,
+  ].join(', ')
+}
+
+const HOME_PAGE_SKY_GRADIENT_WINTER = buildHomePageSkyGradient('winter')
+const HOME_PAGE_SKY_GRADIENT_SPRING = buildHomePageSkyGradient('spring')
+const HOME_PAGE_SKY_GRADIENT_SUMMER = buildHomePageSkyGradient('summer')
+const HOME_PAGE_SKY_GRADIENT_FALL = buildHomePageSkyGradient('fall')
+
+/** Синхронно с `colors.brand.primary`. */
+const BRAND_PRIMARY_HEX = '#1A3C2E' as const
+/** Синхронно с `colors.brand.accent`. */
+const BRAND_ACCENT_HEX = '#E8F4F0' as const
+
+/** Тёмная база перед финальным осветлением accent (как раньше по primary/dark). */
+const HOME_SAFETY_INNER_DARK = `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 84%, ${SURFACE_DARK_HEX} 16%)`
+
+/** Финал: доля тёмной базы и accent задаётся `HOME_PAGE_SKY_FINAL_INTENSE_RATIO`. */
+const HOME_SAFETY_SECTION_GRADIENT_FINAL = `color-mix(in srgb, ${HOME_SAFETY_INNER_DARK} ${HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%, ${BRAND_ACCENT_HEX} ${100 - HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%)`
+
+/** Секция «Безопасность в походах»: плавный спуск accent → primary → тень → финальный микс. */
+const HOME_SAFETY_SECTION_GRADIENT = [
+  'linear-gradient(180deg',
+  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 72%, ${BRAND_ACCENT_HEX} 28%) 0%`,
+  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 78%, ${BRAND_ACCENT_HEX} 22%) 14%`,
+  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 84%, ${BRAND_ACCENT_HEX} 16%) 28%`,
+  `${BRAND_PRIMARY_HEX} 42%`,
+  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 94%, ${SURFACE_DARK_HEX} 6%) 55%`,
+  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 88%, ${SURFACE_DARK_HEX} 12%) 68%`,
+  `color-mix(in srgb, ${BRAND_PRIMARY_HEX} 86%, ${SURFACE_DARK_HEX} 14%) 80%`,
+  `${HOME_SAFETY_INNER_DARK} 90%`,
+  `${HOME_SAFETY_SECTION_GRADIENT_FINAL} 100%)`,
+].join(', ')
+
 const SEASON_PAGE_ATMOSPHERE = {
   winter:
     'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #D6E8F5 38%, transparent) 42%, transparent 72%)',
   spring:
-    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #C8EDD8 38%, transparent) 42%, transparent 72%)',
+    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #E8B8C6 38%, transparent) 42%, transparent 72%)',
   summer:
     'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.5) 0%, color-mix(in srgb, #FDEBC8 40%, transparent) 42%, transparent 72%)',
   fall:
@@ -78,7 +200,6 @@ const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   safelist: [
     { pattern: /^(h|min-h|w)-nav-season-(circle|icon)-(fixed|fluid)$/, variants: ['md', 'max'] },
-    { pattern: /^(h|min-h)-season-section(-md)?$/, variants: ['md'] },
     // @apply в index.css не подхватывает кастомные font-*; в JSX классы нужны в билде.
     'font-heading',
     'font-brand-wordmark',
@@ -95,11 +216,35 @@ const config: Config = {
     'text-tour-detail-included-icon-idle-horizontal',
     'text-tour-detail-included-icon-active-horizontal',
     'text-home-season-strip-label',
+    'font-home-season-banner',
+    'text-home-season-banner-letter',
+    'drop-shadow-home-season-banner-letter',
+    'z-home-season-banner',
+    'z-home-season-banner-veil',
+    'bg-home-season-banner-veil',
+    'duration-home-season-banner-veil',
+    'duration-home-season-banner-crossfade',
+    'duration-home-season-banner-strip-in',
+    'duration-home-season-banner-letter-exit',
+    'duration-home-season-banner-letter-in',
+    'animate-home-season-banner-letter-wave-exit',
+    'animate-home-season-banner-wordmark-shimmer',
+    'bg-home-season-banner-wordmark-winter',
+    'bg-home-season-banner-wordmark-spring',
+    'bg-home-season-banner-wordmark-summer',
+    'bg-home-season-banner-wordmark-fall',
+    'bg-home-season-banner-wordmark-grid',
+    'aspect-home-season-banner-inner',
+    'min-h-home-season-banner-inner',
+    'bg-home-season-banner-stage',
+    'from-home-season-strip-btn-from',
+    'to-home-season-strip-btn-to',
     { pattern: /^object-tour-detail-hero-desktop(-winter-[34])?$/, variants: ['lg'] },
     'object-gallery-winter-4-gora',
     'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
     { pattern: /^drop-shadow-tour-included-hover-/ },
+    { pattern: /^shadow-season-strip-hover-(winter|spring|summer|fall)$/ },
     { pattern: /^text-tourIncludedIcon-active-/ },
     /** Чтобы `@keyframes cta-letter-pop` попали в бандл (используются из `index.css`, не из утилит). */
     'animate-cta-letter-pop',
@@ -110,6 +255,11 @@ const config: Config = {
     /** `SEASON_PAGE_*` в `seasonTheme.ts` — только строковая подстановка по сезону. */
     { pattern: /^bg-season-page-(winter|spring|summer|fall)$/ },
     { pattern: /^bg-season-page-atmosphere-(winter|spring|summer|fall)$/ },
+    { pattern: /^bg-home-page-sky-(winter|spring|summer|fall)$/ },
+    /** `TEAM_SECTION_DIVIDER_CLASS` — `bg-season-*` + opacity. */
+    { pattern: /^bg-season-(winter|spring|summer|fall)\/35$/ },
+    'max-w-team-section-divider',
+    'bg-home-safety-section',
     'blur-season-page-soft',
     'opacity-season-page-atmosphere',
   ],
@@ -117,13 +267,14 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          primary:   '#1A3C2E',
+          primary:   BRAND_PRIMARY_HEX,
           secondary: '#C8A96E',
-          accent:    '#E8F4F0',
+          accent:    BRAND_ACCENT_HEX,
         },
         seasonBg: {
           winter: '#D6E8F5',
-          spring: '#C8EDD8',
+          /** Середина между персиком и розой весеннего градиента. */
+          spring: '#F5DAD8',
           summer: '#FDEBC8',
           fall:   '#F5D5C0',
         },
@@ -149,6 +300,27 @@ const config: Config = {
           dark:  '#0D0D0D',
           light: '#F7F5F0',
         },
+        /**
+         * Базовый интенсивный тон для «неба» главной; фактический низ — смешение с пастелью (`HOME_PAGE_SKY_FINAL_INTENSE_RATIO`).
+         */
+        'home-page-sky-intense': {
+          winter: HOME_PAGE_SKY_INTENSE_HEX.winter,
+          spring: HOME_PAGE_SKY_INTENSE_HEX.spring,
+          summer: HOME_PAGE_SKY_INTENSE_HEX.summer,
+          fall: HOME_PAGE_SKY_INTENSE_HEX.fall,
+        },
+        /** Подложка сетки баннера «В другой сезон» (md+), до появления полосок. */
+        'home-season-banner-stage': '#000000',
+        /** Слой-вуаль над «небом» главной при скролле секции сезона / до блока команды (`useHomeSeasonBannerWhiteVeil`); совпадает с `home-season-banner-stage`. */
+        'home-season-banner-veil': '#000000',
+        /**
+         * Градиент кругов `SeasonSwitcher` в секции главной (на светлой полосе под баннером):
+         * на ~20% темнее, чем `from-black/60 to-black/40` в navbar.
+         */
+        'home-season-strip-btn': {
+          from: 'rgb(0 0 0 / 0.72)',
+          to: 'rgb(0 0 0 / 0.48)',
+        },
         difficulty: {
           easy:   { bg: '#dcfce7', fg: '#166534' },
           medium: { bg: '#fef9c3', fg: '#854d0e' },
@@ -156,15 +328,16 @@ const config: Config = {
           expert: { bg: '#fee2e2', fg: '#991b1b' },
         },
         text: {
-          primary: '#1A1A1A',
+          primary: THEME_TEXT_PRIMARY_HEX,
           muted:   '#6B7280',
-          inverse: '#F7F5F0',
+          inverse: THEME_TEXT_INVERSE_HEX,
         },
         season: {
-          winter: '#7BA7BC',
-          spring: '#7DBF8C',
-          summer: '#E8A838',
-          fall:   '#C8622A',
+          winter: SEASON_ACCENT_HEX.winter,
+          /** Акцент весны в UI (иконки сезона и т.п.): приглушённая роза. */
+          spring: SEASON_ACCENT_HEX.spring,
+          summer: SEASON_ACCENT_HEX.summer,
+          fall:   SEASON_ACCENT_HEX.fall,
         },
         divider: '#E5E7EB',
         /** Иконки выбора мессенджера в модалке заявки (hover / выбранное состояние). */
@@ -182,7 +355,8 @@ const config: Config = {
         tourIncludedIcon: {
           active: {
             winter: '#B45309',
-            spring: '#9D174D',
+            /** Контраст к персиково-розовому `seasonBg.spring`. */
+            spring: '#861C44',
             summer: '#0E7490',
             fall:   '#14532D',
           },
@@ -206,6 +380,7 @@ const config: Config = {
         // Стеки — `src/constants/fonts.ts`. Nord: `font-heading` / `font-hero-carousel-phrase`; лого navbar — `font-brand-wordmark` (Dela Gothic One).
         heading:               [...fontFamilyHeadingStack],
         'brand-wordmark':      [...fontFamilyBrandWordmarkStack],
+        'home-season-banner':  [...fontFamilyHomeSeasonBannerStack],
         body:                  [...fontFamilyBodyStack],
         mono:                  [...fontFamilyMonoStack],
         'hero-carousel-phrase': [...fontFamilyHeroPhraseStack],
@@ -239,6 +414,14 @@ const config: Config = {
         'tour-detail-meta-price-prominent': ['1.625rem', { lineHeight: '1.2' }],
         /** Подпись «В другой сезон» над переключателем на главной (полоса с фоном). */
         'home-season-strip-label': ['1.125rem', { lineHeight: '1.35', letterSpacing: '0.1em' }],
+        /**
+         * Буквы «Вкрайности» в баннере колонок (все ширины).
+         * Базовый clamp ×1.4 к прежним 1.125rem / 2.4vw / 2.5rem.
+         */
+        'home-season-banner-letter': [
+          'clamp(1.575rem, 3.36vw, 3.5rem)',
+          { lineHeight: '1', letterSpacing: '0.04em' },
+        ],
         /** Крупная иконка в списке «Что включено» до hover/tap (страница тура). */
         'tour-detail-included-icon-idle': ['2.25rem', { lineHeight: '1' }],
         /**
@@ -271,6 +454,27 @@ const config: Config = {
         'season-page-atmosphere-spring': SEASON_PAGE_ATMOSPHERE.spring,
         'season-page-atmosphere-summer': SEASON_PAGE_ATMOSPHERE.summer,
         'season-page-atmosphere-fall': SEASON_PAGE_ATMOSPHERE.fall,
+        /** Единое «небо» главной (после hero): пастель сезона → `home-page-sky-intense.*`. */
+        'home-page-sky-winter': HOME_PAGE_SKY_GRADIENT_WINTER,
+        'home-page-sky-spring': HOME_PAGE_SKY_GRADIENT_SPRING,
+        'home-page-sky-summer': HOME_PAGE_SKY_GRADIENT_SUMMER,
+        'home-page-sky-fall': HOME_PAGE_SKY_GRADIENT_FALL,
+        /** Блок «Безопасность в походах» на главной: `brand.primary` + `brand.accent`, см. `HOME_SAFETY_SECTION_GRADIENT`. */
+        'home-safety-section': HOME_SAFETY_SECTION_GRADIENT,
+        /**
+         * Буквы «Вкрайности»: градиент под `background-clip: text` (виден только в глифах), тона от `SEASON_ACCENT_HEX.*`.
+         */
+        'home-season-banner-wordmark-winter': buildHomeSeasonBannerWordmarkGradient('winter'),
+        'home-season-banner-wordmark-spring': buildHomeSeasonBannerWordmarkGradient('spring'),
+        'home-season-banner-wordmark-summer': buildHomeSeasonBannerWordmarkGradient('summer'),
+        'home-season-banner-wordmark-fall': buildHomeSeasonBannerWordmarkGradient('fall'),
+      },
+      backgroundSize: {
+        /**
+         * Буквы баннера: один горизонтальный градиент на всю сетку (10 колонок);
+         * смещение столбца — `--hsb-wm-x` + keyframes `home-season-banner-wordmark-shimmer`.
+         */
+        'home-season-banner-wordmark-grid': '1000% 100%',
       },
       blur: {
         /** Декоративный слой сезонного фона (`SeasonPageBackdrop`). */
@@ -290,6 +494,8 @@ const config: Config = {
         'gallery-hero-lifted': '359 / 200',
         /** Вертикальный акцент (первый кадр «Изюбриная» и др.) — выше широкого 21:9. */
         'gallery-portrait': '3 / 4',
+        /** Баннер 10 колонок внутри `max-w-7xl`: шире колонки, умеренная высота. */
+        'home-season-banner-inner': '10 / 3.25',
       },
       backgroundPosition: {
         /**
@@ -343,8 +549,19 @@ const config: Config = {
         'home-section-top': '4rem',
         /** Home: gap between tours block and season switcher strip. */
         'home-stack-gap': '2.5rem',
-        /** Home: top padding on the season background strip section. */
-        'home-season-strip-pt': '3rem',
+        /**
+         * Home: top padding on the season background strip section.
+         * +15% к прежним 3rem → 3.45rem.
+         */
+        'home-season-strip-pt': '3.45rem',
+        /**
+         * Home: секция «В другой сезон» — зазор под баннером, паддинг снизу полоски
+         * и расстояние между подписью и кнопками (внутри одного flex-контейнера с баннером).
+         * +15% к прежним 0.5rem → 0.575rem.
+         */
+        'home-season-banner-foot-gap': '0.575rem',
+        /** Между капсулой-разделителем и заголовком секции «Команда» на главной. */
+        'team-section-divider-to-heading': '2rem',
         'section-y': '6rem',
         'card-p':    '1.75rem',
         'tooltip-gap': '0.375rem',
@@ -379,12 +596,9 @@ const config: Config = {
         /** Keyframe `slide-in`: см. `KEYFRAME_SLIDE_IN_X` в `tailwind.config.ts`. */
         'keyframe-slide-in-x': KEYFRAME_SLIDE_IN_X,
       },
-      // Секция «В другой сезон»: высота в 2× от базового размера (база 22rem/28rem → 44rem/56rem). Mobile-first: до md — 44rem, от md — 56rem.
       height: {
         /** Один экран под фиксированный navbar; `SeasonNavDock` — оверлей, высоту main не увеличивает. */
         'hero-viewport': 'calc(100vh - theme(spacing.navbar))',
-        'season-section':    '44rem',
-        'season-section-md': '56rem',
         /** Круги сезона в навбаре (фикс с `season-md`, 36px). */
         'nav-season-circle-fixed': '2.25rem',
         /** Плавный масштаб 320–500px (совпадает с max у границы). */
@@ -413,10 +627,12 @@ const config: Config = {
       maxWidth: {
         /** Основная колонка страницы тура: как у сайтового контейнера (`max-w-7xl`), шире прежнего `5xl`. */
         tourDetail: '80rem',
+        /** Горизонтальный разделитель над блоком «Команда» (`TeamCarousel`). */
+        'team-section-divider': '28rem',
       },
       minHeight: {
-        'season-section':    '44rem',
-        'season-section-md': '56rem',
+        /** Минимальная высота прямоугольника баннера внутри контейнера (md+). */
+        'home-season-banner-inner': '11rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
         'route-fallback':    'clamp(16rem, 55vh, 40rem)',
         /** Область описания под горизонтальными иконками «Что включено» (стабильная высота при смене текста). */
@@ -434,6 +650,18 @@ const config: Config = {
          */
         tourIncludedPanel:
           '0 4px 18px color-mix(in srgb, #1A3C2E 10%, #0D0D0D 8%, transparent), 0 10px 26px -8px color-mix(in srgb, #0D0D0D 14%, transparent)',
+        /**
+         * Hover кругов `SeasonSwitcher` на главной (полоса под баннером): лёгкое свечение цветом сезона.
+         * Hex синхронно с `colors.season.*`.
+         */
+        'season-strip-hover-winter':
+          `0 0 0 1px color-mix(in srgb, ${SEASON_ACCENT_HEX.winter} 28%, transparent), 0 0 22px color-mix(in srgb, ${SEASON_ACCENT_HEX.winter} 22%, transparent)`,
+        'season-strip-hover-spring':
+          `0 0 0 1px color-mix(in srgb, ${SEASON_ACCENT_HEX.spring} 28%, transparent), 0 0 22px color-mix(in srgb, ${SEASON_ACCENT_HEX.spring} 22%, transparent)`,
+        'season-strip-hover-summer':
+          `0 0 0 1px color-mix(in srgb, ${SEASON_ACCENT_HEX.summer} 30%, transparent), 0 0 22px color-mix(in srgb, ${SEASON_ACCENT_HEX.summer} 22%, transparent)`,
+        'season-strip-hover-fall':
+          `0 0 0 1px color-mix(in srgb, ${SEASON_ACCENT_HEX.fall} 28%, transparent), 0 0 22px color-mix(in srgb, ${SEASON_ACCENT_HEX.fall} 22%, transparent)`,
       },
       dropShadow: {
         /**
@@ -448,16 +676,19 @@ const config: Config = {
           '0 0 4px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.2)',
         /**
          * Нижняя тень иконки «Что включено» при активации — оттенок согласован с фоном сезона
-         * (`seasonBg.*`). Весна: контраст к мятному фону (`seasonBg.spring` + `brand.primary`).
+         * (`seasonBg.*`). Весна: оттенок розы к персиково-розовому фону.
          */
         'tour-included-hover-winter':
-          '0 5px 10px color-mix(in srgb, #1A1A1A 22%, #7BA7BC 16%, transparent)',
+          `0 5px 10px color-mix(in srgb, #1A1A1A 22%, ${SEASON_ACCENT_HEX.winter} 16%, transparent)`,
         'tour-included-hover-spring':
-          '0 5px 12px color-mix(in srgb, #1A3C2E 38%, #0D0D0D 14%, transparent)',
+          `0 5px 12px color-mix(in srgb, #1A1A1A 22%, ${SEASON_ACCENT_HEX.spring} 22%, transparent)`,
         'tour-included-hover-summer':
-          '0 5px 10px color-mix(in srgb, #1A1A1A 20%, #E8A838 18%, transparent)',
+          `0 5px 10px color-mix(in srgb, #1A1A1A 20%, ${SEASON_ACCENT_HEX.summer} 18%, transparent)`,
         'tour-included-hover-fall':
-          '0 5px 10px color-mix(in srgb, #1A1A1A 24%, #C8622A 14%, transparent)',
+          `0 5px 10px color-mix(in srgb, #1A1A1A 24%, ${SEASON_ACCENT_HEX.fall} 14%, transparent)`,
+        /** Читаемость букв баннера на сменяющемся видео. */
+        'home-season-banner-letter':
+          '0 1px 2px color-mix(in srgb, #0D0D0D 55%, transparent), 0 0 20px color-mix(in srgb, #0D0D0D 25%, transparent)',
       },
       borderRadius: {
         'card':    '1rem',
@@ -478,6 +709,10 @@ const config: Config = {
         'seasonFlash': '300',
         /** Панель бургер-меню: под строкой navbar (100), над контентом и SeasonNavDock (90). */
         mobileNav: '95',
+        /** Колонки баннера «В другой сезон» под контентом `RevealBox` (z-20). */
+        'home-season-banner': '15',
+        /** Между `z-0` небом и `z-10` контентом главной после hero. */
+        'home-season-banner-veil': '1',
       },
       transitionDuration: {
         'carousel':      '600ms',
@@ -502,6 +737,15 @@ const config: Config = {
         'tour-included': TOUR_INCLUDED_MOTOR_DURATION,
         /** Fade подписи под рядом иконок (см. `TOUR_INCLUDED_DESCRIPTION_FADE_MS`). */
         'tour-included-description-fade': TOUR_INCLUDED_DESCRIPTION_FADE,
+        /** Crossfade соседних полосок медиа (out+in одновременно); синхронно с `HOME_SEASON_BANNER_CROSSFADE_MS`. */
+        'home-season-banner-crossfade': `${HOME_SEASON_BANNER_CROSSFADE_MS}ms`,
+        /** Fade in полоски видео; синхронно с `HOME_SEASON_BANNER_STRIP_FADE_IN_MS`. */
+        'home-season-banner-strip-in': `${HOME_SEASON_BANNER_STRIP_FADE_IN_MS}ms`,
+        /** Синхронный fade-out всех букв слова; синхронно с `HOME_SEASON_BANNER_LETTER_EXIT_MS`. */
+        'home-season-banner-letter-exit': `${HOME_SEASON_BANNER_LETTER_EXIT_MS}ms`,
+        'home-season-banner-letter-in': `${HOME_SEASON_BANNER_LETTER_FADE_IN_MS}ms`,
+        /** Opacity слоя-вуали при скролле; синхронно с `HOME_SEASON_BANNER_WHITE_VEIL_TRANSITION_MS`. */
+        'home-season-banner-veil': `${HOME_SEASON_BANNER_WHITE_VEIL_TRANSITION_MS}ms`,
       },
       transitionTimingFunction: {
         'reveal-out': 'ease-out',
@@ -607,6 +851,38 @@ const config: Config = {
           },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        /**
+         * Баннер главной: снос буквы волной 9→0 — лёгкое покачивание + fade.
+         * Длительность в `animation` = `HOME_SEASON_BANNER_LETTER_EXIT_MS`.
+         */
+        'home-season-banner-letter-wave-exit': {
+          '0%': {
+            opacity: '1',
+            transform: 'rotate(0deg) translateY(0)',
+          },
+          '30%': {
+            opacity: '0.82',
+            transform: 'rotate(3.5deg) translateY(0.08rem)',
+          },
+          '65%': {
+            opacity: '0.35',
+            transform: 'rotate(-4deg) translateY(0.18rem)',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'rotate(1.5deg) translateY(0.28rem)',
+          },
+        },
+        /**
+         * Переливание фона в глифах: сдвиг `background-position` вдоль широкого градиента.
+         * `--hsb-wm-x` задаёт столбец (0…100% по 10 колонкам); синхронно с `HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS`.
+         */
+        'home-season-banner-wordmark-shimmer': {
+          '0%': { backgroundPosition: 'var(--hsb-wm-x) 50%' },
+          '100%': {
+            backgroundPosition: 'calc(var(--hsb-wm-x, 0%) + 36%) 50%',
+          },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -623,6 +899,8 @@ const config: Config = {
         'tour-included-text-enter': `tour-included-text-enter ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         'tour-included-text-exit': `tour-included-text-exit ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         'tour-meta-stagger-in': `tour-meta-stagger-in ${SLIDE_IN_DURATION} ease forwards`,
+        'home-season-banner-letter-wave-exit': `home-season-banner-letter-wave-exit ${HOME_SEASON_BANNER_LETTER_EXIT_MS}ms ease-in-out forwards`,
+        'home-season-banner-wordmark-shimmer': `home-season-banner-wordmark-shimmer ${HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS}ms ease-in-out infinite alternate`,
       },
       transitionDelay: {
         'tour-meta-0': '0ms',

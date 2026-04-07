@@ -28,6 +28,8 @@ export const SEASON_STYLE: Record<
     activeShadow: string;
     hoverBorder: string;
     hoverFrom: string;
+    /** Лёгкое свечение при hover круга под баннером (`SeasonSwitcher` variant section). */
+    sectionHoverGlow: string;
     shimmer: string;
     iconColor: string;
     activeRing: string;
@@ -42,6 +44,7 @@ export const SEASON_STYLE: Record<
     activeShadow: 'shadow-season-winter/40',
     hoverBorder: 'group-hover:border-season-winter/50',
     hoverFrom: 'group-hover:from-season-winter/10',
+    sectionHoverGlow: 'group-hover:shadow-season-strip-hover-winter',
     shimmer: 'via-season-winter/20',
     iconColor: 'text-season-winter',
     activeRing: 'ring-2 ring-season-winter/50',
@@ -55,6 +58,7 @@ export const SEASON_STYLE: Record<
     activeShadow: 'shadow-season-spring/40',
     hoverBorder: 'group-hover:border-season-spring/50',
     hoverFrom: 'group-hover:from-season-spring/10',
+    sectionHoverGlow: 'group-hover:shadow-season-strip-hover-spring',
     shimmer: 'via-season-spring/20',
     iconColor: 'text-season-spring',
     activeRing: 'ring-2 ring-season-spring/50',
@@ -68,6 +72,7 @@ export const SEASON_STYLE: Record<
     activeShadow: 'shadow-season-summer/40',
     hoverBorder: 'group-hover:border-season-summer/50',
     hoverFrom: 'group-hover:from-season-summer/10',
+    sectionHoverGlow: 'group-hover:shadow-season-strip-hover-summer',
     shimmer: 'via-season-summer/20',
     iconColor: 'text-season-summer',
     activeRing: 'ring-2 ring-season-summer/50',
@@ -81,6 +86,7 @@ export const SEASON_STYLE: Record<
     activeShadow: 'shadow-season-fall/40',
     hoverBorder: 'group-hover:border-season-fall/50',
     hoverFrom: 'group-hover:from-season-fall/10',
+    sectionHoverGlow: 'group-hover:shadow-season-strip-hover-fall',
     shimmer: 'via-season-fall/20',
     iconColor: 'text-season-fall',
     activeRing: 'ring-2 ring-season-fall/50',

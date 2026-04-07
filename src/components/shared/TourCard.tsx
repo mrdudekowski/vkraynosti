@@ -28,18 +28,20 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   const winterStruck = winterCardStruckPrice(tour);
   return (
     <>
-      <div className={compact ? 'h-32' : 'h-48'}>
+      <div
+        className={`overflow-hidden rounded-t-card ${compact ? 'h-32' : 'h-48'}`}
+      >
         <PlaceholderImage
           src={tour.imageUrl}
           alt={tour.title}
-          className="w-full h-full"
+          className="h-full w-full"
           loading={priorityImage ? 'eager' : 'lazy'}
           fetchPriority={priorityImage ? 'high' : undefined}
         />
       </div>
       <div className="p-card-p">
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="font-heading font-normal text-card text-text-primary leading-tight">
+        <div className="mb-1 flex items-start justify-between gap-2">
+          <h3 className="min-w-0 flex-1 font-heading font-normal text-card leading-tight text-text-primary">
             {tour.title}
           </h3>
           <span
@@ -54,10 +56,10 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
               : UI.difficulty.labels[tour.difficulty]}
           </span>
         </div>
-        <p className="text-text-muted text-sm mb-3">{tour.subtitle}</p>
-        <div className="flex items-center justify-between gap-2 text-sm">
+        <p className="mb-3 text-sm text-text-muted">{tour.subtitle}</p>
+        <div className="flex flex-col gap-2 text-sm">
           <span className="text-text-muted">{tour.duration}</span>
-          <div className="text-right shrink-0">
+          <div className="w-full text-right">
             {tour.season === 'winter' ? (
               <>
                 <span className="font-semibold text-brand-primary block">

@@ -1,4 +1,9 @@
 export const UI = {
+  /**
+   * Десять букв баннера «В другой сезон» (главная): порядок = индекс колонки 0…9.
+   * См. `getHomeSeasonBannerClips` и `HomeSeasonBanner`.
+   */
+  homeSeasonBannerWordmark: 'Вкрайности' as const,
   hero: {
     /** Основной h1 главной страницы (SEO и скринридеры). */
     documentTitle: 'Туры по дикой природе Приморского края',
@@ -67,6 +72,9 @@ export const UI = {
     },
     otherSeasons:  'Другие сезоны',
     switchSeason:  'В другой сезон',
+    /** `aria-label` региона баннера с колонками «Вкрайности» на главной. */
+    homeSeasonBannerRegion:
+      'Анимированный баннер: название Вкрайности и смена видео по колонкам',
     team:         'Команда Вкрайности',
     teamSub:      'Опытные гиды и эксперты',
     safety:       'Безопасность в наших походах',

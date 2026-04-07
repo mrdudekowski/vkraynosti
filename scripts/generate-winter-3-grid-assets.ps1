@@ -4,9 +4,10 @@ $dir = Join-Path $PSScriptRoot "..\public\tours\winter-3" | Resolve-Path
 Set-Location $dir
 . (Join-Path $PSScriptRoot "media\Invoke-Ffmpeg.ps1")
 
+# gr.board / gr.elya / gr.bbq — в сетке `*.grid.mp4` из `generate-winter-3-banner-stub-videos.ps1`, не из webp.
 $images = @(
-  "gr.falaza.webp", "gr.griba.webp", "gr.lift.webp", "gr.board.webp", "gr.board2.webp",
-  "gr.elya.webp", "gr.instr.webp", "gr.bbq.webp"
+  "gr.falaza.webp", "gr.griba.webp", "gr.lift.webp", "gr.board2.webp",
+  "gr.instr.webp"
 )
 
 foreach ($f in $images) {

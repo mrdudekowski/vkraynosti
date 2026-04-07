@@ -24,6 +24,12 @@ export const TOUR_INCLUDED_POINTER_EXIT_DELAY_MS = 420 as const;
 export const TOUR_INCLUDED_AUTO_ROTATE_MS = 3000 as const;
 
 /**
+ * Пауза автосмены после ручного тапа по иконке на устройствах без hover.
+ * После паузы автопрокрутка продолжается с текущего активного пункта.
+ */
+export const TOUR_INCLUDED_MOBILE_MANUAL_PAUSE_MS = 5000 as const;
+
+/**
  * Классы `drop-shadow-*` для нижней тени иконки при активации (фон страницы зависит от сезона).
  */
 export const TOUR_INCLUDED_HOVER_DROP_SHADOW_CLASS: Record<Season, string> = {

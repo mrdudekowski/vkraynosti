@@ -8,6 +8,7 @@ import {
 } from 'react';
 import {
   TOUR_INCLUDED_AUTO_ROTATE_MS,
+  TOUR_INCLUDED_MOBILE_MANUAL_PAUSE_MS,
   TOUR_INCLUDED_POINTER_EXIT_DELAY_MS,
 } from '../constants/tourIncludedHover';
 import { usePrefersReducedMotion } from './usePrefersReducedMotion';
@@ -47,13 +48,15 @@ export function useTourIncludedActiveItem(
   isInteractionPaused: boolean
 ) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [isManualPauseActive, setIsManualPauseActive] = useState(false);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const manualPauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reducedMotion = usePrefersReducedMotion();
   const finePointerHover = useFinePointerHover();
 
   const autoRotateEnabled = useMemo(
-    () => itemCount > 1 && !reducedMotion && finePointerHover,
-    [itemCount, reducedMotion, finePointerHover]
+    () => itemCount > 1 && !reducedMotion,
+    [itemCount, reducedMotion]
   );
 
   const clearExitTimer = useCallback(() => {
@@ -62,6 +65,22 @@ export function useTourIncludedActiveItem(
       exitTimerRef.current = null;
     }
   }, []);
+
+  const clearManualPauseTimer = useCallback(() => {
+    if (manualPauseTimerRef.current != null) {
+      clearTimeout(manualPauseTimerRef.current);
+      manualPauseTimerRef.current = null;
+    }
+  }, []);
+
+  const startManualPause = useCallback(() => {
+    clearManualPauseTimer();
+    setIsManualPauseActive(true);
+    manualPauseTimerRef.current = setTimeout(() => {
+      setIsManualPauseActive(false);
+      manualPauseTimerRef.current = null;
+    }, TOUR_INCLUDED_MOBILE_MANUAL_PAUSE_MS);
+  }, [clearManualPauseTimer]);
 
   const scheduleExit = useCallback(() => {
     if (autoRotateEnabled) return;
@@ -87,12 +106,19 @@ export function useTourIncludedActiveItem(
   const toggleOrActivate = useCallback(
     (index: number) => {
       clearExitTimer();
+      startManualPause();
       setActiveIndex((prev) => (prev === index ? null : index));
     },
-    [clearExitTimer]
+    [clearExitTimer, startManualPause]
   );
 
-  useEffect(() => () => clearExitTimer(), [clearExitTimer]);
+  useEffect(
+    () => () => {
+      clearExitTimer();
+      clearManualPauseTimer();
+    },
+    [clearExitTimer, clearManualPauseTimer]
+  );
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -106,7 +132,10 @@ export function useTourIncludedActiveItem(
   }, [itemCount, autoRotateEnabled]);
 
   useEffect(() => {
-    if (!autoRotateEnabled || itemCount < 2 || isInteractionPaused) return;
+    const desktopInteractionPause = finePointerHover && isInteractionPaused;
+    const mobileManualPause = !finePointerHover && isManualPauseActive;
+    const isAutoRotatePaused = desktopInteractionPause || mobileManualPause;
+    if (!autoRotateEnabled || itemCount < 2 || isAutoRotatePaused) return;
     const id = setInterval(() => {
       setActiveIndex((prev) => {
         const base = prev === null ? 0 : prev;
@@ -114,7 +143,13 @@ export function useTourIncludedActiveItem(
       });
     }, TOUR_INCLUDED_AUTO_ROTATE_MS);
     return () => clearInterval(id);
-  }, [autoRotateEnabled, itemCount, isInteractionPaused]);
+  }, [
+    autoRotateEnabled,
+    finePointerHover,
+    isInteractionPaused,
+    isManualPauseActive,
+    itemCount,
+  ]);
 
   return {
     activeIndex,

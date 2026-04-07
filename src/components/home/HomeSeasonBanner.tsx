@@ -8,6 +8,7 @@ import { UI } from '../../constants/ui';
 import { getHomeSeasonBannerClips, type HomeSeasonBannerClip } from '../../data/homeSeasonBannerClips';
 import {
   useHomeSeasonBannerSequence,
+  type HomeSeasonBannerSoloPhase,
   type HomeSeasonBannerWordOverlay,
 } from '../../hooks/useHomeSeasonBannerSequence';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
@@ -17,12 +18,49 @@ interface HomeSeasonBannerProps {
   season: Season;
 }
 
+/**
+ * Не вешаем `src` на все 10 `<video>` сразу: иначе на деплое десять параллельных запросов к ~36 МБ grid-mp4.
+ * Грузим: активная цепочка, следующая колонка в hold (к предстоящему crossfade), колонка 0 на фазе слова (следующий цикл).
+ */
+function shouldLoadHomeSeasonBannerColumnVideo(
+  clip: HomeSeasonBannerClip,
+  prefersReducedMotion: boolean,
+  wordOverlay: HomeSeasonBannerWordOverlay,
+  soloCol: number | null,
+  soloPhase: HomeSeasonBannerSoloPhase | null,
+  handoff: { from: number; to: number } | null,
+  columnIndex: number
+): boolean {
+  if (!clip.videoSrc || prefersReducedMotion) {
+    return false;
+  }
+  const inVideoChain =
+    wordOverlay === 'hidden' &&
+    (soloCol === columnIndex ||
+      (handoff !== null && (handoff.from === columnIndex || handoff.to === columnIndex)));
+  if (inVideoChain) {
+    return true;
+  }
+  const preloadNextStripColumn =
+    wordOverlay === 'hidden' &&
+    soloCol !== null &&
+    soloPhase === 'hold' &&
+    columnIndex === soloCol + 1 &&
+    soloCol < 9;
+  if (preloadNextStripColumn) {
+    return true;
+  }
+  return wordOverlay !== 'hidden' && columnIndex === 0;
+}
+
 interface BannerColumnVideoProps {
   clip: HomeSeasonBannerClip;
   playing: boolean;
+  /** `metadata` для предзагрузки следующей полоски; `auto` у активного клипа для буфера перед play. */
+  preloadHint: 'metadata' | 'auto';
 }
 
-const BannerColumnVideo = ({ clip, playing }: BannerColumnVideoProps) => {
+const BannerColumnVideo = ({ clip, playing, preloadHint }: BannerColumnVideoProps) => {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -72,7 +110,7 @@ const BannerColumnVideo = ({ clip, playing }: BannerColumnVideoProps) => {
       poster={clip.posterSrc}
       muted
       playsInline
-      preload="metadata"
+      preload={preloadHint}
       aria-hidden
     />
   );
@@ -259,6 +297,17 @@ const HomeSeasonBannerColumn = ({
 
   const playing = !prefersReducedMotion && inVideoChain;
 
+  const shouldLoadVideo = shouldLoadHomeSeasonBannerColumnVideo(
+    clip,
+    prefersReducedMotion,
+    wordOverlay,
+    soloCol,
+    soloPhase,
+    handoff,
+    columnIndex
+  );
+  const videoPreloadHint = playing ? ('auto' as const) : ('metadata' as const);
+
   const letterOpacity = wordLetterOpacityClass(
     wordOverlay,
     prefersReducedMotion,
@@ -324,8 +373,8 @@ const HomeSeasonBannerColumn = ({
         className={`absolute inset-0 ${media.transitionClass} ${media.opacityClass}`}
         aria-hidden
       >
-        {clip.videoSrc ? (
-          <BannerColumnVideo clip={clip} playing={playing} />
+        {clip.videoSrc && shouldLoadVideo ? (
+          <BannerColumnVideo clip={clip} playing={playing} preloadHint={videoPreloadHint} />
         ) : (
           <img
             src={clip.posterSrc}

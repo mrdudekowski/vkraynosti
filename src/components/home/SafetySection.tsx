@@ -10,12 +10,12 @@ import { ROUTES } from '../../constants/routes';
 const SafetySection = () => (
   <section
     id="safety"
-    className="relative isolate overflow-hidden bg-home-safety-section py-section-y text-text-inverse"
+    className="relative isolate overflow-hidden py-section-y text-text-primary"
   >
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-10 lg:mb-12">
-        <h2 className="section-title text-text-inverse">{UI.sections.safety}</h2>
-        <p className="text-text-inverse/70 mt-3 max-w-2xl mx-auto">{UI.sections.safetySub}</p>
+        <h2 className="section-title text-text-primary">{UI.sections.safety}</h2>
+        <p className="text-text-muted mt-3 max-w-2xl mx-auto">{UI.sections.safetySub}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mb-12 items-stretch">
@@ -40,11 +40,11 @@ const SafetySection = () => (
           </div>
         </div>
 
-        <ul className="flex flex-col gap-0 rounded-card border border-white/15 bg-white/5 backdrop-blur-sm divide-y divide-white/10 motion-safe:animate-fade-up">
+        <ul className="flex flex-col gap-0 rounded-card border border-divider bg-white/80 shadow-md backdrop-blur-sm divide-y divide-divider motion-safe:animate-fade-up">
           {SAFETY_ITEMS.map(item => (
             <li
               key={item.id}
-              className="flex gap-4 p-card-p motion-safe:transition-colors motion-safe:duration-hover motion-safe:hover:bg-white/10"
+              className="flex gap-4 p-card-p motion-safe:transition-colors motion-safe:duration-hover motion-safe:hover:bg-text-primary/5"
             >
               <div
                 className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-secondary/25"
@@ -56,10 +56,10 @@ const SafetySection = () => (
                 />
               </div>
               <div className="min-w-0">
-                <h3 className="font-heading font-normal text-base text-text-inverse mb-1">
+                <h3 className="font-heading font-normal text-base text-text-primary mb-1">
                   {item.title}
                 </h3>
-                <p className="text-text-inverse/70 text-sm leading-relaxed">{item.summary}</p>
+                <p className="text-text-muted text-sm leading-relaxed">{item.summary}</p>
               </div>
             </li>
           ))}
@@ -67,7 +67,7 @@ const SafetySection = () => (
       </div>
 
       <div className="text-center">
-        <Link to={ROUTES.SAFETY} className="btn-ghost text-text-inverse" prefetch="intent">
+        <Link to={ROUTES.SAFETY} className="btn-ghost text-text-primary" prefetch="intent">
           {UI.sections.safety_cta}
         </Link>
       </div>

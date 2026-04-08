@@ -213,34 +213,6 @@ const BRAND_PRIMARY_HEX = '#1A3C2E' as const
 /** Синхронно с `colors.brand.accent`. */
 const BRAND_ACCENT_HEX = '#E8F4F0' as const
 
-/**
- * Секция «Безопасность» на главной: синий с лёгким фиолетовым оттенком (фиолетовый — 5% в `color-mix`).
- * Светлый стоп финала — холодный подсвет к `text-text-inverse`.
- */
-const HOME_SAFETY_SECTION_BLUE_HEX = '#1E4D7A' as const
-const HOME_SAFETY_SECTION_PURPLE_HEX = '#4A3D6E' as const
-const HOME_SAFETY_SECTION_LIGHT_HEX = '#E4EBF5' as const
-
-const HOME_SAFETY_BLUE_PURPLE_5 = `color-mix(in srgb, ${HOME_SAFETY_SECTION_BLUE_HEX} 95%, ${HOME_SAFETY_SECTION_PURPLE_HEX} 5%)`
-
-const HOME_SAFETY_INNER_DARK = `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 84%, ${SURFACE_DARK_HEX} 16%)`
-
-const HOME_SAFETY_SECTION_GRADIENT_FINAL = `color-mix(in srgb, ${HOME_SAFETY_INNER_DARK} ${HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%, ${HOME_SAFETY_SECTION_LIGHT_HEX} ${100 - HOME_PAGE_SKY_FINAL_INTENSE_RATIO}%)`
-
-/** Секция «Безопасность в походах»: вертикальный синий градиент с 5% фиолетового в базовом миксе. */
-const HOME_SAFETY_SECTION_GRADIENT = [
-  'linear-gradient(180deg',
-  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 78%, ${HOME_SAFETY_SECTION_LIGHT_HEX} 22%) 0%`,
-  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 84%, ${HOME_SAFETY_SECTION_LIGHT_HEX} 16%) 14%`,
-  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 90%, ${HOME_SAFETY_SECTION_LIGHT_HEX} 10%) 28%`,
-  `${HOME_SAFETY_BLUE_PURPLE_5} 42%`,
-  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 94%, ${SURFACE_DARK_HEX} 6%) 55%`,
-  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 88%, ${SURFACE_DARK_HEX} 12%) 68%`,
-  `color-mix(in srgb, ${HOME_SAFETY_BLUE_PURPLE_5} 86%, ${SURFACE_DARK_HEX} 14%) 80%`,
-  `${HOME_SAFETY_INNER_DARK} 90%`,
-  `${HOME_SAFETY_SECTION_GRADIENT_FINAL} 100%)`,
-].join(', ')
-
 const SEASON_PAGE_ATMOSPHERE = {
   winter:
     'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #D6E8F5 38%, transparent) 42%, transparent 72%)',
@@ -319,7 +291,6 @@ const config: Config = {
     { pattern: /^bg-season-accent-bar-(winter|spring|summer|fall)$/ },
     { pattern: /^drop-shadow-season-chrome-icon-(winter|spring|summer|fall)$/ },
     'max-w-team-section-divider',
-    'bg-home-safety-section',
     'blur-season-page-soft',
     'opacity-season-page-atmosphere',
   ],
@@ -519,8 +490,6 @@ const config: Config = {
         'home-page-sky-spring': HOME_PAGE_SKY_GRADIENT_SPRING,
         'home-page-sky-summer': HOME_PAGE_SKY_GRADIENT_SUMMER,
         'home-page-sky-fall': HOME_PAGE_SKY_GRADIENT_FALL,
-        /** Блок «Безопасность» на главной: синий + 5% фиолетового в mix, см. `HOME_SAFETY_SECTION_GRADIENT`. */
-        'home-safety-section': HOME_SAFETY_SECTION_GRADIENT,
         /**
          * Буквы «Вкрайности»: градиент под `background-clip: text` (виден только в глифах), тона от `SEASON_ACCENT_HEX.*`.
          */

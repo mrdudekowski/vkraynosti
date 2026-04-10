@@ -16,6 +16,10 @@ import type { Season } from '../../types';
 
 interface HomeSeasonBannerProps {
   season: Season;
+  /** Цикл полосок/слова стартует только после `true` (ворота во вьюпорте). */
+  sequenceActive: boolean;
+  /** Смена ключа перезапускает таймлайн (сезон на главной). */
+  sequenceResetKey: string;
 }
 
 /**
@@ -176,7 +180,10 @@ function getColumnMediaVisual(
   return { opacityClass: 'opacity-0', transitionClass: '', liftZ: false };
 }
 
-/** Буква под медиа: видна после crossfade из колонки (накапливаются слева направо до финального слова). */
+/**
+ * Буква под медиа: глиф колонки `i` включается в момент fade out её плашки (crossfade `i → i+1`),
+ * не под полностью видимым видео. В handoff буква только у `from` (уходящая) и слева от неё.
+ */
 function isHomeSeasonBannerLetterUnderlayVisible(
   columnIndex: number,
   soloCol: number | null,
@@ -184,10 +191,13 @@ function isHomeSeasonBannerLetterUnderlayVisible(
   handoff: { from: number; to: number } | null
 ): boolean {
   if (handoff) {
-    return columnIndex < handoff.to;
+    return columnIndex < handoff.from || columnIndex === handoff.from;
   }
   if (soloCol === null || soloPhase === null) {
     return false;
+  }
+  if (soloPhase === 'entering') {
+    return columnIndex < soloCol;
   }
   return columnIndex < soloCol;
 }
@@ -195,7 +205,6 @@ function isHomeSeasonBannerLetterUnderlayVisible(
 function wordLetterOpacityClass(
   phase: HomeSeasonBannerWordOverlay,
   prefersReducedMotion: boolean,
-  fadeInReady: boolean,
   columnIndex: number,
   soloCol: number | null,
   soloPhase: 'entering' | 'hold' | null,
@@ -211,7 +220,7 @@ function wordLetterOpacityClass(
       : 'opacity-0';
   }
   if (phase === 'fadingIn') {
-    return fadeInReady ? 'opacity-100' : 'opacity-0';
+    return 'opacity-100';
   }
   if (phase === 'visible') {
     return 'opacity-100';
@@ -229,13 +238,21 @@ function wordLetterTransitionClass(
   phase: HomeSeasonBannerWordOverlay,
   prefersReducedMotion: boolean,
   fadeInReady: boolean,
-  wordExitWaveLastVisible: number | null
+  wordExitWaveLastVisible: number | null,
+  columnIndex: number,
+  handoff: { from: number; to: number } | null
 ): string {
   if (prefersReducedMotion) {
     return '';
   }
   if (phase === 'hidden') {
+    if (handoff !== null && columnIndex === handoff.from) {
+      return 'transition-opacity duration-home-season-banner-crossfade ease-in-out';
+    }
     return '';
+  }
+  if (phase === 'fadingIn' && !fadeInReady && columnIndex === 9) {
+    return 'transition-opacity duration-home-season-banner-crossfade ease-in-out';
   }
   if (phase === 'fadingIn' && fadeInReady) {
     return 'transition-opacity duration-home-season-banner-letter-in ease-in-out';
@@ -311,7 +328,6 @@ const HomeSeasonBannerColumn = ({
   const letterOpacity = wordLetterOpacityClass(
     wordOverlay,
     prefersReducedMotion,
-    wordOverlayFadeInReady,
     columnIndex,
     soloCol,
     soloPhase,
@@ -322,7 +338,9 @@ const HomeSeasonBannerColumn = ({
     wordOverlay,
     prefersReducedMotion,
     wordOverlayFadeInReady,
-    wordExitWaveLastVisible
+    wordExitWaveLastVisible,
+    columnIndex,
+    handoff
   );
 
   const zClass = media.liftZ ? 'z-10' : 'z-0';
@@ -370,7 +388,7 @@ const HomeSeasonBannerColumn = ({
         </span>
       </div>
       <div
-        className={`absolute inset-0 ${media.transitionClass} ${media.opacityClass}`}
+        className={`absolute inset-0 overflow-hidden ${media.transitionClass} ${media.opacityClass}`}
         aria-hidden
       >
         {clip.videoSrc && shouldLoadVideo ? (
@@ -392,7 +410,7 @@ const HomeSeasonBannerColumn = ({
 /**
  * Десять колонок с crossfade видео и словом «Вкрайности» на всех ширинах вьюпорта.
  */
-const HomeSeasonBanner = ({ season }: HomeSeasonBannerProps) => {
+const HomeSeasonBanner = ({ season, sequenceActive, sequenceResetKey }: HomeSeasonBannerProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const {
     soloCol,
@@ -402,7 +420,7 @@ const HomeSeasonBanner = ({ season }: HomeSeasonBannerProps) => {
     wordOverlay,
     wordOverlayFadeInReady,
     wordExitWaveLastVisible,
-  } = useHomeSeasonBannerSequence(prefersReducedMotion);
+  } = useHomeSeasonBannerSequence(prefersReducedMotion, sequenceActive, sequenceResetKey);
   const clips = useMemo(() => getHomeSeasonBannerClips(season), [season]);
   const letters = useMemo(() => [...UI.homeSeasonBannerWordmark], []);
 
@@ -416,8 +434,11 @@ const HomeSeasonBanner = ({ season }: HomeSeasonBannerProps) => {
       aria-label={UI.sections.homeSeasonBannerRegion}
     >
       <div className="min-h-0 w-full">
-        <div className="aspect-home-season-banner-inner min-h-home-season-banner-inner w-full overflow-hidden bg-home-season-banner-stage">
-          <div className="grid h-full min-h-0 w-full grid-cols-10" aria-hidden>
+        <div
+          data-hsb-clip-root
+          className="aspect-home-season-banner-inner min-h-home-season-banner-inner w-full overflow-hidden bg-home-season-banner-stage"
+        >
+          <div className="grid h-full min-h-0 w-full grid-cols-10 grid-rows-1" aria-hidden>
             {clips.map((clip, index) => (
               <HomeSeasonBannerColumn
                 key={`${season}-${String(index)}`}

@@ -62,6 +62,8 @@ export const UI = {
     mobileMenuDialog: 'Меню навигации',
   },
   sections: {
+    /** `id` секции туров на главной (якорь из навигации, hash «Туры»). */
+    homeToursSectionElementId: 'tours' as const,
     tours:        'Туры по сезонам',
     toursSub:     'Четыре сезона — четыре разных приключения',
     toursTitleBySeason: {

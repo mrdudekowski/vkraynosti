@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import { DOM_DATA_HOME_HERO_ACTIVE_SLIDE } from '../../constants/homeHeroSnap';
 
 /** Слайд героя: неактивные — `inert` (не `aria-hidden` на предке с фокусом у Link при смене слайда). */
 
@@ -16,28 +17,33 @@ const CarouselSlide = ({
   shouldLoadBackground,
   children,
 }: CarouselSlideProps) => {
+  const activeSlideProps =
+    isActive === true
+      ? { [DOM_DATA_HOME_HERO_ACTIVE_SLIDE]: 'true' as const }
+      : undefined;
+
   return (
-  <div
-    className={`absolute inset-0 transition-opacity duration-carousel ${
-      isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-    }`}
-    style={
-      shouldLoadBackground
-        ? {
-            backgroundImage: `url(${backgroundUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }
-        : undefined
-    }
-    inert={!isActive}
-  >
-    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
-    <div className="relative z-10 h-full flex flex-col items-center justify-end text-text-inverse px-4">
-      {children}
+    <div
+      className={`absolute inset-0 ${
+        isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+      }`}
+      style={
+        shouldLoadBackground
+          ? {
+              backgroundImage: `url(${backgroundUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }
+          : undefined
+      }
+      inert={!isActive}
+      {...activeSlideProps}
+    >
+      <div className="relative z-10 h-full flex flex-col items-center justify-end text-text-inverse px-4">
+        {children}
+      </div>
     </div>
-  </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import PageMeta from '../components/shared/PageMeta';
+import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 import { UI } from '../constants/ui';
 import { ROUTES } from '../constants/routes';
 
@@ -15,9 +16,9 @@ const NotFoundPage = () => {
       />
       <div className="min-h-screen flex flex-col items-center justify-center bg-surface-light px-4">
         <div className="max-w-md w-full text-center">
-          <h1 className="font-heading text-section font-normal text-text-primary mb-3">
+          <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-text-primary mb-3">
             {UI.notFoundPage.heading}
-          </h1>
+          </ScrollScrubFade>
           <p className="text-text-muted mb-8 leading-relaxed">
             {UI.notFoundPage.description}
           </p>

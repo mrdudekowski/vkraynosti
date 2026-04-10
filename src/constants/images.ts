@@ -276,6 +276,9 @@ export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS: Record<string, string
 /** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */
 export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-logo.svg` as const;
 
+/** Графический знак Вкрайности (лес), не текстовый вордмарк — `public/vkrai-logo.png`. */
+export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.png` as const;
+
 /** Обложки весенних туров в `public/spring tours/` (сейчас все `.webp`). */
 export const SPRING_TOUR_COVERS = {
   'spring-1': `${SPRING_TOUR_PUBLIC}/spring-1.webp`,

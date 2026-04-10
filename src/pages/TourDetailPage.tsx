@@ -29,6 +29,7 @@ import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
 import TourDetailPriceHighlight from "../components/tours/TourDetailPriceHighlight";
 import TourIncludedIconList from "../components/tours/TourIncludedIconList";
 import RevealBox from "../components/shared/RevealBox";
+import ScrollScrubFade from "../components/shared/ScrollScrubFade";
 import SeasonPageBackdrop from "../components/seasons/SeasonPageBackdrop";
 import { BREAKPOINT_LG_PX } from "../constants/reveal";
 import { useMatchMinWidth } from "../hooks/useMatchMinWidth";
@@ -88,9 +89,9 @@ const TourDetailPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-heading text-section font-normal text-text-primary mb-4">
+          <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-text-primary mb-4">
             {UI.tourDetail.notFound}
-          </h1>
+          </ScrollScrubFade>
           <p className="text-text-muted mb-6">{notFoundBody}</p>
           <Link to={ROUTES.HOME} className="btn-cta-tour" prefetch="none">
             <span>{UI.tourDetail.homeLink}</span>

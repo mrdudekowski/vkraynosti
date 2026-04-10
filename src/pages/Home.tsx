@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
+import { HomeGateBannerShell } from '../components/home/HomeGateBannerShell';
 import HeroCarousel from '../components/home/HeroCarousel';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import TeamCarousel from '../components/home/TeamCarousel';
@@ -8,31 +9,92 @@ import SafetySection from '../components/home/SafetySection';
 import ContactSection from '../components/home/ContactSection';
 import PageMeta from '../components/shared/PageMeta';
 import RevealBox from '../components/shared/RevealBox';
+import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 import SeasonSwitcher from '../components/shared/SeasonSwitcher';
 import TourCard from '../components/shared/TourCard';
 import { IMAGES } from '../constants/images';
+import {
+  HOME_GATE_STAGE_INTERSECT_ENTER,
+  HOME_GATE_STAGE_INTERSECT_LEAVE,
+  homeGateStageIntersectThresholds,
+  homeGateStageVisibleHeightShare,
+} from '../constants/homeGateScroll';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
-import { HOME_PAGE_SKY_BG_CLASS } from '../constants/seasonTheme';
+import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
 import { NAVBAR_SCROLL_OFFSET_PX, scrollElementIntoViewAnchored } from '../constants/smoothScroll';
-import { useHomeSeasonBannerWhiteVeil } from '../hooks/useHomeSeasonBannerWhiteVeil';
+import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
+import { useHomeSkyParallax } from '../hooks/useHomeSkyParallax';
 
 const Home = () => {
   const location = useLocation();
   const lenis = useLenis();
   const { activeSeason } = useSeason();
   const tours = getToursBySeason(activeSeason);
-  const homeSeasonStripSectionRef = useRef<HTMLElement | null>(null);
-  const homeVeilExitAnchorRef = useRef<HTMLDivElement | null>(null);
-  const homeVeilEnterContactRef = useRef<HTMLElement | null>(null);
-  const { veilOpacity } = useHomeSeasonBannerWhiteVeil({
-    seasonStripSectionRef: homeSeasonStripSectionRef,
-    veilExitAnchorRef: homeVeilExitAnchorRef,
-    veilEnterContactRef: homeVeilEnterContactRef,
-    enabled: true,
+  const gateIntersectRef = useRef<HTMLDivElement | null>(null);
+  const heroSectionRef = useRef<HTMLElement | null>(null);
+  const [gateStageFocused, setGateStageFocused] = useState(false);
+  const [bannerShellPresentationId, setBannerShellPresentationId] = useState(0);
+  const gateFocusedRef = useRef(gateStageFocused);
+  const prevSeasonForShellRef = useRef(activeSeason);
+  const homeGateScrollEnabled = location.pathname === ROUTES.HOME;
+  const { ref: homeSkyParallaxRef } = useHomeSkyParallax();
+
+  useHomeNavbarChromeScroll({
+    heroSectionRef,
+    enabled: homeGateScrollEnabled,
   });
+
+  useLayoutEffect(() => {
+    if (!homeGateScrollEnabled) return;
+    const el = gateIntersectRef.current;
+    if (!el) return;
+    const share = homeGateStageVisibleHeightShare(el.getBoundingClientRect(), window.innerHeight);
+    if (share >= HOME_GATE_STAGE_INTERSECT_ENTER) {
+      queueMicrotask(() => {
+        setGateStageFocused(true);
+      });
+    }
+  }, [homeGateScrollEnabled]);
+
+  useEffect(() => {
+    if (!homeGateScrollEnabled) return;
+    const el = gateIntersectRef.current;
+    if (!el) return;
+    const thresholds = homeGateStageIntersectThresholds();
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        if (!e) return;
+        const r = e.intersectionRatio;
+        setGateStageFocused((prev) => {
+          if (!prev && r >= HOME_GATE_STAGE_INTERSECT_ENTER) return true;
+          if (prev && r <= HOME_GATE_STAGE_INTERSECT_LEAVE) return false;
+          return prev;
+        });
+      },
+      { root: null, rootMargin: '0px', threshold: thresholds }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [homeGateScrollEnabled]);
+
+  useEffect(() => {
+    gateFocusedRef.current = gateStageFocused;
+  }, [gateStageFocused]);
+
+  useEffect(() => {
+    if (prevSeasonForShellRef.current !== activeSeason) {
+      prevSeasonForShellRef.current = activeSeason;
+      if (gateFocusedRef.current) {
+        queueMicrotask(() => {
+          setBannerShellPresentationId((n) => n + 1);
+        });
+      }
+    }
+  }, [activeSeason]);
 
   useLayoutEffect(() => {
     if (location.pathname !== ROUTES.HOME || !location.hash) return;
@@ -40,6 +102,7 @@ const Home = () => {
     const el = document.getElementById(id);
     if (el) scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
   }, [location.pathname, location.hash, lenis]);
+
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
   return (
     <>
@@ -50,69 +113,85 @@ const Home = () => {
         path={ROUTES.HOME}
         preloadHeroImageUrl={tours[0]?.imageUrl}
       />
-      <HeroCarousel />
 
-      <div className="relative isolate flex w-full flex-col overflow-hidden">
-        <div
-          className={`pointer-events-none absolute inset-0 z-0 overflow-hidden ${HOME_PAGE_SKY_BG_CLASS[activeSeason]}`}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 z-home-season-banner-veil bg-home-season-banner-veil transition-opacity duration-home-season-banner-veil ease-out"
-          style={{ opacity: veilOpacity }}
-          aria-hidden
-        />
+      <div className="relative isolate flex w-full min-w-0 max-w-full flex-col">
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <div
+            ref={homeSkyParallaxRef}
+            className={`absolute left-0 right-0 top-home-sky-parallax-inner min-h-home-sky-parallax-inner w-full will-change-transform ${HOME_PAGE_SKY_BG_CLASS[activeSeason]}`}
+          />
+        </div>
 
         <div className="relative z-10 flex w-full flex-col">
-          <section id="tours" className="pt-home-section-top pb-home-stack-gap">
-            <RevealBox as="div" className="relative">
+          <div
+            ref={gateIntersectRef}
+            data-home-gate-intersect-root
+            className="shrink-0"
+          >
+            <ScrollScrubFade className="w-full shrink-0">
+              <div className="relative flex w-full shrink-0 flex-col items-center justify-center overflow-x-hidden bg-home-gate-start-screen min-h-home-gate-viewport">
+                <div
+                  data-home-gate-banner-wrap
+                  className={`flex w-full shrink-0 justify-center px-4 sm:px-6 lg:px-8 ${
+                    gateStageFocused ? '' : 'pointer-events-none'
+                  }`}
+                >
+                  <HomeGateBannerShell key={bannerShellPresentationId}>
+                    <HomeSeasonBanner
+                      season={activeSeason}
+                      sequenceActive={gateStageFocused && homeGateScrollEnabled}
+                      sequenceResetKey={activeSeason}
+                    />
+                  </HomeGateBannerShell>
+                </div>
+              </div>
+            </ScrollScrubFade>
+          </div>
+
+          <ScrollScrubFade className="relative w-full">
+            <HeroCarousel ref={heroSectionRef} />
+          </ScrollScrubFade>
+
+          <section
+            id={UI.sections.homeToursSectionElementId}
+            className={`pt-home-section-top pb-home-stack-gap ${SEASON_PAGE_BG_CLASS[activeSeason]}`}
+          >
+            <ScrollScrubFade className="relative">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
-                  <h2 className="section-title text-text-primary">{toursSectionTitle}</h2>
+                  <ScrollScrubFade as="h2" className="section-title text-text-primary">
+                    {toursSectionTitle}
+                  </ScrollScrubFade>
                 </div>
-                <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <RevealBox as="div" className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
                   {tours.map((tour, index) => (
                     <TourCard key={tour.id} tour={tour} priorityImage={index === 0} />
                   ))}
-                </div>
+                </RevealBox>
+                <RevealBox
+                  as="div"
+                  className="mx-auto mt-home-stack-gap flex w-full max-w-7xl flex-col items-center gap-home-season-banner-foot-gap"
+                >
+                  <p className="text-center font-heading text-home-season-strip-label font-normal uppercase text-text-primary">
+                    {UI.sections.switchSeason}
+                  </p>
+                  <SeasonSwitcher variant="section" />
+                </RevealBox>
               </div>
-            </RevealBox>
+            </ScrollScrubFade>
           </section>
 
-          <RevealBox as="div" className="relative w-full">
+          <ScrollScrubFade className="relative w-full">
             <SafetySection />
-          </RevealBox>
+          </ScrollScrubFade>
 
-          <RevealBox as="div" className="relative w-full">
+          <ScrollScrubFade className="relative w-full">
             <TeamCarousel />
-          </RevealBox>
+          </ScrollScrubFade>
 
-          <RevealBox as="div" className="relative w-full">
-            <ContactSection ref={homeVeilEnterContactRef} />
-          </RevealBox>
-
-          <section
-            ref={homeSeasonStripSectionRef}
-            className="flex w-full flex-col overflow-hidden pt-home-season-strip-pt"
-          >
-            <div className="relative w-full shrink-0">
-              <HomeSeasonBanner season={activeSeason} />
-            </div>
-            <RevealBox
-              as="div"
-              className="relative z-20 w-full shrink-0 bg-home-season-banner-stage pt-home-season-banner-foot-gap pb-home-season-banner-foot-gap"
-            >
-              <div
-                ref={homeVeilExitAnchorRef}
-                className="mx-auto flex w-full max-w-7xl flex-col items-center gap-home-season-banner-foot-gap px-4 sm:px-6 lg:px-8"
-              >
-                <p className="text-center font-heading text-home-season-strip-label font-normal uppercase text-text-inverse">
-                  {UI.sections.switchSeason}
-                </p>
-                <SeasonSwitcher variant="section" />
-              </div>
-            </RevealBox>
-          </section>
+          <ScrollScrubFade className="relative w-full">
+            <ContactSection />
+          </ScrollScrubFade>
         </div>
       </div>
     </>

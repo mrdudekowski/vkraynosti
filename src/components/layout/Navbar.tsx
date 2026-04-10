@@ -7,11 +7,12 @@ import { useLenis } from 'lenis/react';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
 import {
-  NAVBAR_SCROLL_OFFSET_PX,
-  scrollElementIntoViewAnchored,
+  getViewportScrollY,
+  scrollHomeHeroTopImmediate,
   scrollWindowToTopSmooth,
 } from '../../constants/smoothScroll';
 import { SEASON_ICON, SEASON_STYLE, SEASON_TEXT_CLASS } from '../../constants/seasonNavbarAppearance';
+import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
 import SeasonSwitcher from '../shared/SeasonSwitcher';
@@ -37,11 +38,11 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
-  const isHome = location.pathname === ROUTES.HOME;
   const { activeSeason } = useSeason();
   const activeSeasonUi = UI.seasons[activeSeason];
   const { open: seasonMenuOpen, setOpen: setSeasonMenuOpen, toggle: toggleSeasonMenu } =
     useSeasonNavMenu();
+  const { snap: homeChrome } = useHomeNavbarChrome();
   const activeSeasonStyle = SEASON_STYLE[activeSeason];
   const brandWordmark = UI.nav.brand;
   const brandFirstLetter = brandWordmark.slice(0, 1);
@@ -95,13 +96,6 @@ const Navbar = () => {
 
   const handleCtaClick = () => {
     closeMenu();
-    if (isHome) {
-      const element = document.querySelector('#tours');
-      if (element instanceof HTMLElement) {
-        scrollElementIntoViewAnchored(lenis, element, NAVBAR_SCROLL_OFFSET_PX);
-      }
-      return;
-    }
     navigate({ pathname: ROUTES.HOME, hash: 'tours' });
   };
 
@@ -113,15 +107,60 @@ const Navbar = () => {
   const handleBrandLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
     const isPlainHome =
       location.pathname === ROUTES.HOME && location.search === '' && location.hash === '';
-    if (isPlainHome && window.scrollY > 0) {
+    if (!isPlainHome) return;
+    if (getViewportScrollY(lenis) > 80) {
+      event.preventDefault();
+      scrollHomeHeroTopImmediate(lenis);
+      return;
+    }
+    if (window.scrollY > 0) {
       event.preventDefault();
       scrollWindowToTopSmooth(lenis);
     }
   };
 
+  const navSurfaceOpacityTransition = homeChrome.disableTopChromeTransition
+    ? 'duration-0'
+    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const navShellTransition = homeChrome.disableTopChromeTransition
+    ? 'duration-0'
+    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const gateStartBackingTransition = homeChrome.disableTopChromeTransition
+    ? 'duration-0'
+    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const mobileOverlayTop = homeChrome.mainUsesNavbarTopPadding ? 'top-16' : 'top-0';
+
+  const isHomePath = location.pathname === ROUTES.HOME;
+  const navShellOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
+  const navShellPointerEvents =
+    isHomePath && navShellOpacity < 0.001 ? 'pointer-events-none' : '';
+  const homeNavChromeSolid =
+    isHomePath &&
+    (homeChrome.gateStageFullBleedMinHeight || homeChrome.topChromeSurfaceOpacity < 1);
+  const navChromeSurfaceClass = homeNavChromeSolid
+    ? 'bg-surface-dark'
+    : 'bg-surface-dark/95 backdrop-blur-sm';
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-navbar bg-surface-dark/95 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="fixed top-0 left-0 right-0 z-navbar">
+      <div
+        className={`${navShellTransition} ${navShellPointerEvents}`.trim()}
+        style={{ opacity: navShellOpacity }}
+      >
+      <div className="relative z-10">
+        {isHomePath ? (
+          <div
+            className={`pointer-events-none absolute inset-0 z-0 bg-home-gate-start-screen ${gateStartBackingTransition}`.trim()}
+            style={{ opacity: homeChrome.gateStageFullBleedMinHeight ? 1 : 0 }}
+            aria-hidden
+          />
+        ) : null}
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 z-[1] ${navChromeSurfaceClass} ${navSurfaceOpacityTransition}`}
+          style={{ opacity: homeChrome.topChromeSurfaceOpacity }}
+        />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Left: Logo + подпись сезона (текст только здесь; в SeasonNavDock — только иконки) */}
@@ -254,7 +293,7 @@ const Navbar = () => {
               <button
                 type="button"
                 className={[
-                  'nav-desktop:hidden fixed top-16 left-0 right-0 bottom-0 z-mobileNav bg-black/50',
+                  `nav-desktop:hidden fixed left-0 right-0 bottom-0 z-mobileNav bg-black/50 ${mobileOverlayTop}`,
                   'transition-opacity duration-mobile-nav ease-out mobile-nav-backdrop',
                   panelEnter ? 'opacity-100' : 'opacity-0 pointer-events-none',
                 ].join(' ')}
@@ -263,7 +302,7 @@ const Navbar = () => {
               />
               <div
                 className={[
-                  'nav-desktop:hidden fixed top-16 right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10',
+                  `nav-desktop:hidden fixed right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10 ${mobileOverlayTop}`,
                   'bg-surface-dark/95 py-4 pl-5 pr-4 shadow-xl backdrop-blur-sm mobile-nav-panel',
                   'w-[min(100vw,theme(maxWidth.sm))] transform transition-transform duration-mobile-nav ease-out',
                   panelEnter ? 'translate-x-0' : 'translate-x-full',
@@ -294,6 +333,8 @@ const Navbar = () => {
             </>,
             document.body
           )}
+        </div>
+      </div>
       </div>
     </nav>
   );

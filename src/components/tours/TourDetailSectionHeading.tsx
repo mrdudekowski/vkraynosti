@@ -1,3 +1,4 @@
+import ScrollScrubFade from "../shared/ScrollScrubFade";
 import type { Season } from "../../types";
 
 export interface TourDetailSectionHeadingProps {
@@ -32,7 +33,9 @@ const TourDetailSectionHeading = ({
         className={`tour-detail-section-heading-accent ${ACCENT_BG[season]}`}
         aria-hidden
       />
-      <h2 className={titleClass}>{title}</h2>
+      <ScrollScrubFade as="h2" className={titleClass}>
+        {title}
+      </ScrollScrubFade>
     </div>
   );
 };

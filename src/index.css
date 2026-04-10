@@ -9,9 +9,15 @@
    * Полоса прокрутки: тонкая, цвет бегунка = `colors.season.*` по `data-season` на `<html>`
    * (ставит `SeasonProvider`). Работает для страницы и для `overflow-y-auto` в модалках.
    */
+  /**
+   * Полоса документа: `html` + модалки через классы overflow-* ниже. Не `*` — иначе второй overflow-контейнер
+   * получает такой же кастомный бегунок и визуально «двойной» скролл.
+   */
   html {
     --scrollbar-thumb: theme('colors.season.spring');
     --scrollbar-track: color-mix(in srgb, theme('colors.surface.light') 94%, theme('colors.divider'));
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
   html[data-season='winter'] {
     --scrollbar-thumb: theme('colors.season.winter');
@@ -26,20 +32,15 @@
     --scrollbar-thumb: theme('colors.season.fall');
   }
 
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  }
-
-  *::-webkit-scrollbar {
+  html::-webkit-scrollbar {
     width: theme('spacing.1.5');
     height: theme('spacing.1.5');
   }
-  *::-webkit-scrollbar-track {
+  html::-webkit-scrollbar-track {
     background: var(--scrollbar-track);
     border-radius: theme('borderRadius.full');
   }
-  *::-webkit-scrollbar-thumb {
+  html::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
     border-radius: theme('borderRadius.full');
     /** Обводка вокруг бегунка: `surface.dark` из темы, толщина `spacing.px`. */
@@ -47,12 +48,49 @@
     transition: background-color theme('transitionDuration.season-change')
       theme('transitionTimingFunction.standard');
   }
-  *::-webkit-scrollbar-thumb:hover {
+  html::-webkit-scrollbar-thumb:hover {
+    filter: brightness(0.9);
+  }
+
+  .overflow-y-auto,
+  .overflow-y-scroll,
+  .overflow-auto {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .overflow-y-auto::-webkit-scrollbar,
+  .overflow-y-scroll::-webkit-scrollbar,
+  .overflow-auto::-webkit-scrollbar {
+    width: theme('spacing.1.5');
+    height: theme('spacing.1.5');
+  }
+  .overflow-y-auto::-webkit-scrollbar-track,
+  .overflow-y-scroll::-webkit-scrollbar-track,
+  .overflow-auto::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: theme('borderRadius.full');
+  }
+  .overflow-y-auto::-webkit-scrollbar-thumb,
+  .overflow-y-scroll::-webkit-scrollbar-thumb,
+  .overflow-auto::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: theme('borderRadius.full');
+    box-shadow: 0 0 0 theme('spacing.px') theme('colors.surface.dark');
+    transition: background-color theme('transitionDuration.season-change')
+      theme('transitionTimingFunction.standard');
+  }
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+  .overflow-y-scroll::-webkit-scrollbar-thumb:hover,
+  .overflow-auto::-webkit-scrollbar-thumb:hover {
     filter: brightness(0.9);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *::-webkit-scrollbar-thumb {
+    html::-webkit-scrollbar-thumb,
+    .overflow-y-auto::-webkit-scrollbar-thumb,
+    .overflow-y-scroll::-webkit-scrollbar-thumb,
+    .overflow-auto::-webkit-scrollbar-thumb {
       transition: none;
     }
   }
@@ -60,6 +98,10 @@
   body {
     @apply font-body text-text-primary bg-surface-light;
     -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    min-width: 0;
   }
   /* Dela Gothic One: в Google Fonts одно начертание 400 — без font-bold рядом с font-brand-wordmark. */
   .font-brand-wordmark {
@@ -138,7 +180,7 @@
   }
 
   .tour-detail-preface-bg__scrim {
-    @apply absolute inset-0 z-[1] bg-surface-dark/40;
+    @apply absolute inset-0 z-stack-base bg-surface-dark/40;
   }
 
   .tour-detail-preface-bg__content {

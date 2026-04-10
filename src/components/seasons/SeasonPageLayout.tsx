@@ -4,6 +4,7 @@ import { UI } from '../../constants/ui';
 import { IMAGES } from '../../constants/images';
 import Breadcrumbs from '../shared/Breadcrumbs';
 import PageMeta from '../shared/PageMeta';
+import ScrollScrubFade from '../shared/ScrollScrubFade';
 import RevealBox from '../shared/RevealBox';
 import type { Season } from '../../types';
 import SeasonPageBackdrop from './SeasonPageBackdrop';
@@ -42,7 +43,9 @@ const SeasonPageLayout = ({
       >
         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-8 pb-8">
           <p className="text-4xl mb-2">{season.emoji}</p>
-          <h1 className="font-heading text-section font-normal text-white">{season.label}</h1>
+          <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-white">
+            {season.label}
+          </ScrollScrubFade>
         </div>
       </div>
 

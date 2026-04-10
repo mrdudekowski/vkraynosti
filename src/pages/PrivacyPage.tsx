@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import PageMeta from '../components/shared/PageMeta';
+import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 
 const PrivacyPage = () => {
   const { privacyPage: p } = UI;
@@ -21,9 +22,9 @@ const PrivacyPage = () => {
         >
           {p.backLink}
         </Link>
-        <h1 className="font-heading text-section font-normal text-text-primary mb-6">
+        <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-text-primary mb-6">
           {p.title}
-        </h1>
+        </ScrollScrubFade>
         <p className="text-text-muted leading-relaxed mb-8">{p.intro}</p>
         <div className="flex flex-col gap-6">
           {p.paragraphs.map((paragraph, idx) => (

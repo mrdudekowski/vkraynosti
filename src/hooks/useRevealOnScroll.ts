@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { RefCallback } from 'react';
 import { REVEAL_ROOT_MARGIN, REVEAL_THRESHOLD } from '../constants/reveal';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 export interface UseRevealOnScrollOptions {
   /** После первого появления отключить observer. */
@@ -26,11 +27,8 @@ export function useRevealOnScroll(options: UseRevealOnScrollOptions = {}) {
     disabled = false,
   } = options;
 
-  const reducedMotion = useMemo(
-    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    []
-  );
-  const noIntersectionObserver = useMemo(() => typeof IntersectionObserver === 'undefined', []);
+  const reducedMotion = usePrefersReducedMotion();
+  const noIntersectionObserver = typeof IntersectionObserver === 'undefined';
 
   const [intersected, setIntersected] = useState(false);
   const [element, setElement] = useState<HTMLElement | null>(null);

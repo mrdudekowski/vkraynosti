@@ -6,6 +6,8 @@ import { useModal } from '../../context/useModal';
 import PlaceholderImage from '../shared/PlaceholderImage';
 import { TEAM } from '../../data/teamData';
 import { TEAM_SECTION_DIVIDER_CLASS } from '../../constants/seasonTheme';
+import RevealBox from '../shared/RevealBox';
+import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { UI } from '../../constants/ui';
 import { useSeason } from '../../context/useSeason';
 import type { TeamMember } from '../../types';
@@ -56,11 +58,15 @@ const TeamCarousel = forwardRef<HTMLElement>(function TeamCarousel(_, ref) {
           />
         </div>
         <div className="text-center mb-12">
-          <h2 className="section-title text-text-primary">{UI.sections.team}</h2>
-          <p className="text-text-muted mt-3">{UI.sections.teamSub}</p>
+          <ScrollScrubFade as="h2" className="section-title text-text-primary">
+            {UI.sections.team}
+          </ScrollScrubFade>
+          <RevealBox as="div" className="mt-3">
+            <p className="text-text-muted">{UI.sections.teamSub}</p>
+          </RevealBox>
         </div>
 
-        <div className="relative">
+        <RevealBox as="div" className="relative">
           <div className="flex gap-6 justify-center overflow-hidden">
             {visibleMembers.map(member => (
               <TeamCard
@@ -85,7 +91,7 @@ const TeamCarousel = forwardRef<HTMLElement>(function TeamCarousel(_, ref) {
           >
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
-        </div>
+        </RevealBox>
       </div>
     </section>
   );

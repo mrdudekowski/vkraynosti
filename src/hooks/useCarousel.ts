@@ -1,4 +1,5 @@
 import { useReducer, useEffect, useCallback, useRef } from 'react';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 interface UseCarouselOptions {
   total: number;
@@ -48,6 +49,7 @@ const initialCarouselState = (total: number): CarouselState => ({
 });
 
 export const useCarousel = ({ total, autoplayMs = 0 }: UseCarouselOptions) => {
+  const reducedMotion = usePrefersReducedMotion();
   const [state, dispatch] = useReducer(carouselReducer, total, initialCarouselState);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const totalRef = useRef(total);
@@ -65,13 +67,13 @@ export const useCarousel = ({ total, autoplayMs = 0 }: UseCarouselOptions) => {
 
   const startAutoplayInterval = useCallback(() => {
     clearAutoplay();
-    if (!autoplayMs) return;
+    if (!autoplayMs || reducedMotion) return;
     intervalRef.current = setInterval(() => {
       const n = totalRef.current;
       if (n <= 0) return;
       dispatch({ type: 'next', total: n });
     }, autoplayMs);
-  }, [autoplayMs, clearAutoplay]);
+  }, [autoplayMs, clearAutoplay, reducedMotion]);
 
   const next = useCallback(() => {
     dispatch({ type: 'next', total });

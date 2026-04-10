@@ -1,14 +1,27 @@
+import { forwardRef, useCallback, useRef, type MutableRefObject, type Ref } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { useCarousel } from '../../hooks/useCarousel';
 import CarouselSlide from '../shared/CarouselSlide';
+import RevealBox from '../shared/RevealBox';
+import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { UI } from '../../constants/ui';
 import { heroCarouselPhraseTypographyStyle } from '../../constants/typography';
+import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { buildTourDetailPath } from '../../constants/routes';
 import { getToursBySeason } from '../../data/toursData';
 import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
+
+function assignRef<T>(ref: Ref<T> | undefined, value: T | null): void {
+  if (ref == null) return;
+  if (typeof ref === 'function') {
+    ref(value);
+  } else {
+    (ref as MutableRefObject<T | null>).current = value;
+  }
+}
 
 /** Смонтирован с `key={activeSeason}` в родителе — сброс индекса слайда без setState в эффекте. */
 function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
@@ -30,23 +43,26 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
           >
-            <Link
-              to={buildTourDetailPath(tour.season, tour.id)}
-              className="text-center group flex flex-col items-center gap-hero-phrase-cta-gap pb-24 max-w-2xl mx-auto px-4"
-              tabIndex={idx === current ? 0 : -1}
-              aria-label={`${tour.title}. ${UI.hero.viewTour}`}
-              prefetch="intent"
+            <RevealBox
+              as="div"
+              className="flex w-full max-w-2xl mx-auto justify-center px-4 pb-24"
             >
-              <p
-                className="font-hero-carousel-phrase font-medium text-text-inverse/80 hero-carousel-phrase-text-shadow animate-fade-up max-w-full"
-                style={heroCarouselPhraseTypographyStyle}
+              <Link
+                to={buildTourDetailPath(tour.season, tour.id)}
+                className="text-center group flex flex-col items-center gap-hero-phrase-cta-gap"
+                tabIndex={idx === current ? 0 : -1}
+                aria-label={`${tour.title}. ${UI.hero.viewTour}`}
+                prefetch="intent"
               >
-                {tour.heroPhrase}
-              </p>
-              <span className="btn-primary inline-block text-base animate-fade-up shrink-0">
-                {UI.hero.viewTour}
-              </span>
-            </Link>
+                <p
+                  className="font-hero-carousel-phrase font-medium text-text-inverse/80 hero-carousel-phrase-text-shadow max-w-full"
+                  style={heroCarouselPhraseTypographyStyle}
+                >
+                  {tour.heroPhrase}
+                </p>
+                <span className="btn-primary inline-block text-base shrink-0">{UI.hero.viewTour}</span>
+              </Link>
+            </RevealBox>
           </CarouselSlide>
         );
       })}
@@ -82,19 +98,35 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
   );
 }
 
-const HeroCarousel = () => {
+const HeroCarousel = forwardRef<HTMLElement>(function HeroCarousel(_props, ref) {
   const { activeSeason } = useSeason();
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  const setSectionRef = useCallback(
+    (node: HTMLElement | null) => {
+      sectionRef.current = node;
+      assignRef(ref, node);
+    },
+    [ref]
+  );
 
   return (
-    <section className="relative h-hero-viewport overflow-hidden bg-surface-dark">
-      <header className="absolute top-6 right-6 z-20 max-w-md pl-4 text-right animate-fade-up">
-        <h1 className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md">
+    <section
+      ref={setSectionRef}
+      id={HOME_HERO_SECTION_ELEMENT_ID}
+      className="relative z-home-hero isolate h-hero-viewport overflow-hidden bg-surface-dark"
+    >
+      <header className="absolute top-home-hero-title-top right-6 z-20 max-w-md pl-4 text-right">
+        <ScrollScrubFade
+          as="h1"
+          className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md"
+        >
           {UI.hero.documentTitle}
-        </h1>
+        </ScrollScrubFade>
       </header>
       <HeroCarouselSlides key={activeSeason} activeSeason={activeSeason} />
     </section>
   );
-};
+});
 
 export default HeroCarousel;

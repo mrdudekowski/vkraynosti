@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import PlaceholderImage from '../shared/PlaceholderImage';
@@ -56,7 +57,9 @@ const TourDetailHero = ({
           <FontAwesomeIcon icon={faArrowLeft} />
           {backLinkLabel}
         </Link>
-        <h1 className="font-heading text-section font-normal text-white">{title}</h1>
+        <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-white">
+          {title}
+        </ScrollScrubFade>
         <p className="text-tour-detail-hero-subtitle text-white/80 mt-1">
           {subtitle}
         </p>

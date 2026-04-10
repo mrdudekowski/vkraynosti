@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UI } from '../../constants/ui';
@@ -8,16 +9,20 @@ import {
   SEASON_STYLE,
   SEASON_TEXT_CLASS,
 } from '../../constants/seasonNavbarAppearance';
+import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
 import { scrollWindowToTopSmooth } from '../../constants/smoothScroll';
+import { ROUTES } from '../../constants/routes';
 
 const SeasonNavDock = () => {
+  const { pathname } = useLocation();
   const [reducedMotion, setReducedMotion] = useState(false);
   const lenis = useLenis();
   const { activeSeason, setActiveSeason } = useSeason();
   const { open, setOpen } = useSeasonNavMenu();
+  const { snap: homeChrome } = useHomeNavbarChrome();
 
   const otherSeasons = SEASON_ORDER.filter(s => s !== activeSeason);
 
@@ -80,29 +85,61 @@ const SeasonNavDock = () => {
     setOpen(false);
   };
 
+  const dockTop = homeChrome.mainUsesNavbarTopPadding ? 'top-16' : 'top-0';
   const slideTransition = reducedMotion
     ? 'duration-0'
     : 'transition-[max-height,transform] duration-season-dock-slide ease-out';
+  const dockSurfaceOpacityTransition = homeChrome.disableTopChromeTransition
+    ? 'duration-0'
+    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const dockShellTransition = homeChrome.disableTopChromeTransition
+    ? 'duration-0'
+    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const dockBackgroundOpacity = open ? 1 : homeChrome.topChromeSurfaceOpacity;
+  const isHomePath = pathname === ROUTES.HOME;
+  const dockGateBackingTransition = homeChrome.disableTopChromeTransition
+    ? 'duration-0'
+    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const dockShellOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
+  const dockShellPointerEvents =
+    isHomePath && dockShellOpacity < 0.001 && !open ? 'pointer-events-none' : '';
 
   return (
     <div
       data-testid="season-nav-dock"
       data-expanded={open ? '' : undefined}
       className={[
-        'block season-md:hidden fixed top-16 left-0 right-0 z-season-dock',
-        'overflow-hidden will-change-transform',
+        `block season-md:hidden fixed left-0 right-0 z-season-dock ${dockTop}`,
+        'overflow-hidden',
+        dockShellTransition,
+        dockShellPointerEvents,
+        open ? 'will-change-transform' : '',
         slideTransition,
         open
           ? 'max-h-season-dock-panel translate-y-0'
           : 'max-h-0 -translate-y-full pointer-events-none',
       ].join(' ')}
+      style={{ opacity: dockShellOpacity }}
     >
-      <div
-        className={[
-          'bg-surface-dark/95 backdrop-blur-sm border-b',
-          open ? 'border-white/10' : 'border-transparent',
-        ].join(' ')}
-      >
+      <div className="relative">
+        {isHomePath ? (
+          <div
+            className={`pointer-events-none absolute inset-0 z-0 bg-home-gate-start-screen ${dockGateBackingTransition}`.trim()}
+            style={{ opacity: homeChrome.gateStageFullBleedMinHeight ? 1 : 0 }}
+            aria-hidden
+          />
+        ) : null}
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 ${homeChrome.gateStageFullBleedMinHeight ? 'z-stack-base' : 'z-0'} bg-surface-dark/95 backdrop-blur-sm ${dockSurfaceOpacityTransition}`}
+          style={{ opacity: dockBackgroundOpacity }}
+        />
+        <div
+          className={[
+            'relative z-10 border-b',
+            open ? 'border-white/10' : 'border-transparent',
+          ].join(' ')}
+        >
         <div
           id="season-nav-dock-panel"
           data-season-nav-panel
@@ -137,6 +174,7 @@ const SeasonNavDock = () => {
               </button>
             );
           })}
+        </div>
         </div>
       </div>
     </div>

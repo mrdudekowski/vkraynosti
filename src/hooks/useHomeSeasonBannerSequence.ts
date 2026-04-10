@@ -36,9 +36,13 @@ export interface HomeSeasonBannerSequenceState {
  * Цепочка 0→9: fade in первой полоски → удержание → crossfade i→i+1 (out и in одновременно) → …
  * Затем слово «Вкрайности» (fade in → пауза → волна сноса 9→0: покачивание + fade, см. keyframes в теме) → пауза → повтор.
  * При `prefers-reduced-motion` — только слово, без видео-цикла.
+ * Пока `sequenceActive === false`, таймеры не ставятся (ворота вне вьюпорта).
+ * `sequenceResetKey` (например сезон) — полный перезапуск таймлайна при смене без смены `sequenceActive`.
  */
 export function useHomeSeasonBannerSequence(
-  prefersReducedMotion: boolean
+  prefersReducedMotion: boolean,
+  sequenceActive: boolean,
+  sequenceResetKey: string
 ): HomeSeasonBannerSequenceState {
   const [soloCol, setSoloCol] = useState<number | null>(null);
   const [soloPhase, setSoloPhase] = useState<HomeSeasonBannerSoloPhase | null>(null);
@@ -55,6 +59,17 @@ export function useHomeSeasonBannerSequence(
       setHandoff(null);
       setHandoffToReady(false);
       setWordOverlay('visible');
+      setWordOverlayFadeInReady(false);
+      setWordExitWaveLastVisible(null);
+      return;
+    }
+
+    if (!sequenceActive) {
+      setSoloCol(null);
+      setSoloPhase(null);
+      setHandoff(null);
+      setHandoffToReady(false);
+      setWordOverlay('hidden');
       setWordOverlayFadeInReady(false);
       setWordExitWaveLastVisible(null);
       return;
@@ -159,7 +174,7 @@ export function useHomeSeasonBannerSequence(
     return () => {
       cancelled = true;
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, sequenceActive, sequenceResetKey]);
 
   return {
     soloCol,

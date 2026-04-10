@@ -10,7 +10,6 @@ import {
   HOME_SEASON_BANNER_STRIP_FADE_IN_MS,
   HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS,
 } from './src/constants/homeSeasonBannerAnimation'
-import { HOME_SEASON_BANNER_WHITE_VEIL_TRANSITION_MS } from './src/constants/homeSeasonBannerWhiteVeil'
 import {
   THEME_TEXT_INVERSE_HEX,
   THEME_TEXT_PRIMARY_HEX,
@@ -23,6 +22,10 @@ import {
   fontFamilyHomeSeasonBannerStack,
   fontFamilyMonoStack,
 } from './src/constants/fontFamilyStacks'
+import { SEASON_ACCENT_HEX } from './src/constants/seasonAccentHex'
+import { HOME_HERO_CEILING_BOUNCE_DURATION_MS } from './src/constants/homeHeroCeiling'
+import { HOME_NAVBAR_CHROME_TRANSITION_MS } from './src/constants/homeNavbarChrome'
+import { HOME_GATE_START_SCREEN_HEX } from './src/constants/homeGateSurface'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -44,6 +47,9 @@ const SLIDE_IN_DURATION = '480ms' as const
 const KEYFRAME_TOUR_META_STAGGER_Y = '0.375rem' as const
 const SCALE_IN_DURATION = '360ms' as const
 const SEASON_FLASH_DURATION = '900ms' as const
+
+/** Отскок при ударе о потолок hero; синхронно с `HOME_HERO_CEILING_BOUNCE_DURATION_MS`. */
+const HOME_HERO_CEILING_BOUNCE_DURATION = `${HOME_HERO_CEILING_BOUNCE_DURATION_MS}ms` as const
 
 /** CTA: зелёный sweep поверх апельсинового `cta.fill` (согласовано с `.btn-cta-tour`). */
 const CTA_SWEEP_DURATION = '400ms' as const
@@ -83,16 +89,6 @@ const SEASON_PAGE_GRADIENT_STOPS = {
 
 /** Синхронно с `colors.surface.dark`. */
 const SURFACE_DARK_HEX = '#0D0D0D' as const
-
-/**
- * Единый акцент сезона в UI (`colors.season.*`, тени переключателя, градиент букв баннера).
- */
-const SEASON_ACCENT_HEX = {
-  winter: '#7BA7BC',
-  spring: '#C76B7E',
-  summer: '#E8A838',
-  fall:   '#C8622A',
-} as const
 
 function buildHomeSeasonBannerWordmarkGradient(
   season: keyof typeof SEASON_ACCENT_HEX
@@ -248,15 +244,23 @@ const config: Config = {
     'text-home-season-banner-letter',
     'drop-shadow-home-season-banner-letter',
     'z-home-season-banner',
-    'z-home-season-banner-veil',
-    'bg-home-season-banner-veil',
-    'duration-home-season-banner-veil',
+    'z-home-gate-letterbox',
+    'z-home-gate-glow',
+    'z-home-gate-return-veil',
+    'bg-home-gate-letterbox',
+    'bg-home-gate-start-screen',
+    'min-h-home-gate-viewport',
+    'z-home-hero',
+    'duration-home-navbar-chrome',
+    'bg-home-gate-return-veil',
+    'top-navbar',
     'duration-home-season-banner-crossfade',
     'duration-home-season-banner-strip-in',
     'duration-home-season-banner-letter-exit',
     'duration-home-season-banner-letter-in',
     'animate-home-season-banner-letter-wave-exit',
     'animate-home-season-banner-wordmark-shimmer',
+    'animate-home-hero-ceiling-bounce',
     'bg-home-season-banner-wordmark-winter',
     'bg-home-season-banner-wordmark-spring',
     'bg-home-season-banner-wordmark-summer',
@@ -342,8 +346,11 @@ const config: Config = {
         },
         /** Подложка сетки баннера «В другой сезон» (md+), до появления полосок. */
         'home-season-banner-stage': '#000000',
-        /** Слой-вуаль над «небом» главной при скролле секции сезона (`useHomeSeasonBannerWhiteVeil`, якорь выхода — ряд переключателя внутри полосы); совпадает с `home-season-banner-stage`. */
-        'home-season-banner-veil': '#000000',
+        /** Letterbox и чёрная вуаль возврата — ворота главной (`useHomeNavbarChromeScroll`). */
+        'home-gate-letterbox': SURFACE_DARK_HEX,
+        /** Стартовый экран ворот: сплошной фон под баннером (синхронно с `HOME_GATE_START_SCREEN_HEX`). */
+        'home-gate-start-screen': HOME_GATE_START_SCREEN_HEX,
+        'home-gate-return-veil': SURFACE_DARK_HEX,
         /**
          * Градиент кругов `SeasonSwitcher` в секции главной (на светлой полосе под баннером):
          * на ~20% темнее, чем `from-black/60 to-black/40` в navbar.
@@ -584,14 +591,16 @@ const config: Config = {
         /** Верхний паддинг контента `tour-detail-preface-bg`. */
         'tour-detail-preface-pt': '1.5rem',
         'tour-detail-preface-pt-sm': '2rem',
-        /** Совпадает с `h-16` у фиксированного Navbar — для `h-hero-viewport`. */
+        /** Совпадает с `h-16` у фиксированного Navbar. */
         'navbar': '4rem',
+        /** `absolute` top у h1 в `HeroCarousel`: высота navbar + бывший зазор `top-6`. */
+        'home-hero-title-top': '5.5rem',
         /**
          * Home: top padding for first content in sections after hero (#tours, #team).
          * Less than `section-y` to avoid doubling vertical rhythm with the hero.
          */
         'home-section-top': '4rem',
-        /** Home: gap between tours block and season switcher strip. */
+        /** Home: margin above «В другой сезон» block at bottom of #tours (after tour grid). */
         'home-stack-gap': '2.5rem',
         /**
          * Home: top padding on the season background strip section.
@@ -646,8 +655,8 @@ const config: Config = {
         'keyframe-slide-in-x': KEYFRAME_SLIDE_IN_X,
       },
       height: {
-        /** Один экран под фиксированный navbar; `SeasonNavDock` — оверлей, высоту main не увеличивает. */
-        'hero-viewport': 'calc(100vh - theme(spacing.navbar))',
+        /** Полный вьюпорт: navbar fixed оверлеем поверх hero (`main` на главной без `pt-16`). */
+        'hero-viewport': '100dvh',
         /** Круги сезона в навбаре (фикс с `season-md`, 36px). */
         'nav-season-circle-fixed': '2.25rem',
         /** Плавный масштаб 320–500px (совпадает с max у границы). */
@@ -678,6 +687,8 @@ const config: Config = {
         tourDetail: '80rem',
         /** Горизонтальный разделитель над блоком «Команда» (`TeamCarousel`). */
         'team-section-divider': '28rem',
+        /** Декоративный графический знак за контентом секции контактов (`ContactSection`); кап ×2 к прежнему 22rem. */
+        'contact-section-mark': 'min(96vw, 44rem)',
       },
       minHeight: {
         /** Герой секции «Безопасность» на главной (фото + градиент и текст). */
@@ -686,6 +697,17 @@ const config: Config = {
         'home-season-banner-inner': '11rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
         'route-fallback':    'clamp(16rem, 55vh, 40rem)',
+        /** Полный вьюпорт ворот; navbar — оверлей (`Home`). */
+        'home-gate-viewport': '100dvh',
+        /**
+         * Внутренний слой параллакса неба на главной: выше родителя на 15%,
+         * чтобы при `translateY` не проступали края (`overflow-hidden` снаружи).
+         */
+        'home-sky-parallax-inner': '115%',
+      },
+      top: {
+        /** Компенсация к `min-h-home-sky-parallax-inner` (центрирование «запаса» по вертикали). */
+        'home-sky-parallax-inner': '-7.5%',
       },
       boxShadow: {
         /**
@@ -748,6 +770,8 @@ const config: Config = {
         cta: '0.3125rem',
       },
       zIndex: {
+        /** Локальный слой над z-0 внутри абсолютного стека (оверлеи под контентом). */
+        'stack-base': '1',
         'navbar':      '100',
         /** Под навбаром: полоса `SeasonNavDock`. */
         'season-dock': '90',
@@ -761,8 +785,12 @@ const config: Config = {
         mobileNav: '95',
         /** Колонки баннера «В другой сезон» под контентом `RevealBox` (z-20). */
         'home-season-banner': '15',
-        /** Между `z-0` небом и `z-10` контентом главной после hero. */
-        'home-season-banner-veil': '1',
+        /** Ворота главной: под навбаром (100) и доком сезона (90). */
+        'home-gate-letterbox': '82',
+        /** Секция `#home-hero`: стек над следующими секциями при наложении. */
+        'home-hero': '12',
+        'home-gate-glow': '83',
+        'home-gate-return-veil': '84',
       },
       transitionDuration: {
         'carousel':      '600ms',
@@ -794,8 +822,8 @@ const config: Config = {
         /** Синхронный fade-out всех букв слова; синхронно с `HOME_SEASON_BANNER_LETTER_EXIT_MS`. */
         'home-season-banner-letter-exit': `${HOME_SEASON_BANNER_LETTER_EXIT_MS}ms`,
         'home-season-banner-letter-in': `${HOME_SEASON_BANNER_LETTER_FADE_IN_MS}ms`,
-        /** Opacity слоя-вуали при скролле; синхронно с `HOME_SEASON_BANNER_WHITE_VEIL_TRANSITION_MS`. */
-        'home-season-banner-veil': `${HOME_SEASON_BANNER_WHITE_VEIL_TRANSITION_MS}ms`,
+        /** Navbar + SeasonNavDock: токен класса `duration-home-navbar-chrome` (на главной opacity transition отключён). */
+        'home-navbar-chrome': `${HOME_NAVBAR_CHROME_TRANSITION_MS}ms`,
       },
       transitionTimingFunction: {
         'reveal-out': 'ease-out',
@@ -926,12 +954,27 @@ const config: Config = {
         /**
          * Переливание фона в глифах: сдвиг `background-position` вдоль широкого градиента.
          * `--hsb-wm-x` задаёт столбец (0…100% по 10 колонкам); синхронно с `HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS`.
+         * Сдвиг ограничен `min(…, 100% − --hsb-wm-x)`: иначе у колонок с большим `--hsb-wm-x` сумма с +36%
+         * уводит позицию за пределы градиента — `bg-clip-text` даёт прозрачные буквы (заметно на зиме и хвосте слова).
          */
         'home-season-banner-wordmark-shimmer': {
           '0%': { backgroundPosition: 'var(--hsb-wm-x) 50%' },
           '100%': {
-            backgroundPosition: 'calc(var(--hsb-wm-x, 0%) + 36%) 50%',
+            backgroundPosition:
+              'calc(var(--hsb-wm-x, 0%) + min(36%, calc(100% - var(--hsb-wm-x, 0%)))) 50%',
           },
+        },
+        /**
+         * Hero: мягкая дуга к потолку (один пик, без второго «отскока» — нет конфликта с opacity-слайдами).
+         * `translate3d` + полная амплитуда только в середине кривой timing на утилите анимации.
+         */
+        'home-hero-ceiling-bounce': {
+          '0%': { transform: 'translate3d(0, 0, 0)' },
+          '50%': {
+            transform:
+              'translate3d(0, calc(-1 * var(--home-hero-ceiling-bounce-px, 0px)), 0)',
+          },
+          '100%': { transform: 'translate3d(0, 0, 0)' },
         },
       },
       animation: {
@@ -951,6 +994,7 @@ const config: Config = {
         'tour-meta-stagger-in': `tour-meta-stagger-in ${SLIDE_IN_DURATION} ease forwards`,
         'home-season-banner-letter-wave-exit': `home-season-banner-letter-wave-exit ${HOME_SEASON_BANNER_LETTER_EXIT_MS}ms ease-in-out forwards`,
         'home-season-banner-wordmark-shimmer': `home-season-banner-wordmark-shimmer ${HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS}ms ease-in-out infinite alternate`,
+        'home-hero-ceiling-bounce': `home-hero-ceiling-bounce ${HOME_HERO_CEILING_BOUNCE_DURATION} cubic-bezier(0.45, 0, 0.25, 1) forwards`,
       },
       transitionDelay: {
         'tour-meta-0': '0ms',

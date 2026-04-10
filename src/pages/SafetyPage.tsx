@@ -9,6 +9,7 @@ import { UI } from '../constants/ui';
 import { ROUTES } from '../constants/routes';
 import { IMAGES } from '../constants/images';
 import PageMeta from '../components/shared/PageMeta';
+import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 import winterSafety from '../data/safety/winter.json';
 import springSafety from '../data/safety/spring.json';
 import summerSafety from '../data/safety/summer.json';
@@ -66,7 +67,9 @@ const SafetyPage = () => {
       />
       {/* Hero */}
       <div className="bg-brand-primary py-20 px-4 text-center">
-        <h1 className="section-title text-text-inverse mb-3">{UI.sections.safety}</h1>
+        <ScrollScrubFade as="h1" className="section-title text-text-inverse mb-3">
+          {UI.sections.safety}
+        </ScrollScrubFade>
         <p className="text-text-inverse/70 text-lg max-w-2xl mx-auto">{UI.sections.safetySub}</p>
       </div>
 

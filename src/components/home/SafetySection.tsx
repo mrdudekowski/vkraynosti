@@ -4,6 +4,8 @@ import { faShieldHalved } from '@fortawesome/free-solid-svg-icons';
 import { SAFETY_ITEMS } from '../../data/safetyData';
 import { SAFETY_ICON_MAP } from '../../constants/safetyIcons';
 import { HOME_SAFETY_SECTION_HERO_IMAGE } from '../../constants/images';
+import RevealBox from '../shared/RevealBox';
+import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
 
@@ -14,11 +16,18 @@ const SafetySection = () => (
   >
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-10 lg:mb-12">
-        <h2 className="section-title text-text-primary">{UI.sections.safety}</h2>
-        <p className="text-text-muted mt-3 max-w-2xl mx-auto">{UI.sections.safetySub}</p>
+        <ScrollScrubFade as="h2" className="section-title text-text-primary">
+          {UI.sections.safety}
+        </ScrollScrubFade>
+        <RevealBox as="div" className="mt-3 max-w-2xl mx-auto">
+          <p className="text-text-muted">{UI.sections.safetySub}</p>
+        </RevealBox>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mb-12 items-stretch">
+      <RevealBox
+        as="div"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mb-12 items-stretch"
+      >
         <div className="relative overflow-hidden rounded-card isolate min-h-home-safety-hero motion-safe:animate-fade-up">
           <img
             src={HOME_SAFETY_SECTION_HERO_IMAGE}
@@ -30,7 +39,7 @@ const SafetySection = () => (
             loading="lazy"
           />
           <div
-            className="absolute inset-0 z-[1] bg-gradient-to-t from-surface-dark/92 via-surface-dark/45 to-surface-dark/10"
+            className="absolute inset-0 z-stack-base bg-gradient-to-t from-surface-dark/92 via-surface-dark/45 to-surface-dark/10"
             aria-hidden
           />
           <div className="relative z-10 flex min-h-home-safety-hero flex-col justify-end p-card-p">
@@ -64,13 +73,13 @@ const SafetySection = () => (
             </li>
           ))}
         </ul>
-      </div>
+      </RevealBox>
 
-      <div className="text-center">
+      <RevealBox as="div" className="text-center">
         <Link to={ROUTES.SAFETY} className="btn-ghost text-text-primary" prefetch="intent">
           {UI.sections.safety_cta}
         </Link>
-      </div>
+      </RevealBox>
     </div>
   </section>
 );

@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { useCarousel } from '../../hooks/useCarousel';
+import { useScrollScrubFade } from '../../hooks/useScrollScrubFade';
 import CarouselSlide from '../shared/CarouselSlide';
-import RevealBox from '../shared/RevealBox';
-import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { UI } from '../../constants/ui';
 import { heroCarouselPhraseTypographyStyle } from '../../constants/typography';
 import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
@@ -43,10 +42,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
           >
-            <RevealBox
-              as="div"
-              className="flex w-full max-w-2xl mx-auto justify-center px-4 pb-24"
-            >
+            <div className="flex w-full max-w-2xl mx-auto justify-center px-4 pb-24">
               <Link
                 to={buildTourDetailPath(tour.season, tour.id)}
                 className="text-center group flex flex-col items-center gap-hero-phrase-cta-gap"
@@ -62,7 +58,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
                 </p>
                 <span className="btn-primary inline-block text-base shrink-0">{UI.hero.viewTour}</span>
               </Link>
-            </RevealBox>
+            </div>
           </CarouselSlide>
         );
       })}
@@ -101,6 +97,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
 const HeroCarousel = forwardRef<HTMLElement>(function HeroCarousel(_props, ref) {
   const { activeSeason } = useSeason();
   const sectionRef = useRef<HTMLElement | null>(null);
+  const { ref: heroContentFadeRef } = useScrollScrubFade();
 
   const setSectionRef = useCallback(
     (node: HTMLElement | null) => {
@@ -114,17 +111,16 @@ const HeroCarousel = forwardRef<HTMLElement>(function HeroCarousel(_props, ref) 
     <section
       ref={setSectionRef}
       id={HOME_HERO_SECTION_ELEMENT_ID}
-      className="relative z-home-hero isolate h-hero-viewport overflow-hidden bg-surface-dark"
+      className="relative z-home-hero isolate h-hero-viewport overflow-hidden bg-home-gate-start-screen"
     >
-      <header className="absolute top-home-hero-title-top right-6 z-20 max-w-md pl-4 text-right">
-        <ScrollScrubFade
-          as="h1"
-          className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md"
-        >
-          {UI.hero.documentTitle}
-        </ScrollScrubFade>
-      </header>
-      <HeroCarouselSlides key={activeSeason} activeSeason={activeSeason} />
+      <div ref={heroContentFadeRef} className="absolute inset-0 z-10 transition-none">
+        <header className="absolute top-home-hero-title-top right-6 z-20 max-w-md pl-4 text-right">
+          <h1 className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md">
+            {UI.hero.documentTitle}
+          </h1>
+        </header>
+        <HeroCarouselSlides key={activeSeason} activeSeason={activeSeason} />
+      </div>
     </section>
   );
 });

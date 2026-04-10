@@ -89,15 +89,18 @@ export function useHomeNavbarChromeScroll({
   ]);
 
   const publishChromeRef = useRef(publishChrome);
-  publishChromeRef.current = publishChrome;
+
+  useLayoutEffect(() => {
+    publishChromeRef.current = publishChrome;
+  }, [publishChrome]);
 
   const schedulePublishChrome = useCallback(() => {
     if (chromePublishRef.current.rafId != null) return;
     chromePublishRef.current.rafId = requestAnimationFrame(() => {
       chromePublishRef.current.rafId = null;
-      publishChrome();
+      publishChromeRef.current();
     });
-  }, [publishChrome]);
+  }, []);
 
   useLayoutEffect(() => {
     queueMicrotask(() => {
@@ -108,12 +111,13 @@ export function useHomeNavbarChromeScroll({
   useEffect(() => {
     if (!enabled) return;
     publishChrome();
+    const chromeState = chromePublishRef.current;
     if (lenis) {
       const unsub = lenis.on('scroll', schedulePublishChrome);
       return () => {
-        if (chromePublishRef.current.rafId != null) {
-          cancelAnimationFrame(chromePublishRef.current.rafId);
-          chromePublishRef.current.rafId = null;
+        if (chromeState.rafId != null) {
+          cancelAnimationFrame(chromeState.rafId);
+          chromeState.rafId = null;
         }
         unsub();
       };
@@ -123,9 +127,9 @@ export function useHomeNavbarChromeScroll({
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
-      if (chromePublishRef.current.rafId != null) {
-        cancelAnimationFrame(chromePublishRef.current.rafId);
-        chromePublishRef.current.rafId = null;
+      if (chromeState.rafId != null) {
+        cancelAnimationFrame(chromeState.rafId);
+        chromeState.rafId = null;
       }
       window.removeEventListener('scroll', onScroll);
     };
@@ -135,15 +139,16 @@ export function useHomeNavbarChromeScroll({
     if (!enabled) return;
     const hero = heroSectionRef.current;
     if (!hero) return;
+    const chromeState = chromePublishRef.current;
     const ro = new ResizeObserver(() => {
       schedulePublishChrome();
     });
     ro.observe(hero);
     return () => {
       ro.disconnect();
-      if (chromePublishRef.current.rafId != null) {
-        cancelAnimationFrame(chromePublishRef.current.rafId);
-        chromePublishRef.current.rafId = null;
+      if (chromeState.rafId != null) {
+        cancelAnimationFrame(chromeState.rafId);
+        chromeState.rafId = null;
       }
     };
   }, [enabled, heroSectionRef, schedulePublishChrome]);

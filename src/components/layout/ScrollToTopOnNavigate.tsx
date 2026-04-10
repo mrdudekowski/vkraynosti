@@ -2,15 +2,19 @@ import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { ROUTES } from '../../constants/routes';
-import { scrollWindowToTopImmediate, scrollWindowToTopSmooth } from '../../constants/smoothScroll';
+import {
+  NAVBAR_SCROLL_OFFSET_PX,
+  scrollElementIntoViewAnchored,
+  scrollWindowToTopImmediate,
+  scrollWindowToTopSmooth,
+} from '../../constants/smoothScroll';
 
 const routeSignature = (pathname: string, search: string, hash: string) =>
   `${pathname}${search}${hash}`;
 
 /**
- * При первой загрузке/перезагрузке — мгновенно вверх, кроме главной с #якорем (секции в Home).
- * После смены маршрута плавно поднимает окно к верху.
- * Не срабатывает при переходе на главную с якорем (скролл к секции — в Home).
+ * Первый монтинг (в т.ч. F5): всегда мгновенно вверх — без якорного скролла по URL.
+ * Дальше: смена маршрута — плавно вверх; переход на главную с `#hash` или смена только hash — к секции.
  */
 const ScrollToTopOnNavigate = () => {
   const location = useLocation();
@@ -22,19 +26,28 @@ const ScrollToTopOnNavigate = () => {
 
     if (prevSignatureRef.current === null) {
       prevSignatureRef.current = signature;
-      const isHomeWithSectionHash =
-        location.pathname === ROUTES.HOME && location.hash.length > 1;
-      if (!isHomeWithSectionHash) {
-        scrollWindowToTopImmediate(lenis);
-      }
+      scrollWindowToTopImmediate(lenis);
       return;
     }
-    if (prevSignatureRef.current === signature) return;
+
+    if (prevSignatureRef.current === signature) {
+      return;
+    }
+
+    const previousSignature = prevSignatureRef.current;
     prevSignatureRef.current = signature;
 
     const isHomeWithSectionHash =
       location.pathname === ROUTES.HOME && location.hash.length > 1;
-    if (isHomeWithSectionHash) return;
+
+    if (isHomeWithSectionHash && previousSignature !== signature) {
+      const id = location.hash.slice(1);
+      const el = document.getElementById(id);
+      if (el) {
+        scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
+      }
+      return;
+    }
 
     scrollWindowToTopSmooth(lenis);
   }, [location, lenis]);

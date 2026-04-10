@@ -13,15 +13,17 @@ import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 export function useHomeSkyParallax(): { ref: RefCallback<HTMLElement> } {
   const lenis = useLenis();
   const reducedMotion = usePrefersReducedMotion();
-  const [element, setElement] = useState<HTMLElement | null>(null);
+  const elementRef = useRef<HTMLElement | null>(null);
+  const [elementAttached, setElementAttached] = useState(false);
   const rafIdRef = useRef<number | null>(null);
 
   const setRef: RefCallback<HTMLElement> = useCallback((node) => {
-    setElement(node);
+    elementRef.current = node;
+    setElementAttached(node != null);
   }, []);
 
   const applyStyles = useCallback(() => {
-    const el = element;
+    const el = elementRef.current;
     if (!el || typeof window === 'undefined') return;
 
     if (reducedMotion) {
@@ -32,7 +34,7 @@ export function useHomeSkyParallax(): { ref: RefCallback<HTMLElement> } {
     const scrollY = getViewportScrollY(lenis);
     const yPx = computeParallaxTranslateYPx(scrollY, HOME_SKY_PARALLAX_SCROLL_FACTOR);
     el.style.transform = `translate3d(0, ${yPx}px, 0)`;
-  }, [element, lenis, reducedMotion]);
+  }, [lenis, reducedMotion]);
 
   const schedule = useCallback(() => {
     if (rafIdRef.current != null) return;
@@ -47,7 +49,7 @@ export function useHomeSkyParallax(): { ref: RefCallback<HTMLElement> } {
   }, [applyStyles]);
 
   useEffect(() => {
-    if (!element) return;
+    if (!elementAttached) return;
 
     let unsubLenis: (() => void) | undefined;
     if (lenis) {
@@ -68,7 +70,7 @@ export function useHomeSkyParallax(): { ref: RefCallback<HTMLElement> } {
         rafIdRef.current = null;
       }
     };
-  }, [element, lenis, schedule]);
+  }, [elementAttached, lenis, schedule]);
 
   return { ref: setRef };
 }

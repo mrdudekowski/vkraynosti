@@ -14,15 +14,17 @@ import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 export function useScrollScrubFade(): { ref: RefCallback<HTMLElement> } {
   const lenis = useLenis();
   const reducedMotion = usePrefersReducedMotion();
-  const [element, setElement] = useState<HTMLElement | null>(null);
+  const elementRef = useRef<HTMLElement | null>(null);
+  const [elementAttached, setElementAttached] = useState(false);
   const rafIdRef = useRef<number | null>(null);
 
   const setRef: RefCallback<HTMLElement> = useCallback((node) => {
-    setElement(node);
+    elementRef.current = node;
+    setElementAttached(node != null);
   }, []);
 
   const applyStyles = useCallback(() => {
-    const el = element;
+    const el = elementRef.current;
     if (!el || typeof window === 'undefined') return;
 
     if (reducedMotion) {
@@ -45,7 +47,7 @@ export function useScrollScrubFade(): { ref: RefCallback<HTMLElement> } {
     } else {
       el.style.removeProperty('pointer-events');
     }
-  }, [element, reducedMotion]);
+  }, [reducedMotion]);
 
   const schedule = useCallback(() => {
     if (rafIdRef.current != null) return;
@@ -60,12 +62,15 @@ export function useScrollScrubFade(): { ref: RefCallback<HTMLElement> } {
   }, [applyStyles]);
 
   useEffect(() => {
-    if (!element) return;
+    if (!elementAttached) return;
+
+    const el = elementRef.current;
+    if (!el) return;
 
     const ro = new ResizeObserver(() => {
       schedule();
     });
-    ro.observe(element);
+    ro.observe(el);
 
     const onResize = () => {
       schedule();
@@ -93,7 +98,7 @@ export function useScrollScrubFade(): { ref: RefCallback<HTMLElement> } {
         rafIdRef.current = null;
       }
     };
-  }, [element, lenis, schedule]);
+  }, [elementAttached, lenis, schedule]);
 
   return { ref: setRef };
 }

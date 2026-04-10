@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useLenis } from 'lenis/react';
 import { HomeGateBannerShell } from '../components/home/HomeGateBannerShell';
 import HeroCarousel from '../components/home/HeroCarousel';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
@@ -24,13 +23,11 @@ import { UI } from '../constants/ui';
 import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
 import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
-import { NAVBAR_SCROLL_OFFSET_PX, scrollElementIntoViewAnchored } from '../constants/smoothScroll';
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
 import { useHomeSkyParallax } from '../hooks/useHomeSkyParallax';
 
 const Home = () => {
   const location = useLocation();
-  const lenis = useLenis();
   const { activeSeason } = useSeason();
   const tours = getToursBySeason(activeSeason);
   const gateIntersectRef = useRef<HTMLDivElement | null>(null);
@@ -96,13 +93,6 @@ const Home = () => {
     }
   }, [activeSeason]);
 
-  useLayoutEffect(() => {
-    if (location.pathname !== ROUTES.HOME || !location.hash) return;
-    const id = location.hash.slice(1);
-    const el = document.getElementById(id);
-    if (el) scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
-  }, [location.pathname, location.hash, lenis]);
-
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
   return (
     <>
@@ -148,9 +138,7 @@ const Home = () => {
             </ScrollScrubFade>
           </div>
 
-          <ScrollScrubFade className="relative w-full">
-            <HeroCarousel ref={heroSectionRef} />
-          </ScrollScrubFade>
+          <HeroCarousel ref={heroSectionRef} />
 
           <section
             id={UI.sections.homeToursSectionElementId}

@@ -6,8 +6,18 @@
  * crossfade и фазы слова остаются синхронными.
  */
 
-/** Удержание полоски с видео/картинкой перед переходом к следующей колонке. */
-export const HOME_SEASON_BANNER_MEDIA_VISIBLE_MS = 792 as const;
+/**
+ * Длительность воспроизведения видео в одной колонке баннера (секунды).
+ * Совпадает с `durationSec` зимних клипов в `homeSeasonBannerClips.ts` и сегментом loop в `BannerColumnVideo`.
+ */
+export const HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC = 5 as const;
+
+/**
+ * Удержание полоски с видео/картинкой перед переходом к следующей колонке
+ * (= время показа одного ролика в миллисекундах).
+ */
+export const HOME_SEASON_BANNER_MEDIA_VISIBLE_MS =
+  HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC * 1000;
 
 /**
  * Crossfade соседних полосок (out+in одновременно).

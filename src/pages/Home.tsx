@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { HomeGateBannerShell } from '../components/home/HomeGateBannerShell';
+import { HomeGateScrollToHeroLink } from '../components/home/HomeGateScrollToHeroLink';
 import HeroCarousel from '../components/home/HeroCarousel';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import TeamCarousel from '../components/home/TeamCarousel';
@@ -33,10 +34,10 @@ const Home = () => {
   const gateIntersectRef = useRef<HTMLDivElement | null>(null);
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const [gateStageFocused, setGateStageFocused] = useState(false);
-  const [bannerShellPresentationId, setBannerShellPresentationId] = useState(0);
-  const gateFocusedRef = useRef(gateStageFocused);
-  const prevSeasonForShellRef = useRef(activeSeason);
   const homeGateScrollEnabled = location.pathname === ROUTES.HOME;
+  const homeGateBannerColumnHover =
+    UI.sections.homeGateSeasonBannerStaticPresentation &&
+    UI.sections.homeGateSeasonBannerLetterHoverVideo;
   const { ref: homeSkyParallaxRef } = useHomeSkyParallax();
 
   useHomeNavbarChromeScroll({
@@ -78,21 +79,6 @@ const Home = () => {
     return () => obs.disconnect();
   }, [homeGateScrollEnabled]);
 
-  useEffect(() => {
-    gateFocusedRef.current = gateStageFocused;
-  }, [gateStageFocused]);
-
-  useEffect(() => {
-    if (prevSeasonForShellRef.current !== activeSeason) {
-      prevSeasonForShellRef.current = activeSeason;
-      if (gateFocusedRef.current) {
-        queueMicrotask(() => {
-          setBannerShellPresentationId((n) => n + 1);
-        });
-      }
-    }
-  }, [activeSeason]);
-
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
   return (
     <>
@@ -118,24 +104,24 @@ const Home = () => {
             data-home-gate-intersect-root
             className="shrink-0"
           >
-            <ScrollScrubFade className="w-full shrink-0">
+            <div className="transition-none w-full shrink-0">
               <div className="relative flex w-full shrink-0 flex-col items-center justify-center overflow-x-hidden bg-home-gate-start-screen min-h-home-gate-viewport">
                 <div
                   data-home-gate-banner-wrap
                   className={`flex w-full shrink-0 justify-center px-4 sm:px-6 lg:px-8 ${
-                    gateStageFocused ? '' : 'pointer-events-none'
+                    gateStageFocused || homeGateBannerColumnHover ? '' : 'pointer-events-none'
                   }`}
                 >
-                  <HomeGateBannerShell key={bannerShellPresentationId}>
+                  <HomeGateBannerShell>
                     <HomeSeasonBanner
                       season={activeSeason}
-                      sequenceActive={gateStageFocused && homeGateScrollEnabled}
-                      sequenceResetKey={activeSeason}
+                      staticPresentation={UI.sections.homeGateSeasonBannerStaticPresentation}
                     />
                   </HomeGateBannerShell>
                 </div>
+                <HomeGateScrollToHeroLink />
               </div>
-            </ScrollScrubFade>
+            </div>
           </div>
 
           <HeroCarousel ref={heroSectionRef} />

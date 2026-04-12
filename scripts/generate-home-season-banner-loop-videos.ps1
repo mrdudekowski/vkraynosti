@@ -17,7 +17,8 @@ $repoRoot = Join-Path $PSScriptRoot ".." | Resolve-Path
 $publicTours = Join-Path $repoRoot "public\tours" | Resolve-Path
 . (Join-Path $PSScriptRoot "media\Invoke-Ffmpeg.ps1")
 
-$DurationSec = 2.4
+# Синхронно с HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC в src/constants/homeSeasonBannerAnimation.ts
+$DurationSec = 5
 
 # Колонка баннера 0..9: подпапка tours, входной grid mp4, секунда старта в исходнике, имя выхода
 $Cuts = @(

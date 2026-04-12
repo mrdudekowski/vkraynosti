@@ -33,6 +33,20 @@ export function clamp01(v: number): number {
 export const HOME_GATE_RETURN_VEIL_RAMP_SCROLL_PX = 420 as const;
 
 /**
+ * Макс. позиция скролла (px, `getViewportScrollY(lenis)`), при которой видна стрелка «к hero»
+ * на воротах. Выше — fade-out (`useHomeGateScrollHintVisible` + `HomeGateScrollToHeroLink`).
+ */
+export const HOME_GATE_SCROLL_HINT_VISIBLE_MAX_SCROLL_PX = 14 as const;
+
+/** Длительность opacity перехода стрелки ворот; синхронно с `duration-home-gate-scroll-hint-fade` в теме. */
+export const HOME_GATE_SCROLL_HINT_FADE_MS = 260 as const;
+
+/** Видна ли подсказка скролла при заданном `scrollY` и пороге (для тестов и хука). */
+export function computeHomeGateScrollHintVisible(scrollY: number, maxScrollPx: number): boolean {
+  return scrollY <= maxScrollPx;
+}
+
+/**
  * Базовая непрозрачность вуали при возврате из hero к воротам (тесты и возможный UI).
  * `direction` — 1 вниз, -1 вверх, 0 неизвестно.
  */

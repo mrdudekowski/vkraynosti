@@ -25,6 +25,7 @@ import {
 import { SEASON_ACCENT_HEX } from './src/constants/seasonAccentHex'
 import { HOME_HERO_CEILING_BOUNCE_DURATION_MS } from './src/constants/homeHeroCeiling'
 import { HOME_NAVBAR_CHROME_TRANSITION_MS } from './src/constants/homeNavbarChrome'
+import { HOME_GATE_SCROLL_HINT_FADE_MS } from './src/constants/homeGateScroll'
 import { HOME_GATE_START_SCREEN_HEX } from './src/constants/homeGateSurface'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
@@ -32,6 +33,9 @@ const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as c
 
 /** Синхронно с `TOUR_INCLUDED_DESCRIPTION_FADE_MS` и fade подписи «Что включено». */
 const TOUR_INCLUDED_DESCRIPTION_FADE = `${TOUR_INCLUDED_DESCRIPTION_FADE_MS}ms` as const
+
+/** Синхронно с `HOME_GATE_SCROLL_HINT_FADE_MS` и стрелкой ворот (`HomeGateScrollToHeroLink`). */
+const HOME_GATE_SCROLL_HINT_FADE = `${HOME_GATE_SCROLL_HINT_FADE_MS}ms` as const
 
 /** Длительность выезда мобильного меню (синхронно с `animation.mobile-nav-*`). */
 const MOBILE_NAV_DURATION = '320ms' as const
@@ -50,6 +54,9 @@ const SEASON_FLASH_DURATION = '900ms' as const
 
 /** Отскок при ударе о потолок hero; синхронно с `HOME_HERO_CEILING_BOUNCE_DURATION_MS`. */
 const HOME_HERO_CEILING_BOUNCE_DURATION = `${HOME_HERO_CEILING_BOUNCE_DURATION_MS}ms` as const
+
+/** Покачивание стрелки «к hero» на стартовом экране; синхронно с `animation.home-gate-scroll-hint-bob`. */
+const HOME_GATE_SCROLL_HINT_BOB_DURATION = '2000ms' as const
 
 /** CTA: зелёный sweep поверх апельсинового `cta.fill` (согласовано с `.btn-cta-tour`). */
 const CTA_SWEEP_DURATION = '400ms' as const
@@ -244,9 +251,20 @@ const config: Config = {
     'text-home-season-banner-letter',
     'drop-shadow-home-season-banner-letter',
     'z-home-season-banner',
+    'z-30',
     'z-home-gate-letterbox',
     'z-home-gate-glow',
     'z-home-gate-return-veil',
+    'z-home-gate-scroll-hint',
+    'pb-home-gate-scroll-hint-bottom',
+    'px-home-gate-scroll-hint-pad-x',
+    'py-home-gate-scroll-hint-pad-y',
+    'min-h-home-gate-scroll-hint-target',
+    'min-w-home-gate-scroll-hint-target',
+    'h-home-gate-scroll-hint-icon',
+    'w-home-gate-scroll-hint-icon',
+    'motion-safe:animate-home-gate-scroll-hint-bob',
+    'duration-home-gate-scroll-hint-fade',
     'bg-home-gate-letterbox',
     'bg-home-gate-start-screen',
     'min-h-home-gate-viewport',
@@ -258,6 +276,7 @@ const config: Config = {
     'duration-home-season-banner-strip-in',
     'duration-home-season-banner-letter-exit',
     'duration-home-season-banner-letter-in',
+    'scale-home-season-banner-loop',
     'animate-home-season-banner-letter-wave-exit',
     'animate-home-season-banner-wordmark-shimmer',
     'animate-home-hero-ceiling-bounce',
@@ -613,6 +632,14 @@ const config: Config = {
          * +15% к прежним 0.5rem → 0.575rem.
          */
         'home-season-banner-foot-gap': '0.575rem',
+        /** От низа вьюпорта ворот до кнопки «вниз к hero» (`HomeGateScrollToHeroLink`). */
+        'home-gate-scroll-hint-bottom': '1.25rem',
+        /** Горизонтальные отступы круглой кнопки-стрелки ворот. */
+        'home-gate-scroll-hint-pad-x': '0.875rem',
+        /** Вертикальные отступы круглой кнопки-стрелки ворот. */
+        'home-gate-scroll-hint-pad-y': '0.5rem',
+        /** Амплитуда `keyframes.home-gate-scroll-hint-bob` (согласовано с keyframes). */
+        'home-gate-scroll-hint-bob-y': '0.35rem',
         /** Между капсулой-разделителем и заголовком секции «Команда» на главной. */
         'team-section-divider-to-heading': '2rem',
         'section-y': '6rem',
@@ -665,10 +692,14 @@ const config: Config = {
         'nav-season-icon-fixed': '1rem',
         'nav-season-icon-fluid':
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
+        /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`). */
+        'home-gate-scroll-hint-icon': '1.375rem',
         /** Hero страницы тура (карусель фото + градиент под заголовок). */
         'tour-detail-hero': 'clamp(28rem, 58vh, 48rem)',
       },
       width: {
+        /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`). */
+        'home-gate-scroll-hint-icon': '1.375rem',
         'nav-season-circle-fixed': '2.25rem',
         'nav-season-circle-fluid':
           'clamp(1.75rem, 1.75rem + (100vw - 20rem) * 0.0444, 2.25rem)',
@@ -682,6 +713,10 @@ const config: Config = {
         /** Полноэкранный просмотр фото тура (`TourPhotoViewer`, `object-contain`). */
         'photo-viewer': 'min(90dvh, 90vh)',
       },
+      minWidth: {
+        /** Минимальная сторона круглой кнопки «к hero» на воротах (~44px hit area). */
+        'home-gate-scroll-hint-target': '2.75rem',
+      },
       maxWidth: {
         /** Основная колонка страницы тура: как у сайтового контейнера (`max-w-7xl`), шире прежнего `5xl`. */
         tourDetail: '80rem',
@@ -693,6 +728,8 @@ const config: Config = {
       minHeight: {
         /** Герой секции «Безопасность» на главной (фото + градиент и текст). */
         'home-safety-hero': 'clamp(17rem, 52vw, 26rem)',
+        /** Минимальная высота круглой кнопки «к hero» на воротах (`min-w-home-gate-scroll-hint-target`). */
+        'home-gate-scroll-hint-target': '2.75rem',
         /** Минимальная высота прямоугольника баннера внутри контейнера (md+). */
         'home-season-banner-inner': '11rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
@@ -769,6 +806,10 @@ const config: Config = {
         /** Кнопка CTA (прямоугольная, не pill). */
         cta: '0.3125rem',
       },
+      scale: {
+        /** Зимние `*.banner-loop`: +20% к кадру внутри колонки (`HomeSeasonBannerColumn`, обрезка `overflow-hidden`). */
+        'home-season-banner-loop': '1.2',
+      },
       zIndex: {
         /** Локальный слой над z-0 внутри абсолютного стека (оверлеи под контентом). */
         'stack-base': '1',
@@ -791,6 +832,8 @@ const config: Config = {
         'home-hero': '12',
         'home-gate-glow': '83',
         'home-gate-return-veil': '84',
+        /** Кнопка «к hero» на стартовом экране — над баннером (`z-home-season-banner` ниже). */
+        'home-gate-scroll-hint': '25',
       },
       transitionDuration: {
         'carousel':      '600ms',
@@ -803,6 +846,8 @@ const config: Config = {
         'season-dock-slide': '320ms',
         /** Мобильное меню навбара: выезд панели справа. */
         'mobile-nav': MOBILE_NAV_DURATION,
+        /** Стрелка «к hero» на воротах: fade по скроллу; синхронно с `HOME_GATE_SCROLL_HINT_FADE_MS`. */
+        'home-gate-scroll-hint-fade': HOME_GATE_SCROLL_HINT_FADE,
         /** CTA: зелёный слой `::after` (sweep). */
         'cta-sweep': CTA_SWEEP_DURATION,
         /** CTA: лёгкий scale у подписи при hover (не dual). */
@@ -964,6 +1009,13 @@ const config: Config = {
               'calc(var(--hsb-wm-x, 0%) + min(36%, calc(100% - var(--hsb-wm-x, 0%)))) 50%',
           },
         },
+        /** Стартовый экран: лёгкое покачивание стрелки «к hero» вниз. */
+        'home-gate-scroll-hint-bob': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': {
+            transform: 'translateY(theme(spacing.home-gate-scroll-hint-bob-y))',
+          },
+        },
         /**
          * Hero: мягкая дуга к потолку (один пик, без второго «отскока» — нет конфликта с opacity-слайдами).
          * `translate3d` + полная амплитуда только в середине кривой timing на утилите анимации.
@@ -995,6 +1047,7 @@ const config: Config = {
         'home-season-banner-letter-wave-exit': `home-season-banner-letter-wave-exit ${HOME_SEASON_BANNER_LETTER_EXIT_MS}ms ease-in-out forwards`,
         'home-season-banner-wordmark-shimmer': `home-season-banner-wordmark-shimmer ${HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS}ms ease-in-out infinite alternate`,
         'home-hero-ceiling-bounce': `home-hero-ceiling-bounce ${HOME_HERO_CEILING_BOUNCE_DURATION} cubic-bezier(0.45, 0, 0.25, 1) forwards`,
+        'home-gate-scroll-hint-bob': `home-gate-scroll-hint-bob ${HOME_GATE_SCROLL_HINT_BOB_DURATION} ease-in-out infinite`,
       },
       transitionDelay: {
         'tour-meta-0': '0ms',

@@ -74,9 +74,17 @@ export const UI = {
     },
     otherSeasons:  'Другие сезоны',
     switchSeason:  'В другой сезон',
+    /** У ворот главной: только слово, без видео и таймлайна (см. `HomeSeasonBanner`). */
+    homeGateSeasonBannerStaticPresentation: true as const,
+    /** При статичном баннере: по hover на колонку — fade-in и loop-видео (если есть `videoSrc`). */
+    homeGateSeasonBannerLetterHoverVideo: true as const,
     /** `aria-label` региона баннера с колонками «Вкрайности» на главной. */
-    homeSeasonBannerRegion:
-      'Анимированный баннер: название Вкрайности и смена видео по колонкам',
+    homeSeasonBannerRegion: 'Баннер с названием Вкрайности по колонкам сезона',
+    /**
+     * Кнопка-стрелка внизу стартового экрана: тот же переход, что у ссылок навбара на секции
+     * (`Link` + `hash`, скролл через `ScrollToTopOnNavigate` и `NAVBAR_SCROLL_OFFSET_PX`).
+     */
+    homeGateScrollToHeroAriaLabel: 'Перейти к обзору туров' as const,
     team:         'Команда Вкрайности',
     teamSub:      'Опытные гиды и эксперты',
     safety:       'Безопасность в наших походах',

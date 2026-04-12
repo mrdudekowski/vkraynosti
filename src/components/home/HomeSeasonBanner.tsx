@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 import {
   HOME_SEASON_BANNER_WORDMARK_GRADIENT_BG_CLASS,
@@ -16,26 +16,40 @@ import type { Season } from '../../types';
 
 interface HomeSeasonBannerProps {
   season: Season;
-  /** Цикл полосок/слова стартует только после `true` (ворота во вьюпорте). */
-  sequenceActive: boolean;
-  /** Смена ключа перезапускает таймлайн (сезон на главной). */
-  sequenceResetKey: string;
+  /** Цикл полосок/слова стартует только после `true` (ворота во вьюпорте). Не используется при `staticPresentation`. */
+  sequenceActive?: boolean;
+  /** Смена ключа перезапускает таймлайн (сезон на главной). Не используется при `staticPresentation`. */
+  sequenceResetKey?: string;
+  /**
+   * Статичное слово без видео и без fade-out волны (как при `prefers-reduced-motion`).
+   * Флаг главной ворот — см. `UI.sections.homeGateSeasonBannerStaticPresentation`.
+   */
+  staticPresentation?: boolean;
 }
 
 /**
  * Не вешаем `src` на все 10 `<video>` сразу: иначе на деплое десять параллельных запросов к ~36 МБ grid-mp4.
- * Грузим: активная цепочка, следующая колонка в hold (к предстоящему crossfade), колонка 0 на фазе слова (следующий цикл).
+ * Грузим: hover по колонке (статичный баннер: видео или постер), активная цепочка, следующая в hold, колонка 0 перед новым циклом слова.
+ * При `timelineStatic` — только hover, без фоновой подгрузки колонки 0.
  */
 function shouldLoadHomeSeasonBannerColumnVideo(
   clip: HomeSeasonBannerClip,
-  prefersReducedMotion: boolean,
+  systemPrefersReducedMotion: boolean,
   wordOverlay: HomeSeasonBannerWordOverlay,
   soloCol: number | null,
   soloPhase: HomeSeasonBannerSoloPhase | null,
   handoff: { from: number; to: number } | null,
-  columnIndex: number
+  columnIndex: number,
+  columnHoverVideoReveal: boolean,
+  timelineStatic: boolean
 ): boolean {
-  if (!clip.videoSrc || prefersReducedMotion) {
+  if (!clip.videoSrc || systemPrefersReducedMotion) {
+    return false;
+  }
+  if (columnHoverVideoReveal) {
+    return true;
+  }
+  if (timelineStatic) {
     return false;
   }
   const inVideoChain =
@@ -281,7 +295,12 @@ interface HomeSeasonBannerColumnProps {
   handoffToReady: boolean;
   wordOverlayFadeInReady: boolean;
   wordExitWaveLastVisible: number | null;
-  prefersReducedMotion: boolean;
+  /** Системный reduced motion; видео по hover не включается. */
+  systemPrefersReducedMotion: boolean;
+  /** Статичный таймлайн (ворота или reduced motion): без цикла полосок. */
+  timelineStatic: boolean;
+  /** Статичный баннер у ворот: hover по колонке с fade-in видео. */
+  letterHoverVideoEnabled: boolean;
 }
 
 const HomeSeasonBannerColumn = ({
@@ -296,8 +315,12 @@ const HomeSeasonBannerColumn = ({
   handoffToReady,
   wordOverlayFadeInReady,
   wordExitWaveLastVisible,
-  prefersReducedMotion,
+  systemPrefersReducedMotion,
+  timelineStatic,
+  letterHoverVideoEnabled,
 }: HomeSeasonBannerColumnProps) => {
+  const [columnHovered, setColumnHovered] = useState(false);
+
   const media = getColumnMediaVisual(
     columnIndex,
     wordOverlay,
@@ -312,22 +335,30 @@ const HomeSeasonBannerColumn = ({
     (soloCol === columnIndex ||
       (handoff !== null && (handoff.from === columnIndex || handoff.to === columnIndex)));
 
-  const playing = !prefersReducedMotion && inVideoChain;
+  /** Наведение на колонку у ворот: видео (зима) или постер сезона — без `videoSrc` эффекта иначе не видно. */
+  const hoverColumnReveal = letterHoverVideoEnabled && columnHovered;
+  const hoverVideoReveal = hoverColumnReveal && Boolean(clip.videoSrc);
+
+  const playing =
+    (!systemPrefersReducedMotion && inVideoChain) ||
+    (hoverVideoReveal && !systemPrefersReducedMotion);
 
   const shouldLoadVideo = shouldLoadHomeSeasonBannerColumnVideo(
     clip,
-    prefersReducedMotion,
+    systemPrefersReducedMotion,
     wordOverlay,
     soloCol,
     soloPhase,
     handoff,
-    columnIndex
+    columnIndex,
+    hoverVideoReveal,
+    timelineStatic
   );
   const videoPreloadHint = playing ? ('auto' as const) : ('metadata' as const);
 
   const letterOpacity = wordLetterOpacityClass(
     wordOverlay,
-    prefersReducedMotion,
+    timelineStatic,
     columnIndex,
     soloCol,
     soloPhase,
@@ -336,17 +367,21 @@ const HomeSeasonBannerColumn = ({
   );
   const letterTransition = wordLetterTransitionClass(
     wordOverlay,
-    prefersReducedMotion,
+    timelineStatic,
     wordOverlayFadeInReady,
     wordExitWaveLastVisible,
     columnIndex,
     handoff
   );
 
-  const zClass = media.liftZ ? 'z-10' : 'z-0';
+  const mediaOpacityClass = hoverColumnReveal ? 'opacity-100' : media.opacityClass;
+  const mediaTransitionClass = hoverColumnReveal
+    ? 'transition-opacity duration-home-season-banner-strip-in ease-in-out'
+    : media.transitionClass;
+  const columnZClass = hoverColumnReveal ? 'z-20' : media.liftZ ? 'z-10' : 'z-0';
 
   const isWordWaveExitColumn =
-    !prefersReducedMotion &&
+    !timelineStatic &&
     wordOverlay === 'fadingOut' &&
     wordExitWaveLastVisible !== null &&
     columnIndex === wordExitWaveLastVisible + 1;
@@ -355,7 +390,7 @@ const HomeSeasonBannerColumn = ({
   const wordmarkAxisPct =
     wordmarkAxisCount > 0 ? (columnIndex / wordmarkAxisCount) * 100 : 0;
 
-  const letterFillClass = prefersReducedMotion
+  const letterFillClass = timelineStatic
     ? HOME_SEASON_BANNER_WORDMARK_SOLID_TEXT_CLASS[season]
     : [
         HOME_SEASON_BANNER_WORDMARK_GRADIENT_BG_CLASS[season],
@@ -373,14 +408,30 @@ const HomeSeasonBannerColumn = ({
     .filter(Boolean)
     .join(' ');
 
-  const letterGlyphStyle: CSSProperties | undefined = prefersReducedMotion
+  const letterGlyphStyle: CSSProperties | undefined = timelineStatic
     ? undefined
     : { ['--hsb-wm-x' as string]: `${String(wordmarkAxisPct)}%` };
 
+  const letterOverlayClass = hoverColumnReveal
+    ? systemPrefersReducedMotion
+      ? 'opacity-0'
+      : 'opacity-0 transition-opacity duration-home-season-banner-strip-in ease-in-out'
+    : [letterTransition, letterOpacity].filter(Boolean).join(' ');
+
   return (
-    <div className={`relative h-full min-h-0 min-w-0 ${zClass}`}>
+    <div
+      className={`relative h-full min-h-0 min-w-0 ${columnZClass} ${
+        letterHoverVideoEnabled ? 'pointer-events-auto' : ''
+      }`}
+      onMouseEnter={() => {
+        if (letterHoverVideoEnabled) setColumnHovered(true);
+      }}
+      onMouseLeave={() => {
+        if (letterHoverVideoEnabled) setColumnHovered(false);
+      }}
+    >
       <div
-        className={`absolute inset-0 flex items-center justify-center ${letterTransition} ${letterOpacity}`}
+        className={`absolute inset-0 z-10 flex items-center justify-center ${letterOverlayClass}`}
         aria-hidden
       >
         <span className={letterGlyphClassName} style={letterGlyphStyle}>
@@ -388,30 +439,40 @@ const HomeSeasonBannerColumn = ({
         </span>
       </div>
       <div
-        className={`absolute inset-0 overflow-hidden ${media.transitionClass} ${media.opacityClass}`}
+        className={`absolute inset-0 z-0 overflow-hidden ${mediaTransitionClass} ${mediaOpacityClass}`}
         aria-hidden
       >
-        {clip.videoSrc && shouldLoadVideo ? (
-          <BannerColumnVideo clip={clip} playing={playing} preloadHint={videoPreloadHint} />
-        ) : (
-          <img
-            src={clip.posterSrc}
-            alt=""
-            className="pointer-events-none h-full min-h-0 w-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-        )}
+        <div className="pointer-events-none h-full min-h-0 w-full origin-center scale-home-season-banner-loop">
+          {clip.videoSrc && shouldLoadVideo ? (
+            <BannerColumnVideo clip={clip} playing={playing} preloadHint={videoPreloadHint} />
+          ) : (
+            <img
+              src={clip.posterSrc}
+              alt=""
+              className="pointer-events-none h-full min-h-0 w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
 /**
- * Десять колонок с crossfade видео и словом «Вкрайности» на всех ширинах вьюпорта.
+ * Десять колонок: по умолчанию crossfade видео и слово «Вкрайности»; при `staticPresentation` — только слово.
  */
-const HomeSeasonBanner = ({ season, sequenceActive, sequenceResetKey }: HomeSeasonBannerProps) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
+const HomeSeasonBanner = ({
+  season,
+  sequenceActive = false,
+  sequenceResetKey = '',
+  staticPresentation = false,
+}: HomeSeasonBannerProps) => {
+  const systemPrefersReducedMotion = usePrefersReducedMotion();
+  const timelineStatic = staticPresentation || systemPrefersReducedMotion;
+  const letterHoverVideoEnabled =
+    staticPresentation && !systemPrefersReducedMotion && UI.sections.homeGateSeasonBannerLetterHoverVideo;
   const {
     soloCol,
     soloPhase,
@@ -420,7 +481,7 @@ const HomeSeasonBanner = ({ season, sequenceActive, sequenceResetKey }: HomeSeas
     wordOverlay,
     wordOverlayFadeInReady,
     wordExitWaveLastVisible,
-  } = useHomeSeasonBannerSequence(prefersReducedMotion, sequenceActive, sequenceResetKey);
+  } = useHomeSeasonBannerSequence(timelineStatic, sequenceActive, sequenceResetKey);
   const clips = useMemo(() => getHomeSeasonBannerClips(season), [season]);
   const letters = useMemo(() => [...UI.homeSeasonBannerWordmark], []);
 
@@ -428,9 +489,11 @@ const HomeSeasonBanner = ({ season, sequenceActive, sequenceResetKey }: HomeSeas
     console.error('UI.homeSeasonBannerWordmark must contain exactly 10 characters');
   }
 
+  const sectionPointerClass = letterHoverVideoEnabled ? '' : 'pointer-events-none';
+
   return (
     <section
-      className="pointer-events-none relative z-home-season-banner w-full"
+      className={`relative z-home-season-banner w-full ${sectionPointerClass}`.trim()}
       aria-label={UI.sections.homeSeasonBannerRegion}
     >
       <div className="min-h-0 w-full">
@@ -453,7 +516,9 @@ const HomeSeasonBanner = ({ season, sequenceActive, sequenceResetKey }: HomeSeas
                 handoffToReady={handoffToReady}
                 wordOverlayFadeInReady={wordOverlayFadeInReady}
                 wordExitWaveLastVisible={wordExitWaveLastVisible}
-                prefersReducedMotion={prefersReducedMotion}
+                systemPrefersReducedMotion={systemPrefersReducedMotion}
+                timelineStatic={timelineStatic}
+                letterHoverVideoEnabled={letterHoverVideoEnabled}
               />
             ))}
           </div>

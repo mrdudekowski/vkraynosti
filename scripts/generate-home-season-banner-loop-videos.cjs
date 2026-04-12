@@ -21,7 +21,8 @@ if (!ffmpegPath) {
 const repoRoot = path.resolve(__dirname, '..');
 const publicTours = path.join(repoRoot, 'public', 'tours');
 
-const durationSec = 2.4;
+/** Синхронно с `HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC` в `src/constants/homeSeasonBannerAnimation.ts`. */
+const durationSec = 5;
 const dryRun = process.argv.includes('--dry-run');
 const posters = process.argv.includes('--posters');
 

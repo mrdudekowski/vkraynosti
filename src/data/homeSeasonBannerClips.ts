@@ -1,3 +1,4 @@
+import { HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC } from '../constants/homeSeasonBannerAnimation';
 import {
   HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS,
   HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS,
@@ -27,9 +28,6 @@ const posterClip = (posterSrc: string): HomeSeasonBannerClip => ({
   durationSec: 0,
 });
 
-/** Длина сегмента для loop на время показа полоски (см. `HOME_SEASON_BANNER_MEDIA_VISIBLE_MS`). */
-const WINTER_LOOP_SEGMENT_SEC = 2.4 as const;
-
 const WINTER_BANNER_CLIP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 /**
@@ -42,7 +40,7 @@ const WINTER_CLIPS: HomeSeasonBannerClip[] = WINTER_BANNER_CLIP_INDICES.map((i) 
     videoSrc,
     posterSrc: HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS[videoSrc]!,
     startSec: 0,
-    durationSec: WINTER_LOOP_SEGMENT_SEC,
+    durationSec: HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC,
   };
 });
 

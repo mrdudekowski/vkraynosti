@@ -5,7 +5,7 @@ interface HomeGateBannerShellProps {
 }
 
 /**
- * Оболочка баннера у ворот: контейнер без анимаций при монтировании.
+ * Оболочка баннера у ворот: контейнер; само содержимое — статичный `HomeSeasonBanner` (см. UI).
  */
 export function HomeGateBannerShell({ children }: HomeGateBannerShellProps) {
   return (

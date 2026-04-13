@@ -2,7 +2,7 @@
 # Нарезает короткие лупы для баннера «В другой сезон» из существующих *.grid.mp4.
 #
 # Синхронизировать таблицу $Cuts с `src/data/homeSeasonBannerClips.ts` (WINTER_CLIPS: startSec, источник).
-# После генерации: пути к выходам — `HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS` и постеры в `images.ts`.
+# Выход: `public/banners_winter/` — пути в `HOME_SEASON_BANNER_WINTER_LOOP_*` (`src/constants/images.ts`).
 #
 # Seek: по умолчанию -ss ПОСЛЕ -i (точная отсечка по времени; медленнее на длинных файлах).
 # Для ускорения можно перенести первый -ss перед -i (привязка к ключевым кадрам).
@@ -15,6 +15,8 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = Join-Path $PSScriptRoot ".." | Resolve-Path
 $publicTours = Join-Path $repoRoot "public\tours" | Resolve-Path
+$bannerWinterOut = Join-Path $repoRoot "public\banners_winter"
+New-Item -ItemType Directory -Force -Path $bannerWinterOut | Out-Null
 . (Join-Path $PSScriptRoot "media\Invoke-Ffmpeg.ps1")
 
 # Синхронно с HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC в src/constants/homeSeasonBannerAnimation.ts
@@ -35,9 +37,9 @@ $Cuts = @(
 )
 
 foreach ($row in $Cuts) {
-  $dir = Join-Path $publicTours $row.Subdir
-  $inPath = Join-Path $dir $row.In
-  $outPath = Join-Path $dir $row.Out
+  $sourceDir = Join-Path $publicTours $row.Subdir
+  $inPath = Join-Path $sourceDir $row.In
+  $outPath = Join-Path $bannerWinterOut $row.Out
   if (-not (Test-Path $inPath)) {
     Write-Warning "Skip missing input: $inPath"
     continue
@@ -63,9 +65,9 @@ foreach ($row in $Cuts) {
 
   if ($Posters) {
     $base = [System.IO.Path]::GetFileNameWithoutExtension($row.Out)
-    $posterPath = Join-Path $dir "${base}.poster.webp"
+    $posterPath = Join-Path $bannerWinterOut "${base}.poster.webp"
     Invoke-Ffmpeg @('-y', '-i', $outPath, '-vframes', '1', '-q:v', '80', $posterPath)
   }
 }
 
-Write-Host "Done. При смене нарезок обновите таблицу в скрипте и константы `HOME_SEASON_BANNER_WINTER_LOOP_*` в `src/constants/images.ts`."
+Write-Host "Done. Выход: public\banners_winter\. При смене нарезок — таблица в скрипте и `HOME_SEASON_BANNER_WINTER_LOOP_*` в `src/constants/images.ts`."

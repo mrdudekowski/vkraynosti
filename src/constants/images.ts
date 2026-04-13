@@ -1,4 +1,5 @@
 import { PUBLIC_ASSET_BASE } from './fonts';
+import type { Season } from '../types';
 
 const BASE = 'https://placehold.co';
 
@@ -7,6 +8,17 @@ const SPRING_TOUR_PUBLIC = `${PUBLIC_ASSET_BASE}spring%20tours`;
 
 /** Папки туров: `public/tours/{tourId}/` — обложка и галерея одного маршрута. */
 const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours`;
+
+/**
+ * Стартовый экран главной (`HomeSeasonBanner`): `public/banners_winter/`, `banners_spring/`, …
+ * Видео-лупы и постеры сезона — только в своей папке.
+ */
+export const HOME_SEASON_BANNER_MEDIA_BASE: Record<Season, string> = {
+  winter: `${PUBLIC_ASSET_BASE}banners_winter`,
+  spring: `${PUBLIC_ASSET_BASE}banners_spring`,
+  summer: `${PUBLIC_ASSET_BASE}banners_summer`,
+  fall: `${PUBLIC_ASSET_BASE}banners_fall`,
+} as const;
 
 const TOUR_WINTER_1 = `${TOURS_ASSET_BASE}/winter-1`;
 
@@ -243,34 +255,36 @@ export const TOUR_WINTER_5_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 /**
  * Короткие лупы для баннера главной (колонки 0…9 ↔ `UI.homeSeasonBannerWordmark`).
- * Генерация: `scripts/generate-home-season-banner-loop-videos.ps1` (флаг `-Posters` — кадр-постер из первого кадра лупа).
- * Синхронизировать с таблицей `$Cuts` в том скрипте и с `src/data/homeSeasonBannerClips.ts`.
+ * Файлы в `public/banners_winter/`. Генерация: `npm run generate:banner-loops` / `scripts/generate-home-season-banner-loop-videos.ps1` (`-Posters`).
+ * Синхронизировать таблицу нарезок в скриптах и `src/data/homeSeasonBannerClips.ts`.
  */
+const BANNER_WINTER = HOME_SEASON_BANNER_MEDIA_BASE.winter;
+
 export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS = [
-  `${TOUR_WINTER_3}/gr.clip1.banner-loop.mp4`,
-  `${TOUR_WINTER_3}/gr.clip3.banner-loop.mp4`,
-  `${TOUR_WINTER_3}/gr.clip4.banner-loop.mp4`,
-  `${TOUR_WINTER_3}/gr.clip5.banner-loop.mp4`,
-  `${TOUR_WINTER_4}/hs.clip1.banner-loop.mp4`,
-  `${TOUR_WINTER_5}/ars.clip1.banner-loop.mp4`,
-  `${TOUR_WINTER_5}/ars.clip2.banner-loop.mp4`,
-  `${TOUR_WINTER_3}/gr.board.banner-loop.mp4`,
-  `${TOUR_WINTER_3}/gr.elya.banner-loop.mp4`,
-  `${TOUR_WINTER_3}/gr.bbq.banner-loop.mp4`,
+  `${BANNER_WINTER}/gr.clip1.banner-loop.mp4`,
+  `${BANNER_WINTER}/gr.clip3.banner-loop.mp4`,
+  `${BANNER_WINTER}/gr.clip4.banner-loop.mp4`,
+  `${BANNER_WINTER}/gr.clip5.banner-loop.mp4`,
+  `${BANNER_WINTER}/hs.clip1.banner-loop.mp4`,
+  `${BANNER_WINTER}/ars.clip1.banner-loop.mp4`,
+  `${BANNER_WINTER}/ars.clip2.banner-loop.mp4`,
+  `${BANNER_WINTER}/gr.board.banner-loop.mp4`,
+  `${BANNER_WINTER}/gr.elya.banner-loop.mp4`,
+  `${BANNER_WINTER}/gr.bbq.banner-loop.mp4`,
 ] as const;
 
 /** Постеры для `<video poster>` лупов баннера (первый кадр нарезки). */
 export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS: Record<string, string> = {
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[0]]: `${TOUR_WINTER_3}/gr.clip1.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[1]]: `${TOUR_WINTER_3}/gr.clip3.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[2]]: `${TOUR_WINTER_3}/gr.clip4.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[3]]: `${TOUR_WINTER_3}/gr.clip5.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[4]]: `${TOUR_WINTER_4}/hs.clip1.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[5]]: `${TOUR_WINTER_5}/ars.clip1.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[6]]: `${TOUR_WINTER_5}/ars.clip2.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[7]]: `${TOUR_WINTER_3}/gr.board.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[8]]: `${TOUR_WINTER_3}/gr.elya.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[9]]: `${TOUR_WINTER_3}/gr.bbq.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[0]]: `${BANNER_WINTER}/gr.clip1.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[1]]: `${BANNER_WINTER}/gr.clip3.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[2]]: `${BANNER_WINTER}/gr.clip4.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[3]]: `${BANNER_WINTER}/gr.clip5.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[4]]: `${BANNER_WINTER}/hs.clip1.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[5]]: `${BANNER_WINTER}/ars.clip1.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[6]]: `${BANNER_WINTER}/ars.clip2.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[7]]: `${BANNER_WINTER}/gr.board.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[8]]: `${BANNER_WINTER}/gr.elya.banner-loop.poster.webp`,
+  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[9]]: `${BANNER_WINTER}/gr.bbq.banner-loop.poster.webp`,
 };
 
 /** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */
@@ -295,11 +309,12 @@ export const IMAGES = {
     summer: `${BASE}/1920x1080/E8A838/ffffff?text=Лето+·+Вкрайности`,
     fall:   `${BASE}/1920x1080/C8622A/ffffff?text=Осень+·+Вкрайности`,
   },
+  /** Статичные постеры колонок баннера на стартовом экране (без видео-лупов). */
   seasonSection: {
-    winter: `${PUBLIC_ASSET_BASE}imagesraw/winter.png`,
-    spring: `${PUBLIC_ASSET_BASE}imagesraw/spring.png`,
-    summer: `${PUBLIC_ASSET_BASE}imagesraw/Summer.png`,
-    fall:   `${PUBLIC_ASSET_BASE}imagesraw/fall.png`,
+    winter: `${HOME_SEASON_BANNER_MEDIA_BASE.winter}/winter.png`,
+    spring: `${HOME_SEASON_BANNER_MEDIA_BASE.spring}/spring.png`,
+    summer: `${HOME_SEASON_BANNER_MEDIA_BASE.summer}/Summer.png`,
+    fall:   `${HOME_SEASON_BANNER_MEDIA_BASE.fall}/fall.png`,
   },
   team: {
     placeholder: `${BASE}/400x500/1A3C2E/C8A96E?text=Эксперт`,

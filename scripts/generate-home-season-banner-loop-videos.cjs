@@ -1,5 +1,6 @@
 /**
- * Нарезка лупов баннера (та же таблица, что в `generate-home-season-banner-loop-videos.ps1`).
+ * Нарезка лупов баннера зимы (та же таблица, что в `generate-home-season-banner-loop-videos.ps1`).
+ * Вход: `public/tours/{winter-*}/…grid.mp4`. Выход: `public/banners_winter/*.banner-loop.mp4`.
  * Использует `ffmpeg-static` из devDependencies — не требует ffmpeg в PATH.
  *
  *   node scripts/generate-home-season-banner-loop-videos.cjs
@@ -20,6 +21,7 @@ if (!ffmpegPath) {
 
 const repoRoot = path.resolve(__dirname, '..');
 const publicTours = path.join(repoRoot, 'public', 'tours');
+const bannerWinterOutDir = path.join(repoRoot, 'public', 'banners_winter');
 
 /** Синхронно с `HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC` в `src/constants/homeSeasonBannerAnimation.ts`. */
 const durationSec = 5;
@@ -50,10 +52,14 @@ function runFfmpeg(args) {
   if (r.status !== 0) process.exit(r.status ?? 1);
 }
 
+if (!dryRun) {
+  fs.mkdirSync(bannerWinterOutDir, { recursive: true });
+}
+
 for (const row of cuts) {
-  const dir = path.join(publicTours, row.subdir);
-  const inPath = path.join(dir, row.input);
-  const outPath = path.join(dir, row.output);
+  const sourceDir = path.join(publicTours, row.subdir);
+  const inPath = path.join(sourceDir, row.input);
+  const outPath = path.join(bannerWinterOutDir, row.output);
   if (!fs.existsSync(inPath)) {
     console.warn(`Skip missing input: ${inPath}`);
     continue;
@@ -88,7 +94,7 @@ for (const row of cuts) {
 
   if (posters) {
     const base = path.basename(row.output, '.mp4');
-    const posterPath = path.join(dir, `${base}.poster.webp`);
+    const posterPath = path.join(bannerWinterOutDir, `${base}.poster.webp`);
     runFfmpeg(['-y', '-i', outPath, '-vframes', '1', '-q:v', '80', posterPath]);
   }
 }

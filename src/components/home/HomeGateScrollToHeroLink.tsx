@@ -12,10 +12,7 @@ import { HOME_GATE_SCROLL_HERO_ICON_MASK_SRC } from '../../constants/homeGateScr
 import { ROUTES } from '../../constants/routes';
 import { useHomeGateScrollHintVisible } from '../../hooks/useHomeGateScrollHintVisible';
 import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
-import {
-  NAVBAR_SCROLL_OFFSET_PX,
-  scrollElementIntoViewAnchored,
-} from '../../constants/smoothScroll';
+import { scrollHomeHeroTopSmooth } from '../../constants/smoothScroll';
 import { UI } from '../../constants/ui';
 import { useSeason } from '../../context/useSeason';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
@@ -23,8 +20,8 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 const maskUrlCss = `url("${HOME_GATE_SCROLL_HERO_ICON_MASK_SRC}")`;
 
 /**
- * Якорь и скролл как у пунктов навбара: `Link` на `/#home-hero` + `ScrollToTopOnNavigate`;
- * при уже активном hash — тот же вызов, что в `ScrollToTopOnNavigate`: `scrollElementIntoViewAnchored` + `NAVBAR_SCROLL_OFFSET_PX`.
+ * Якорь и скролл совпадают с навигацией по секциям: `Link` на `/#home-hero` + `ScrollToTopOnNavigate`;
+ * при уже активном hash — `scrollHomeHeroTopSmooth(lenis)` (тот же оффет навбара, что в `smoothScroll`).
  *
  * Градиент сезона: те же `bg-home-season-banner-wordmark-*`, что у букв баннера, через `mask-image`
  * (у `<svg>` Font Awesome `background-clip: text` даёт пустую иконку в части браузеров).
@@ -55,10 +52,7 @@ export function HomeGateScrollToHeroLink() {
       if (location.pathname !== ROUTES.HOME) return;
       if (location.hash !== heroHash) return;
       event.preventDefault();
-      const el = document.getElementById(HOME_HERO_SECTION_ELEMENT_ID);
-      if (el) {
-        scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
-      }
+      scrollHomeHeroTopSmooth(lenis);
     },
     [heroHash, lenis, location.hash, location.pathname]
   );

@@ -6,11 +6,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
-import {
-  getViewportScrollY,
-  scrollHomeHeroTopImmediate,
-  scrollWindowToTopSmooth,
-} from '../../constants/smoothScroll';
+import { scrollHomeHeroTopImmediate, scrollHomeHeroTopSmooth } from '../../constants/smoothScroll';
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { SEASON_ICON, SEASON_STYLE, SEASON_TEXT_CLASS } from '../../constants/seasonNavbarAppearance';
 import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
@@ -38,6 +35,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const { activeSeason } = useSeason();
   const activeSeasonUi = UI.seasons[activeSeason];
   const { open: seasonMenuOpen, setOpen: setSeasonMenuOpen, toggle: toggleSeasonMenu } =
@@ -108,14 +106,11 @@ const Navbar = () => {
     const isPlainHome =
       location.pathname === ROUTES.HOME && location.search === '' && location.hash === '';
     if (!isPlainHome) return;
-    if (getViewportScrollY(lenis) > 80) {
-      event.preventDefault();
+    event.preventDefault();
+    if (prefersReducedMotion) {
       scrollHomeHeroTopImmediate(lenis);
-      return;
-    }
-    if (window.scrollY > 0) {
-      event.preventDefault();
-      scrollWindowToTopSmooth(lenis);
+    } else {
+      scrollHomeHeroTopSmooth(lenis);
     }
   };
 

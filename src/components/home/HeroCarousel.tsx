@@ -42,7 +42,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
           >
-            <div className="flex w-full max-w-2xl mx-auto justify-center px-4 pb-24">
+            <div className="flex w-full max-w-2xl mx-auto justify-center px-home-hero-carousel-text-gutter-x pb-24 md:px-4">
               <Link
                 to={buildTourDetailPath(tour.season, tour.id)}
                 className="text-center group flex flex-col items-center gap-hero-phrase-cta-gap"

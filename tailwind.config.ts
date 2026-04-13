@@ -648,6 +648,11 @@ const config: Config = {
         'tooltip-x':   '0.625rem',
         'tooltip-y':   '0.375rem',
         'hero-phrase-cta-gap': '2.5rem',
+        /**
+         * Home hero carousel: горизонтальный паддинг подписи/CTA на узких экранах.
+         * ≥ `left-4` + `w-12` кнопки навигации + небольшой зазор, чтобы текст не заходил под стрелки.
+         */
+        'home-hero-carousel-text-gutter-x': '4.5rem',
         /** Зазор между списком ссылок (`nav-desktop:flex`) и блоком SeasonSwitcher+CTA в Navbar. */
         'navbar-nav-to-season': 'clamp(1rem, 2vw, 2rem)',
         /** Смещение по Y для scroll-reveal (translateY). */

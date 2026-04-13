@@ -13,7 +13,8 @@ import { getViewportScrollY } from '../constants/smoothScroll';
  */
 export function useHomeGateScrollHintVisible(enabled: boolean): { visible: boolean } {
   const lenis = useLenis();
-  const [visible, setVisible] = useState(true);
+  /** Только от скролла; итог — `enabled && scrollBasedVisible` (без setState при `enabled === false`). */
+  const [scrollBasedVisible, setScrollBasedVisible] = useState(true);
 
   const readVisible = useCallback((): boolean => {
     if (!enabled) return false;
@@ -28,19 +29,18 @@ export function useHomeGateScrollHintVisible(enabled: boolean): { visible: boole
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = null;
       const next = readVisible();
-      setVisible((prev) => (prev === next ? prev : next));
+      setScrollBasedVisible((prev) => (prev === next ? prev : next));
     });
   }, [readVisible]);
 
   useLayoutEffect(() => {
     queueMicrotask(() => {
-      setVisible(readVisible());
+      setScrollBasedVisible(readVisible());
     });
   }, [readVisible]);
 
   useEffect(() => {
     if (!enabled) {
-      setVisible(false);
       return;
     }
 
@@ -71,5 +71,5 @@ export function useHomeGateScrollHintVisible(enabled: boolean): { visible: boole
     };
   }, [enabled, lenis, scheduleSync]);
 
-  return { visible };
+  return { visible: enabled && scrollBasedVisible };
 }

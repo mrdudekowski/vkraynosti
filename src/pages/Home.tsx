@@ -17,6 +17,7 @@ import {
   homeGateStageIntersectThresholds,
   homeGateStageVisibleHeightShare,
 } from '../constants/homeGateScroll';
+import { getHomeSeasonBannerWinterVideoPreloadLinks } from '../constants/homeSeasonBannerVideoPreload';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { getToursBySeason } from '../data/toursData';
@@ -81,6 +82,11 @@ const Home = () => {
     return () => obs.disconnect();
   }, [homeGateScrollEnabled]);
 
+  const winterBannerVideoPreloads = useMemo(
+    () => (activeSeason === 'winter' ? getHomeSeasonBannerWinterVideoPreloadLinks() : undefined),
+    [activeSeason]
+  );
+
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
   return (
     <>
@@ -90,6 +96,7 @@ const Home = () => {
         imageUrl={IMAGES.hero[activeSeason]}
         path={ROUTES.HOME}
         preloadHeroImageUrl={tours[0]?.imageUrl}
+        priorityVideoPreloads={winterBannerVideoPreloads}
       />
 
       <div className="relative isolate flex w-full min-w-0 max-w-full flex-col">

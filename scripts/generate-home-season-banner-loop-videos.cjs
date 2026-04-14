@@ -2,6 +2,7 @@
  * Нарезка лупов баннера зимы (та же таблица, что в `generate-home-season-banner-loop-videos.ps1`).
  * Вход: `public/tours/{winter-*}/…grid.mp4`. Выход: `public/banners_winter/*.banner-loop.mp4`.
  * Использует `ffmpeg-static` из devDependencies — не требует ffmpeg в PATH.
+ * Кодирование: H.264 CRF 30, max ширина 800px (`scale`), `+faststart` — синхронно с `.ps1`.
  *
  *   node scripts/generate-home-season-banner-loop-videos.cjs
  *   node scripts/generate-home-season-banner-loop-videos.cjs --posters
@@ -80,9 +81,9 @@ for (const row of cuts) {
     '-pix_fmt',
     'yuv420p',
     '-crf',
-    '28',
+    '30',
     '-vf',
-    "scale='min(854,iw)':-2",
+    "scale='min(800,iw)':-2",
     '-an',
     '-movflags',
     '+faststart',

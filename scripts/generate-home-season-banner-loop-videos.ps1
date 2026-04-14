@@ -49,8 +49,8 @@ foreach ($row in $Cuts) {
     '-y', '-i', $inPath,
     '-ss', ([string]$row.StartSec).Replace(',', '.'),
     '-t', ([string]$DurationSec).Replace(',', '.'),
-    '-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-crf', '28',
-    '-vf', "scale='min(854,iw)':-2",
+    '-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-crf', '30',
+    '-vf', "scale='min(800,iw)':-2",
     '-an', '-movflags', '+faststart',
     $outPath
   )

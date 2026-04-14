@@ -27,6 +27,10 @@ import { HOME_HERO_CEILING_BOUNCE_DURATION_MS } from './src/constants/homeHeroCe
 import { HOME_NAVBAR_CHROME_TRANSITION_MS } from './src/constants/homeNavbarChrome'
 import { HOME_GATE_SCROLL_HINT_FADE_MS } from './src/constants/homeGateScroll'
 import { HOME_GATE_START_SCREEN_HEX } from './src/constants/homeGateSurface'
+import {
+  MODAL_CHUNK_LOADER_DURATION_MS,
+  MODAL_CHUNK_LOADER_STAGGER_MS,
+} from './src/constants/modalLazyChunkLoaderAnimation'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -57,6 +61,10 @@ const HOME_HERO_CEILING_BOUNCE_DURATION = `${HOME_HERO_CEILING_BOUNCE_DURATION_M
 
 /** Покачивание стрелки «к hero» на стартовом экране; синхронно с `animation.home-gate-scroll-hint-bob`. */
 const HOME_GATE_SCROLL_HINT_BOB_DURATION = '2000ms' as const
+
+/** Лоадер ленивой модалки (`ModalLazyChunkFallback`); синхронно с `modalLazyChunkLoaderAnimation.ts`. */
+const MODAL_CHUNK_LOADER_DURATION = `${MODAL_CHUNK_LOADER_DURATION_MS}ms` as const
+const MODAL_CHUNK_LOADER_STAGGER = `${MODAL_CHUNK_LOADER_STAGGER_MS}ms` as const
 
 /** CTA: зелёный sweep поверх апельсинового `cta.fill` (согласовано с `.btn-cta-tour`). */
 const CTA_SWEEP_DURATION = '400ms' as const
@@ -724,8 +732,6 @@ const config: Config = {
         'photo-viewer': 'min(90dvh, 90vh)',
         /** Тело модалок с прокруткой (`TourRequestModal`, `TeamMemberModal`). */
         'modal-body': 'min(90dvh, 90vh)',
-        /** Плейсхолдер пока грузится ленивый чанк модалки (`ModalLazyChunkFallback`). */
-        'modal-lazy-placeholder': '5rem',
       },
       minWidth: {
         /** Минимальная сторона круглой кнопки «к hero» на воротах (~44px hit area). */
@@ -1049,6 +1055,15 @@ const config: Config = {
           },
           '100%': { transform: 'translate3d(0, 0, 0)' },
         },
+        /**
+         * Плейсхолдер ленивой модалки: два круга у нижней кромки контейнера (`ModalLazyChunkFallback`).
+         * Размеры: оболочка `spacing.21` (84px), круги `h-16 w-16` (64px).
+         */
+        'modal-chunk-loader-bubble': {
+          '0%': { transform: 'translate(-50%, -100%) scale(0)' },
+          '50%': { transform: 'translate(-50%, 0%) scale(1)' },
+          '100%': { transform: 'translate(-50%, -100%) scale(0)' },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -1069,11 +1084,14 @@ const config: Config = {
         'home-season-banner-wordmark-shimmer': `home-season-banner-wordmark-shimmer ${HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS}ms ease-in-out infinite alternate`,
         'home-hero-ceiling-bounce': `home-hero-ceiling-bounce ${HOME_HERO_CEILING_BOUNCE_DURATION} cubic-bezier(0.45, 0, 0.25, 1) forwards`,
         'home-gate-scroll-hint-bob': `home-gate-scroll-hint-bob ${HOME_GATE_SCROLL_HINT_BOB_DURATION} ease-in-out infinite`,
+        'modal-chunk-loader-bubble': `modal-chunk-loader-bubble ${MODAL_CHUNK_LOADER_DURATION} linear infinite`,
       },
       transitionDelay: {
         'tour-meta-0': '0ms',
         'tour-meta-1': '80ms',
         'tour-meta-2': '160ms',
+        /** Второй круг лоадера ленивой модалки (`ModalLazyChunkFallback`). */
+        'modal-chunk-stagger': MODAL_CHUNK_LOADER_STAGGER,
       },
       screens: {
         /**

@@ -1,10 +1,11 @@
 import { HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS } from './images';
 
 /**
- * Сколько первых лупов в очереди `<link rel="preload" as="video">` получают `fetchPriority="high"`.
- * Остальные — `low`, чтобы не конкурировать друг с другом и с первым кадром hero.
+ * Сколько лупов отдаём в `<head>` как `rel="preload" as="video"`.
+ * Десять параллельных preloads перегружают лимит соединений к origin (~6) — очередь и 5–8 с до первого кадра.
+ * Остальные колонки подтягиваются при hover из HTTP-кэша после первого запроса.
  */
-export const HOME_SEASON_BANNER_WINTER_VIDEO_PRELOAD_HIGH_PRIORITY_COUNT = 4 as const;
+export const HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT = 3 as const;
 
 export interface HomeSeasonBannerWinterVideoPreloadLink {
   href: string;
@@ -12,12 +13,10 @@ export interface HomeSeasonBannerWinterVideoPreloadLink {
 }
 
 /**
- * Порядок совпадает с колонками 0…9 баннера (`HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS`).
+ * Только первые N лупов (левые колонки вордмарка), все с `fetchPriority="high"`.
  */
 export function getHomeSeasonBannerWinterVideoPreloadLinks(): readonly HomeSeasonBannerWinterVideoPreloadLink[] {
-  return HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS.map((href, i) => ({
-    href,
-    fetchPriority:
-      i < HOME_SEASON_BANNER_WINTER_VIDEO_PRELOAD_HIGH_PRIORITY_COUNT ? ('high' as const) : ('low' as const),
-  }));
+  return HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT).map(
+    (href) => ({ href, fetchPriority: 'high' as const })
+  );
 }

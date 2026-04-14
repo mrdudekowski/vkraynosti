@@ -28,7 +28,8 @@ interface HomeSeasonBannerProps {
 }
 
 /**
- * Не вешаем `src` на все 10 `<video>` сразу: иначе десять параллельных буферизаций; лупы в `public/banners_winter/` + ранний `<link rel="preload" as="video">` на главной (зима).
+ * Не вешаем `src` на все 10 `<video>` сразу: иначе десять параллельных буферизаций.
+ * В `<head>` — только первые N лупов (`homeSeasonBannerVideoPreload.ts`); после первого hover колонку не размонтируем — иначе сброс буфера и долгий повторный fetch.
  * Грузим: hover по колонке (статичный баннер: видео или постер), активная цепочка, следующая в hold, колонка 0 перед новым циклом слова.
  * При `timelineStatic` — только hover, без фоновой подгрузки колонки 0.
  */
@@ -84,11 +85,20 @@ const BannerColumnVideo = ({ clip, playing, preloadHint }: BannerColumnVideoProp
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (playing) {
-      void v.play().catch(() => {});
-    } else {
+    if (!playing) {
       v.pause();
+      return;
     }
+    const tryPlay = () => {
+      void v.play().catch(() => {});
+    };
+    if (v.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      tryPlay();
+      return;
+    }
+    tryPlay();
+    v.addEventListener('canplay', tryPlay, { once: true });
+    return () => v.removeEventListener('canplay', tryPlay);
   }, [playing]);
 
   useEffect(() => {
@@ -107,7 +117,9 @@ const BannerColumnVideo = ({ clip, playing, preloadHint }: BannerColumnVideoProp
     const v = ref.current;
     if (!v || !clip.videoSrc) return;
     const onMeta = () => {
-      v.currentTime = clip.startSec;
+      if (clip.startSec > 0 || Math.abs(v.currentTime - clip.startSec) > 0.05) {
+        v.currentTime = clip.startSec;
+      }
     };
     v.addEventListener('loadedmetadata', onMeta);
     if (v.readyState >= 1) {
@@ -320,6 +332,8 @@ const HomeSeasonBannerColumn = ({
   letterHoverVideoEnabled,
 }: HomeSeasonBannerColumnProps) => {
   const [columnHovered, setColumnHovered] = useState(false);
+  /** Статичный hover-режим: после первого наведения не снимаем `<video>`, чтобы не сбрасывать буфер (иначе 5–8 с при каждом входе). */
+  const [videoPrimedForColumn, setVideoPrimedForColumn] = useState(false);
 
   const media = getColumnMediaVisual(
     columnIndex,
@@ -343,7 +357,7 @@ const HomeSeasonBannerColumn = ({
     (!systemPrefersReducedMotion && inVideoChain) ||
     (hoverVideoReveal && !systemPrefersReducedMotion);
 
-  const shouldLoadVideo = shouldLoadHomeSeasonBannerColumnVideo(
+  const baseShouldLoadVideo = shouldLoadHomeSeasonBannerColumnVideo(
     clip,
     systemPrefersReducedMotion,
     wordOverlay,
@@ -354,7 +368,13 @@ const HomeSeasonBannerColumn = ({
     hoverVideoReveal,
     timelineStatic
   );
-  const videoPreloadHint = playing ? ('auto' as const) : ('metadata' as const);
+  const keepMountedAfterFirstHover =
+    timelineStatic && letterHoverVideoEnabled && Boolean(clip.videoSrc) && videoPrimedForColumn;
+  const shouldLoadVideo = baseShouldLoadVideo || keepMountedAfterFirstHover;
+  const holdBufferWhilePrimed =
+    timelineStatic && letterHoverVideoEnabled && Boolean(clip.videoSrc) && videoPrimedForColumn;
+  const videoPreloadHint =
+    playing || holdBufferWhilePrimed ? ('auto' as const) : ('metadata' as const);
 
   const letterOpacity = wordLetterOpacityClass(
     wordOverlay,
@@ -424,7 +444,12 @@ const HomeSeasonBannerColumn = ({
         letterHoverVideoEnabled ? 'pointer-events-auto' : ''
       }`}
       onMouseEnter={() => {
-        if (letterHoverVideoEnabled) setColumnHovered(true);
+        if (letterHoverVideoEnabled) {
+          setColumnHovered(true);
+          if (clip.videoSrc) {
+            setVideoPrimedForColumn(true);
+          }
+        }
       }}
       onMouseLeave={() => {
         if (letterHoverVideoEnabled) setColumnHovered(false);
@@ -450,7 +475,7 @@ const HomeSeasonBannerColumn = ({
               src={clip.posterSrc}
               alt=""
               className="pointer-events-none h-full min-h-0 w-full object-cover"
-              loading="lazy"
+              loading={clip.videoSrc ? 'eager' : 'lazy'}
               decoding="async"
             />
           )}

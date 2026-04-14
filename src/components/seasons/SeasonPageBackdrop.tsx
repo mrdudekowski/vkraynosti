@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Season } from '../../types';
 import {
   SEASON_PAGE_ATMOSPHERE_BG_CLASS,
@@ -10,7 +11,7 @@ interface SeasonPageBackdropProps {
   className?: string;
 }
 
-const SeasonPageBackdrop = ({
+const SeasonPageBackdropComponent = ({
   season,
   className = 'absolute inset-0 -z-10 overflow-hidden',
 }: SeasonPageBackdropProps) => (
@@ -21,5 +22,7 @@ const SeasonPageBackdrop = ({
     />
   </div>
 );
+
+const SeasonPageBackdrop = memo(SeasonPageBackdropComponent);
 
 export default SeasonPageBackdrop;

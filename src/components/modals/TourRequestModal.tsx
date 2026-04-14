@@ -2,8 +2,10 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWhatsapp, faTelegram } from '@fortawesome/free-brands-svg-icons';
-import { faTimes, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faTelegram } from '@fortawesome/free-brands-svg-icons/faTelegram';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons/faWhatsapp';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner';
+import { faTimes } from '@fortawesome/free-solid-svg-icons/faTimes';
 import type { TourRequestModalPayload } from '../../types';
 import { useModal } from '../../context/useModal';
 import { UI } from '../../constants/ui';
@@ -108,7 +110,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
     >
       <div
         ref={panelRef}
-        className="relative bg-white rounded-modal max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl animate-scale-in flex flex-col"
+        className="relative bg-white rounded-modal max-w-lg w-full max-h-modal-body overflow-y-auto shadow-xl animate-scale-in flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tour-request-title"

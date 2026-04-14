@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 import {
   HOME_SEASON_BANNER_WORDMARK_GRADIENT_BG_CLASS,
@@ -463,7 +463,7 @@ const HomeSeasonBannerColumn = ({
 /**
  * Десять колонок: по умолчанию crossfade видео и слово «Вкрайности»; при `staticPresentation` — только слово.
  */
-const HomeSeasonBanner = ({
+const HomeSeasonBannerComponent = ({
   season,
   sequenceActive = false,
   sequenceResetKey = '',
@@ -527,5 +527,7 @@ const HomeSeasonBanner = ({
     </section>
   );
 };
+
+const HomeSeasonBanner = memo(HomeSeasonBannerComponent);
 
 export default HomeSeasonBanner;

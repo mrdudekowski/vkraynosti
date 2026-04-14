@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShieldHalved } from '@fortawesome/free-solid-svg-icons';
+import { faShieldHalved } from '@fortawesome/free-solid-svg-icons/faShieldHalved';
 import { SAFETY_ITEMS } from '../../data/safetyData';
 import { SAFETY_ICON_MAP } from '../../constants/safetyIcons';
 import { HOME_SAFETY_SECTION_HERO_IMAGE } from '../../constants/images';

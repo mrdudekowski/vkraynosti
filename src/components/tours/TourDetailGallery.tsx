@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import PlaceholderImage from '../shared/PlaceholderImage';
 import GalleryGridVideo from './GalleryGridVideo';
 import {
@@ -37,7 +37,7 @@ export interface TourDetailGalleryProps {
 const openAriaForHumanNumber = (humanNumber: string) =>
   UI.tourDetail.galleryPhoto.openPhotoAria.replace('{n}', humanNumber);
 
-const TourDetailGallery = ({
+const TourDetailGalleryComponent = ({
   images,
   firstImageIndexInTourGallery,
   tourTitle,
@@ -444,5 +444,7 @@ const TourDetailGallery = ({
     </div>
   );
 };
+
+const TourDetailGallery = memo(TourDetailGalleryComponent);
 
 export default TourDetailGallery;

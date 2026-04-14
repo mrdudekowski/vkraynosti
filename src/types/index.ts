@@ -5,7 +5,7 @@ export interface TourProgramStep {
   description: string;
 }
 
-/** Пункт блока «Что включено»: текст и иконка Font Awesome (`@fortawesome/free-solid-svg-icons`). */
+/** Пункт блока «Что включено»: текст и иконка Font Awesome (импорт иконок с `@fortawesome/free-solid-svg-icons/fa…`). */
 export interface TourIncludedItem {
   text: string;
   icon: IconDefinition;

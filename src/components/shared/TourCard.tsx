@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { KeyboardEvent } from 'react';
 import type { Tour } from '../../types';
@@ -88,7 +89,7 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   );
 };
 
-const TourCard = ({ tour, onClick, compact = false, priorityImage = false }: TourCardProps) => {
+const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = false }: TourCardProps) => {
   if (!onClick) {
     return (
       <Link
@@ -120,5 +121,7 @@ const TourCard = ({ tour, onClick, compact = false, priorityImage = false }: Tou
     </div>
   );
 };
+
+const TourCard = memo(TourCardComponent);
 
 export default TourCard;

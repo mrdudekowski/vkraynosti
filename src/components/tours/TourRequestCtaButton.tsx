@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
 import { UI } from "../../constants/ui";
 
 type TourRequestCtaButtonProps = {

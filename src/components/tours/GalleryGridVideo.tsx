@@ -70,7 +70,7 @@ const GalleryGridVideo = ({
           decoding="async"
         />
       ) : (
-        <div className="h-full min-h-[4rem] w-full bg-surface-light" />
+        <div className="h-full min-h-gallery-grid-video w-full bg-surface-light" />
       )}
     </div>
   );

@@ -1,18 +1,16 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import {
-  faBed,
-  faChalkboardTeacher,
-  faCheck,
-  faDog,
-  faHelmetSafety,
-  faHotTubPerson,
-  faMugHot,
-  faPersonHiking,
-  faShuttleVan,
-  faSocks,
-  faSnowboarding,
-  faUserTie,
-} from '@fortawesome/free-solid-svg-icons';
+import { faBed } from '@fortawesome/free-solid-svg-icons/faBed';
+import { faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons/faChalkboardTeacher';
+import { faCheck } from '@fortawesome/free-solid-svg-icons/faCheck';
+import { faDog } from '@fortawesome/free-solid-svg-icons/faDog';
+import { faHelmetSafety } from '@fortawesome/free-solid-svg-icons/faHelmetSafety';
+import { faHotTubPerson } from '@fortawesome/free-solid-svg-icons/faHotTubPerson';
+import { faMugHot } from '@fortawesome/free-solid-svg-icons/faMugHot';
+import { faPersonHiking } from '@fortawesome/free-solid-svg-icons/faPersonHiking';
+import { faShuttleVan } from '@fortawesome/free-solid-svg-icons/faShuttleVan';
+import { faSocks } from '@fortawesome/free-solid-svg-icons/faSocks';
+import { faSnowboarding } from '@fortawesome/free-solid-svg-icons/faSnowboarding';
+import { faUserTie } from '@fortawesome/free-solid-svg-icons/faUserTie';
 import type { Tour, TourIncludedItem } from '../types';
 import {
   IMAGES,

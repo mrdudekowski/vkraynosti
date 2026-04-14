@@ -1,7 +1,8 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock, faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
+import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons/faCircleQuestion';
+import { faClock } from '@fortawesome/free-solid-svg-icons/faClock';
 import { getTourById } from "../data/toursData";
 import {
   ROUTES,
@@ -21,7 +22,9 @@ import {
 } from "../utils/tourGalleryUrls";
 import PageMeta from "../components/shared/PageMeta";
 import TourDetailHero from "../components/tours/TourDetailHero";
-import TourDetailGallery from "../components/tours/TourDetailGallery";
+import TourDetailGallery, {
+  type TourGalleryLayoutVariant,
+} from "../components/tours/TourDetailGallery";
 import TourPhotoViewer from "../components/tours/TourPhotoViewer";
 import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
 import TourDetailSectionHeading from "../components/tours/TourDetailSectionHeading";
@@ -61,18 +64,50 @@ const TourDetailPage = () => {
     tourTitle: string;
   } | null>(null);
 
-  const viewerGalleryUrls = tour == null ? [] : getTourGalleryViewerUrls(tour);
-  const gridGalleryUrls = tour == null ? [] : getTourGalleryGridUrls(tour);
+  const viewerGalleryUrls = useMemo(
+    () => (tour == null ? [] : getTourGalleryViewerUrls(tour)),
+    [tour]
+  );
+  const gridGalleryUrls = useMemo(
+    () => (tour == null ? [] : getTourGalleryGridUrls(tour)),
+    [tour]
+  );
 
   /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе второй кадр viewer-галереи. */
-  const prefaceBackgroundUrl =
-    tour == null
-      ? null
-      : (tour.prefaceBackgroundImageUrl ??
-        (viewerGalleryUrls.length > 1 ? viewerGalleryUrls[1] : null));
-  const galleryGridImages =
-    tour && gridGalleryUrls.length > 2 ? gridGalleryUrls.slice(2) : [];
+  const prefaceBackgroundUrl = useMemo(() => {
+    if (tour == null) return null;
+    return (
+      tour.prefaceBackgroundImageUrl ??
+      (viewerGalleryUrls.length > 1 ? viewerGalleryUrls[1] : null)
+    );
+  }, [tour, viewerGalleryUrls]);
+
+  const galleryGridImages = useMemo(() => {
+    if (!tour || gridGalleryUrls.length <= 2) return [];
+    return gridGalleryUrls.slice(2);
+  }, [tour, gridGalleryUrls]);
+
   const galleryFirstIndexInFullTour = 2;
+
+  const getVideoPosterForGridSrc = useMemo(():
+    | ((src: string) => string | undefined)
+    | undefined => {
+    if (!tour) return undefined;
+    if (tour.id === "winter-3")
+      return (src) => TOUR_WINTER_3_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "winter-4")
+      return (src) => TOUR_WINTER_4_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "winter-5")
+      return (src) => TOUR_WINTER_5_GRID_VIDEO_POSTERS[src];
+    return undefined;
+  }, [tour]);
+
+  const galleryLayoutVariant = useMemo((): TourGalleryLayoutVariant => {
+    if (!tour) return "default";
+    if (tour.id === "winter-1") return "izubrinaya";
+    if (tour.id === "winter-5") return "arsgora";
+    return "default";
+  }, [tour]);
 
   const handleOpenTourRequest = useCallback(() => {
     if (!tour) return;
@@ -83,6 +118,22 @@ const TourDetailPage = () => {
       season: tour.season,
     });
   }, [tour, openTourRequestModal]);
+
+  const handleOpenGalleryPhoto = useCallback(
+    (idx: number) => {
+      if (!tour) return;
+      setPhotoViewer({
+        images: viewerGalleryUrls,
+        initialIndex: idx,
+        tourTitle: tour.title,
+      });
+    },
+    [tour, viewerGalleryUrls]
+  );
+
+  const closePhotoViewer = useCallback(() => {
+    setPhotoViewer(null);
+  }, []);
 
   if (!tour) {
     const notFoundBody = UI.tourDetail.notFoundWithId.replace("{id}", tourId);
@@ -169,7 +220,7 @@ const TourDetailPage = () => {
           images={photoViewer.images}
           initialIndex={photoViewer.initialIndex}
           tourTitle={photoViewer.tourTitle}
-          onClose={() => setPhotoViewer(null)}
+          onClose={closePhotoViewer}
         />
       )}
 
@@ -260,30 +311,10 @@ const TourDetailPage = () => {
                     images={galleryGridImages}
                     firstImageIndexInTourGallery={galleryFirstIndexInFullTour}
                     tourTitle={tour.title}
-                    onOpenPhoto={(idx) =>
-                      setPhotoViewer({
-                        images: getTourGalleryViewerUrls(tour),
-                        initialIndex: idx,
-                        tourTitle: tour.title,
-                      })
-                    }
+                    onOpenPhoto={handleOpenGalleryPhoto}
                     prefersReducedMotion={prefersReducedMotion}
-                    getVideoPosterForGridSrc={
-                      tour.id === "winter-3"
-                        ? (src) => TOUR_WINTER_3_GRID_VIDEO_POSTERS[src]
-                        : tour.id === "winter-4"
-                          ? (src) => TOUR_WINTER_4_GRID_VIDEO_POSTERS[src]
-                          : tour.id === "winter-5"
-                            ? (src) => TOUR_WINTER_5_GRID_VIDEO_POSTERS[src]
-                            : undefined
-                    }
-                    layoutVariant={
-                      tour.id === "winter-1"
-                        ? "izubrinaya"
-                        : tour.id === "winter-5"
-                          ? "arsgora"
-                          : "default"
-                    }
+                    getVideoPosterForGridSrc={getVideoPosterForGridSrc}
+                    layoutVariant={galleryLayoutVariant}
                   />
                 </div>
               )}

@@ -1,11 +1,9 @@
-import {
-  faShieldHalved,
-  faMap,
-  faKitMedical,
-  faCloudSun,
-  faSatelliteDish,
-  faHelicopter,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCloudSun } from '@fortawesome/free-solid-svg-icons/faCloudSun';
+import { faHelicopter } from '@fortawesome/free-solid-svg-icons/faHelicopter';
+import { faKitMedical } from '@fortawesome/free-solid-svg-icons/faKitMedical';
+import { faMap } from '@fortawesome/free-solid-svg-icons/faMap';
+import { faSatelliteDish } from '@fortawesome/free-solid-svg-icons/faSatelliteDish';
+import { faShieldHalved } from '@fortawesome/free-solid-svg-icons/faShieldHalved';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 export const SAFETY_ICON_MAP: Record<string, IconDefinition> = {

@@ -19,7 +19,13 @@ export default defineConfig({
           if (!id.includes('node_modules')) return;
           if (id.includes('react-dom')) return 'vendor-react-dom';
           if (id.includes('react-router')) return 'vendor-router';
-          if (id.includes('@fortawesome')) return 'vendor-icons';
+          /**
+           * Font Awesome: три слоя — бренды (часто только футер/контакты/модалка), solid (данные туров, UI),
+           * `@fortawesome/react-fontawesome` + `fontawesome-svg-core`. Параллельная загрузка и точечный кеш.
+           */
+          if (id.includes('@fortawesome/free-brands-svg-icons')) return 'vendor-fa-brands';
+          if (id.includes('@fortawesome/free-solid-svg-icons')) return 'vendor-fa-solid';
+          if (id.includes('@fortawesome')) return 'vendor-fa-core';
           if (id.includes('node_modules/react/')) return 'vendor-react';
         },
       },

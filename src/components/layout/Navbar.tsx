@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { UI } from '../../constants/ui';
@@ -152,7 +152,7 @@ const Navbar = () => {
         ) : null}
         <div
           aria-hidden
-          className={`pointer-events-none absolute inset-0 z-[1] ${navChromeSurfaceClass} ${navSurfaceOpacityTransition}`}
+          className={`pointer-events-none absolute inset-0 z-stack-base ${navChromeSurfaceClass} ${navSurfaceOpacityTransition}`}
           style={{ opacity: homeChrome.topChromeSurfaceOpacity }}
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -299,7 +299,7 @@ const Navbar = () => {
                 className={[
                   `nav-desktop:hidden fixed right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10 ${mobileOverlayTop}`,
                   'bg-surface-dark/95 py-4 pl-5 pr-4 shadow-xl backdrop-blur-sm mobile-nav-panel',
-                  'w-[min(100vw,theme(maxWidth.sm))] transform transition-transform duration-mobile-nav ease-out',
+                  'w-mobile-nav-drawer transform transition-transform duration-mobile-nav ease-out',
                   panelEnter ? 'translate-x-0' : 'translate-x-full',
                 ].join(' ')}
                 role="dialog"

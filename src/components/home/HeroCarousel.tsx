@@ -1,7 +1,8 @@
-import { forwardRef, useCallback, useRef, type MutableRefObject, type Ref } from 'react';
+import { forwardRef, memo, useCallback, useRef, type MutableRefObject, type Ref } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
 import { useCarousel } from '../../hooks/useCarousel';
 import { useScrollScrubFade } from '../../hooks/useScrollScrubFade';
 import CarouselSlide from '../shared/CarouselSlide';
@@ -94,7 +95,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
   );
 }
 
-const HeroCarousel = forwardRef<HTMLElement>(function HeroCarousel(_props, ref) {
+const HeroCarouselInner = forwardRef<HTMLElement>(function HeroCarousel(_props, ref) {
   const { activeSeason } = useSeason();
   const sectionRef = useRef<HTMLElement | null>(null);
   const { ref: heroContentFadeRef } = useScrollScrubFade();
@@ -124,5 +125,7 @@ const HeroCarousel = forwardRef<HTMLElement>(function HeroCarousel(_props, ref) 
     </section>
   );
 });
+
+const HeroCarousel = memo(HeroCarouselInner);
 
 export default HeroCarousel;

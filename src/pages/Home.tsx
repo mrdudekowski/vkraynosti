@@ -1,12 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { HomeGateBannerShell } from '../components/home/HomeGateBannerShell';
 import { HomeGateScrollToHeroLink } from '../components/home/HomeGateScrollToHeroLink';
 import HeroCarousel from '../components/home/HeroCarousel';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
-import TeamCarousel from '../components/home/TeamCarousel';
-import SafetySection from '../components/home/SafetySection';
-import ContactSection from '../components/home/ContactSection';
+import HomeBelowFoldSuspenseFallback from '../components/home/HomeBelowFoldSuspenseFallback';
 import PageMeta from '../components/shared/PageMeta';
 import RevealBox from '../components/shared/RevealBox';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
@@ -27,10 +25,14 @@ import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seaso
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
 import { useHomeSkyParallax } from '../hooks/useHomeSkyParallax';
 
+const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
+const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
+const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
+
 const Home = () => {
   const location = useLocation();
   const { activeSeason } = useSeason();
-  const tours = getToursBySeason(activeSeason);
+  const tours = useMemo(() => getToursBySeason(activeSeason), [activeSeason]);
   const gateIntersectRef = useRef<HTMLDivElement | null>(null);
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const [gateStageFocused, setGateStageFocused] = useState(false);
@@ -155,17 +157,19 @@ const Home = () => {
             </ScrollScrubFade>
           </section>
 
-          <ScrollScrubFade className="relative w-full">
-            <SafetySection />
-          </ScrollScrubFade>
+          <Suspense fallback={<HomeBelowFoldSuspenseFallback />}>
+            <ScrollScrubFade className="relative w-full">
+              <SafetySectionLazy />
+            </ScrollScrubFade>
 
-          <ScrollScrubFade className="relative w-full">
-            <TeamCarousel />
-          </ScrollScrubFade>
+            <ScrollScrubFade className="relative w-full">
+              <TeamCarouselLazy />
+            </ScrollScrubFade>
 
-          <ScrollScrubFade className="relative w-full">
-            <ContactSection />
-          </ScrollScrubFade>
+            <ScrollScrubFade className="relative w-full">
+              <ContactSectionLazy />
+            </ScrollScrubFade>
+          </Suspense>
         </div>
       </div>
     </>

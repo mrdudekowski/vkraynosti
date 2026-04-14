@@ -1,5 +1,8 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faSnowflake, faSeedling, faSun, faLeaf } from '@fortawesome/free-solid-svg-icons';
+import { faLeaf } from '@fortawesome/free-solid-svg-icons/faLeaf';
+import { faSeedling } from '@fortawesome/free-solid-svg-icons/faSeedling';
+import { faSnowflake } from '@fortawesome/free-solid-svg-icons/faSnowflake';
+import { faSun } from '@fortawesome/free-solid-svg-icons/faSun';
 import type { Season } from '../types';
 
 /**

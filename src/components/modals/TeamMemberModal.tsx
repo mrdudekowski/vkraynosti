@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck } from '@fortawesome/free-solid-svg-icons/faCheck';
+import { faTimes } from '@fortawesome/free-solid-svg-icons/faTimes';
 import type { TeamMember } from '../../types';
 import { useModal } from '../../context/useModal';
 import { UI } from '../../constants/ui';
@@ -39,7 +40,7 @@ const TeamMemberModal = ({ member }: TeamMemberModalProps) => {
       >
         <div
           ref={panelRef}
-          className="bg-white rounded-modal max-w-lg w-full animate-scale-in overflow-hidden max-h-[90vh] flex flex-col"
+          className="bg-white rounded-modal max-w-lg w-full animate-scale-in overflow-hidden max-h-modal-body flex flex-col"
         >
           <div className="relative h-64 shrink-0">
             <PlaceholderImage src={member.imageUrl} alt={member.name} className="w-full h-full" />

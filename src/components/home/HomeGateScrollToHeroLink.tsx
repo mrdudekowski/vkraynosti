@@ -2,7 +2,7 @@ import { useCallback, type CSSProperties, type MouseEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesDown } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesDown } from '@fortawesome/free-solid-svg-icons/faAnglesDown';
 
 import {
   HOME_SEASON_BANNER_WORDMARK_GRADIENT_BG_CLASS,

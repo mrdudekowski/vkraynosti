@@ -1,5 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMountain, faRoute, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faMountain } from '@fortawesome/free-solid-svg-icons/faMountain';
+import { faRoute } from '@fortawesome/free-solid-svg-icons/faRoute';
+import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers';
 import { UI } from "../../constants/ui";
 import type { Tour } from "../../types";
 

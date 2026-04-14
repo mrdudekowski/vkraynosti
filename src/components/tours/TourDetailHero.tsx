@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons/faArrowLeft';
 import PlaceholderImage from '../shared/PlaceholderImage';
 
 interface TourDetailHeroProps {
@@ -18,7 +19,7 @@ interface TourDetailHeroProps {
   openPhotoAriaLabel?: string;
 }
 
-const TourDetailHero = ({
+const TourDetailHeroComponent = ({
   imageUrl,
   imageAlt,
   title,
@@ -67,5 +68,7 @@ const TourDetailHero = ({
     </div>
   </div>
 );
+
+const TourDetailHero = memo(TourDetailHeroComponent);
 
 export default TourDetailHero;

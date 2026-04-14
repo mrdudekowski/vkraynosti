@@ -1,7 +1,8 @@
 import { forwardRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone } from '@fortawesome/free-solid-svg-icons';
-import { faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
+import { faPhone } from '@fortawesome/free-solid-svg-icons/faPhone';
+import { faTelegram } from '@fortawesome/free-brands-svg-icons/faTelegram';
+import { faVk } from '@fortawesome/free-brands-svg-icons/faVk';
 import { VKRAI_FOREST_LOGO } from '../../constants/images';
 import RevealBox from '../shared/RevealBox';
 import ScrollScrubFade from '../shared/ScrollScrubFade';

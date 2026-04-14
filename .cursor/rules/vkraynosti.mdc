@@ -8,7 +8,7 @@ alwaysApply: true
 
 ## Architecture
 - SPA with React + TypeScript + Vite + Tailwind CSS v3
-- React Router v6 for routing
+- React Router v7 for routing
 - All pages live in src/pages/, all components in src/components/
 - Global state via React Context only (no Redux)
 - Data layer: src/data/*.ts — all tour/team/safety data as typed constants
@@ -44,8 +44,8 @@ alwaysApply: true
 After each phase, verify: TypeScript compiles, no console errors, routing works, no hardcoded values remain.
 
 ## Tech Notes
-- React 18: Use functional components with hooks; Context + useReducer for state; createPortal for modals
-- React Router v6: createBrowserRouter with nested routes and Layout outlet; useParams for dynamic segments
+- React 19: Use functional components with hooks; Context + useReducer for state; createPortal for modals
+- React Router v7: createBrowserRouter with nested routes and Layout outlet; useParams for dynamic segments
 - Tailwind CSS v3: All custom tokens in theme.extend; use @layer components for reusable classes; content paths must include ./src/**/*.{ts,tsx}
 - FontAwesome React: Install @fortawesome/react-fontawesome + icon packs; import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; use library.add() or direct icon imports
 - Vite: Fast HMR dev server; env vars via import.meta.env; build output to dist/

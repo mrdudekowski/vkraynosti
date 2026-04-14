@@ -1,19 +1,27 @@
-import { useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 import { ReactLenis, useLenis } from 'lenis/react';
-import { useAnimationFrame } from 'motion/react';
 import 'lenis/dist/lenis.css';
 import { getLenisRootOptions, SMOOTH_SCROLL_ENABLED } from '../../constants/smoothScroll';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 /**
- * Единый такт: Motion `useAnimationFrame` вызывает `lenis.raf(time)` — без отдельного RAF-цикла в фичах.
+ * Один RAF-цикл: каждый кадр `lenis.raf(time)` — без лишней зависимости на сторонний рантайм анимаций.
  * Фичи могут подписаться на `lenis.on('scroll')` и синхронизировать UI со скроллом.
  */
-function LenisMotionRafSync() {
+function LenisRafSync() {
   const lenis = useLenis();
-  useAnimationFrame((time) => {
-    lenis?.raf(time);
-  });
+
+  useEffect(() => {
+    if (!lenis) return;
+    let frameId = 0;
+    const tick = (time: number) => {
+      lenis.raf(time);
+      frameId = requestAnimationFrame(tick);
+    };
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [lenis]);
+
   return null;
 }
 
@@ -31,7 +39,7 @@ const SmoothScrollProvider = ({ children }: SmoothScrollProviderProps) => {
 
   return (
     <ReactLenis root options={options}>
-      <LenisMotionRafSync />
+      <LenisRafSync />
       {children}
     </ReactLenis>
   );

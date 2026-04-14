@@ -711,12 +711,21 @@ const config: Config = {
         'nav-season-icon-fixed': '1rem',
         'nav-season-icon-fluid':
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
+        /**
+         * Выдвижная панель бургер-меню (`Navbar`): не шире `max-w-sm` (24rem), на узких экранах — 100vw.
+         * Синхронно с прежним `w-[min(100vw,theme(maxWidth.sm))]`.
+         */
+        'mobile-nav-drawer': 'min(100vw, 24rem)',
       },
       maxHeight: {
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
         /** Полноэкранный просмотр фото тура (`TourPhotoViewer`, `object-contain`). */
         'photo-viewer': 'min(90dvh, 90vh)',
+        /** Тело модалок с прокруткой (`TourRequestModal`, `TeamMemberModal`). */
+        'modal-body': 'min(90dvh, 90vh)',
+        /** Плейсхолдер пока грузится ленивый чанк модалки (`ModalLazyChunkFallback`). */
+        'modal-lazy-placeholder': '5rem',
       },
       minWidth: {
         /** Минимальная сторона круглой кнопки «к hero» на воротах (~44px hit area). */
@@ -737,8 +746,15 @@ const config: Config = {
         'home-gate-scroll-hint-target': '2.75rem',
         /** Минимальная высота прямоугольника баннера внутри контейнера (md+). */
         'home-season-banner-inner': '11rem',
+        /** Плейсхолдер ячейки видео в сетке до готовности плеера (`GalleryGridVideo`). */
+        'gallery-grid-video': '4rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */
         'route-fallback':    'clamp(16rem, 55vh, 40rem)',
+        /**
+         * Пока грузятся ленивые секции «Безопасность / Команда / Контакты» на главной.
+         * Оценка суммарной высоты трёх блоков — смягчить CLS без бесконечной полосы.
+         */
+        'home-below-fold-suspense': 'clamp(28rem, 65vh, 52rem)',
         /** Полный вьюпорт ворот; navbar — оверлей (`Home`). */
         'home-gate-viewport': '100dvh',
         /**

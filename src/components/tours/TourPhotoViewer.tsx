@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faChevronLeft,
-  faChevronRight,
-  faTimes,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
+import { faTimes } from '@fortawesome/free-solid-svg-icons/faTimes';
 import { UI } from '../../constants/ui';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';

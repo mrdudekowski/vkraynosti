@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
-import { faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons/faEnvelope';
+import { faPhone } from '@fortawesome/free-solid-svg-icons/faPhone';
+import { faTelegram } from '@fortawesome/free-brands-svg-icons/faTelegram';
+import { faVk } from '@fortawesome/free-brands-svg-icons/faVk';
 import { UI } from '../../constants/ui';
 import { CONTACTS } from '../../constants/contacts';
 import { ROUTES } from '../../constants/routes';

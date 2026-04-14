@@ -119,6 +119,8 @@ export const UI = {
   },
   modal: {
     close: 'Закрыть',
+    /** Пока подгружается ленивый чанк модалки (`Layout` + `Suspense`): `aria-label` полноэкранного плейсхолдера. */
+    lazyChunkLoadingLabel: 'Загрузка окна',
   },
   tourRequestModal: {
     title: 'Заявка на тур',

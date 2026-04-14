@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import { SeasonNavMenuProvider } from '../../context/SeasonNavMenuProvider';
@@ -12,9 +12,11 @@ import Footer from './Footer';
 import SeasonRouteSync from './SeasonRouteSync';
 import ScrollToTopOnNavigate from './ScrollToTopOnNavigate';
 import { useModal } from '../../context/useModal';
-import TeamMemberModal from '../modals/TeamMemberModal';
-import TourRequestModal from '../modals/TourRequestModal';
 import RouteFallback from '../shared/RouteFallback';
+import ModalLazyChunkFallback from '../shared/ModalLazyChunkFallback';
+
+const TeamMemberModal = lazy(() => import('../modals/TeamMemberModal'));
+const TourRequestModal = lazy(() => import('../modals/TourRequestModal'));
 
 function LayoutChrome() {
   const { pathname } = useLocation();
@@ -66,10 +68,14 @@ const Layout = () => {
         </HomeNavbarChromeProvider>
       </SeasonNavMenuProvider>
       {modal.type === 'teamMember' && (
-        <TeamMemberModal member={modal.payload} />
+        <Suspense fallback={<ModalLazyChunkFallback />}>
+          <TeamMemberModal member={modal.payload} />
+        </Suspense>
       )}
       {modal.type === 'tourRequest' && (
-        <TourRequestModal key={modal.payload.tourId} payload={modal.payload} />
+        <Suspense fallback={<ModalLazyChunkFallback />}>
+          <TourRequestModal key={modal.payload.tourId} payload={modal.payload} />
+        </Suspense>
       )}
     </div>
   );

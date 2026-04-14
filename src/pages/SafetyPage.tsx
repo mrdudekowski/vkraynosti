@@ -1,7 +1,8 @@
 import { useLayoutEffect } from 'react';
 import { useLenis } from 'lenis/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShieldHalved, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons/faArrowLeft';
+import { faShieldHalved } from '@fortawesome/free-solid-svg-icons/faShieldHalved';
 import { Link } from 'react-router-dom';
 import { SAFETY_ITEMS } from '../data/safetyData';
 import { SAFETY_ICON_MAP } from '../constants/safetyIcons';

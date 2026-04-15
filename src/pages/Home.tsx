@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { HomeGateBannerShell } from '../components/home/HomeGateBannerShell';
@@ -59,7 +59,7 @@ const Home = () => {
   const [gridPhase, setGridPhase] = useState<HomeToursGridPhase>('idle');
   const [gridAnimationCycle, setGridAnimationCycle] = useState(0);
   const [pendingExpandedSeason, setPendingExpandedSeason] = useState<Season | null>(null);
-  const [shouldScrollAfterCollapse, setShouldScrollAfterCollapse] = useState(false);
+  const shouldScrollAfterCollapseRef = useRef(false);
   const gateIntersectRef = useRef<HTMLDivElement | null>(null);
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const expandControlButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -146,6 +146,11 @@ const Home = () => {
     if (activeSeason === 'spring') return springPromoVideoUrls;
     return [];
   }, [activeSeason, springPromoVideoUrls, winterPromoVideoUrls]);
+  const activeSeasonPromoVideoCount = activeSeasonPromoVideoUrls.length;
+  const normalizedPromoVideoIndex =
+    activeSeasonPromoVideoCount > 0 ? toursPromoVideoIndex % activeSeasonPromoVideoCount : 0;
+  const activeSeasonPromoVideoUrl =
+    activeSeasonPromoVideoCount > 0 ? activeSeasonPromoVideoUrls[normalizedPromoVideoIndex] : null;
   const hasHiddenTours = tours.length > HOME_TOURS_PREVIEW_LIMIT;
   const shouldRenderExpandCard = hasHiddenTours;
   const activeSeasonIndex = SEASON_ORDER.indexOf(activeSeason);
@@ -159,7 +164,7 @@ const Home = () => {
   const toggleToursVisibility = () => {
     if (gridPhase !== 'idle') return;
     const nextExpandedSeason = isAllToursExpanded ? null : activeSeason;
-    setShouldScrollAfterCollapse(isAllToursExpanded);
+    shouldScrollAfterCollapseRef.current = isAllToursExpanded;
     setPendingExpandedSeason(nextExpandedSeason);
     setGridPhase('fadingOut');
   };
@@ -168,10 +173,11 @@ const Home = () => {
     setActiveSeason(nextSeason);
     setExpandedSeason(null);
     setPendingExpandedSeason(null);
+    shouldScrollAfterCollapseRef.current = false;
     setGridPhase('idle');
   };
 
-  const snapToCollapseTarget = () => {
+  const snapToCollapseTarget = useCallback(() => {
     const headingTarget = toursHeadingWrapRef.current ?? document.getElementById(HOME_TOURS_HEADING_ELEMENT_ID);
     const isTabletOrDesktopViewport = window.innerWidth >= BREAKPOINT_MD_PX;
     const scrollTarget = isTabletOrDesktopViewport ? headingTarget : expandControlButtonRef.current;
@@ -184,11 +190,7 @@ const Home = () => {
 
     const viewportTop = window.scrollY + scrollTarget.getBoundingClientRect().top;
     window.scrollTo({ top: viewportTop + NAVBAR_SCROLL_OFFSET_PX, behavior: 'auto' });
-  };
-
-  useEffect(() => {
-    setToursPromoVideoIndex(0);
-  }, [activeSeasonPromoVideoUrls]);
+  }, [lenis]);
 
   useEffect(() => {
     if (activeSeasonPromoVideoUrls.length <= 1) return;
@@ -210,16 +212,16 @@ const Home = () => {
 
   useEffect(() => {
     if (gridPhase !== 'preFadeIn') return;
-    if (shouldScrollAfterCollapse) {
+    if (shouldScrollAfterCollapseRef.current) {
       // In preFadeIn grid is already re-rendered but still hidden (opacity 0).
       snapToCollapseTarget();
-      setShouldScrollAfterCollapse(false);
+      shouldScrollAfterCollapseRef.current = false;
     }
     const frameId = window.requestAnimationFrame(() => {
       setGridPhase('fadingIn');
     });
     return () => window.cancelAnimationFrame(frameId);
-  }, [gridPhase, shouldScrollAfterCollapse]);
+  }, [gridPhase, snapToCollapseTarget]);
 
   useEffect(() => {
     if (gridPhase !== 'fadingIn') return;
@@ -228,7 +230,7 @@ const Home = () => {
     const cascadeDurationMs =
       GRID_REVEAL_DURATION_MS + Math.max(renderedGridItemsCount - 1, 0) * GRID_CASCADE_STEP_MS;
     const timeoutId = window.setTimeout(() => {
-      setShouldScrollAfterCollapse(false);
+      shouldScrollAfterCollapseRef.current = false;
       setPendingExpandedSeason(null);
       setGridPhase('idle');
     }, cascadeDurationMs);
@@ -343,9 +345,9 @@ const Home = () => {
                       >
                         {activeSeasonLeadTour != null ? (
                           <div className="absolute inset-0" aria-hidden>
-                            {activeSeasonPromoVideoUrls.length > 0 ? (
+                            {activeSeasonPromoVideoUrl != null ? (
                               <video
-                                key={activeSeasonPromoVideoUrls[toursPromoVideoIndex]}
+                                key={activeSeasonPromoVideoUrl}
                                 className="h-full w-full object-cover opacity-60"
                                 autoPlay
                                 muted
@@ -353,7 +355,7 @@ const Home = () => {
                                 preload="metadata"
                                 loop
                               >
-                                <source src={activeSeasonPromoVideoUrls[toursPromoVideoIndex]} />
+                                <source src={activeSeasonPromoVideoUrl} />
                               </video>
                             ) : (
                               <PlaceholderImage

@@ -14,7 +14,12 @@
     "test:e2e": "playwright test",
     "test:e2e:perf": "playwright test e2e/tour-detail-performance.spec.ts",
     "preview": "vite preview",
-    "generate:banner-loops": "node scripts/generate-home-season-banner-loop-videos.cjs --posters"
+    "generate:banner-loops": "node scripts/generate-home-season-banner-loop-videos.cjs --posters",
+    "generate:spring-grids": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-spring-1-2-3-grid-assets.ps1",
+    "generate:spring-clips": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-spring-2-3-tour-videos.ps1",
+    "generate:winter-3-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-3-grid-assets.ps1",
+    "generate:winter-4-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-4-grid-assets.ps1",
+    "generate:winter-5-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-5-grid-assets.ps1"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^7.2.0",

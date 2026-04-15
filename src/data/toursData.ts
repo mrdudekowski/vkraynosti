@@ -1,15 +1,25 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faBed } from '@fortawesome/free-solid-svg-icons/faBed';
+import { faBinoculars } from '@fortawesome/free-solid-svg-icons/faBinoculars';
+import { faBookOpen } from '@fortawesome/free-solid-svg-icons/faBookOpen';
 import { faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons/faChalkboardTeacher';
 import { faCheck } from '@fortawesome/free-solid-svg-icons/faCheck';
 import { faDog } from '@fortawesome/free-solid-svg-icons/faDog';
 import { faHelmetSafety } from '@fortawesome/free-solid-svg-icons/faHelmetSafety';
 import { faHotTubPerson } from '@fortawesome/free-solid-svg-icons/faHotTubPerson';
 import { faMugHot } from '@fortawesome/free-solid-svg-icons/faMugHot';
+import { faMugSaucer } from '@fortawesome/free-solid-svg-icons/faMugSaucer';
 import { faPersonHiking } from '@fortawesome/free-solid-svg-icons/faPersonHiking';
+import { faPlane } from '@fortawesome/free-solid-svg-icons/faPlane';
 import { faShuttleVan } from '@fortawesome/free-solid-svg-icons/faShuttleVan';
 import { faSocks } from '@fortawesome/free-solid-svg-icons/faSocks';
 import { faSnowboarding } from '@fortawesome/free-solid-svg-icons/faSnowboarding';
+import { faTicket } from '@fortawesome/free-solid-svg-icons/faTicket';
+import { faTruck } from '@fortawesome/free-solid-svg-icons/faTruck';
+import { faUtensils } from '@fortawesome/free-solid-svg-icons/faUtensils';
+import { faWind } from '@fortawesome/free-solid-svg-icons/faWind';
+import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
+import { faPaw } from '@fortawesome/free-solid-svg-icons/faPaw';
 import { faUserTie } from '@fortawesome/free-solid-svg-icons/faUserTie';
 import type { Tour, TourIncludedItem } from '../types';
 import {
@@ -31,6 +41,15 @@ import {
   TOUR_WINTER_5_COVER,
   TOUR_WINTER_5_GALLERY_GRID,
   TOUR_WINTER_5_GALLERY_VIEWER,
+  TOUR_SPRING_1_COVER,
+  TOUR_SPRING_1_GALLERY_GRID,
+  TOUR_SPRING_1_GALLERY_VIEWER,
+  TOUR_SPRING_2_COVER,
+  TOUR_SPRING_2_GALLERY_GRID,
+  TOUR_SPRING_2_GALLERY_VIEWER,
+  TOUR_SPRING_3_COVER,
+  TOUR_SPRING_3_GALLERY_GRID,
+  TOUR_SPRING_3_GALLERY_VIEWER,
 } from '../constants/images';
 import { UI } from '../constants/ui';
 
@@ -332,110 +351,371 @@ export const TOURS: Tour[] = [
     galleryGridUrls: [...TOUR_WINTER_5_GALLERY_GRID],
   },
 
-  // SPRING — 4 tours
+  // SPRING — 7 tours
   {
     id: 'spring-1',
     season: 'spring',
-    title: 'Алтай: Цветение Маральника',
-    subtitle: 'Розовые горы в мае',
-    heroPhrase: 'Розовые горы просыпаются после зимы',
-    duration: '6 дней',
-    difficulty: 'Easy',
-    price: 'от 32 000 ₽',
-    description: 'В мае горы Алтая покрываются розовым цветением маральника — рододендрона. Лёгкий трекинг среди цветущих склонов с видами на снежные вершины.',
+    title: 'Восхождение на Лысого Деда',
+    subtitle: 'Самый восточный «тысячник» с трагической историей',
+    heroPhrase:
+      'Каменный гребень, обломки самолётов и панорама на морские бухты с высоты 1120 метров',
+    duration: '14–16 часов',
+    difficulty: 'Medium',
+    price: 'от 6 000 ₽',
+    descriptionLeadBold: 'Гора Лысый Дед (1120 м)',
+    description:
+      ' — самый восточный «тысячник» Ливадийского хребта в Шкотовском районе Приморья. Известна тремя авиакатастрофами 1950-х годов, обломки самолётов до сих пор лежат на склонах. С вершины открывается панорама на Фокинское водохранилище, морское побережье и соседние хребты. Входит в список для получения почётного знака «Лунный медведь».',
     program: [
-      { timeLabel: 'День 1 · 10:00', description: 'Цветение маральника' },
-      { timeLabel: 'День 2 · 15:00', description: 'Панорамные виды' },
-      { timeLabel: 'День 4 · 11:00', description: 'Горные реки' },
-      { timeLabel: 'День 5 · 19:00', description: 'Алтайская кухня' },
+      { timeLabel: '06:00', description: 'Выезд из Владивостока' },
+      { timeLabel: '09:00', description: 'Прибытие в село Моленый Мыс, инструктаж' },
+      {
+        timeLabel: '09:30–12:30',
+        description:
+          'Подход к подножию (около 6 км по лесной дороге) и восхождение',
+      },
+      {
+        timeLabel: '12:30–13:30',
+        description:
+          'Отдых на вершине, обед с панорамным видом, фото- и видеофиксация нашего успеха! Осмотр обломков самолётов',
+      },
+      { timeLabel: '13:30–17:00', description: 'Спуск' },
+      { timeLabel: '17:00–18:00', description: 'Горячий ужин' },
+      { timeLabel: '18:00–21:00', description: 'Возвращение в город' },
     ],
     includedInPrice: [
-      inc('Сопровождение гида по тропам'),
-      inc('Перекус и обеды на маршруте по программе'),
-      inc('Групповая аптечка и средства от клещей (сезон)'),
-      inc('Трансфер к точке старта и обратно'),
-      inc('Походная картография района'),
+      inc('Трансфер Владивосток — Моленый Мыс — Владивосток', faShuttleVan),
+      inc('Горячее питание после спуска', faMugHot),
+      inc('Гид-проводник', faUserTie),
+      inc(
+        'Интересные истории о разбившихся самолётах, лётчиках и мистике Лысого Деда',
+        faPlane
+      ),
+      inc('Наше тепло и забота — это входит в каждый тур', faHeart),
     ],
-    imageUrl: SPRING_TOUR_COVERS['spring-1'],
-    galleryImages: [SPRING_TOUR_COVERS['spring-1'], SPRING_TOUR_COVERS['spring-1'], SPRING_TOUR_COVERS['spring-1']],
+    imageUrl: TOUR_SPRING_1_COVER,
+    galleryImages: [...TOUR_SPRING_1_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_1_GALLERY_GRID],
   },
   {
     id: 'spring-2',
     season: 'spring',
-    title: 'Камчатка: Первый Снег',
-    subtitle: 'Вулканы в облаках',
-    heroPhrase: 'Вулканы над землёй, которая только просыпается',
-    duration: '9 дней',
+    title: 'Восхождение на Ольховую',
+    subtitle: 'Высочайшая вершина с горными озёрами',
+    heroPhrase:
+      'Два высокогорных озера и панорама на хребты Сихотэ-Алиня с высоты 1669 метров',
+    duration: '16–18 часов',
     difficulty: 'Hard',
-    price: 'от 85 000 ₽',
-    description: 'Весенняя Камчатка — время, когда склоны вулканов ещё покрыты снегом, а природа просыпается. Трекинг к кратерам действующих вулканов.',
+    price: 'от 7 000 ₽',
+    descriptionLeadBold: 'Гора Ольховая (1669 м)',
+    description:
+      ' — одна из высочайших вершин Приморья, расположена в Партизанском районе, входит в Алексеевский хребет. Уникальна наличием двух высокогорных озёр на высоте 1600 м. В Большом Алексеевском озере обитают краснокнижные тритоны. Популярна для круглогодичных восхождений, особенно красива осенью, когда склоны покрывает ковёр из брусники. Входит в список для получения почётного знака «Приморский барс».',
     program: [
-      { timeLabel: 'День 2 · 08:30', description: 'Действующие вулканы' },
-      { timeLabel: 'День 4 · 12:00', description: 'Гейзеры' },
-      { timeLabel: 'День 6 · 17:00', description: 'Медведи' },
-      { timeLabel: 'День 8 · 09:00', description: 'Вертолётные экскурсии' },
+      {
+        timeLabel: 'Ранний выезд',
+        description: 'Выезд из Владивостока, трансфер в Партизанский район.',
+      },
+      {
+        timeLabel: 'День в горах',
+        description:
+          'Восхождение на гору Ольховую (1669 м): маршрут к двум высокогорным озёрам, панорамы Сихотэ-Алиня.',
+      },
+      {
+        timeLabel: 'Вечер',
+        description: 'Спуск и возвращение во Владивосток (итоговое время зависит от темпа группы и погоды).',
+      },
     ],
     includedInPrice: [
-      inc('Вертолётные перелёты по заявленным в программе точкам'),
-      inc('Полевой гид и радиосвязь в группе'),
-      inc('Газовые горелки и общественное снаряжение лагеря'),
-      inc('Питание в экспедиции'),
-      inc('Разрешения и сборы на территориях парков — по факту включения в оферту'),
+      inc('Трансфер от точки сбора и обратно во Владивосток', faShuttleVan),
+      inc('Горячее питание по программе дня', faMugHot),
+      inc('Гид-проводник', faUserTie),
+      inc('Сопровождение на маршруте восхождения', faPersonHiking),
     ],
-    imageUrl: SPRING_TOUR_COVERS['spring-2'],
-    galleryImages: [SPRING_TOUR_COVERS['spring-2'], SPRING_TOUR_COVERS['spring-2'], SPRING_TOUR_COVERS['spring-2']],
+    imageUrl: TOUR_SPRING_2_COVER,
+    galleryImages: [...TOUR_SPRING_2_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_2_GALLERY_GRID],
   },
   {
     id: 'spring-3',
     season: 'spring',
-    title: 'Байкал Весной',
-    subtitle: 'Ледоход и первая зелень',
-    heroPhrase: 'Лёд трескается — Байкал снова свободен',
-    duration: '5 дней',
-    difficulty: 'Easy',
-    price: 'от 24 000 ₽',
-    description: 'Наблюдение за таянием льда на Байкале — уникальное природное шоу. Пешие прогулки вдоль берега, знакомство с байкальской флорой.',
+    title: 'Восхождение на Пидан (Высокую)',
+    subtitle: 'Главная мистическая вершина Приморья',
+    heroPhrase: 'Зелёная тайга, древние дольмены и вид на бескрайнее море',
+    duration: '15 часов',
+    difficulty: 'Medium',
+    price: '6 000 ₽',
+    descriptionLeadBold: 'Гора Пидан (Высокая, 1332 м)',
+    description:
+      ' — главная мистическая вершина Южного Приморья, часть Ливадийского хребта. Известна древними дольменами, каменными россыпями-курумниками и мощной энергетикой, привлекающей туристов со всего Дальнего Востока. Летом гора особенно хороша: зелёная тайга, цветущий рододендрон на склонах, прозрачный воздух и панорама до Японского моря с вершины. Входит в список «Приморского барса».',
     program: [
-      { timeLabel: 'День 1 · 14:00', description: 'Ледоход' },
-      { timeLabel: 'День 2 · 10:00', description: 'Нерпа на льдинах' },
-      { timeLabel: 'День 3 · 16:00', description: 'Горячие источники' },
-      { timeLabel: 'День 4 · 13:00', description: 'Рыбная кухня' },
+      { timeLabel: '5:00', description: 'Выезд' },
+      {
+        timeLabel: '07:00',
+        description:
+          'Прибытие в село Лукьяновка, пересадка на ГАЗ-66 (доставка прямо к подножию, бережём ваши силы)',
+      },
+      {
+        timeLabel: '10:00',
+        description: 'Прибытие к подножию: перекус, сбор, инструктаж',
+      },
+      { timeLabel: '10:30–14:30', description: 'Восхождение' },
+      { timeLabel: '14:30–15:30', description: 'Пикник и фото-сессия' },
+      { timeLabel: '18:00', description: 'Возвращение к машине, ужин' },
+      { timeLabel: '21:00', description: 'Прибытие в город' },
     ],
     includedInPrice: [
-      inc('Трансферы по береговой программе'),
-      inc('Гид-экскурсовод по природе Байкала'),
-      inc('Вход в зону источников — если предусмотрено маршрутом'),
-      inc('Питание: завтраки и обеды по расписанию'),
-      inc('Бинокль для наблюдения за нерпой — на время выходов'),
+      inc('Трансфер Владивосток — Лукьяновка — Владивосток', faShuttleVan),
+      inc('Горячее питание и прохладительные напитки после спуска', faMugHot),
+      inc(
+        'Гид-проводник и захватывающие истории о дольменах, шаманах и «летающем человеке»',
+        faUserTie
+      ),
+      inc('Проезд на подготовленном транспорте к подножию и обратно', faTruck),
     ],
-    imageUrl: SPRING_TOUR_COVERS['spring-3'],
-    galleryImages: [SPRING_TOUR_COVERS['spring-3'], SPRING_TOUR_COVERS['spring-3'], SPRING_TOUR_COVERS['spring-3']],
+    imageUrl: TOUR_SPRING_3_COVER,
+    galleryImages: [...TOUR_SPRING_3_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_3_GALLERY_GRID],
   },
   {
     id: 'spring-4',
     season: 'spring',
-    title: 'Кавказ: Весенний Трекинг',
-    subtitle: 'Альпийские луга и водопады',
-    heroPhrase: 'Водопады бурлят, горы цветут',
-    duration: '7 дней',
-    difficulty: 'Medium',
-    price: 'от 38 000 ₽',
-    description: 'Весной Кавказские горы преображаются: альпийские луга цветут, водопады бурлят от талых вод. Трекинг по классическим маршрутам.',
+    title: 'Восхождение на гору Сестра',
+    subtitle: 'Скальные «Зубы Дракона» и панорамы южного Сихотэ-Алиня',
+    heroPhrase:
+      'Главная вершина хребта Зубы Дракона — каменные изваяния и вид на долину Уссури с высоты 1671 метр',
+    duration: '18–20 часов',
+    difficulty: 'Hard',
+    price: 'от 9 000 ₽',
+    descriptionLeadBold: 'Гора Сестра (1671 м)',
+    description:
+      ' — одна из высочайших вершин южного Сихотэ-Алиня, расположена на границе Лазовского и Чугуевского районов, в национальном парке «Зов тигра». Венчает хребет «Зубы Дракона», знаменитый скальными останцами причудливой формы. Рядом находится гора-спутник Камень Брат (1402 м). С вершины открываются панорамы на долины рек Уссури и Милоградовки, а также на соседние вершины — Снежную, Облачную и Пидан. Входит в список для получения почётного знака «Приморский барс».',
     program: [
-      { timeLabel: 'День 1 · 09:00', description: 'Альпийские луга' },
-      { timeLabel: 'День 3 · 11:30', description: 'Водопады' },
-      { timeLabel: 'День 4 · 15:00', description: 'Горские сёла' },
-      { timeLabel: 'День 6 · 08:00', description: 'Вид на Эльбрус' },
+      {
+        timeLabel: '02:30',
+        description: 'Выезд из Владивостока навстречу приключениям!',
+      },
+      { timeLabel: '07:30', description: 'Прибытие в село Лазо, перекус' },
+      {
+        timeLabel: '08:30',
+        description:
+          'Прибытие к урочищу Пасека Ощепкова (граница нацпарка «Зов тигра»), инструктаж, оформление разрешений',
+      },
+      {
+        timeLabel: '09:00–15:00',
+        description:
+          'Восхождение (5–6 часов) через тайгу к каменным останцам и на вершину',
+      },
+      {
+        timeLabel: '15:00–16:00',
+        description:
+          'Отдых на вершине, обед с панорамным видом, фото- и видеофиксация нашего успеха!',
+      },
+      { timeLabel: '16:00–19:30', description: 'Спуск' },
+      { timeLabel: '19:30–20:30', description: 'Горячий ужин у подножия' },
+      { timeLabel: '20:30–01:00', description: 'Возвращение в город' },
     ],
     includedInPrice: [
-      inc('Горный гид и маршрутные разрешения'),
-      inc('Ночёвки в гостевых домах по программе'),
-      inc('Питание на маршруте'),
-      inc('Трансфер к тропе и с тропы'),
-      inc('Групповая страховка от несчастного случая — по условиям оферты'),
+      inc('Трансфер Владивосток — Лазо — Владивосток', faShuttleVan),
+      inc('Горячее питание (ужин после спуска)', faMugHot),
+      inc('Гид-проводник', faUserTie),
+      inc('Разрешение на посещение национального парка «Зов тигра»', faTicket),
+      inc(
+        'Интересные истории о горе, каменных изваяниях и древних легендах',
+        faBookOpen
+      ),
     ],
     imageUrl: SPRING_TOUR_COVERS['spring-4'],
-    galleryImages: [SPRING_TOUR_COVERS['spring-4'], SPRING_TOUR_COVERS['spring-4'], SPRING_TOUR_COVERS['spring-4']],
+    galleryImages: [
+      SPRING_TOUR_COVERS['spring-4'],
+      SPRING_TOUR_COVERS['spring-4'],
+      SPRING_TOUR_COVERS['spring-4'],
+    ],
+  },
+  {
+    id: 'spring-5',
+    season: 'spring',
+    title: 'Восхождение на Читинзу (Скалистую)',
+    subtitle: 'Вершина контрастов, скальных изваяний и таинственного свиста',
+    heroPhrase:
+      'Альпийские луга, каменные останцы и панорама на Золотую долину с высоты 1239 метров',
+    duration: '14–16 часов',
+    difficulty: 'Hard',
+    price: 'от 6 000 ₽',
+    descriptionLeadBold: 'Гора Читинза (Скалистая, 1239 м)',
+    description:
+      ' — одна из самых популярных вершин Приморья, расположена в Партизанском районе. Уникальна природными контрастами: от глухой тайги до альпийских лугов, от берёзовых рощ до хвойных лесов. На склонах находится водопад Берендей (10 метров) и множество живописных ручьёв. С вершины открывается вид на Золотую долину, хребет Чандолаз, залив Восток и Ливадийский хребет. Входит в список для получения почётного знака «Приморский барс».',
+    program: [
+      {
+        timeLabel: '04:00',
+        description: 'Выезд из Владивостока навстречу приключениям!',
+      },
+      {
+        timeLabel: '07:30',
+        description:
+          'Прибытие к селу Тигровое или станции Красноармейская (в зависимости от маршрута)',
+      },
+      {
+        timeLabel: '08:00–12:30',
+        description:
+          'Восхождение (4–5 часов) через тайгу с ручьями, водопадами и сменой растительных поясов',
+      },
+      {
+        timeLabel: '12:30–13:30',
+        description:
+          'Отдых на вершине, обед с панорамным видом, фото- и видеофиксация нашего успеха!',
+      },
+      { timeLabel: '13:30–17:00', description: 'Спуск' },
+      {
+        timeLabel: '17:00–18:00',
+        description: 'Горячий обед на костре и согревающий чай у подножия',
+      },
+      { timeLabel: '18:00–22:00', description: 'Возвращение в город' },
+    ],
+    includedInPrice: [
+      inc('Трансфер Владивосток — подножие — Владивосток', faShuttleVan),
+      inc('Горячее питание после спуска', faMugHot),
+      inc('Гид-проводник', faUserTie),
+      inc(
+        'Интересные истории о горе, «свистящей» конструкции и легендах места',
+        faWind
+      ),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-5'],
+    galleryImages: [
+      SPRING_TOUR_COVERS['spring-5'],
+      SPRING_TOUR_COVERS['spring-5'],
+      SPRING_TOUR_COVERS['spring-5'],
+    ],
+  },
+  {
+    id: 'spring-6',
+    season: 'spring',
+    title: 'Мараловая ферма и Парк Драконов',
+    subtitle: 'Благородные олени и скальные драконы за один день',
+    heroPhrase:
+      'Покормить маралов с рук и увидеть окаменевших драконов — всё за один световой день',
+    duration: '14–16 часов',
+    difficulty: 'Easy',
+    price: 'от 7 200 ₽',
+    description:
+      'Мараловая ферма «Заповедная долина» расположена в 9 км от села Лазо. Здесь живут более 300 маралов и пятнистых оленей. Гостей ждёт экскурсия с кормлением животных из рук, а также возможность приобрести сувенирную продукцию на основе пантов. Парк Драконов — уникальный природный скальный комплекс в Лазовском районе Приморья, на склоне Партизанского хребта. Известен причудливыми скальными образованиями, напоминающими драконов и мифических существ. Входит в список самых необычных мест Дальнего Востока.',
+    program: [
+      {
+        timeLabel: '04:00',
+        description:
+          'Выезд из Владивостока. Дорога живописная, можно поспать или посмотреть в окно на просыпающуюся тайгу.',
+      },
+      {
+        timeLabel: '08:30',
+        description:
+          'Прибытие на мараловую ферму «Заповедная долина» (село Лазо).',
+      },
+      {
+        timeLabel: '09:00–10:30',
+        description:
+          'Экскурсия на мараловую ферму. Кормим оленей с рук, гладим, фотографируемся. Гид расскажет о пантовом оленеводстве и целебных свойствах пантов.',
+      },
+      {
+        timeLabel: '10:30–11:00',
+        description:
+          'Свободное время: сувениры (пантовая продукция, настойки на меду), чай с травяными сборами.',
+      },
+      { timeLabel: '11:00–12:00', description: 'Переезд в село Чистоводное.' },
+      { timeLabel: '12:00–13:00', description: 'Обед на природе.' },
+      {
+        timeLabel: '13:00–14:00',
+        description:
+          'Подъём к Парку Драконов. Тропа живописная, несложная, с панорамными видами на долину.',
+      },
+      {
+        timeLabel: '14:00–16:30',
+        description:
+          'Прогулка по парку. Увидим «каменных драконов», «драконьи яйца», «змеиные головы» и другие причудливые скалы. Фотосессия на фоне мистических пейзажей.',
+      },
+      { timeLabel: '16:30–17:30', description: 'Спуск и сборы.' },
+      { timeLabel: '17:30–22:00', description: 'Возвращение во Владивосток.' },
+    ],
+    includedInPrice: [
+      inc(
+        'Трансфер Владивосток — Лазо — Чистоводное — Владивосток',
+        faShuttleVan
+      ),
+      inc('Экскурсия на мараловую ферму', faBinoculars),
+      inc('Кормление оленей с рук', faPaw),
+      inc('Гид-проводник на весь маршрут', faUserTie),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-6'],
+    galleryImages: [
+      SPRING_TOUR_COVERS['spring-6'],
+      SPRING_TOUR_COVERS['spring-6'],
+      SPRING_TOUR_COVERS['spring-6'],
+    ],
+  },
+  {
+    id: 'spring-7',
+    season: 'spring',
+    title: 'Путешествие в ущелье Дарданеллы',
+    subtitle: 'Каменные стражи и горная река в сердце Приморья',
+    heroPhrase:
+      'Скалы-исполины, сжимающие реку Тигровую, и горячий обед на берегу с видом на «Замок принцессы»',
+    duration: '14–16 часов',
+    difficulty: 'Easy',
+    price: 'от 4 500 ₽',
+    description:
+      'Ущелье Дарданеллы (Щёки) — геоморфологический памятник природы регионального значения, расположен в долине реки Тигровой в Партизанском районе Приморья. Протяжённость ущелья — около 14 км, высота скал — до 150 м. Известно причудливыми скальными останцами: «Замок Принцессы», «Зуб Бабы Яги», «Зуб Кощея Бессмертного», «Голова Спящего Рыцаря» и другими. Название получило в честь пролива Дарданеллы — по легенде, его дали партизаны отряда Сергея Лазо, для которых ущелье было естественной неприступной крепостью.',
+    program: [
+      {
+        timeLabel: '08:00',
+        description:
+          'Выезд из Владивостока. Дорога живописная, примерно 2,5 часа.',
+      },
+      {
+        timeLabel: '10:30',
+        description:
+          'Прибытие к ущелью Дарданеллы (со стороны села Бровничи). Инструктаж, подготовка к походу.',
+      },
+      {
+        timeLabel: '10:45–14:30',
+        description:
+          'Пешая прогулка по маршруту: тропа вдоль реки Тигровой → подъём к «Замку Принцессы» → скальный массив «Каменный монастырь» → видовые площадки на долину реки. Общая протяжённость пешего маршрута — около 5–6 км.',
+      },
+      {
+        timeLabel: '14:30–16:00',
+        description:
+          'Большой привал на поляне на берегу реки Тигровой рядом с прижимом «Щёки». Горячий обед (приготовлю на месте с душой). Отдых, фотосессия, купание в тёплое время года.',
+      },
+      {
+        timeLabel: '16:00–17:30',
+        description: 'Спуск и возвращение к машине.',
+      },
+      {
+        timeLabel: '17:30–20:30',
+        description:
+          'Возвращение во Владивосток. Уставшие, счастливые и с кучей фотографий.',
+      },
+    ],
+    includedInPrice: [
+      inc(
+        'Трансфер Владивосток — ущелье Дарданеллы — Владивосток',
+        faShuttleVan
+      ),
+      inc(
+        'Горячий обед на берегу реки Тигровой (приготовлю на газовой горелке — душевно, сытно, с заботой)',
+        faUtensils
+      ),
+      inc('Горячие напитки (чай/кофе/глинтвейн по сезону)', faMugSaucer),
+      inc('Гид-проводник', faUserTie),
+      inc(
+        'Интересные истории о партизанах Сергея Лазо, происхождении названия и скалах-останцах',
+        faBookOpen
+      ),
+      inc('Наше тепло и забота — это входит в каждый тур', faHeart),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-7'],
+    galleryImages: [
+      SPRING_TOUR_COVERS['spring-7'],
+      SPRING_TOUR_COVERS['spring-7'],
+      SPRING_TOUR_COVERS['spring-7'],
+    ],
   },
 
   // SUMMER — 4 tours

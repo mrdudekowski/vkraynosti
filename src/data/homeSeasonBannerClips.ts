@@ -31,7 +31,7 @@ const posterClip = (posterSrc: string): HomeSeasonBannerClip => ({
 const WINTER_BANNER_CLIP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 /**
- * Зима: десять `*.banner-loop.mp4` в `public/banners_winter/` (нарезка из `public/tours/.../*.grid.mp4` — `npm run generate:banner-loops`).
+ * Зима: десять `*.banner-loop.webm` в `public/banners_winter/` (нарезка из `public/tours/.../*.grid.webm` — `npm run generate:banner-loops`).
  * В рантайме фрагмент с начала файла (`startSec: 0`).
  */
 const WINTER_CLIPS: HomeSeasonBannerClip[] = WINTER_BANNER_CLIP_INDICES.map((i) => {

@@ -1,8 +1,8 @@
 /**
  * Нарезка лупов баннера зимы (та же таблица, что в `generate-home-season-banner-loop-videos.ps1`).
- * Вход: `public/tours/{winter-*}/…grid.mp4`. Выход: `public/banners_winter/*.banner-loop.mp4`.
+ * Вход: `public/tours/{winter-*}/…grid.webm`. Выход: `public/banners_winter/*.banner-loop.webm`.
  * Использует `ffmpeg-static` из devDependencies — не требует ffmpeg в PATH.
- * Кодирование: H.264 CRF 30, max ширина 800px (`scale`), `+faststart` — синхронно с `.ps1`.
+ * Кодирование: VP9 (пресет banner — CRF 33, max ширина 800px) — синхронно с `.ps1` и `WebmTourEncoding.ps1`.
  *
  *   node scripts/generate-home-season-banner-loop-videos.cjs
  *   node scripts/generate-home-season-banner-loop-videos.cjs --posters
@@ -29,18 +29,36 @@ const durationSec = 5;
 const dryRun = process.argv.includes('--dry-run');
 const posters = process.argv.includes('--posters');
 
+const vp9BannerArgs = [
+  '-c:v',
+  'libvpx-vp9',
+  '-crf',
+  '33',
+  '-b:v',
+  '0',
+  '-row-mt',
+  '1',
+  '-cpu-used',
+  '2',
+  '-deadline',
+  'good',
+  '-pix_fmt',
+  'yuv420p',
+  '-an',
+];
+
 /** @type {{ subdir: string; input: string; startSec: number; output: string }[]} */
 const cuts = [
-  { subdir: 'winter-3', input: 'gr.clip1.grid.mp4', startSec: 3, output: 'gr.clip1.banner-loop.mp4' },
-  { subdir: 'winter-3', input: 'gr.clip3.grid.mp4', startSec: 0, output: 'gr.clip3.banner-loop.mp4' },
-  { subdir: 'winter-3', input: 'gr.clip4.grid.mp4', startSec: 16, output: 'gr.clip4.banner-loop.mp4' },
-  { subdir: 'winter-3', input: 'gr.clip5.grid.mp4', startSec: 1, output: 'gr.clip5.banner-loop.mp4' },
-  { subdir: 'winter-4', input: 'hs.clip1.grid.mp4', startSec: 5, output: 'hs.clip1.banner-loop.mp4' },
-  { subdir: 'winter-5', input: 'ars.clip1.grid.mp4', startSec: 2, output: 'ars.clip1.banner-loop.mp4' },
-  { subdir: 'winter-5', input: 'ars.clip2.grid.mp4', startSec: 7, output: 'ars.clip2.banner-loop.mp4' },
-  { subdir: 'winter-3', input: 'gr.board.grid.mp4', startSec: 0, output: 'gr.board.banner-loop.mp4' },
-  { subdir: 'winter-3', input: 'gr.elya.grid.mp4', startSec: 0, output: 'gr.elya.banner-loop.mp4' },
-  { subdir: 'winter-3', input: 'gr.bbq.grid.mp4', startSec: 0, output: 'gr.bbq.banner-loop.mp4' },
+  { subdir: 'winter-3', input: 'gr.clip1.grid.webm', startSec: 3, output: 'gr.clip1.banner-loop.webm' },
+  { subdir: 'winter-3', input: 'gr.clip3.grid.webm', startSec: 0, output: 'gr.clip3.banner-loop.webm' },
+  { subdir: 'winter-3', input: 'gr.clip4.grid.webm', startSec: 16, output: 'gr.clip4.banner-loop.webm' },
+  { subdir: 'winter-3', input: 'gr.clip5.grid.webm', startSec: 1, output: 'gr.clip5.banner-loop.webm' },
+  { subdir: 'winter-4', input: 'hs.clip1.grid.webm', startSec: 5, output: 'hs.clip1.banner-loop.webm' },
+  { subdir: 'winter-5', input: 'ars.clip1.grid.webm', startSec: 2, output: 'ars.clip1.banner-loop.webm' },
+  { subdir: 'winter-5', input: 'ars.clip2.grid.webm', startSec: 7, output: 'ars.clip2.banner-loop.webm' },
+  { subdir: 'winter-3', input: 'gr.board.grid.webm', startSec: 0, output: 'gr.board.banner-loop.webm' },
+  { subdir: 'winter-3', input: 'gr.elya.grid.webm', startSec: 0, output: 'gr.elya.banner-loop.webm' },
+  { subdir: 'winter-3', input: 'gr.bbq.grid.webm', startSec: 0, output: 'gr.bbq.banner-loop.webm' },
 ];
 
 function runFfmpeg(args) {
@@ -74,19 +92,9 @@ for (const row of cuts) {
     String(row.startSec),
     '-t',
     String(durationSec),
-    '-c:v',
-    'libx264',
-    '-profile:v',
-    'high',
-    '-pix_fmt',
-    'yuv420p',
-    '-crf',
-    '30',
     '-vf',
     "scale='min(800,iw)':-2",
-    '-an',
-    '-movflags',
-    '+faststart',
+    ...vp9BannerArgs,
     outPath,
   ];
 
@@ -94,7 +102,7 @@ for (const row of cuts) {
   runFfmpeg(encodeArgs);
 
   if (posters) {
-    const base = path.basename(row.output, '.mp4');
+    const base = path.basename(row.output, '.webm');
     const posterPath = path.join(bannerWinterOutDir, `${base}.poster.webp`);
     runFfmpeg(['-y', '-i', outPath, '-vframes', '1', '-q:v', '80', posterPath]);
   }

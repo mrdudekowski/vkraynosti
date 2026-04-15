@@ -1,6 +1,6 @@
-# Создаёт gr.board/elya/bbq `*.grid.mp4` и `*.poster.webp` в `public/tours/winter-3/`.
+# Создаёт gr.board/elya/bbq `*.grid.webm` и `*.poster.webp` в `public/tours/winter-3/`.
 # ffmpeg: `node_modules\@ffmpeg-installer\win32-x64\ffmpeg.exe` после `npm i`, иначе — из PATH.
-# Параметры кодирования — как в `generate-winter-3-grid-assets.ps1`.
+# Параметры кодирования — как в `generate-winter-3-grid-assets.ps1` (сетка VP9).
 param(
   [string] $BoardIn = "$env:USERPROFILE\Downloads\IMG_2035.MOV",
   [string] $ElyaIn = "$env:USERPROFILE\Downloads\-4424874489062906118.MP4",
@@ -15,6 +15,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = Join-Path $PSScriptRoot ".." | Resolve-Path
 $outDir = Join-Path $repoRoot "public\tours\winter-3" | Resolve-Path
+. (Join-Path $PSScriptRoot "media\WebmTourEncoding.ps1")
 
 if (-not $FfmpegExe) {
   $bundled = Join-Path $repoRoot "node_modules\@ffmpeg-installer\win32-x64\ffmpeg.exe"
@@ -31,9 +32,9 @@ function Invoke-FfmpegLocal {
 }
 
 $jobs = @(
-  @{ In = $BoardIn; Ss = [string]$BoardStartSec; Out = "gr.board.grid.mp4" }
-  @{ In = $ElyaIn; Ss = [string]$ElyaStartSec; Out = "gr.elya.grid.mp4" }
-  @{ In = $BbqIn; Ss = [string]$BbqStartSec; Out = "gr.bbq.grid.mp4" }
+  @{ In = $BoardIn; Ss = [string]$BoardStartSec; Out = "gr.board.grid.webm" }
+  @{ In = $ElyaIn; Ss = [string]$ElyaStartSec; Out = "gr.elya.grid.webm" }
+  @{ In = $BbqIn; Ss = [string]$BbqStartSec; Out = "gr.bbq.grid.webm" }
 )
 
 foreach ($j in $jobs) {
@@ -41,20 +42,19 @@ foreach ($j in $jobs) {
     throw "Missing input: $($j.In)"
   }
   $outPath = Join-Path $outDir $j.Out
-  Invoke-FfmpegLocal @(
-    '-y', '-ss', $j.Ss, '-i', $j.In,
-    '-t', ([string]$SegmentDurationSec),
-    '-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-crf', '28',
-    '-vf', "scale='min(854,iw)':-2",
-    '-an', '-movflags', '+faststart',
-    $outPath
-  )
+  $vf = Get-WebmScaleFilter 'grid'
+  $enc = Get-WebmVp9CodecArgs 'grid'
+  Invoke-FfmpegLocal (@(
+      '-y', '-ss', $j.Ss, '-i', $j.In,
+      '-t', ([string]$SegmentDurationSec),
+      '-vf', $vf
+    ) + $enc + @($outPath))
 }
 
 foreach ($base in @("gr.board", "gr.elya", "gr.bbq")) {
-  $mp4 = Join-Path $outDir "${base}.grid.mp4"
+  $webm = Join-Path $outDir "${base}.grid.webm"
   $webp = Join-Path $outDir "${base}.poster.webp"
-  Invoke-FfmpegLocal @('-y', '-i', $mp4, '-vframes', '1', '-q:v', '80', $webp)
+  Invoke-FfmpegLocal @('-y', '-i', $webm, '-vframes', '1', '-q:v', '80', $webp)
 }
 
 Write-Host "Done winter-3 banner stub videos in $outDir"

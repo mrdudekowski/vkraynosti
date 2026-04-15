@@ -44,7 +44,7 @@ export interface Tour {
    */
   galleryImages: string[];
   /**
-   * Оптимизированные URL для сетки страницы тура и карточек (webp / низкий mp4).
+   * Оптимизированные URL для сетки страницы тура и карточек (webp / VP9 webm).
    * При отсутствии для сетки используется `galleryImages`.
    */
   galleryGridUrls?: string[];

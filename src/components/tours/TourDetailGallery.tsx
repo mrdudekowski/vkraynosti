@@ -2,6 +2,8 @@ import { memo, type ReactNode } from 'react';
 import PlaceholderImage from '../shared/PlaceholderImage';
 import GalleryGridVideo from './GalleryGridVideo';
 import {
+  TOUR_SPRING_2_LAKE1_IMAGE,
+  TOUR_SPRING_3_GROUP_IMAGE,
   TOUR_WINTER_1_REST4_IMAGE,
   TOUR_WINTER_1_TOP_IMAGE,
   TOUR_WINTER_2_PEAK_IMAGE,
@@ -17,7 +19,13 @@ import {
 import { UI } from '../../constants/ui';
 import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';
 
-export type TourGalleryLayoutVariant = 'default' | 'izubrinaya' | 'arsgora';
+export type TourGalleryLayoutVariant =
+  | 'default'
+  | 'izubrinaya'
+  | 'arsgora'
+  | 'lysy-ded'
+  | 'olkhovaya'
+  | 'pidan';
 
 export interface TourDetailGalleryProps {
   /** Кадры для сетки (без главного фото hero страницы). */
@@ -30,7 +38,7 @@ export interface TourDetailGalleryProps {
   layoutVariant?: TourGalleryLayoutVariant;
   /** Уменьшить движение: в сетке только постер для видео. */
   prefersReducedMotion?: boolean;
-  /** Постер webp для grid-mp4 по URL сетки (например winter-3). */
+  /** Постер webp для grid-webm по URL сетки (например winter-3). */
   getVideoPosterForGridSrc?: (gridSrc: string) => string | undefined;
 }
 
@@ -323,6 +331,99 @@ const TourDetailGalleryComponent = ({
         )}
 
         {images.length > 4 && renderIzubrinayaRemainder(images.slice(4), 4)}
+      </div>
+    );
+  }
+
+  /**
+   * Лысый Дед (spring-1): после hero/preface в `images` четыре кадра —
+   * спуск и подход — на всю ширину сетки (`grid-cols-2` + `col-span-2 aspect-square`, блок 2×2),
+   * между ними гребень и вершина — два квадрата 1×1 в один ряд.
+   * Порядок: descent, ridge, summit, approach (`galleryGridUrls.slice(2)`).
+   */
+  if (layoutVariant === 'lysy-ded' && images.length === 4) {
+    const lysyBlockTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
+    const lysyTileOneByOne = 'aspect-square w-full min-w-0';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, lysyBlockTwoByTwo)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[1], 1, lysyTileOneByOne)}
+          {renderTileButton(images[2], 2, lysyTileOneByOne)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[3], 3, lysyBlockTwoByTwo)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Ольховая (spring-2): после hero/preface — озеро на всю ширину (`col-span-2 aspect-square`);
+   * ниже гребень слева на две строки, справа вершина и клип — два квадрата (`slice(2)`: lake, ridge, summit, clip1).
+   */
+  if (
+    layoutVariant === 'olkhovaya' &&
+    images.length === 4 &&
+    images[0] === TOUR_SPRING_2_LAKE1_IMAGE
+  ) {
+    const olkhLakeTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
+    const olkhRidgeTallLeft =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, olkhLakeTwoByTwo)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[1], 1, olkhRidgeTallLeft)}
+          {renderTileButton(images[2], 2, 'col-start-2 row-start-1 aspect-square w-full min-h-0')}
+          {renderTileButton(images[3], 3, 'col-start-2 row-start-2 aspect-square w-full min-h-0')}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Пидан (spring-3): чередование 2×2 и bento 1×2 + два квадрата справа.
+   * Сверху — bento clip5 \| вершина \| clip4; групповое фото 2×2 — после гребня; внизу bento clip3 \| clip6 \| clip7.
+   * Порядок `slice(2)`: group, taiga, clip1, clip2, ridge, clip5, summit, clip4, sea, clip3, clip6, clip7.
+   */
+  if (
+    layoutVariant === 'pidan' &&
+    images.length === 12 &&
+    images[0] === TOUR_SPRING_3_GROUP_IMAGE
+  ) {
+    const pidanTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
+    const pidanTallLeft =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const pidanRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
+    const pidanRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
+
+    const pidanFullWidthSquare = (sliceIndex: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[sliceIndex], sliceIndex, pidanTwoByTwo)}
+      </div>
+    );
+
+    const pidanBentoRow = (left: number, rightTop: number, rightBottom: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[left], left, pidanTallLeft)}
+        {renderTileButton(images[rightTop], rightTop, pidanRightTop)}
+        {renderTileButton(images[rightBottom], rightBottom, pidanRightBot)}
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        {pidanBentoRow(5, 6, 7)}
+        {pidanBentoRow(1, 2, 3)}
+        {pidanFullWidthSquare(4)}
+        {pidanFullWidthSquare(0)}
+        {pidanFullWidthSquare(8)}
+        {pidanBentoRow(9, 10, 11)}
       </div>
     );
   }

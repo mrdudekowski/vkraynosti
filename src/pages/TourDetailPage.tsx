@@ -10,6 +10,8 @@ import {
   buildTourDetailPath,
 } from "../constants/routes";
 import {
+  TOUR_SPRING_2_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_3_GRID_VIDEO_POSTERS,
   TOUR_WINTER_3_GRID_VIDEO_POSTERS,
   TOUR_WINTER_3_PREFACE_BACKGROUND,
   TOUR_WINTER_4_GRID_VIDEO_POSTERS,
@@ -99,6 +101,10 @@ const TourDetailPage = () => {
       return (src) => TOUR_WINTER_4_GRID_VIDEO_POSTERS[src];
     if (tour.id === "winter-5")
       return (src) => TOUR_WINTER_5_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-2")
+      return (src) => TOUR_SPRING_2_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-3")
+      return (src) => TOUR_SPRING_3_GRID_VIDEO_POSTERS[src];
     return undefined;
   }, [tour]);
 
@@ -106,6 +112,9 @@ const TourDetailPage = () => {
     if (!tour) return "default";
     if (tour.id === "winter-1") return "izubrinaya";
     if (tour.id === "winter-5") return "arsgora";
+    if (tour.id === "spring-1") return "lysy-ded";
+    if (tour.id === "spring-2") return "olkhovaya";
+    if (tour.id === "spring-3") return "pidan";
     return "default";
   }, [tour]);
 

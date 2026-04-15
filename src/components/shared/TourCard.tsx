@@ -94,7 +94,7 @@ const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = fal
     return (
       <Link
         to={buildTourDetailPath(tour.season, tour.id)}
-        className="card-base block cursor-pointer no-underline text-inherit"
+        className="card-base block h-full w-full max-h-tour-card max-w-tour-card justify-self-center cursor-pointer no-underline text-inherit"
         prefetch="intent"
       >
         {cardInner(tour, compact, priorityImage)}
@@ -111,7 +111,7 @@ const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = fal
 
   return (
     <div
-      className="card-base cursor-pointer"
+      className="card-base h-full w-full max-h-tour-card max-w-tour-card justify-self-center cursor-pointer"
       onClick={onClick}
       role="button"
       tabIndex={0}

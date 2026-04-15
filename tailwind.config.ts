@@ -18,6 +18,7 @@ import {
   fontFamilyBodyStack,
   fontFamilyBrandWordmarkStack,
   fontFamilyHeadingStack,
+  fontFamilyHeroHeadingStack,
   fontFamilyHeroPhraseStack,
   fontFamilyHomeSeasonBannerStack,
   fontFamilyMonoStack,
@@ -241,6 +242,7 @@ const config: Config = {
     { pattern: /^(h|min-h|w)-nav-season-(circle|icon)-(fixed|fluid)$/, variants: ['md', 'max'] },
     // @apply в index.css не подхватывает кастомные font-*; в JSX классы нужны в билде.
     'font-heading',
+    'font-hero-heading',
     'font-brand-wordmark',
     'font-hero-carousel-phrase',
     'text-brand-wordmark-nav',
@@ -257,6 +259,9 @@ const config: Config = {
     'text-home-season-strip-label',
     'font-home-season-banner',
     'text-home-season-banner-letter',
+    'text-home-hero-document-title',
+    'text-home-hero-carousel-phrase',
+    'max-w-home-hero-phrase',
     'drop-shadow-home-season-banner-letter',
     'z-home-season-banner',
     'z-30',
@@ -442,8 +447,9 @@ const config: Config = {
         'photo-viewer-nav-hover': 'rgba(13, 13, 13, 0.62)',
       },
       fontFamily: {
-        // Стеки — `src/constants/fonts.ts`. Nord: `font-heading` / `font-hero-carousel-phrase`; лого navbar — `font-brand-wordmark` (Dela Gothic One).
+        // Стеки — `src/constants/fonts.ts`. Hero: `font-hero-heading` / `font-hero-carousel-phrase`; лого navbar — `font-brand-wordmark` (Dela Gothic One).
         heading:               [...fontFamilyHeadingStack],
+        'hero-heading':        [...fontFamilyHeroHeadingStack],
         'brand-wordmark':      [...fontFamilyBrandWordmarkStack],
         'home-season-banner':  [...fontFamilyHomeSeasonBannerStack],
         body:                  [...fontFamilyBodyStack],
@@ -477,6 +483,20 @@ const config: Config = {
          * Цена в том же ряду: от 2× `text-xl` (1.25rem), затем −35% ≈ 1.625rem.
          */
         'tour-detail-meta-price-prominent': ['1.625rem', { lineHeight: '1.2' }],
+        /**
+         * Заголовок документа в шапке hero главной (`HeroCarousel` h1): меньше, чем `text-section`.
+         */
+        'home-hero-document-title': [
+          'clamp(1.125rem, 1.65vw + 0.4rem, 1.625rem)',
+          { lineHeight: '1.2' },
+        ],
+        /**
+         * Подпись-фраза тура в hero (`HeroCarousel`): clamp по ширине вьюпорта, переносы через утилиты в JSX.
+         */
+        'home-hero-carousel-phrase': [
+          'clamp(0.9375rem, 2.8vw + 0.55rem, 2rem)',
+          { lineHeight: '1.35' },
+        ],
         /** Подпись «В другой сезон» над переключателем на главной (полоса с фоном). */
         'home-season-strip-label': ['1.125rem', { lineHeight: '1.35', letterSpacing: '0.1em' }],
         /**
@@ -732,6 +752,8 @@ const config: Config = {
         'photo-viewer': 'min(90dvh, 90vh)',
         /** Тело модалок с прокруткой (`TourRequestModal`, `TeamMemberModal`). */
         'modal-body': 'min(90dvh, 90vh)',
+        /** Максимальная высота карточки тура в сетке главной. */
+        'tour-card': '30rem',
       },
       minWidth: {
         /** Минимальная сторона круглой кнопки «к hero» на воротах (~44px hit area). */
@@ -740,18 +762,24 @@ const config: Config = {
       maxWidth: {
         /** Основная колонка страницы тура: как у сайтового контейнера (`max-w-7xl`), шире прежнего `5xl`. */
         tourDetail: '80rem',
+        /** Контейнер баннера ворот: центрирование и ограничение ширины на широких экранах. */
+        'home-gate-banner-shell': 'min(100%, 80rem)',
         /** Горизонтальный разделитель над блоком «Команда» (`TeamCarousel`). */
         'team-section-divider': '28rem',
         /** Декоративный графический знак за контентом секции контактов (`ContactSection`); кап ×2 к прежнему 22rem. */
         'contact-section-mark': 'min(96vw, 44rem)',
+        /** Единая максимальная ширина карточки тура в сетке главной. */
+        'tour-card': '22rem',
+        /** Блок подписи/CTA карусели в hero: не шире контента и вьюпорта. */
+        'home-hero-phrase': 'min(100%, min(42rem, 92vw))',
       },
       minHeight: {
         /** Герой секции «Безопасность» на главной (фото + градиент и текст). */
         'home-safety-hero': 'clamp(17rem, 52vw, 26rem)',
         /** Минимальная высота круглой кнопки «к hero» на воротах (`min-w-home-gate-scroll-hint-target`). */
         'home-gate-scroll-hint-target': '2.75rem',
-        /** Минимальная высота прямоугольника баннера внутри контейнера (md+). */
-        'home-season-banner-inner': '11rem',
+        /** Минимальная высота прямоугольника баннера внутри ворот (адаптивно для mobile/tablet/desktop). */
+        'home-season-banner-inner': 'clamp(8.5rem, 18vw, 12.5rem)',
         /** Плейсхолдер ячейки видео в сетке до готовности плеера (`GalleryGridVideo`). */
         'gallery-grid-video': '4rem',
         /** Fallback при Suspense при смене маршрута (без CLS от «прыга» контента). */

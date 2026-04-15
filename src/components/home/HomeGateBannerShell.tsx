@@ -9,7 +9,10 @@ interface HomeGateBannerShellProps {
  */
 export function HomeGateBannerShell({ children }: HomeGateBannerShellProps) {
   return (
-    <div data-home-gate-banner-shell className="overflow-hidden opacity-100">
+    <div
+      data-home-gate-banner-shell
+      className="w-full max-w-home-gate-banner-shell overflow-hidden opacity-100"
+    >
       {children}
     </div>
   );

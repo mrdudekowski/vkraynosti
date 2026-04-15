@@ -7,12 +7,25 @@ import { useCarousel } from '../../hooks/useCarousel';
 import { useScrollScrubFade } from '../../hooks/useScrollScrubFade';
 import CarouselSlide from '../shared/CarouselSlide';
 import { UI } from '../../constants/ui';
-import { heroCarouselPhraseTypographyStyle } from '../../constants/typography';
 import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { buildTourDetailPath } from '../../constants/routes';
 import { getToursBySeason } from '../../data/toursData';
 import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
+
+const HERO_PAGINATION_ACTIVE_DOT_CLASS: Record<Season, string> = {
+  winter: 'bg-season-winter',
+  spring: 'bg-season-spring',
+  summer: 'bg-season-summer',
+  fall: 'bg-season-fall',
+};
+
+const HERO_PAGINATION_INACTIVE_DOT_HOVER_CLASS: Record<Season, string> = {
+  winter: 'hover:bg-season-winter/80',
+  spring: 'hover:bg-season-spring/80',
+  summer: 'hover:bg-season-summer/80',
+  fall: 'hover:bg-season-fall/80',
+};
 
 function assignRef<T>(ref: Ref<T> | undefined, value: T | null): void {
   if (ref == null) return;
@@ -43,17 +56,16 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
           >
-            <div className="flex w-full max-w-2xl mx-auto justify-center px-home-hero-carousel-text-gutter-x pb-24 md:px-4">
+            <div className="flex w-full max-w-home-hero-phrase mx-auto justify-center px-home-hero-carousel-text-gutter-x pb-24 md:px-4">
               <Link
                 to={buildTourDetailPath(tour.season, tour.id)}
-                className="text-center group flex flex-col items-center gap-hero-phrase-cta-gap"
+                className="text-center group flex min-w-0 w-full max-w-full flex-col items-center gap-hero-phrase-cta-gap"
                 tabIndex={idx === current ? 0 : -1}
                 aria-label={`${tour.title}. ${UI.hero.viewTour}`}
                 prefetch="intent"
               >
                 <p
-                  className="font-hero-carousel-phrase font-medium text-text-inverse/80 hero-carousel-phrase-text-shadow max-w-full"
-                  style={heroCarouselPhraseTypographyStyle}
+                  className="font-hero-carousel-phrase text-home-hero-carousel-phrase font-normal text-text-inverse hero-carousel-phrase-text-shadow w-full min-w-0 max-w-full text-pretty break-words hyphens-auto"
                 >
                   {tour.heroPhrase}
                 </p>
@@ -85,7 +97,9 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             key={idx}
             onClick={() => goTo(idx)}
             className={`w-2.5 h-2.5 rounded-full transition-all duration-hover ${
-              idx === current ? 'bg-brand-secondary scale-125' : 'bg-white/50 hover:bg-white/80'
+              idx === current
+                ? `${HERO_PAGINATION_ACTIVE_DOT_CLASS[activeSeason]} scale-125`
+                : `bg-white/50 ${HERO_PAGINATION_INACTIVE_DOT_HOVER_CLASS[activeSeason]}`
             }`}
             aria-label={`Слайд ${idx + 1}`}
           />
@@ -116,7 +130,7 @@ const HeroCarouselInner = forwardRef<HTMLElement>(function HeroCarousel(_props, 
     >
       <div ref={heroContentFadeRef} className="absolute inset-0 z-10 transition-none">
         <header className="absolute top-home-hero-title-top right-6 z-20 max-w-md pl-4 text-right">
-          <h1 className="font-brand-wordmark text-text-inverse text-section leading-tight drop-shadow-md">
+          <h1 className="font-hero-heading text-text-inverse text-home-hero-document-title drop-shadow-md">
             {UI.hero.documentTitle}
           </h1>
         </header>

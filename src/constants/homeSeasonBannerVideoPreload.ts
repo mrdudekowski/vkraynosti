@@ -1,4 +1,7 @@
-import { HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS } from './images';
+import {
+  HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS,
+  HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS,
+} from './images';
 
 /**
  * Сколько лупов отдаём в `<head>` как `rel="preload" as="video"`.
@@ -17,6 +20,12 @@ export interface HomeSeasonBannerWinterVideoPreloadLink {
  */
 export function getHomeSeasonBannerWinterVideoPreloadLinks(): readonly HomeSeasonBannerWinterVideoPreloadLink[] {
   return HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT).map(
+    (href) => ({ href, fetchPriority: 'high' as const })
+  );
+}
+
+export function getHomeSeasonBannerSpringVideoPreloadLinks(): readonly HomeSeasonBannerWinterVideoPreloadLink[] {
+  return HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT).map(
     (href) => ({ href, fetchPriority: 'high' as const })
   );
 }

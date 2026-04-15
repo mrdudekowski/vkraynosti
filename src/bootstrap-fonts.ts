@@ -7,6 +7,7 @@ import {
 } from './constants/fonts';
 
 const VK_FONTS_ATTR = 'data-vk-fonts';
+const STROGO_FONT_URL = new URL('../fonts/Strogo-Regular.ttf', import.meta.url).href;
 
 /**
  * Nord `@font-face` вставляется из JS с полными URL (`BASE_URL`), без `url(var(...))` — иначе минификатор CSS ломает синтаксис.
@@ -68,6 +69,24 @@ function injectSatyrBannerFontFace(): void {
   document.head.prepend(style);
 }
 
+function injectStrogoFontFace(): void {
+  if (typeof document === 'undefined') return;
+  if (document.head.querySelector('style[data-vk-strogo-font-face]')) return;
+
+  const style = document.createElement('style');
+  style.setAttribute('data-vk-strogo-font-face', '');
+  style.textContent = `
+@font-face {
+  font-family: 'Strogo';
+  src: url('${STROGO_FONT_URL}') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+`.trim();
+  document.head.prepend(style);
+}
+
 /**
  * Подключает Google Fonts из `constants/fonts.ts` до основного CSS (без второго @import в bundle).
  * Preload критичного Nord Regular — быстрее первый текст в `font-heading`.
@@ -75,6 +94,7 @@ function injectSatyrBannerFontFace(): void {
 if (typeof document !== 'undefined') {
   injectNordFontFaces();
   injectSatyrBannerFontFace();
+  injectStrogoFontFace();
 
   if (!document.head.querySelector(`link[${VK_FONTS_ATTR}]`)) {
     const head = document.head;
@@ -86,6 +106,14 @@ if (typeof document !== 'undefined') {
     preloadNord.href = NORD_FONT_URLS.regular;
     preloadNord.crossOrigin = 'anonymous';
     preloadNord.setAttribute(VK_FONTS_ATTR, '');
+
+    const preloadStrogo = document.createElement('link');
+    preloadStrogo.rel = 'preload';
+    preloadStrogo.as = 'font';
+    preloadStrogo.type = 'font/ttf';
+    preloadStrogo.href = STROGO_FONT_URL;
+    preloadStrogo.crossOrigin = 'anonymous';
+    preloadStrogo.setAttribute(VK_FONTS_ATTR, '');
 
     const preApi = document.createElement('link');
     preApi.rel = 'preconnect';
@@ -103,6 +131,6 @@ if (typeof document !== 'undefined') {
     sheet.href = GOOGLE_FONTS_STYLESHEET_HREF;
     sheet.setAttribute(VK_FONTS_ATTR, '');
 
-    head.append(preloadNord, preApi, preStatic, sheet);
+    head.append(preloadNord, preloadStrogo, preApi, preStatic, sheet);
   }
 }

@@ -1,7 +1,7 @@
 /**
  * Имена семей и загрузка шрифтов.
  *
- * Локально: Nord (Light / Regular / Medium / Bold), Satyr SP Basic (баннер главной) — `public/fonts/` + `@font-face` в `bootstrap-fonts.ts`.
+ * Локально: Nord (Light / Regular / Medium / Bold), Satyr SP Basic (баннер главной), Strogo (hero) — `@font-face` в `bootstrap-fonts.ts`.
  * Google Fonts: Dela Gothic One (лого в navbar), Source Sans 3 (body).
  *
  * При смене имён файлов Nord — обновить и этот файл (константы ниже), и `bootstrap-fonts.ts`.
@@ -10,10 +10,12 @@
 export {
   FONT_FAMILY_NORD,
   FONT_FAMILY_BRAND_WORDMARK,
+  FONT_FAMILY_HERO_HEADING,
   FONT_FAMILY_BODY,
   FONT_FAMILY_HOME_SEASON_BANNER,
   TAILWIND_FONT_HEADING_CLASS,
   fontFamilyHeadingStack,
+  fontFamilyHeroHeadingStack,
   fontFamilyHeroPhraseStack,
   fontFamilyBrandWordmarkStack,
   fontFamilyHomeSeasonBannerStack,

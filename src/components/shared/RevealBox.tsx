@@ -19,6 +19,8 @@ const RevealBox = ({
   className = '',
   id,
   once,
+  bidirectional,
+  directional,
   threshold,
   rootMargin,
   initialVisible,
@@ -26,6 +28,8 @@ const RevealBox = ({
 }: RevealBoxProps) => {
   const { ref, isRevealed, revealClassName } = useRevealOnScroll({
     once,
+    bidirectional,
+    directional,
     threshold,
     rootMargin,
     initialVisible,

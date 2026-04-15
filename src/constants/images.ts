@@ -396,6 +396,36 @@ export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS: Record<string, string
   [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[9]]: `${BANNER_WINTER}/gr.bbq.banner-loop.poster.webp`,
 };
 
+/**
+ * Весна: баннер ворот главной из оптимизированных grid-клипов туров spring-2/spring-3.
+ * До появления новых spring-лупов в `public/banners_spring/` дублируем клипы #2 и #5, чтобы закрыть 10 колонок.
+ */
+export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS = [
+  `${TOUR_SPRING_2}/olv.clip1.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip1.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip2.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip5.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip4.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip3.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip6.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip7.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip1.grid.webm`,
+  `${TOUR_SPRING_3}/pd.clip4.grid.webm`,
+] as const;
+
+export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS: Record<string, string> = {
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[0]]: `${TOUR_SPRING_2}/olv.clip1.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[1]]: `${TOUR_SPRING_3}/pd.clip1.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[2]]: `${TOUR_SPRING_3}/pd.clip2.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[3]]: `${TOUR_SPRING_3}/pd.clip5.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[4]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[5]]: `${TOUR_SPRING_3}/pd.clip3.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[6]]: `${TOUR_SPRING_3}/pd.clip6.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[7]]: `${TOUR_SPRING_3}/pd.clip7.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[8]]: `${TOUR_SPRING_3}/pd.clip1.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[9]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
+};
+
 /** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */
 export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-logo.svg` as const;
 

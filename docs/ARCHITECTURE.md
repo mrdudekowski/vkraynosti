@@ -35,5 +35,7 @@
 
 ## Связанные документы
 
+- [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) — контекст продукта, зафиксированные решения и **инженерный TODO** по коду
+- [PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md) — чек-лист до коммерческого продакшена
 - [PERFORMANCE.md](./PERFORMANCE.md) — метрики и проверки производительности
 - Корневой [README.md](../README.md) — команды и CI

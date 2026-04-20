@@ -310,6 +310,15 @@ export const TOUR_SPRING_2_COVER_GRID = TOUR_SPRING_2_GALLERY_GRID[0];
 export const TOUR_SPRING_2_COVER = TOUR_SPRING_2_COVER_GRID;
 
 const TOUR_SPRING_3 = `${TOURS_ASSET_BASE}/spring-3`;
+const TOUR_SPRING_4 = `${TOURS_ASSET_BASE}/spring-4`;
+const TOUR_SPRING_5 = `${TOURS_ASSET_BASE}/spring-5`;
+
+/** Первый ролик «Сестра» (`ss.clip1.*`); постер — в плейсхолдере сетки «Пидан» и в баннере главной. */
+export const TOUR_SPRING_4_CLIP1_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip1.grid.webm` as const;
+export const TOUR_SPRING_4_CLIP1_VIEWER_WEBM = `${TOUR_SPRING_4}/ss.clip1.webm` as const;
+export const TOUR_SPRING_4_CLIP1_POSTER_WEBP = `${TOUR_SPRING_4}/ss.clip1.poster.webp` as const;
+export const TOUR_SPRING_4_CLIP3_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip3.grid.webm` as const;
+export const TOUR_SPRING_4_CLIP5_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip5.grid.webm` as const;
 
 /** «Пидан» — полное качество (просмотрщик). */
 export const TOUR_SPRING_3_GALLERY_VIEWER = [
@@ -317,7 +326,7 @@ export const TOUR_SPRING_3_GALLERY_VIEWER = [
   `${TOUR_SPRING_3}/pd.preface.webp`,
   `${TOUR_SPRING_3}/pd.group.webp`,
   `${TOUR_SPRING_3}/pd.taiga.webp`,
-  `${TOUR_SPRING_3}/pd.clip1.webm`,
+  TOUR_SPRING_4_CLIP1_POSTER_WEBP,
   `${TOUR_SPRING_3}/pd.clip2.webm`,
   `${TOUR_SPRING_3}/pd.ridge.webp`,
   `${TOUR_SPRING_3}/pd.clip5.webm`,
@@ -334,7 +343,7 @@ export const TOUR_SPRING_3_GALLERY_GRID = [
   `${TOUR_SPRING_3}/pd.preface.grid.webp`,
   `${TOUR_SPRING_3}/pd.group.grid.webp`,
   `${TOUR_SPRING_3}/pd.taiga.grid.webp`,
-  `${TOUR_SPRING_3}/pd.clip1.grid.webm`,
+  TOUR_SPRING_4_CLIP1_POSTER_WEBP,
   `${TOUR_SPRING_3}/pd.clip2.grid.webm`,
   `${TOUR_SPRING_3}/pd.ridge.grid.webp`,
   `${TOUR_SPRING_3}/pd.clip5.grid.webm`,
@@ -350,7 +359,6 @@ export const TOUR_SPRING_3_GALLERY_GRID = [
 export const TOUR_SPRING_3_GROUP_IMAGE = TOUR_SPRING_3_GALLERY_GRID[2];
 
 export const TOUR_SPRING_3_GRID_VIDEO_POSTERS: Record<string, string> = {
-  [TOUR_SPRING_3_GALLERY_GRID[4]]: `${TOUR_SPRING_3}/pd.clip1.poster.webp`,
   [TOUR_SPRING_3_GALLERY_GRID[5]]: `${TOUR_SPRING_3}/pd.clip2.poster.webp`,
   [TOUR_SPRING_3_GALLERY_GRID[7]]: `${TOUR_SPRING_3}/pd.clip5.poster.webp`,
   [TOUR_SPRING_3_GALLERY_GRID[9]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
@@ -361,6 +369,73 @@ export const TOUR_SPRING_3_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 export const TOUR_SPRING_3_COVER_GRID = TOUR_SPRING_3_GALLERY_GRID[0];
 export const TOUR_SPRING_3_COVER = TOUR_SPRING_3_COVER_GRID;
+
+/** Обложка карточки и первый кадр сетки — панорама (`ss.pan`). */
+export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/ss.pan.grid.webp` as const;
+
+/**
+ * «Сестра» — полное качество (просмотрщик). Макет `sestra` (как «Пидан»): после hero/preface
+ * group, taiga, clip1…clip6 и clip8 в слотах 2,3,5,6,7,9,10,11; фото — pan, topping между роликами (clip7 исключён).
+ */
+export const TOUR_SPRING_4_GALLERY_VIEWER = [
+  `${TOUR_SPRING_4}/ss.pan.webp`,
+  `${TOUR_SPRING_4}/ss.topping.webp`,
+  `${TOUR_SPRING_4}/ss.team.webp`,
+  `${TOUR_SPRING_4}/ss.taiga.webp`,
+  TOUR_SPRING_4_CLIP1_VIEWER_WEBM,
+  `${TOUR_SPRING_4}/ss.clip2.webm`,
+  `${TOUR_SPRING_4}/ss.pan.webp`,
+  `${TOUR_SPRING_4}/ss.clip3.webm`,
+  `${TOUR_SPRING_4}/ss.clip4.webm`,
+  `${TOUR_SPRING_4}/ss.clip5.webm`,
+  `${TOUR_SPRING_4}/ss.topping.webp`,
+  `${TOUR_SPRING_4}/ss.clip6.webm`,
+  `${TOUR_SPRING_4}/ss.clip8.webm`,
+] as const;
+
+/** Сетка «Сестра» (VP9 grid-webm для клипов; clip7 исключён из тура). */
+export const TOUR_SPRING_4_GALLERY_GRID = [
+  `${TOUR_SPRING_4}/ss.pan.grid.webp`,
+  `${TOUR_SPRING_4}/ss.topping.grid.webp`,
+  `${TOUR_SPRING_4}/ss.team.grid.webp`,
+  `${TOUR_SPRING_4}/ss.taiga.grid.webp`,
+  TOUR_SPRING_4_CLIP1_GRID_WEBM,
+  `${TOUR_SPRING_4}/ss.clip2.grid.webm`,
+  `${TOUR_SPRING_4}/ss.pan.grid.webp`,
+  TOUR_SPRING_4_CLIP3_GRID_WEBM,
+  `${TOUR_SPRING_4}/ss.clip4.grid.webm`,
+  TOUR_SPRING_4_CLIP5_GRID_WEBM,
+  `${TOUR_SPRING_4}/ss.topping.grid.webp`,
+  `${TOUR_SPRING_4}/ss.clip6.grid.webm`,
+  `${TOUR_SPRING_4}/ss.clip8.grid.webm`,
+] as const;
+
+/** Первый кадр сетки после hero/preface — `slice(2)` [0] («Сестра», макет `sestra`). */
+export const TOUR_SPRING_4_GROUP_IMAGE = TOUR_SPRING_4_GALLERY_GRID[2];
+
+export const TOUR_SPRING_4_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [TOUR_SPRING_4_CLIP1_GRID_WEBM]: TOUR_SPRING_4_CLIP1_POSTER_WEBP,
+  [`${TOUR_SPRING_4}/ss.clip2.grid.webm`]: `${TOUR_SPRING_4}/ss.clip2.poster.webp`,
+  [TOUR_SPRING_4_CLIP3_GRID_WEBM]: `${TOUR_SPRING_4}/ss.clip3.poster.webp`,
+  [`${TOUR_SPRING_4}/ss.clip4.grid.webm`]: `${TOUR_SPRING_4}/ss.clip4.poster.webp`,
+  [TOUR_SPRING_4_CLIP5_GRID_WEBM]: `${TOUR_SPRING_4}/ss.clip5.poster.webp`,
+  [`${TOUR_SPRING_4}/ss.clip6.grid.webm`]: `${TOUR_SPRING_4}/ss.clip6.poster.webp`,
+  [`${TOUR_SPRING_4}/ss.clip8.grid.webm`]: `${TOUR_SPRING_4}/ss.clip8.poster.webp`,
+};
+
+/** «Читинза» — текущая подборка оригинальных фото из `content/Читинза` (webp). */
+export const TOUR_SPRING_5_GALLERY_VIEWER = [
+  `${TOUR_SPRING_5}/peak.webp`,
+  `${TOUR_SPRING_5}/peak2.webp`,
+  `${TOUR_SPRING_5}/peak5.webp`,
+  `${TOUR_SPRING_5}/yar.webp`,
+  `${TOUR_SPRING_5}/forest.webp`,
+  `${TOUR_SPRING_5}/woods.webp`,
+] as const;
+
+/** Для фото-сета `spring-5` grid совпадает с viewer. */
+export const TOUR_SPRING_5_GALLERY_GRID = TOUR_SPRING_5_GALLERY_VIEWER;
+export const TOUR_SPRING_5_COVER_GRID = TOUR_SPRING_5_GALLERY_GRID[0];
 
 /**
  * Короткие лупы для баннера главной (колонки 0…9 ↔ `UI.homeSeasonBannerWordmark`).
@@ -402,27 +477,27 @@ export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS: Record<string, string
  */
 export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS = [
   `${TOUR_SPRING_2}/olv.clip1.grid.webm`,
-  `${TOUR_SPRING_3}/pd.clip1.grid.webm`,
+  TOUR_SPRING_4_CLIP1_GRID_WEBM,
   `${TOUR_SPRING_3}/pd.clip2.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip5.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip4.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip3.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip6.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip7.grid.webm`,
-  `${TOUR_SPRING_3}/pd.clip1.grid.webm`,
+  TOUR_SPRING_4_CLIP1_GRID_WEBM,
   `${TOUR_SPRING_3}/pd.clip4.grid.webm`,
 ] as const;
 
 export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS: Record<string, string> = {
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[0]]: `${TOUR_SPRING_2}/olv.clip1.poster.webp`,
-  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[1]]: `${TOUR_SPRING_3}/pd.clip1.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[1]]: TOUR_SPRING_4_CLIP1_POSTER_WEBP,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[2]]: `${TOUR_SPRING_3}/pd.clip2.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[3]]: `${TOUR_SPRING_3}/pd.clip5.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[4]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[5]]: `${TOUR_SPRING_3}/pd.clip3.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[6]]: `${TOUR_SPRING_3}/pd.clip6.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[7]]: `${TOUR_SPRING_3}/pd.clip7.poster.webp`,
-  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[8]]: `${TOUR_SPRING_3}/pd.clip1.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[8]]: TOUR_SPRING_4_CLIP1_POSTER_WEBP,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[9]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
 };
 
@@ -433,15 +508,15 @@ export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-l
 export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.png` as const;
 
 /**
- * Обложки весенних туров: spring-1…3 — оптимизированный первый кадр из `public/tours/spring-N/`;
- * spring-4…7 — `public/spring tours/` (пока общие webp).
+ * Обложки весенних туров: spring-1…4 — первый кадр сетки из `public/tours/spring-N/`;
+ * spring-5…7 — `public/spring tours/` (пока общие webp).
  */
 export const SPRING_TOUR_COVERS = {
   'spring-1': TOUR_SPRING_1_COVER,
   'spring-2': TOUR_SPRING_2_COVER,
   'spring-3': TOUR_SPRING_3_COVER,
-  'spring-4': `${SPRING_TOUR_PUBLIC}/spring-4.webp`,
-  'spring-5': `${SPRING_TOUR_PUBLIC}/spring-5.webp`,
+  'spring-4': TOUR_SPRING_4_COVER_GRID,
+  'spring-5': TOUR_SPRING_5_COVER_GRID,
   'spring-6': `${SPRING_TOUR_PUBLIC}/spring-6.webp`,
   'spring-7': `${SPRING_TOUR_PUBLIC}/spring-7.webp`,
 } as const;

@@ -4,6 +4,7 @@ import GalleryGridVideo from './GalleryGridVideo';
 import {
   TOUR_SPRING_2_LAKE1_IMAGE,
   TOUR_SPRING_3_GROUP_IMAGE,
+  TOUR_SPRING_4_GROUP_IMAGE,
   TOUR_WINTER_1_REST4_IMAGE,
   TOUR_WINTER_1_TOP_IMAGE,
   TOUR_WINTER_2_PEAK_IMAGE,
@@ -25,7 +26,8 @@ export type TourGalleryLayoutVariant =
   | 'arsgora'
   | 'lysy-ded'
   | 'olkhovaya'
-  | 'pidan';
+  | 'pidan'
+  | 'sestra';
 
 export interface TourDetailGalleryProps {
   /** Кадры для сетки (без главного фото hero страницы). */
@@ -389,7 +391,7 @@ const TourDetailGalleryComponent = ({
   /**
    * Пидан (spring-3): чередование 2×2 и bento 1×2 + два квадрата справа.
    * Сверху — bento clip5 \| вершина \| clip4; групповое фото 2×2 — после гребня; внизу bento clip3 \| clip6 \| clip7.
-   * Порядок `slice(2)`: group, taiga, clip1, clip2, ridge, clip5, summit, clip4, sea, clip3, clip6, clip7.
+   * Порядок `slice(2)`: group, taiga, clip1_poster (файл в `tours/spring-4/`), clip2, ridge, clip5, summit, clip4, sea, clip3, clip6, clip7.
    */
   if (
     layoutVariant === 'pidan' &&
@@ -424,6 +426,52 @@ const TourDetailGalleryComponent = ({
         {pidanFullWidthSquare(0)}
         {pidanFullWidthSquare(8)}
         {pidanBentoRow(9, 10, 11)}
+      </div>
+    );
+  }
+
+  /**
+   * Сестра (spring-4): как «Пидан» (`pidan`), другой якорный URL группового кадра; без clip7 (11 кадров после preface).
+   * Порядок `slice(2)`: group, taiga, clip1…clip6, clip8; фото — pan, topping; нижний ряд — clip6 и clip8 по высоте bento.
+   */
+  if (
+    layoutVariant === 'sestra' &&
+    images.length === 11 &&
+    images[0] === TOUR_SPRING_4_GROUP_IMAGE
+  ) {
+    const sestraTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
+    const sestraTallLeft =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const sestraTallRight =
+      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const sestraRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
+    const sestraRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
+
+    const sestraFullWidthSquare = (sliceIndex: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[sliceIndex], sliceIndex, sestraTwoByTwo)}
+      </div>
+    );
+
+    const sestraBentoRow = (left: number, rightTop: number, rightBottom: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[left], left, sestraTallLeft)}
+        {renderTileButton(images[rightTop], rightTop, sestraRightTop)}
+        {renderTileButton(images[rightBottom], rightBottom, sestraRightBot)}
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        {sestraBentoRow(5, 6, 7)}
+        {sestraBentoRow(1, 2, 3)}
+        {sestraFullWidthSquare(4)}
+        {sestraFullWidthSquare(0)}
+        {sestraFullWidthSquare(8)}
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[9], 9, sestraTallLeft)}
+          {renderTileButton(images[10], 10, sestraTallRight)}
+        </div>
       </div>
     );
   }

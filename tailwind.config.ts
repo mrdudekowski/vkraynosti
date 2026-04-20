@@ -725,14 +725,14 @@ const config: Config = {
         'nav-season-icon-fixed': '1rem',
         'nav-season-icon-fluid':
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
-        /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`). */
-        'home-gate-scroll-hint-icon': '1.375rem',
+        /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`), увеличена в 2 раза. */
+        'home-gate-scroll-hint-icon': '2.75rem',
         /** Hero страницы тура (карусель фото + градиент под заголовок). */
         'tour-detail-hero': 'clamp(28rem, 58vh, 48rem)',
       },
       width: {
-        /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`). */
-        'home-gate-scroll-hint-icon': '1.375rem',
+        /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`), увеличена в 2 раза. */
+        'home-gate-scroll-hint-icon': '2.75rem',
         'nav-season-circle-fixed': '2.25rem',
         'nav-season-circle-fluid':
           'clamp(1.75rem, 1.75rem + (100vw - 20rem) * 0.0444, 2.25rem)',

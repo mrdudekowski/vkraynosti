@@ -25,8 +25,8 @@ export const HOME_SEASON_BANNER_MEDIA_VISIBLE_MS =
  */
 export const HOME_SEASON_BANNER_CROSSFADE_MS = 260 as const;
 
-/** Fade in полоски (видео) после rAF. Синхронно с `duration-home-season-banner-strip-in`. */
-export const HOME_SEASON_BANNER_STRIP_FADE_IN_MS = 216 as const;
+/** Fade in полоски (видео) после rAF. Увеличен для более мягких hover-переходов. */
+export const HOME_SEASON_BANNER_STRIP_FADE_IN_MS = 340 as const;
 
 /**
  * Fade in полного слова «Вкрайности» (после rAF в хуке).

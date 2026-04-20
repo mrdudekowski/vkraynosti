@@ -7,6 +7,8 @@
 | Документ | Назначение |
 |----------|------------|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Структура репозитория, слои, маршрутизация |
+| [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md) | Контекст продукта, зафиксированные решения, **инженерный TODO** по коду |
+| [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md) | Чек-лист до коммерческого продакшена |
 | [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Метрики производительности, **профилирование в Chrome (Profiler / Performance)**, эталоны |
 | [.cursor/rules/vkraynosti.mdc](.cursor/rules/vkraynosti.mdc) | Правила кода для агентов и разработчиков (SSOT по стилю и данным) |
 

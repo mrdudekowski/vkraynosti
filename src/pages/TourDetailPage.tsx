@@ -12,6 +12,7 @@ import {
 import {
   TOUR_SPRING_2_GRID_VIDEO_POSTERS,
   TOUR_SPRING_3_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_4_GRID_VIDEO_POSTERS,
   TOUR_WINTER_3_GRID_VIDEO_POSTERS,
   TOUR_WINTER_3_PREFACE_BACKGROUND,
   TOUR_WINTER_4_GRID_VIDEO_POSTERS,
@@ -22,6 +23,7 @@ import {
   getTourGalleryGridUrls,
   getTourGalleryViewerUrls,
 } from "../utils/tourGalleryUrls";
+import { splitTourDescription } from "../utils/splitTourDescription";
 import PageMeta from "../components/shared/PageMeta";
 import TourDetailHero from "../components/tours/TourDetailHero";
 import TourDetailGallery, {
@@ -105,6 +107,8 @@ const TourDetailPage = () => {
       return (src) => TOUR_SPRING_2_GRID_VIDEO_POSTERS[src];
     if (tour.id === "spring-3")
       return (src) => TOUR_SPRING_3_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-4")
+      return (src) => TOUR_SPRING_4_GRID_VIDEO_POSTERS[src];
     return undefined;
   }, [tour]);
 
@@ -115,6 +119,7 @@ const TourDetailPage = () => {
     if (tour.id === "spring-1") return "lysy-ded";
     if (tour.id === "spring-2") return "olkhovaya";
     if (tour.id === "spring-3") return "pidan";
+    if (tour.id === "spring-4") return "sestra";
     return "default";
   }, [tour]);
 
@@ -143,6 +148,15 @@ const TourDetailPage = () => {
   const closePhotoViewer = useCallback(() => {
     setPhotoViewer(null);
   }, []);
+
+  const descriptionColumns = useMemo(
+    () =>
+      splitTourDescription(
+        tour?.description ?? "",
+        tour?.descriptionAside
+      ),
+    [tour?.description, tour?.descriptionAside]
+  );
 
   if (!tour) {
     const notFoundBody = UI.tourDetail.notFoundWithId.replace("{id}", tourId);
@@ -183,6 +197,11 @@ const TourDetailPage = () => {
       disabled={isLgOrAbove}
     >
       <div className="min-w-0">
+        {descriptionColumns.asideText != null && (
+          <p className="tour-detail-about-aside-copy">
+            {descriptionColumns.asideText}
+          </p>
+        )}
         <TourDetailSectionHeading
           title={UI.tourDetail.includedHeading}
           season={tour.season}
@@ -272,7 +291,11 @@ const TourDetailPage = () => {
                                 {tour.descriptionLeadBold}
                               </strong>
                             )}
-                          {tour.description}
+                          {tour.descriptionLeadBold != null &&
+                          tour.descriptionLeadBold.length > 0
+                            ? " — "
+                            : ""}
+                          {descriptionColumns.primaryText}
                         </p>
                         <div className="mt-8 max-w-prose">
                           <TourRequestCtaButton
@@ -299,7 +322,11 @@ const TourDetailPage = () => {
                             {tour.descriptionLeadBold}
                           </strong>
                         )}
-                      {tour.description}
+                      {tour.descriptionLeadBold != null &&
+                      tour.descriptionLeadBold.length > 0
+                        ? " — "
+                        : ""}
+                      {descriptionColumns.primaryText}
                     </p>
                     <div className="mt-8 max-w-prose">
                       <TourRequestCtaButton onClick={handleOpenTourRequest} />

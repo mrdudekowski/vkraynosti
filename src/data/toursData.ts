@@ -50,6 +50,10 @@ import {
   TOUR_SPRING_3_COVER,
   TOUR_SPRING_3_GALLERY_GRID,
   TOUR_SPRING_3_GALLERY_VIEWER,
+  TOUR_SPRING_4_GALLERY_GRID,
+  TOUR_SPRING_4_GALLERY_VIEWER,
+  TOUR_SPRING_5_GALLERY_GRID,
+  TOUR_SPRING_5_GALLERY_VIEWER,
 } from '../constants/images';
 import { UI } from '../constants/ui';
 
@@ -441,7 +445,9 @@ export const TOURS: Tour[] = [
     price: '6 000 ₽',
     descriptionLeadBold: 'Гора Пидан (Высокая, 1332 м)',
     description:
-      ' — главная мистическая вершина Южного Приморья, часть Ливадийского хребта. Известна древними дольменами, каменными россыпями-курумниками и мощной энергетикой, привлекающей туристов со всего Дальнего Востока. Летом гора особенно хороша: зелёная тайга, цветущий рододендрон на склонах, прозрачный воздух и панорама до Японского моря с вершины. Входит в список «Приморского барса».',
+      ' — главная мистическая вершина Южного Приморья известна древними дольменами, каменными россыпями-курумниками и мощной энергетикой.',
+    descriptionAside:
+      'Привлекает туристов зеленой тайгой, цветущим рододендроном на склонах, панорамой Японского моря и самым чистым прозрачным воздухом.',
     program: [
       { timeLabel: '5:00', description: 'Выезд' },
       {
@@ -519,11 +525,8 @@ export const TOURS: Tour[] = [
       ),
     ],
     imageUrl: SPRING_TOUR_COVERS['spring-4'],
-    galleryImages: [
-      SPRING_TOUR_COVERS['spring-4'],
-      SPRING_TOUR_COVERS['spring-4'],
-      SPRING_TOUR_COVERS['spring-4'],
-    ],
+    galleryImages: [...TOUR_SPRING_4_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_4_GALLERY_GRID],
   },
   {
     id: 'spring-5',
@@ -574,11 +577,8 @@ export const TOURS: Tour[] = [
       ),
     ],
     imageUrl: SPRING_TOUR_COVERS['spring-5'],
-    galleryImages: [
-      SPRING_TOUR_COVERS['spring-5'],
-      SPRING_TOUR_COVERS['spring-5'],
-      SPRING_TOUR_COVERS['spring-5'],
-    ],
+    galleryImages: [...TOUR_SPRING_5_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_5_GALLERY_GRID],
   },
   {
     id: 'spring-6',

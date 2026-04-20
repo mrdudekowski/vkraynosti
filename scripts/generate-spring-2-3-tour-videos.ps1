@@ -26,7 +26,8 @@ $spring2 = Join-Path $PSScriptRoot "..\public\tours\spring-2" | Resolve-Path
 Encode-ClipPair -TourDir $spring2.Path -BaseName "olv.clip1"
 
 $spring3 = Join-Path $PSScriptRoot "..\public\tours\spring-3" | Resolve-Path
-foreach ($n in 1..7) {
+# «Сестра»: клипы из `*.MOV` — скрипт `encode-sestra-tour-movs.ps1` (не из .mp4 в spring-4).
+foreach ($n in 2..7) {
   Encode-ClipPair -TourDir $spring3.Path -BaseName "pd.clip$n"
 }
 

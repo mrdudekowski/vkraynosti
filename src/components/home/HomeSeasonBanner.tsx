@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 import {
   HOME_SEASON_BANNER_WORDMARK_GRADIENT_BG_CLASS,
@@ -13,6 +13,8 @@ import {
 } from '../../hooks/useHomeSeasonBannerSequence';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import type { Season } from '../../types';
+
+const HOME_SEASON_BANNER_HOVER_LEAVE_GRACE_MS = 120;
 
 interface HomeSeasonBannerProps {
   season: Season;
@@ -313,6 +315,9 @@ interface HomeSeasonBannerColumnProps {
   timelineStatic: boolean;
   /** Статичный баннер у ворот: hover по колонке с fade-in видео. */
   letterHoverVideoEnabled: boolean;
+  isColumnHovered: boolean;
+  onColumnHoverStart: (columnIndex: number) => void;
+  onColumnHoverEnd: () => void;
 }
 
 const HomeSeasonBannerColumn = ({
@@ -330,8 +335,10 @@ const HomeSeasonBannerColumn = ({
   systemPrefersReducedMotion,
   timelineStatic,
   letterHoverVideoEnabled,
+  isColumnHovered,
+  onColumnHoverStart,
+  onColumnHoverEnd,
 }: HomeSeasonBannerColumnProps) => {
-  const [columnHovered, setColumnHovered] = useState(false);
   /** Статичный hover-режим: после первого наведения не снимаем `<video>`, чтобы не сбрасывать буфер (иначе 5–8 с при каждом входе). */
   const [videoPrimedForColumn, setVideoPrimedForColumn] = useState(false);
 
@@ -350,7 +357,7 @@ const HomeSeasonBannerColumn = ({
       (handoff !== null && (handoff.from === columnIndex || handoff.to === columnIndex)));
 
   /** Наведение на колонку у ворот: видео (зима) или постер сезона — без `videoSrc` эффекта иначе не видно. */
-  const hoverColumnReveal = letterHoverVideoEnabled && columnHovered;
+  const hoverColumnReveal = letterHoverVideoEnabled && isColumnHovered;
   const hoverVideoReveal = hoverColumnReveal && Boolean(clip.videoSrc);
 
   const playing =
@@ -445,14 +452,14 @@ const HomeSeasonBannerColumn = ({
       }`}
       onMouseEnter={() => {
         if (letterHoverVideoEnabled) {
-          setColumnHovered(true);
+          onColumnHoverStart(columnIndex);
           if (clip.videoSrc) {
             setVideoPrimedForColumn(true);
           }
         }
       }}
       onMouseLeave={() => {
-        if (letterHoverVideoEnabled) setColumnHovered(false);
+        if (letterHoverVideoEnabled) onColumnHoverEnd();
       }}
     >
       <div
@@ -498,6 +505,8 @@ const HomeSeasonBannerComponent = ({
   const timelineStatic = staticPresentation || systemPrefersReducedMotion;
   const letterHoverVideoEnabled =
     staticPresentation && !systemPrefersReducedMotion && UI.sections.homeGateSeasonBannerLetterHoverVideo;
+  const [hoveredColumnIndex, setHoveredColumnIndex] = useState<number | null>(null);
+  const clearHoverTimerRef = useRef<number | null>(null);
   const {
     soloCol,
     soloPhase,
@@ -509,6 +518,30 @@ const HomeSeasonBannerComponent = ({
   } = useHomeSeasonBannerSequence(timelineStatic, sequenceActive, sequenceResetKey);
   const clips = useMemo(() => getHomeSeasonBannerClips(season), [season]);
   const letters = useMemo(() => [...UI.homeSeasonBannerWordmark], []);
+
+  const clearPendingHoverReset = useCallback(() => {
+    if (clearHoverTimerRef.current == null) return;
+    window.clearTimeout(clearHoverTimerRef.current);
+    clearHoverTimerRef.current = null;
+  }, []);
+
+  const handleColumnHoverStart = useCallback(
+    (columnIndex: number) => {
+      clearPendingHoverReset();
+      setHoveredColumnIndex(columnIndex);
+    },
+    [clearPendingHoverReset]
+  );
+
+  const handleColumnHoverEnd = useCallback(() => {
+    clearPendingHoverReset();
+    clearHoverTimerRef.current = window.setTimeout(() => {
+      setHoveredColumnIndex(null);
+      clearHoverTimerRef.current = null;
+    }, HOME_SEASON_BANNER_HOVER_LEAVE_GRACE_MS);
+  }, [clearPendingHoverReset]);
+
+  useEffect(() => clearPendingHoverReset, [clearPendingHoverReset]);
 
   if (import.meta.env.DEV && letters.length !== 10) {
     console.error('UI.homeSeasonBannerWordmark must contain exactly 10 characters');
@@ -544,6 +577,9 @@ const HomeSeasonBannerComponent = ({
                 systemPrefersReducedMotion={systemPrefersReducedMotion}
                 timelineStatic={timelineStatic}
                 letterHoverVideoEnabled={letterHoverVideoEnabled}
+                isColumnHovered={hoveredColumnIndex === index}
+                onColumnHoverStart={handleColumnHoverStart}
+                onColumnHoverEnd={handleColumnHoverEnd}
               />
             ))}
           </div>

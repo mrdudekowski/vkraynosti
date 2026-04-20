@@ -160,11 +160,11 @@
   }
 
   /**
-   * Две колонки «О туре» + «Что включено»: с `xl` — 2×1 grid и тонкая вертикаль между колонками
-   * (`divide-tour-detail-heading-rule`; на одной колонке divide не включается).
+   * Две колонки «О туре» + «Что включено»: всегда 2 колонки в ряд; тонкая вертикаль между ними
+   * (`divide-tour-detail-heading-rule`).
    */
   .tour-detail-about-included-grid {
-    @apply grid grid-cols-1 xl:grid-cols-2 xl:gap-x-0 gap-y-10 mb-10 xl:items-start xl:divide-x xl:divide-tour-detail-heading-rule;
+    @apply grid grid-cols-2 gap-x-0 gap-y-10 mb-10 items-start divide-x divide-tour-detail-heading-rule;
   }
 
   /**
@@ -188,7 +188,7 @@
   }
 
   .tour-detail-preface-bg .tour-detail-about-included-grid {
-    @apply mb-0 xl:divide-white/25;
+    @apply mb-0 divide-white/25;
   }
 
   .tour-detail-preface-bg .tour-detail-section-heading-row {
@@ -231,14 +231,23 @@
     @apply text-text-inverse/90;
   }
 
-  /** Колонка «О туре»: справа отступ к линии только от xl. */
+  /** Колонка «О туре»: отступ к вертикали; на узких экранах компактнее. */
   .tour-detail-about-column {
-    @apply xl:pr-12;
+    @apply pr-4 sm:pr-8 lg:pr-12 min-w-0;
   }
 
-  /** Колонка «Что включено»: отступ слева от вертикали только от xl. */
+  /** Колонка «Что включено»: отступ от вертикали; на узких экранах компактнее. */
   .tour-detail-included-column {
-    @apply xl:pl-12;
+    @apply pl-4 sm:pl-8 lg:pl-12 min-w-0;
+  }
+
+  /** Дополнительный текст в правой колонке верхнего блока деталей тура. */
+  .tour-detail-about-aside-copy {
+    @apply mb-6 text-tour-detail-prose text-text-muted;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-aside-copy {
+    @apply text-text-inverse/90;
   }
 
   /** Полупрозрачная плашка блока «Что включено» (`RevealBox` на странице тура): градиент + тень. */

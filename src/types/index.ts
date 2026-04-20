@@ -33,6 +33,8 @@ export interface Tour {
   description: string;
   /** Необязательный вводной фрагмент перед `description` (жирный, напр. название с высотой). */
   descriptionLeadBold?: string;
+  /** Необязательный дополнительный текст для правой колонки верхнего блока деталей тура. */
+  descriptionAside?: string;
   program: TourProgramStep[];
   /** Доп. примечания под программой (после общего дисклеймера о времени). */
   programAdditionalNotes?: string[];

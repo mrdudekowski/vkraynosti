@@ -522,10 +522,11 @@ const TourDetailGalleryComponent = ({
 
   /**
    * Аскольд (spring-10): 9 кадров после hero/preface (без `ask.clip1`, `ask.clip3` в галерее).
-   * Ряд 1: `ask.intro` | `ask.clip2` (1×2 | 1×2).
-   * Ряд 2: `rock` | `clip5` (1×2 | 1×2).
-   * Ряд 3: `clip6` на всю ширину (`aspect-gallery-tile-2x2`) — на месте бывшего ряда `clip3|clip4`.
-   * Ряд 4: `clip4` | `beacon` (1×2 | 1×2); ряд 5: `view2` | `view3` (1×2 | 1×2, `object-gallery-spring-10-tall-panorama`).
+   * Сетка собрана из 2×2-блоков и одного широкого ряда:
+   * 1) `intro` вертикально слева; справа два 1×1 (`rock`, `clip5`).
+   * 2) Слева два 1×1 (`clip4`, `view2`); справа вертикальный `beacon`.
+   * 3) `clip6` на всю ширину (`aspect-gallery-tile-2x2`).
+   * 4) Нижний ряд: `clip5` (1×1), ниже `view3` на всю ширину (`2×2`).
    * Порядок `slice(2)`: intro, clip2, clip4, clip5, clip6, beacon, rock, view2, view3.
    */
   if (layoutVariant === 'askold' && images.length === 9) {
@@ -533,28 +534,29 @@ const TourDetailGalleryComponent = ({
       'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
     const askoldPairTallRight =
       'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const askoldRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
+    const askoldRightBottom = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
+    const askoldLeftTop = 'col-start-1 row-start-1 aspect-square w-full min-h-0';
+    const askoldLeftBottom = 'col-start-1 row-start-2 aspect-square w-full min-h-0';
     const askoldClip6WideTwoByTwo =
       'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0';
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, askoldPairTallLeft)}
-          {renderTileButton(images[1], 1, askoldPairTallRight)}
-        </div>
-        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[6], 6, askoldPairTallLeft)}
-          {renderTileButton(images[3], 3, askoldPairTallRight)}
-        </div>
-        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[4], 4, askoldClip6WideTwoByTwo)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[2], 2, askoldPairTallLeft)}
+          {renderTileButton(images[0], 0, askoldPairTallLeft)}
+          {renderTileButton(images[6], 6, askoldRightTop)}
+          {renderTileButton(images[3], 3, askoldRightBottom)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[2], 2, askoldLeftTop)}
+          {renderTileButton(images[7], 7, askoldLeftBottom)}
           {renderTileButton(images[5], 5, askoldPairTallRight)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[7], 7, askoldPairTallLeft)}
-          {renderTileButton(images[8], 8, askoldPairTallRight)}
+          {renderTileButton(images[8], 8, askoldClip6WideTwoByTwo)}
         </div>
       </div>
     );

@@ -5,6 +5,8 @@ import {
   TOUR_SPRING_2_LAKE1_IMAGE,
   TOUR_SPRING_3_GROUP_IMAGE,
   TOUR_SPRING_4_GROUP_IMAGE,
+  TOUR_SPRING_5_GROUP_IMAGE,
+  TOUR_SPRING_6_GROUP_IMAGE,
   TOUR_WINTER_1_REST4_IMAGE,
   TOUR_WINTER_1_TOP_IMAGE,
   TOUR_WINTER_2_PEAK_IMAGE,
@@ -16,8 +18,9 @@ import {
   TOUR_WINTER_4_DOGGO_IMAGE,
   TOUR_WINTER_4_DOGGOS_IMAGE,
   TOUR_WINTER_4_GORA_IMAGE,
+  TOUR_SPRING_10_VIEW2_GRID,
+  TOUR_SPRING_10_VIEW3_GRID,
 } from '../../constants/images';
-import { UI } from '../../constants/ui';
 import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';
 
 export type TourGalleryLayoutVariant =
@@ -27,16 +30,17 @@ export type TourGalleryLayoutVariant =
   | 'lysy-ded'
   | 'olkhovaya'
   | 'pidan'
-  | 'sestra';
+  | 'sestra'
+  | 'chitinza'
+  | 'falaza'
+  | 'vorobey-winery'
+  | 'dardanelles'
+  | 'askold';
 
 export interface TourDetailGalleryProps {
   /** Кадры для сетки (без главного фото hero страницы). */
   images: string[];
-  /** Индекс в полном `tour.galleryImages` для `images[0]` (обычно `1`). */
-  firstImageIndexInTourGallery: number;
   tourTitle: string;
-  /** Индекс в полном `tour.galleryImages` (для полноэкранного просмотра и стрелок). */
-  onOpenPhoto: (indexInFullGallery: number) => void;
   layoutVariant?: TourGalleryLayoutVariant;
   /** Уменьшить движение: в сетке только постер для видео. */
   prefersReducedMotion?: boolean;
@@ -44,14 +48,9 @@ export interface TourDetailGalleryProps {
   getVideoPosterForGridSrc?: (gridSrc: string) => string | undefined;
 }
 
-const openAriaForHumanNumber = (humanNumber: string) =>
-  UI.tourDetail.galleryPhoto.openPhotoAria.replace('{n}', humanNumber);
-
 const TourDetailGalleryComponent = ({
   images,
-  firstImageIndexInTourGallery,
   tourTitle,
-  onOpenPhoto,
   layoutVariant = 'default',
   prefersReducedMotion = false,
   getVideoPosterForGridSrc,
@@ -71,6 +70,9 @@ const TourDetailGalleryComponent = ({
   const imgClassesForWinterFraming = (imageSrc: string) => {
     if (imageSrc === TOUR_WINTER_1_REST4_IMAGE) return 'object-gallery-winter-rest4';
     if (imageSrc === TOUR_WINTER_4_GORA_IMAGE) return 'object-gallery-winter-4-gora';
+    if (imageSrc === TOUR_SPRING_10_VIEW2_GRID || imageSrc === TOUR_SPRING_10_VIEW3_GRID) {
+      return 'object-gallery-spring-10-tall-panorama';
+    }
     return '';
   };
 
@@ -80,8 +82,6 @@ const TourDetailGalleryComponent = ({
     tileClassName: string,
     additionalImgClass = ''
   ) => {
-    const idxInTour = firstImageIndexInTourGallery + indexInGrid;
-    const humanN = String(idxInTour + 1);
     const resolvedTileClass = tileClassesWithWinterHeroLift(tileClassName, src);
     const imgExtra = [imgClassesForWinterFraming(src), additionalImgClass]
       .filter(Boolean)
@@ -91,7 +91,7 @@ const TourDetailGalleryComponent = ({
     const isFirstTile = staggerIndex === 0;
     const deferSrcUntilVisible = !isFirstTile;
 
-    const tileAlt = `${tourTitle} — фото ${humanN}`;
+    const tileAlt = `${tourTitle} — фото ${indexInGrid + 1}`;
 
     if (isVideoAssetUrl(src)) {
       const poster = getVideoPosterForGridSrc?.(src);
@@ -107,12 +107,9 @@ const TourDetailGalleryComponent = ({
     }
 
     return (
-      <button
+      <div
         key={`${src}-${indexInGrid}`}
-        type="button"
-        className={`cursor-pointer overflow-hidden rounded-card border-0 p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary bg-transparent ${resolvedTileClass}`}
-        aria-label={openAriaForHumanNumber(humanN)}
-        onClick={() => onOpenPhoto(idxInTour)}
+        className={`overflow-hidden rounded-card ${resolvedTileClass}`}
       >
         <PlaceholderImage
           src={src}
@@ -123,7 +120,7 @@ const TourDetailGalleryComponent = ({
           fetchPriority={isFirstTile ? 'high' : undefined}
           deferSrcUntilVisible={deferSrcUntilVisible}
         />
-      </button>
+      </div>
     );
   };
 
@@ -471,6 +468,187 @@ const TourDetailGalleryComponent = ({
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[9], 9, sestraTallLeft)}
           {renderTileButton(images[10], 10, sestraTallRight)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Читинза (spring-5) и Маралы × Драконы (spring-6): ритм как у «Сестра» (`sestra`), 11 кадров после hero/preface.
+   * spring-5 `slice(2)`: woods, yar, clip1…clip4, peak, forest, peak5, peak2, hike.
+   * spring-6 `slice(2)`: hills, deer, clip1, clip2, drag, clip3, clip4, hills5, deer2, clip5, deer3.
+   */
+  if (
+    layoutVariant === 'chitinza' &&
+    images.length === 11 &&
+    (images[0] === TOUR_SPRING_5_GROUP_IMAGE || images[0] === TOUR_SPRING_6_GROUP_IMAGE)
+  ) {
+    const chitinzaTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
+    const chitinzaTallLeft =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const chitinzaTallRight =
+      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const chitinzaRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
+    const chitinzaRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
+
+    const chitinzaFullWidthSquare = (sliceIndex: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[sliceIndex], sliceIndex, chitinzaTwoByTwo)}
+      </div>
+    );
+
+    const chitinzaBentoRow = (left: number, rightTop: number, rightBottom: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[left], left, chitinzaTallLeft)}
+        {renderTileButton(images[rightTop], rightTop, chitinzaRightTop)}
+        {renderTileButton(images[rightBottom], rightBottom, chitinzaRightBot)}
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        {chitinzaBentoRow(5, 6, 7)}
+        {chitinzaBentoRow(1, 2, 3)}
+        {chitinzaFullWidthSquare(4)}
+        {chitinzaFullWidthSquare(0)}
+        {chitinzaFullWidthSquare(8)}
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[9], 9, chitinzaTallLeft)}
+          {renderTileButton(images[10], 10, chitinzaTallRight)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Аскольд (spring-10): 9 кадров после hero/preface (без `ask.clip1`, `ask.clip3` в галерее).
+   * Ряд 1: `ask.intro` | `ask.clip2` (1×2 | 1×2).
+   * Ряд 2: `rock` | `clip5` (1×2 | 1×2).
+   * Ряд 3: `clip6` на всю ширину (`aspect-gallery-tile-2x2`) — на месте бывшего ряда `clip3|clip4`.
+   * Ряд 4: `clip4` | `beacon` (1×2 | 1×2); ряд 5: `view2` | `view3` (1×2 | 1×2, `object-gallery-spring-10-tall-panorama`).
+   * Порядок `slice(2)`: intro, clip2, clip4, clip5, clip6, beacon, rock, view2, view3.
+   */
+  if (layoutVariant === 'askold' && images.length === 9) {
+    const askoldPairTallLeft =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const askoldPairTallRight =
+      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const askoldClip6WideTwoByTwo =
+      'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, askoldPairTallLeft)}
+          {renderTileButton(images[1], 1, askoldPairTallRight)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[6], 6, askoldPairTallLeft)}
+          {renderTileButton(images[3], 3, askoldPairTallRight)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[4], 4, askoldClip6WideTwoByTwo)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[2], 2, askoldPairTallLeft)}
+          {renderTileButton(images[5], 5, askoldPairTallRight)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[7], 7, askoldPairTallLeft)}
+          {renderTileButton(images[8], 8, askoldPairTallRight)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Фалаза (spring-8): сторителлинг из 5 кадров после hero/preface —
+   * 2x2 панорама, затем bento с клипом слева (1x2), справа два квадрата, и финальный широкий кадр.
+   * Порядок `slice(2)`: top, view2, clip1, top2, love_actually.
+   */
+  if (layoutVariant === 'falaza' && images.length === 5) {
+    const falazaTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
+    const falazaTallLeft = 'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const falazaRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
+    const falazaRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, falazaTwoByTwo)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[2], 2, falazaTallLeft)}
+          {renderTileButton(images[1], 1, falazaRightTop)}
+          {renderTileButton(images[3], 3, falazaRightBot)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[4], 4, falazaTwoByTwo)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Воробей + Винодельня (spring-9): 9 кадров после hero/preface, где все 3 вертикальных видео идут как 1x2.
+   * Порядок `slice(2)`: top, view2, clip1, rocks, clip2, forest, clip3, sign, top2.
+   */
+  if (layoutVariant === 'vorobey-winery' && images.length === 9) {
+    const wineryTallLeft = 'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const wineryTallRight = 'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const wineryRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
+    const wineryRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
+    const wineryLeftTop = 'col-start-1 row-start-1 aspect-square w-full min-h-0';
+    const wineryLeftBot = 'col-start-1 row-start-2 aspect-square w-full min-h-0';
+
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[2], 2, wineryTallLeft)}
+          {renderTileButton(images[0], 0, wineryRightTop)}
+          {renderTileButton(images[1], 1, wineryRightBot)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[3], 3, wineryLeftTop)}
+          {renderTileButton(images[5], 5, wineryLeftBot)}
+          {renderTileButton(images[4], 4, wineryTallRight)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[6], 6, wineryTallLeft)}
+          {renderTileButton(images[7], 7, wineryRightTop)}
+          {renderTileButton(images[8], 8, wineryRightBot)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Дарданеллы (spring-7): 6 кадров после hero/preface.
+   * Правило тура: `camp` внизу — плитка на всю ширину сетки (`aspect-gallery-tile-2x2`); клипы `ddn.clip1/2` — 1x2;
+   * первый ряд — клип слева и `view2` справа (оба 1x2).
+   * Порядок `slice(2)`: clip1, view2, clip2, yarchill, exit2, camp.
+   */
+  if (layoutVariant === 'dardanelles' && images.length === 6) {
+    /** Полная ширина двух колонок, высота как у «двух квадратов» (`aspect-gallery-tile-2x2`). */
+    const dardanellesCampTwoByTwo = 'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0';
+    const dardanellesTallLeft =
+      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const dardanellesTallRight =
+      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
+    const dardanellesLeftTop = 'col-start-1 row-start-1 aspect-square w-full min-h-0';
+    const dardanellesLeftBot = 'col-start-1 row-start-2 aspect-square w-full min-h-0';
+
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, dardanellesTallLeft)}
+          {renderTileButton(images[1], 1, dardanellesTallRight)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[3], 3, dardanellesLeftTop)}
+          {renderTileButton(images[4], 4, dardanellesLeftBot)}
+          {renderTileButton(images[2], 2, dardanellesTallRight)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[5], 5, dardanellesCampTwoByTwo)}
         </div>
       </div>
     );

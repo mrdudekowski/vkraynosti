@@ -592,6 +592,16 @@ const config: Config = {
         'gallery-hero-lifted': '359 / 200',
         /** Вертикальный акцент (первый кадр «Изюбриная» и др.) — выше широкого 21:9. */
         'gallery-portrait': '3 / 4',
+        /**
+         * Плитка на всю ширину двухколоночной сетки галереи с высотой «две ячейки» квадрата
+         * (`col-span-2` + квадрат 1:1 ≈ два ряда при той же ширине колонки).
+         */
+        'gallery-tile-2x2': '1 / 1',
+        /**
+         * Плитка на всю ширину двухколоночной сетки, низкая панорама (ширина : высота = 2 : 1).
+         * `TourDetailGallery` — маяк Аскольда (`spring-10`, `askold`).
+         */
+        'gallery-tile-2x1': '2 / 1',
         /** Баннер 10 колонок внутри `max-w-7xl`: шире колонки, умеренная высота. */
         'home-season-banner-inner': '10 / 3.25',
       },
@@ -616,6 +626,10 @@ const config: Config = {
         'tour-detail-hero-desktop-winter-3': 'center 77%',
         /** Хаски-тур (winter-4): чуть ниже дефолтного hero, без обрезки голов (см. `tour-detail-hero-desktop`). */
         'tour-detail-hero-desktop-winter-4': 'center 58%',
+        /**
+         * Аскольд (spring-10): `view2` / `view3` в вертикальной плитке 1×2 — центр кадра при `object-cover`.
+         */
+        'gallery-spring-10-tall-panorama': 'center center',
       },
       spacing: {
         /** Зазор между ячейками сетки фотогалереи на странице тура. */

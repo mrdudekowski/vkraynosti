@@ -19,7 +19,8 @@
     "generate:spring-clips": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-spring-2-3-tour-videos.ps1",
     "generate:winter-3-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-3-grid-assets.ps1",
     "generate:winter-4-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-4-grid-assets.ps1",
-    "generate:winter-5-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-5-grid-assets.ps1"
+    "generate:winter-5-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-5-grid-assets.ps1",
+    "media:shrink-webm": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/batch-shrink-public-webm.ps1"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^7.2.0",

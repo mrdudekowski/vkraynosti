@@ -24,6 +24,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Исходники фото/видео туров (не в репозитории)
+/content/
+
 # Generated/raw media should never go to production artifact
 public/tours/**/*.mov
 public/tours/**/*.source.*

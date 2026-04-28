@@ -3,9 +3,6 @@ import type { Season } from '../types';
 
 const BASE = 'https://placehold.co';
 
-/** Папка `public/spring tours/` — пробел в URL кодируется. */
-const SPRING_TOUR_PUBLIC = `${PUBLIC_ASSET_BASE}spring%20tours`;
-
 /** Папки туров: `public/tours/{tourId}/` — обложка и галерея одного маршрута. */
 const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours`;
 
@@ -423,19 +420,267 @@ export const TOUR_SPRING_4_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_4}/ss.clip8.grid.webm`]: `${TOUR_SPRING_4}/ss.clip8.poster.webp`,
 };
 
-/** «Читинза» — текущая подборка оригинальных фото из `content/Читинза` (webp). */
+/**
+ * «Читинза» (spring-5): порядок как у макета `sestra` — hero/preface, затем 11 кадров сетки.
+ * Клипы: `scripts/encode-chitinza-tour-movs.ps1` → `ctz.clip1..4` (.webm / .grid.webm / .poster.webp).
+ */
 export const TOUR_SPRING_5_GALLERY_VIEWER = [
-  `${TOUR_SPRING_5}/peak.webp`,
-  `${TOUR_SPRING_5}/peak2.webp`,
-  `${TOUR_SPRING_5}/peak5.webp`,
-  `${TOUR_SPRING_5}/yar.webp`,
-  `${TOUR_SPRING_5}/forest.webp`,
+  `${TOUR_SPRING_5}/top.webp`,
+  `${TOUR_SPRING_5}/view.webp`,
   `${TOUR_SPRING_5}/woods.webp`,
+  `${TOUR_SPRING_5}/yar.webp`,
+  `${TOUR_SPRING_5}/ctz.clip1.webm`,
+  `${TOUR_SPRING_5}/ctz.clip2.webm`,
+  `${TOUR_SPRING_5}/peak.webp`,
+  `${TOUR_SPRING_5}/ctz.clip3.webm`,
+  `${TOUR_SPRING_5}/ctz.clip4.webm`,
+  `${TOUR_SPRING_5}/forest.webp`,
+  `${TOUR_SPRING_5}/peak5.webp`,
+  `${TOUR_SPRING_5}/peak2.webp`,
+  `${TOUR_SPRING_5}/hike.webp`,
 ] as const;
 
-/** Для фото-сета `spring-5` grid совпадает с viewer. */
-export const TOUR_SPRING_5_GALLERY_GRID = TOUR_SPRING_5_GALLERY_VIEWER;
-export const TOUR_SPRING_5_COVER_GRID = TOUR_SPRING_5_GALLERY_GRID[0];
+export const TOUR_SPRING_5_GALLERY_GRID = [
+  `${TOUR_SPRING_5}/top.webp`,
+  `${TOUR_SPRING_5}/view.webp`,
+  `${TOUR_SPRING_5}/woods.webp`,
+  `${TOUR_SPRING_5}/yar.webp`,
+  `${TOUR_SPRING_5}/ctz.clip1.grid.webm`,
+  `${TOUR_SPRING_5}/ctz.clip2.grid.webm`,
+  `${TOUR_SPRING_5}/peak.webp`,
+  `${TOUR_SPRING_5}/ctz.clip3.grid.webm`,
+  `${TOUR_SPRING_5}/ctz.clip4.grid.webm`,
+  `${TOUR_SPRING_5}/forest.webp`,
+  `${TOUR_SPRING_5}/peak5.webp`,
+  `${TOUR_SPRING_5}/peak2.webp`,
+  `${TOUR_SPRING_5}/hike.webp`,
+] as const;
+
+/** Первый кадр сетки после hero/preface — `slice(2)` [0] (макет `chitinza`). */
+export const TOUR_SPRING_5_GROUP_IMAGE = TOUR_SPRING_5_GALLERY_GRID[2];
+
+export const TOUR_SPRING_5_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [`${TOUR_SPRING_5}/ctz.clip1.grid.webm`]: `${TOUR_SPRING_5}/ctz.clip1.poster.webp`,
+  [`${TOUR_SPRING_5}/ctz.clip2.grid.webm`]: `${TOUR_SPRING_5}/ctz.clip2.poster.webp`,
+  [`${TOUR_SPRING_5}/ctz.clip3.grid.webm`]: `${TOUR_SPRING_5}/ctz.clip3.poster.webp`,
+  [`${TOUR_SPRING_5}/ctz.clip4.grid.webm`]: `${TOUR_SPRING_5}/ctz.clip4.poster.webp`,
+};
+
+export const TOUR_SPRING_5_COVER_GRID = `${TOUR_SPRING_5}/top.webp` as const;
+
+const TOUR_SPRING_6 = `${TOURS_ASSET_BASE}/spring-6`;
+
+/**
+ * «Мараловая ферма и Парк Драконов» (spring-6). Исходники: `content/МаралыXДраконы/webp/`.
+ * Клипы: `scripts/encode-spring-6-maral-dragon-movs.ps1` → `mnd.clip1..5`.
+ * Макет сетки — как «Читинза» (`chitinza`): 11 кадров после hero/preface; `hills3` только фон «О туре».
+ */
+export const TOUR_SPRING_6_PREFACE_BACKGROUND = `${TOUR_SPRING_6}/hills3.webp` as const;
+
+export const TOUR_SPRING_6_GALLERY_VIEWER = [
+  `${TOUR_SPRING_6}/deerlol.webp`,
+  `${TOUR_SPRING_6}/view.webp`,
+  `${TOUR_SPRING_6}/hills.webp`,
+  `${TOUR_SPRING_6}/deer.webp`,
+  `${TOUR_SPRING_6}/mnd.clip1.webm`,
+  `${TOUR_SPRING_6}/mnd.clip2.webm`,
+  `${TOUR_SPRING_6}/drag.webp`,
+  `${TOUR_SPRING_6}/mnd.clip3.webm`,
+  `${TOUR_SPRING_6}/mnd.clip4.webm`,
+  `${TOUR_SPRING_6}/hills5.webp`,
+  `${TOUR_SPRING_6}/deer2.webp`,
+  `${TOUR_SPRING_6}/mnd.clip5.webm`,
+  `${TOUR_SPRING_6}/deer3.webp`,
+] as const;
+
+export const TOUR_SPRING_6_GALLERY_GRID = [
+  `${TOUR_SPRING_6}/deerlol.webp`,
+  `${TOUR_SPRING_6}/view.webp`,
+  `${TOUR_SPRING_6}/hills.webp`,
+  `${TOUR_SPRING_6}/deer.webp`,
+  `${TOUR_SPRING_6}/mnd.clip1.grid.webm`,
+  `${TOUR_SPRING_6}/mnd.clip2.grid.webm`,
+  `${TOUR_SPRING_6}/drag.webp`,
+  `${TOUR_SPRING_6}/mnd.clip3.grid.webm`,
+  `${TOUR_SPRING_6}/mnd.clip4.grid.webm`,
+  `${TOUR_SPRING_6}/hills5.webp`,
+  `${TOUR_SPRING_6}/deer2.webp`,
+  `${TOUR_SPRING_6}/mnd.clip5.grid.webm`,
+  `${TOUR_SPRING_6}/deer3.webp`,
+] as const;
+
+/** Первый кадр сетки после hero/preface — `slice(2)` [0] (макет `chitinza`). */
+export const TOUR_SPRING_6_GROUP_IMAGE = TOUR_SPRING_6_GALLERY_GRID[2];
+
+export const TOUR_SPRING_6_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [`${TOUR_SPRING_6}/mnd.clip1.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip1.poster.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip2.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip2.poster.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip3.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip3.poster.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip4.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip4.poster.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip5.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip5.poster.webp`,
+};
+
+export const TOUR_SPRING_6_COVER_GRID = `${TOUR_SPRING_6}/deerlol.webp` as const;
+
+const TOUR_SPRING_7 = `${TOURS_ASSET_BASE}/spring-7`;
+const TOUR_SPRING_8 = `${TOURS_ASSET_BASE}/spring-8`;
+const TOUR_SPRING_9 = `${TOURS_ASSET_BASE}/spring-9`;
+const TOUR_SPRING_10 = `${TOURS_ASSET_BASE}/spring-10`;
+
+/**
+ * «Ущелье Дарданеллы» (spring-7). Исходники: `content/Дарданелла (все сезоны кроме зимы)/`.
+ * Клипы: `scripts/encode-spring-7-dardanelle-movs.ps1` → `ddn.clip1..2`.
+ * Макет `dardanelles` в `TourDetailGallery`: `camp` внизу (плитка 2×2 по сетке), клипы — 1x2.
+ * Hero — `view`, фон «О туре» — `view3` (см. `prefaceBackgroundImageUrl` в данных тура).
+ */
+export const TOUR_SPRING_7_GALLERY_VIEWER = [
+  `${TOUR_SPRING_7}/view.webp`,
+  `${TOUR_SPRING_7}/view3.webp`,
+  `${TOUR_SPRING_7}/ddn.clip1.webm`,
+  `${TOUR_SPRING_7}/view2.webp`,
+  `${TOUR_SPRING_7}/ddn.clip2.webm`,
+  `${TOUR_SPRING_7}/yarchill.webp`,
+  `${TOUR_SPRING_7}/exit2.webp`,
+  `${TOUR_SPRING_7}/camp.webp`,
+] as const;
+
+export const TOUR_SPRING_7_GALLERY_GRID = [
+  `${TOUR_SPRING_7}/view.webp`,
+  `${TOUR_SPRING_7}/view3.webp`,
+  `${TOUR_SPRING_7}/ddn.clip1.grid.webm`,
+  `${TOUR_SPRING_7}/view2.webp`,
+  `${TOUR_SPRING_7}/ddn.clip2.grid.webm`,
+  `${TOUR_SPRING_7}/yarchill.webp`,
+  `${TOUR_SPRING_7}/exit2.webp`,
+  `${TOUR_SPRING_7}/camp.webp`,
+] as const;
+
+export const TOUR_SPRING_7_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [`${TOUR_SPRING_7}/ddn.clip1.grid.webm`]: `${TOUR_SPRING_7}/ddn.clip1.poster.webp`,
+  [`${TOUR_SPRING_7}/ddn.clip2.grid.webm`]: `${TOUR_SPRING_7}/ddn.clip2.poster.webp`,
+};
+
+export const TOUR_SPRING_7_COVER_GRID = `${TOUR_SPRING_7}/view.webp` as const;
+export const TOUR_SPRING_7_PREFACE_BACKGROUND = `${TOUR_SPRING_7}/view3.webp` as const;
+
+/**
+ * «Восхождение на г. Фалаза» (spring-8). Исходники: `content/Фалаза/`.
+ * Макет: hero-панорама + отдельный фон «О туре», далее 5 кадров (включая клип).
+ */
+export const TOUR_SPRING_8_GALLERY_VIEWER = [
+  `${TOUR_SPRING_8}/view3.webp`,
+  `${TOUR_SPRING_8}/view.webp`,
+  `${TOUR_SPRING_8}/top.webp`,
+  `${TOUR_SPRING_8}/view2.webp`,
+  `${TOUR_SPRING_8}/flz.clip1.webm`,
+  `${TOUR_SPRING_8}/top2.webp`,
+  `${TOUR_SPRING_8}/love_actually.webp`,
+] as const;
+
+export const TOUR_SPRING_8_GALLERY_GRID = [
+  `${TOUR_SPRING_8}/view3.webp`,
+  `${TOUR_SPRING_8}/view.webp`,
+  `${TOUR_SPRING_8}/top.webp`,
+  `${TOUR_SPRING_8}/view2.webp`,
+  `${TOUR_SPRING_8}/flz.clip1.grid.webm`,
+  `${TOUR_SPRING_8}/top2.webp`,
+  `${TOUR_SPRING_8}/love_actually.webp`,
+] as const;
+
+export const TOUR_SPRING_8_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [`${TOUR_SPRING_8}/flz.clip1.grid.webm`]: `${TOUR_SPRING_8}/flz.clip1.poster.webp`,
+};
+
+export const TOUR_SPRING_8_COVER_GRID = `${TOUR_SPRING_8}/view3.webp` as const;
+export const TOUR_SPRING_8_PREFACE_BACKGROUND = `${TOUR_SPRING_8}/view.webp` as const;
+
+/**
+ * «Восхождение на г. Воробей + Винодельня» (spring-9).
+ * Макет: hero вершины + отдельный preface кадр винодельни, далее 9 кадров сетки с 3 вертикальными клипами.
+ */
+export const TOUR_SPRING_9_GALLERY_VIEWER = [
+  `${TOUR_SPRING_9}/top3.webp`,
+  `${TOUR_SPRING_9}/wine.webp`,
+  `${TOUR_SPRING_9}/top.webp`,
+  `${TOUR_SPRING_9}/view2.webp`,
+  `${TOUR_SPRING_9}/vrb.clip1.webm`,
+  `${TOUR_SPRING_9}/rocks.webp`,
+  `${TOUR_SPRING_9}/vrb.clip2.webm`,
+  `${TOUR_SPRING_9}/forest.webp`,
+  `${TOUR_SPRING_9}/vrb.clip3.webm`,
+  `${TOUR_SPRING_9}/sign.webp`,
+  `${TOUR_SPRING_9}/top2.webp`,
+] as const;
+
+export const TOUR_SPRING_9_GALLERY_GRID = [
+  `${TOUR_SPRING_9}/top3.webp`,
+  `${TOUR_SPRING_9}/wine.webp`,
+  `${TOUR_SPRING_9}/top.webp`,
+  `${TOUR_SPRING_9}/view2.webp`,
+  `${TOUR_SPRING_9}/vrb.clip1.grid.webm`,
+  `${TOUR_SPRING_9}/rocks.webp`,
+  `${TOUR_SPRING_9}/vrb.clip2.grid.webm`,
+  `${TOUR_SPRING_9}/forest.webp`,
+  `${TOUR_SPRING_9}/vrb.clip3.grid.webm`,
+  `${TOUR_SPRING_9}/sign.webp`,
+  `${TOUR_SPRING_9}/top2.webp`,
+] as const;
+
+export const TOUR_SPRING_9_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [`${TOUR_SPRING_9}/vrb.clip1.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip1.poster.webp`,
+  [`${TOUR_SPRING_9}/vrb.clip2.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip2.poster.webp`,
+  [`${TOUR_SPRING_9}/vrb.clip3.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip3.poster.webp`,
+};
+
+export const TOUR_SPRING_9_COVER_GRID = `${TOUR_SPRING_9}/top3.webp` as const;
+export const TOUR_SPRING_9_PREFACE_BACKGROUND = `${TOUR_SPRING_9}/wine.webp` as const;
+
+/**
+ * «Остров Аскольд» (spring-10). Фото: все шесть из `content/Аскольд/webp/`; MP4 (6 с): `encode-spring-10-askold-trimmed-mp4.ps1` → `ask.intro`; MOV: `encode-spring-10-askold-movs.ps1` → `ask.clip1..6` (в галерее не показываем `ask.clip1`, `ask.clip3`).
+ * Hero — `view`, фон «О туре» — `beach`. В данных по порядку: intro, clip2, clip4–6, beacon, rock, view2, view3; раскладка `askold` — в `TourDetailGallery`.
+ */
+export const TOUR_SPRING_10_GALLERY_VIEWER = [
+  `${TOUR_SPRING_10}/view.webp`,
+  `${TOUR_SPRING_10}/beach.webp`,
+  `${TOUR_SPRING_10}/ask.intro.webm`,
+  `${TOUR_SPRING_10}/ask.clip2.webm`,
+  `${TOUR_SPRING_10}/ask.clip4.webm`,
+  `${TOUR_SPRING_10}/ask.clip5.webm`,
+  `${TOUR_SPRING_10}/ask.clip6.webm`,
+  `${TOUR_SPRING_10}/beacon.webp`,
+  `${TOUR_SPRING_10}/rock.webp`,
+  `${TOUR_SPRING_10}/view2.webp`,
+  `${TOUR_SPRING_10}/view3.webp`,
+] as const;
+
+export const TOUR_SPRING_10_GALLERY_GRID = [
+  `${TOUR_SPRING_10}/view.webp`,
+  `${TOUR_SPRING_10}/beach.webp`,
+  `${TOUR_SPRING_10}/ask.intro.grid.webm`,
+  `${TOUR_SPRING_10}/ask.clip2.grid.webm`,
+  `${TOUR_SPRING_10}/ask.clip4.grid.webm`,
+  `${TOUR_SPRING_10}/ask.clip5.grid.webm`,
+  `${TOUR_SPRING_10}/ask.clip6.grid.webm`,
+  `${TOUR_SPRING_10}/beacon.webp`,
+  `${TOUR_SPRING_10}/rock.webp`,
+  `${TOUR_SPRING_10}/view2.webp`,
+  `${TOUR_SPRING_10}/view3.webp`,
+] as const;
+
+export const TOUR_SPRING_10_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [`${TOUR_SPRING_10}/ask.intro.grid.webm`]: `${TOUR_SPRING_10}/ask.intro.poster.webp`,
+  [`${TOUR_SPRING_10}/ask.clip2.grid.webm`]: `${TOUR_SPRING_10}/ask.clip2.poster.webp`,
+  [`${TOUR_SPRING_10}/ask.clip4.grid.webm`]: `${TOUR_SPRING_10}/ask.clip4.poster.webp`,
+  [`${TOUR_SPRING_10}/ask.clip5.grid.webm`]: `${TOUR_SPRING_10}/ask.clip5.poster.webp`,
+  [`${TOUR_SPRING_10}/ask.clip6.grid.webm`]: `${TOUR_SPRING_10}/ask.clip6.poster.webp`,
+};
+
+export const TOUR_SPRING_10_COVER_GRID = `${TOUR_SPRING_10}/view.webp` as const;
+export const TOUR_SPRING_10_PREFACE_BACKGROUND = `${TOUR_SPRING_10}/beach.webp` as const;
+
+/** Сетка `askold`: вертикальные панорамы — якорь обрезки в `TourDetailGallery`. */
+export const TOUR_SPRING_10_VIEW2_GRID = `${TOUR_SPRING_10}/view2.webp` as const;
+export const TOUR_SPRING_10_VIEW3_GRID = `${TOUR_SPRING_10}/view3.webp` as const;
 
 /**
  * Короткие лупы для баннера главной (колонки 0…9 ↔ `UI.homeSeasonBannerWordmark`).
@@ -509,7 +754,8 @@ export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.png` as const;
 
 /**
  * Обложки весенних туров: spring-1…4 — первый кадр сетки из `public/tours/spring-N/`;
- * spring-5…7 — `public/spring tours/` (пока общие webp).
+ * spring-5 — `public/tours/spring-5/`; spring-6 — `public/tours/spring-6/`; spring-7 — `public/tours/spring-7/` (VP9 `ddn.clip*`);
+ * spring-10 — `public/tours/spring-10/` (`content/Аскольд/webp`, MOV → `encode-spring-10-askold-movs.ps1`).
  */
 export const SPRING_TOUR_COVERS = {
   'spring-1': TOUR_SPRING_1_COVER,
@@ -517,8 +763,11 @@ export const SPRING_TOUR_COVERS = {
   'spring-3': TOUR_SPRING_3_COVER,
   'spring-4': TOUR_SPRING_4_COVER_GRID,
   'spring-5': TOUR_SPRING_5_COVER_GRID,
-  'spring-6': `${SPRING_TOUR_PUBLIC}/spring-6.webp`,
-  'spring-7': `${SPRING_TOUR_PUBLIC}/spring-7.webp`,
+  'spring-6': TOUR_SPRING_6_COVER_GRID,
+  'spring-7': TOUR_SPRING_7_COVER_GRID,
+  'spring-8': TOUR_SPRING_8_COVER_GRID,
+  'spring-9': TOUR_SPRING_9_COVER_GRID,
+  'spring-10': TOUR_SPRING_10_COVER_GRID,
 } as const;
 
 export const IMAGES = {

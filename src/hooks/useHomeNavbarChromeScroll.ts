@@ -44,6 +44,72 @@ function resolveLenisVirtualScrollDelta(lenis: Lenis, data: VirtualScrollData): 
   return deltaY;
 }
 
+/** Вне React: Lenis требует патча `options.virtualScroll` на инстансе из контекста. */
+type HomeNavbarCeilingVirtualScrollRefs = {
+  heroSectionRef: RefObject<HTMLElement | null>;
+  heroTopCeilingArmedRef: { current: boolean };
+  heroCeilingMinLockRef: { current: number | null };
+  heroTopCeilingMinScrollYRef: { current: number | null };
+};
+
+function installHomeNavbarCeilingVirtualScroll(
+  lenisInstance: Lenis,
+  refs: HomeNavbarCeilingVirtualScrollRefs,
+): () => void {
+  const prevVirtualScroll = lenisInstance.options.virtualScroll;
+  lenisInstance.options.virtualScroll = (data: VirtualScrollData): boolean => {
+    if (typeof prevVirtualScroll === 'function' && prevVirtualScroll(data) === false) {
+      return false;
+    }
+    if ('ctrlKey' in data.event && data.event.ctrlKey) {
+      return true;
+    }
+
+    const heroEl = refs.heroSectionRef.current;
+    const scrollNow = lenisInstance.scroll;
+    const heroMinRaw = computeHomeHeroMinScrollY(scrollNow, heroEl);
+    if (heroMinRaw != null && scrollNow >= heroMinRaw - HOME_HERO_CEILING_EPSILON_PX) {
+      refs.heroTopCeilingArmedRef.current = true;
+    }
+
+    const minY =
+      refs.heroTopCeilingArmedRef.current && refs.heroCeilingMinLockRef.current != null
+        ? refs.heroCeilingMinLockRef.current
+        : heroMinRaw;
+    refs.heroTopCeilingMinScrollYRef.current = minY;
+
+    if (heroMinRaw == null || !refs.heroTopCeilingArmedRef.current || minY == null) {
+      return true;
+    }
+
+    const delta = resolveLenisVirtualScrollDelta(lenisInstance, data);
+    if (delta === 0) {
+      return true;
+    }
+
+    const nextTarget = lenisInstance.targetScroll + delta;
+    if (nextTarget >= minY - HOME_HERO_CEILING_EPSILON_PX) {
+      return true;
+    }
+
+    if (data.event.cancelable) {
+      data.event.preventDefault();
+    }
+    const y = lenisInstance.scroll;
+    const tgt = lenisInstance.targetScroll;
+    if (y < minY - HOME_HERO_CEILING_EPSILON_PX) {
+      lenisInstance.scrollTo(minY, { immediate: true });
+    } else if (tgt < minY - HOME_HERO_CEILING_EPSILON_PX) {
+      lenisInstance.scrollTo(y, { immediate: true });
+    }
+    return false;
+  };
+
+  return () => {
+    lenisInstance.options.virtualScroll = prevVirtualScroll;
+  };
+}
+
 /**
  * Главная: синхронизирует `HomeNavbarChromeContext` со скроллом (Lenis или `window`),
  * без дублирующего локального `useState` и без лишнего моста в `Home.tsx`.
@@ -198,59 +264,12 @@ export function useHomeNavbarChromeScroll({
    */
   useEffect(() => {
     if (!enabled || !lenis) return;
-
-    const prevVirtualScroll = lenis.options.virtualScroll;
-    lenis.options.virtualScroll = (data: VirtualScrollData): boolean => {
-      if (typeof prevVirtualScroll === 'function' && prevVirtualScroll(data) === false) {
-        return false;
-      }
-      if ('ctrlKey' in data.event && data.event.ctrlKey) {
-        return true;
-      }
-
-      const heroEl = heroSectionRef.current;
-      const scrollNow = lenis.scroll;
-      const heroMinRaw = computeHomeHeroMinScrollY(scrollNow, heroEl);
-      if (heroMinRaw != null && scrollNow >= heroMinRaw - HOME_HERO_CEILING_EPSILON_PX) {
-        heroTopCeilingArmedRef.current = true;
-      }
-
-      const minY =
-        heroTopCeilingArmedRef.current && heroCeilingMinLockRef.current != null
-          ? heroCeilingMinLockRef.current
-          : heroMinRaw;
-      heroTopCeilingMinScrollYRef.current = minY;
-
-      if (heroMinRaw == null || !heroTopCeilingArmedRef.current || minY == null) {
-        return true;
-      }
-
-      const delta = resolveLenisVirtualScrollDelta(lenis, data);
-      if (delta === 0) {
-        return true;
-      }
-
-      const nextTarget = lenis.targetScroll + delta;
-      if (nextTarget >= minY - HOME_HERO_CEILING_EPSILON_PX) {
-        return true;
-      }
-
-      if (data.event.cancelable) {
-        data.event.preventDefault();
-      }
-      const y = lenis.scroll;
-      const tgt = lenis.targetScroll;
-      if (y < minY - HOME_HERO_CEILING_EPSILON_PX) {
-        lenis.scrollTo(minY, { immediate: true });
-      } else if (tgt < minY - HOME_HERO_CEILING_EPSILON_PX) {
-        lenis.scrollTo(y, { immediate: true });
-      }
-      return false;
-    };
-
-    return () => {
-      lenis.options.virtualScroll = prevVirtualScroll;
-    };
+    return installHomeNavbarCeilingVirtualScroll(lenis, {
+      heroSectionRef,
+      heroTopCeilingArmedRef,
+      heroCeilingMinLockRef,
+      heroTopCeilingMinScrollYRef,
+    });
   }, [enabled, lenis, heroSectionRef]);
 
   useEffect(() => {

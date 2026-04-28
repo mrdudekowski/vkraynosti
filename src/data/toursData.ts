@@ -17,6 +17,7 @@ import { faSnowboarding } from '@fortawesome/free-solid-svg-icons/faSnowboarding
 import { faTicket } from '@fortawesome/free-solid-svg-icons/faTicket';
 import { faTruck } from '@fortawesome/free-solid-svg-icons/faTruck';
 import { faUtensils } from '@fortawesome/free-solid-svg-icons/faUtensils';
+import { faWater } from '@fortawesome/free-solid-svg-icons/faWater';
 import { faWind } from '@fortawesome/free-solid-svg-icons/faWind';
 import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
 import { faPaw } from '@fortawesome/free-solid-svg-icons/faPaw';
@@ -54,6 +55,21 @@ import {
   TOUR_SPRING_4_GALLERY_VIEWER,
   TOUR_SPRING_5_GALLERY_GRID,
   TOUR_SPRING_5_GALLERY_VIEWER,
+  TOUR_SPRING_6_GALLERY_GRID,
+  TOUR_SPRING_6_GALLERY_VIEWER,
+  TOUR_SPRING_6_PREFACE_BACKGROUND,
+  TOUR_SPRING_7_GALLERY_GRID,
+  TOUR_SPRING_7_GALLERY_VIEWER,
+  TOUR_SPRING_7_PREFACE_BACKGROUND,
+  TOUR_SPRING_8_GALLERY_GRID,
+  TOUR_SPRING_8_GALLERY_VIEWER,
+  TOUR_SPRING_8_PREFACE_BACKGROUND,
+  TOUR_SPRING_9_GALLERY_GRID,
+  TOUR_SPRING_9_GALLERY_VIEWER,
+  TOUR_SPRING_9_PREFACE_BACKGROUND,
+  TOUR_SPRING_10_GALLERY_GRID,
+  TOUR_SPRING_10_GALLERY_VIEWER,
+  TOUR_SPRING_10_PREFACE_BACKGROUND,
 } from '../constants/images';
 import { UI } from '../constants/ui';
 
@@ -353,7 +369,7 @@ export const TOURS: Tour[] = [
     galleryGridUrls: [...TOUR_WINTER_5_GALLERY_GRID],
   },
 
-  // SPRING — 7 tours
+  // SPRING — 10 tours
   {
     id: 'spring-1',
     season: 'spring',
@@ -637,11 +653,9 @@ export const TOURS: Tour[] = [
       inc('Гид-проводник на весь маршрут', faUserTie),
     ],
     imageUrl: SPRING_TOUR_COVERS['spring-6'],
-    galleryImages: [
-      SPRING_TOUR_COVERS['spring-6'],
-      SPRING_TOUR_COVERS['spring-6'],
-      SPRING_TOUR_COVERS['spring-6'],
-    ],
+    prefaceBackgroundImageUrl: TOUR_SPRING_6_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_6_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_6_GALLERY_GRID],
   },
   {
     id: 'spring-7',
@@ -703,11 +717,149 @@ export const TOURS: Tour[] = [
       inc('Наше тепло и забота — это входит в каждый тур', faHeart),
     ],
     imageUrl: SPRING_TOUR_COVERS['spring-7'],
-    galleryImages: [
-      SPRING_TOUR_COVERS['spring-7'],
-      SPRING_TOUR_COVERS['spring-7'],
-      SPRING_TOUR_COVERS['spring-7'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_7_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_7_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_7_GALLERY_GRID],
+  },
+  {
+    id: 'spring-8',
+    season: 'spring',
+    title: 'Восхождение на г. Фалаза',
+    subtitle: 'Одна из самых красивых и доступных вершин Приморья',
+    heroPhrase:
+      'Панорамная вершина, горный воздух и целый день среди лучших пейзажей Приморья',
+    duration: '1 день / 13 часов',
+    difficulty: 'Medium',
+    price: '6 000 ₽',
+    descriptionLeadBold: 'Гора Фалаза (Литовка, 1279 м)',
+    description:
+      ' — одна из самых популярных и живописных вершин южного Приморья, входит в Ливадийский хребет Сихотэ-Алиня и ценится за удобную транспортную доступность, красивые панорамы и маршрут на один день. Также входит в десятку «Приморского Барса» — именно с неё многие начинают собирать свои «звёздочки» Приморья. Этот маршрут отлично подходит тем, кто хочет получить настоящее горное впечатление без многодневного похода: бодрое восхождение, отдых на вершине, фото на фоне дальних хребтов и приятную усталость, которую особенно приятно завершить горячим ужином после спуска. Фалаза часто становится одной из любимых вершин даже у тех, кто только начинает знакомство с горными походами.',
+    program: [
+      { timeLabel: '07:00', description: 'Выезд из Владивостока' },
+      {
+        timeLabel: '09:30',
+        description: 'Прибытие к подножию Фалазы, инструктаж, сбор',
+      },
+      { timeLabel: '10:00', description: 'Восхождение на вершину' },
+      {
+        timeLabel: '13:00',
+        description: 'Отдых на вершине, фото- и видео-фиксация, пикник',
+      },
+      { timeLabel: '14:30–16:30', description: 'Спуск' },
+      { timeLabel: '16:30', description: 'Горячий ужин' },
+      { timeLabel: '17:30', description: 'Выезд в город' },
+      { timeLabel: '20:00', description: 'Прибытие во Владивосток' },
     ],
+    includedInPrice: [
+      inc('Трансфер Владивосток — Грибановка — Владивосток', faShuttleVan),
+      inc('Горячее питание и напитки после спуска', faMugHot),
+      inc('Сопровождение гида-проводника на маршруте', faUserTie),
+      inc('Инструктаж и организация безопасного прохождения маршрута', faPersonHiking),
+      inc('Фото- и видео-фиксация на память', faBinoculars),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-8'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_8_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_8_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_8_GALLERY_GRID],
+  },
+  {
+    id: 'spring-9',
+    season: 'spring',
+    title: 'Восхождение на г. Воробей + Винодельня',
+    subtitle:
+      'Лёгкое восхождение в Приморье и дегустация местных вин в Анисимовке',
+    heroPhrase:
+      'Сначала — вершина из списка «Приморского Барса», потом — бокал приморского вина среди гор',
+    duration: '1 день / 14,5 часов',
+    difficulty: 'Easy',
+    price: '6 000 ₽',
+    descriptionLeadBold: 'Гора Воробей (Туманная, 1230 м)',
+    description:
+      ' — одна из самых узнаваемых вершин юга Приморья. Она расположена на хребте Большой Воробей рядом с Анисимовкой, входит в число десяти вершин проекта «Приморский Барс» и считается доступной для тех, кто хочет получить красивое горное приключение без перегруза. Главная особенность этого тура — сочетание активного дня в горах и гастрономического впечатления после маршрута. После восхождения и спуска мы отправимся в Майхинское хозяйство в Анисимовке, где гостей принимают на экскурсии и дегустации местных вин. Это формат для тех, кому хочется не просто сходить на вершину, а прожить день глубже: с природой, движением, вкусом и хорошей компанией.',
+    program: [
+      { timeLabel: '07:00', description: 'Выезд из Владивостока' },
+      { timeLabel: '09:00', description: 'Прибытие к подножию' },
+      { timeLabel: '09:30–12:30', description: 'Восхождение' },
+      {
+        timeLabel: '12:30–14:30',
+        description: 'Отдых на вершине, фото- и видео-фиксация, обед',
+      },
+      { timeLabel: '14:30–16:30', description: 'Спуск' },
+      { timeLabel: '17:30', description: 'Посещение винодельни, дегустация' },
+      { timeLabel: '19:30', description: 'Выезд в город' },
+      { timeLabel: '21:30', description: 'Прибытие во Владивосток' },
+    ],
+    includedInPrice: [
+      inc('Трансфер из Владивостока и обратно', faShuttleVan),
+      inc('Сопровождение гида-проводника на всём маршруте', faUserTie),
+      inc('Горячий обед на маршруте', faMugHot),
+      inc('Посещение Майхинского хозяйства', faBinoculars),
+      inc('Дегустация местных вин', faUtensils),
+      inc('Помощь с фото и видео на маршруте', faHeart),
+      inc('Организация маршрута и сопровождение группы на протяжении всего дня', faCheck),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-9'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_9_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_9_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_9_GALLERY_GRID],
+  },
+  {
+    id: 'spring-10',
+    season: 'spring',
+    title: 'Путешествие на остров Аскольд',
+    subtitle:
+      'Остров-призрак с маяками, кекурами и морскими котиками',
+    heroPhrase:
+      'Катерная прогулка к легендарному острову, где добывали золото, а теперь отдыхают сивучи и ларги',
+    duration: '12–14 часов',
+    difficulty: 'Medium',
+    metaAudienceLabel: 'Лёгкая / средняя',
+    price: '7 000 ₽',
+    descriptionLeadBold: 'Остров Аскольд',
+    description:
+      ' — необитаемый остров в заливе Петра Великого, площадь 14,6 км². Известен старинным маяком (1879 г.), 180-мм башенной батареей №26, лежбищем тюленей-ларг и сивучей, а также пятнистыми оленями. Был центром золотодобычи в XIX веке, позже — секретным военным объектом. Кекуры «Пять пальцев» — пять живописных скал-столбов между островами Аскольд и Путятина, популярное место наблюдения за морскими львами.',
+    program: [
+      { timeLabel: '07:00', description: 'Выезд из Владивостока' },
+      {
+        timeLabel: '10:00',
+        description: 'Прибытие в посёлок Дунай, пересадка на катер',
+      },
+      {
+        timeLabel: '10:00–11:00',
+        description:
+          'Морская прогулка к кекурам «Пять пальцев». Наблюдение за сивучами и ларгами в естественной среде',
+      },
+      {
+        timeLabel: '11:00–11:30',
+        description:
+          'Высадка на остров Аскольд (бухта Наездник или Юго-Восточная — зависит от погоды)',
+      },
+      {
+        timeLabel: '11:30–15:30',
+        description:
+          'Пешая прогулка по острову. Посещение башенной батареи №26, маяка на мысе Елагина, смотровых площадок',
+      },
+      {
+        timeLabel: '15:30–16:30',
+        description: 'Обед на берегу. Готовим на месте',
+      },
+      { timeLabel: '16:30–17:00', description: 'Посадка на катер' },
+      { timeLabel: '17:00–18:00', description: 'Переход в посёлок Дунай' },
+      { timeLabel: '18:00–21:00', description: 'Возвращение во Владивосток' },
+    ],
+    includedInPrice: [
+      inc('Индивидуальный трансфер Владивосток — Дунай — Владивосток', faShuttleVan),
+      inc('Катер до острова Аскольд и обратно', faWater),
+      inc('Сопровождение гида-проводника — команда «Вкрайности»', faUserTie),
+      inc('Обед на берегу (готовлю на месте)', faUtensils),
+      inc('Горячие напитки (чай/кофе)', faMugHot),
+      inc('Захватывающие истории об острове и его обитателях', faBookOpen),
+      inc('Наше тепло и индивидуальный подход', faHeart),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-10'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_10_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_10_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_10_GALLERY_GRID],
   },
 
   // SUMMER — 4 tours

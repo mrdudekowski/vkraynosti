@@ -1,8 +1,10 @@
 import type { MouseEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UI } from '../../constants/ui';
 import { SEASON_ICON, SEASON_ORDER, SEASON_STYLE } from '../../constants/seasonNavbarAppearance';
+import { ROUTES } from '../../constants/routes';
 import type { Season } from '../../types';
 import { useSeason } from '../../context/useSeason';
 import { scrollWindowToTopSmooth } from '../../constants/smoothScroll';
@@ -17,11 +19,12 @@ interface SeasonSwitcherProps {
 const SeasonSwitcher = ({ variant = 'section', className }: SeasonSwitcherProps) => {
   const { activeSeason, setActiveSeason } = useSeason();
   const lenis = useLenis();
+  const navigate = useNavigate();
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>, season: Season) => {
     event.preventDefault();
-    if (season === activeSeason) return;
     setActiveSeason(season);
+    void navigate(ROUTES.HOME);
     scrollWindowToTopSmooth(lenis);
   };
 

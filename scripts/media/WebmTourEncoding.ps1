@@ -1,5 +1,5 @@
 # VP9 WebM — параметры синхронизированы с `scripts/generate-home-season-banner-loop-videos.cjs`.
-# full: просмотрщик (макс. ширина 1920); grid: сетка туров (854); banner: лупы баннера (800).
+# full / grid / banner: макс. длинная сторона 1920 / 854 / 800 px (см. Get-WebmScaleFilter).
 
 function Get-WebmVp9CodecArgs {
   param(
@@ -25,10 +25,12 @@ function Get-WebmScaleFilter {
     [ValidateSet('full', 'grid', 'banner')]
     [string]$Preset
   )
-  $w = switch ($Preset) {
-    'full' { '1920' }
-    'grid' { '854' }
+  # Ограничиваем длинную сторону (не только ширину): иначе портретное видео
+  # после `min(1920,iw):-2` остаётся 1920×3000+ и раздувает WebM выше лимита GitHub (100 MiB).
+  $L = switch ($Preset) {
+    'full'   { '1920' }
+    'grid'   { '854' }
     'banner' { '800' }
   }
-  return "scale='min($w,iw)':-2"
+  return "scale=w=if(gt(ih\,iw)\,-2\,min($L\,iw)):h=if(gt(ih\,iw)\,min($L\,ih)\,-2)"
 }

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons/faCircleQuestion';
@@ -13,6 +13,12 @@ import {
   TOUR_SPRING_2_GRID_VIDEO_POSTERS,
   TOUR_SPRING_3_GRID_VIDEO_POSTERS,
   TOUR_SPRING_4_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_5_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_6_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_7_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_8_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_9_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_10_GRID_VIDEO_POSTERS,
   TOUR_WINTER_3_GRID_VIDEO_POSTERS,
   TOUR_WINTER_3_PREFACE_BACKGROUND,
   TOUR_WINTER_4_GRID_VIDEO_POSTERS,
@@ -29,7 +35,6 @@ import TourDetailHero from "../components/tours/TourDetailHero";
 import TourDetailGallery, {
   type TourGalleryLayoutVariant,
 } from "../components/tours/TourDetailGallery";
-import TourPhotoViewer from "../components/tours/TourPhotoViewer";
 import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
 import TourDetailSectionHeading from "../components/tours/TourDetailSectionHeading";
 import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
@@ -62,12 +67,6 @@ const TourDetailPage = () => {
     enabled: programRevealEnabled,
     mainColumnRef: revealProgressRef,
   });
-  const [photoViewer, setPhotoViewer] = useState<{
-    images: string[];
-    initialIndex: number;
-    tourTitle: string;
-  } | null>(null);
-
   const viewerGalleryUrls = useMemo(
     () => (tour == null ? [] : getTourGalleryViewerUrls(tour)),
     [tour]
@@ -91,8 +90,6 @@ const TourDetailPage = () => {
     return gridGalleryUrls.slice(2);
   }, [tour, gridGalleryUrls]);
 
-  const galleryFirstIndexInFullTour = 2;
-
   const getVideoPosterForGridSrc = useMemo(():
     | ((src: string) => string | undefined)
     | undefined => {
@@ -109,6 +106,18 @@ const TourDetailPage = () => {
       return (src) => TOUR_SPRING_3_GRID_VIDEO_POSTERS[src];
     if (tour.id === "spring-4")
       return (src) => TOUR_SPRING_4_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-5")
+      return (src) => TOUR_SPRING_5_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-6")
+      return (src) => TOUR_SPRING_6_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-7")
+      return (src) => TOUR_SPRING_7_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-8")
+      return (src) => TOUR_SPRING_8_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-9")
+      return (src) => TOUR_SPRING_9_GRID_VIDEO_POSTERS[src];
+    if (tour.id === "spring-10")
+      return (src) => TOUR_SPRING_10_GRID_VIDEO_POSTERS[src];
     return undefined;
   }, [tour]);
 
@@ -120,6 +129,11 @@ const TourDetailPage = () => {
     if (tour.id === "spring-2") return "olkhovaya";
     if (tour.id === "spring-3") return "pidan";
     if (tour.id === "spring-4") return "sestra";
+    if (tour.id === "spring-5" || tour.id === "spring-6") return "chitinza";
+    if (tour.id === "spring-7") return "dardanelles";
+    if (tour.id === "spring-8") return "falaza";
+    if (tour.id === "spring-9") return "vorobey-winery";
+    if (tour.id === "spring-10") return "askold";
     return "default";
   }, [tour]);
 
@@ -132,22 +146,6 @@ const TourDetailPage = () => {
       season: tour.season,
     });
   }, [tour, openTourRequestModal]);
-
-  const handleOpenGalleryPhoto = useCallback(
-    (idx: number) => {
-      if (!tour) return;
-      setPhotoViewer({
-        images: viewerGalleryUrls,
-        initialIndex: idx,
-        tourTitle: tour.title,
-      });
-    },
-    [tour, viewerGalleryUrls]
-  );
-
-  const closePhotoViewer = useCallback(() => {
-    setPhotoViewer(null);
-  }, []);
 
   const descriptionColumns = useMemo(
     () =>
@@ -242,16 +240,6 @@ const TourDetailPage = () => {
         }
       />
 
-      {photoViewer != null && (
-        <TourPhotoViewer
-          key={photoViewer.initialIndex}
-          images={photoViewer.images}
-          initialIndex={photoViewer.initialIndex}
-          tourTitle={photoViewer.tourTitle}
-          onClose={closePhotoViewer}
-        />
-      )}
-
       <div className="tour-detail-page-gutter">
         <div className="tour-detail-page-inner">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-x-0">
@@ -345,9 +333,7 @@ const TourDetailPage = () => {
                   />
                   <TourDetailGallery
                     images={galleryGridImages}
-                    firstImageIndexInTourGallery={galleryFirstIndexInFullTour}
                     tourTitle={tour.title}
-                    onOpenPhoto={handleOpenGalleryPhoto}
                     prefersReducedMotion={prefersReducedMotion}
                     getVideoPosterForGridSrc={getVideoPosterForGridSrc}
                     layoutVariant={galleryLayoutVariant}

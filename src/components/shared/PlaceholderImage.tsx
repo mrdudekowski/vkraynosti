@@ -68,6 +68,7 @@ const DeferredPlaceholderImage = ({
       className={`object-cover ${imgClassName} ${className}`.trim()}
       loading={loading}
       fetchPriority={fetchPriority}
+      decoding="async"
     />
   );
 };
@@ -89,6 +90,7 @@ const PlaceholderImage = ({
         className={`object-cover ${imgClassName} ${className}`.trim()}
         loading={loading}
         fetchPriority={fetchPriority}
+        decoding="async"
       />
     );
   }

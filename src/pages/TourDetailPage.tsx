@@ -6,7 +6,7 @@ import { faClock } from '@fortawesome/free-solid-svg-icons/faClock';
 import { getTourById } from "../data/toursData";
 import {
   ROUTES,
-  SEASON_TO_LIST_ROUTE,
+  buildHomeSectionPath,
   buildTourDetailPath,
 } from "../constants/routes";
 import {
@@ -48,6 +48,7 @@ import { useMatchMinWidth } from "../hooks/useMatchMinWidth";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { useTourProgramScrollReveal } from "../hooks/useTourProgramScrollReveal";
 import { useModal } from "../context/useModal";
+import { useBrowserBackToHomeTours } from "../hooks/useBrowserBackToHomeTours";
 
 const TourDetailPage = () => {
   const { season = "", tourId = "" } = useParams<{
@@ -56,6 +57,7 @@ const TourDetailPage = () => {
   }>();
   const tour = getTourById(tourId);
   const { openTourRequestModal } = useModal();
+  useBrowserBackToHomeTours({ enabled: tour != null });
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
   const prefersReducedMotion = usePrefersReducedMotion();
   const programRevealEnabled = !prefersReducedMotion && tour != null;
@@ -229,7 +231,7 @@ const TourDetailPage = () => {
         imageAlt={tour.title}
         title={tour.title}
         subtitle={tour.subtitle}
-        backLinkTo={SEASON_TO_LIST_ROUTE[tour.season]}
+        backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
         backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
         desktopHeroImgClassName={
           tour.id === 'winter-3'

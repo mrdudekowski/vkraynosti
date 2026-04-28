@@ -8,7 +8,8 @@ import {
  * Десять параллельных preloads перегружают лимит соединений к origin (~6) — очередь и 5–8 с до первого кадра.
  * Остальные колонки подтягиваются при hover из HTTP-кэша после первого запроса.
  */
-export const HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT = 3 as const;
+export const HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
+export const HOME_SEASON_BANNER_SPRING_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
 
 export interface HomeSeasonBannerWinterVideoPreloadLink {
   href: string;
@@ -25,7 +26,7 @@ export function getHomeSeasonBannerWinterVideoPreloadLinks(): readonly HomeSeaso
 }
 
 export function getHomeSeasonBannerSpringVideoPreloadLinks(): readonly HomeSeasonBannerWinterVideoPreloadLink[] {
-  return HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT).map(
+  return HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_SPRING_HEAD_PRELOAD_CLIP_COUNT).map(
     (href) => ({ href, fetchPriority: 'high' as const })
   );
 }

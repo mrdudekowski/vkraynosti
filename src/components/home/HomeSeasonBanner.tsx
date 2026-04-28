@@ -482,7 +482,8 @@ const HomeSeasonBannerColumn = ({
               src={clip.posterSrc}
               alt=""
               className="pointer-events-none h-full min-h-0 w-full object-cover"
-              loading={clip.videoSrc ? 'eager' : 'lazy'}
+              loading={columnIndex === 0 ? 'eager' : 'lazy'}
+              fetchPriority={columnIndex === 0 ? 'high' : 'low'}
               decoding="async"
             />
           )}

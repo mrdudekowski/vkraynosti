@@ -14,6 +14,9 @@ export const ROUTES = {
   PRIVACY:     '/privacy',
 } as const;
 
+export const buildHomeSectionPath = (sectionId: string): string =>
+  `${ROUTES.HOME}#${sectionId}`;
+
 /** Список туров по сезону — единая карта для навигации и ссылок «назад». */
 export const SEASON_TO_LIST_ROUTE: Record<Season, string> = {
   winter: ROUTES.WINTER,

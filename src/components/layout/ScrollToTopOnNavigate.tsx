@@ -23,6 +23,7 @@ const ScrollToTopOnNavigate = () => {
 
   useLayoutEffect(() => {
     const signature = routeSignature(location.pathname, location.search, location.hash);
+    const isHomeWithSectionHash = location.pathname === ROUTES.HOME && location.hash.length > 1;
 
     if (prevSignatureRef.current === null) {
       prevSignatureRef.current = signature;
@@ -36,9 +37,6 @@ const ScrollToTopOnNavigate = () => {
 
     const previousSignature = prevSignatureRef.current;
     prevSignatureRef.current = signature;
-
-    const isHomeWithSectionHash =
-      location.pathname === ROUTES.HOME && location.hash.length > 1;
 
     if (isHomeWithSectionHash && previousSignature !== signature) {
       const id = location.hash.slice(1);

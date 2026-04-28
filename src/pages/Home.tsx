@@ -60,11 +60,15 @@ const Home = () => {
   const [gridAnimationCycle, setGridAnimationCycle] = useState(0);
   const [pendingExpandedSeason, setPendingExpandedSeason] = useState<Season | null>(null);
   const shouldScrollAfterCollapseRef = useRef(false);
+  const expandCardMediaViewportRef = useRef<HTMLDivElement | null>(null);
   const gateIntersectRef = useRef<HTMLDivElement | null>(null);
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const expandControlButtonRef = useRef<HTMLButtonElement | null>(null);
   const toursHeadingWrapRef = useRef<HTMLDivElement | null>(null);
   const [gateStageFocused, setGateStageFocused] = useState(false);
+  const [expandCardVideoInView, setExpandCardVideoInView] = useState(
+    () => typeof IntersectionObserver === 'undefined'
+  );
   const homeGateScrollEnabled = location.pathname === ROUTES.HOME;
   const homeGateBannerColumnHover =
     UI.sections.homeGateSeasonBannerStaticPresentation &&
@@ -191,6 +195,27 @@ const Home = () => {
     const viewportTop = window.scrollY + scrollTarget.getBoundingClientRect().top;
     window.scrollTo({ top: viewportTop + NAVBAR_SCROLL_OFFSET_PX, behavior: 'auto' });
   }, [lenis]);
+
+  useEffect(() => {
+    if (expandCardVideoInView) return;
+    const el = expandCardMediaViewportRef.current;
+    if (el == null) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setExpandCardVideoInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0]?.isIntersecting) {
+          setExpandCardVideoInView(true);
+          observer.disconnect();
+        }
+      },
+      { root: null, rootMargin: '300px 0px', threshold: 0.01 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [expandCardVideoInView]);
 
   useEffect(() => {
     if (activeSeasonPromoVideoUrls.length <= 1) return;
@@ -345,14 +370,16 @@ const Home = () => {
                       >
                         {activeSeasonLeadTour != null ? (
                           <div className="absolute inset-0" aria-hidden>
-                            {activeSeasonPromoVideoUrl != null ? (
+                            <div ref={expandCardMediaViewportRef} className="h-full w-full">
+                            {activeSeasonPromoVideoUrl != null && expandCardVideoInView ? (
                               <video
                                 key={activeSeasonPromoVideoUrl}
                                 className="h-full w-full object-cover opacity-60"
+                                poster={activeSeasonLeadTour.imageUrl}
                                 autoPlay
                                 muted
                                 playsInline
-                                preload="metadata"
+                                preload="none"
                                 loop
                               >
                                 <source src={activeSeasonPromoVideoUrl} />
@@ -365,6 +392,7 @@ const Home = () => {
                                 loading="lazy"
                               />
                             )}
+                            </div>
                             <div
                               ref={expandOverlayRevealRef}
                               className={`absolute inset-0 bg-surface-dark/45 reveal-base ${expandOverlayRevealClassName}`}

@@ -20,6 +20,7 @@ import {
   computeHomeHeroMinScrollY,
   getViewportScrollY,
 } from '../constants/smoothScroll';
+import { HOME_GATE_SCROLL_HINT_VISIBLE_MAX_SCROLL_PX } from '../constants/homeGateScroll';
 import { useHomeNavbarChrome } from '../context/useHomeNavbarChrome';
 import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
@@ -152,6 +153,14 @@ export function useHomeNavbarChromeScroll({
 
     let scrollRaw = getViewportScrollY(lenis);
     const heroMinRaw = computeHomeHeroMinScrollY(scrollRaw, heroSectionRef.current);
+
+    const isAtGateTop = scrollRaw <= HOME_GATE_SCROLL_HINT_VISIBLE_MAX_SCROLL_PX;
+    if (isAtGateTop && heroTopCeilingArmedRef.current) {
+      heroTopCeilingArmedRef.current = false;
+      heroTopCeilingMinScrollYRef.current = null;
+      heroCeilingMinLockRef.current = null;
+    }
+
     if (heroMinRaw != null && scrollRaw >= heroMinRaw - HOME_HERO_CEILING_EPSILON_PX) {
       heroTopCeilingArmedRef.current = true;
       if (heroCeilingMinLockRef.current == null) {

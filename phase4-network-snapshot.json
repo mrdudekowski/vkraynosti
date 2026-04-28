@@ -1,0 +1,289 @@
+{
+  "timestamp": "2026-04-28T11:59:15.046Z",
+  "desktop": [
+    {
+      "profile": "desktop",
+      "route": "home",
+      "mediaCount": 14,
+      "firstMediaStartMs": 243.09999999403954,
+      "first2sMediaCount": 13,
+      "transferBytes": 20214365,
+      "transferBytesFirst2s": 2715503,
+      "samples": [
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-1/ld.hero.grid.webp",
+          "startTime": 243.09999999403954,
+          "transferSize": 44284,
+          "duration": 2.300000011920929,
+          "initiatorType": "video"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-2/olv.clip1.poster.webp",
+          "startTime": 350.2999999821186,
+          "transferSize": 140670,
+          "duration": 2.600000023841858,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-4/ss.clip1.poster.webp",
+          "startTime": 356.59999999403954,
+          "transferSize": 375216,
+          "duration": 8.5,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip2.poster.webp",
+          "startTime": 356.69999998807907,
+          "transferSize": 373000,
+          "duration": 10,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip5.poster.webp",
+          "startTime": 356.69999998807907,
+          "transferSize": 100270,
+          "duration": 7.4000000059604645,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip4.poster.webp",
+          "startTime": 356.69999998807907,
+          "transferSize": 307972,
+          "duration": 10.400000005960464,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip3.poster.webp",
+          "startTime": 356.7999999821186,
+          "transferSize": 93290,
+          "duration": 8.400000005960464,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip6.poster.webp",
+          "startTime": 356.7999999821186,
+          "transferSize": 93610,
+          "duration": 8.5,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip7.poster.webp",
+          "startTime": 356.7999999821186,
+          "transferSize": 167088,
+          "duration": 13.100000023841858,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-2/olv.hero.grid.webp",
+          "startTime": 356.7999999821186,
+          "transferSize": 174802,
+          "duration": 15.600000023841858,
+          "initiatorType": "img"
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "route": "tour-winter-3",
+      "mediaCount": 7,
+      "firstMediaStartMs": 176.2000000178814,
+      "first2sMediaCount": 7,
+      "transferBytes": 3326282,
+      "transferBytesFirst2s": 3326282,
+      "samples": [
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.falaza.grid.webp",
+          "startTime": 176.2000000178814,
+          "transferSize": 57078,
+          "duration": 3,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.boarder.webp",
+          "startTime": 416.5,
+          "transferSize": 2330484,
+          "duration": 38.70000001788139,
+          "initiatorType": "css"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip2.poster.webp",
+          "startTime": 469.2000000178814,
+          "transferSize": 179290,
+          "duration": 7.799999982118607,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip3.poster.webp",
+          "startTime": 469.30000001192093,
+          "transferSize": 133190,
+          "duration": 7.199999988079071,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip1.poster.webp",
+          "startTime": 469.30000001192093,
+          "transferSize": 512876,
+          "duration": 9,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip4.poster.webp",
+          "startTime": 469.59999999403954,
+          "transferSize": 32386,
+          "duration": 6.700000017881393,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip5.poster.webp",
+          "startTime": 469.59999999403954,
+          "transferSize": 80978,
+          "duration": 7.600000023841858,
+          "initiatorType": "img"
+        }
+      ]
+    }
+  ],
+  "mobile": [
+    {
+      "profile": "mobile",
+      "route": "home",
+      "mediaCount": 14,
+      "firstMediaStartMs": 206.59999999403954,
+      "first2sMediaCount": 13,
+      "transferBytes": 20214365,
+      "transferBytesFirst2s": 2715503,
+      "samples": [
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-1/ld.hero.grid.webp",
+          "startTime": 206.59999999403954,
+          "transferSize": 44284,
+          "duration": 3,
+          "initiatorType": "video"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-2/olv.clip1.poster.webp",
+          "startTime": 287.30000001192093,
+          "transferSize": 140670,
+          "duration": 2.9000000059604645,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-4/ss.clip1.poster.webp",
+          "startTime": 295.7000000178814,
+          "transferSize": 375216,
+          "duration": 8.399999976158142,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip2.poster.webp",
+          "startTime": 295.7000000178814,
+          "transferSize": 373000,
+          "duration": 10.399999976158142,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip5.poster.webp",
+          "startTime": 295.80000001192093,
+          "transferSize": 100270,
+          "duration": 7.799999982118607,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip4.poster.webp",
+          "startTime": 295.80000001192093,
+          "transferSize": 307972,
+          "duration": 10.199999988079071,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip3.poster.webp",
+          "startTime": 295.80000001192093,
+          "transferSize": 93290,
+          "duration": 8.400000005960464,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip6.poster.webp",
+          "startTime": 295.90000000596046,
+          "transferSize": 93610,
+          "duration": 8.599999994039536,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.clip7.poster.webp",
+          "startTime": 295.90000000596046,
+          "transferSize": 167088,
+          "duration": 14.800000011920929,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/spring-3/pd.hero.grid.webp",
+          "startTime": 296,
+          "transferSize": 80550,
+          "duration": 14.400000005960464,
+          "initiatorType": "img"
+        }
+      ]
+    },
+    {
+      "profile": "mobile",
+      "route": "tour-winter-3",
+      "mediaCount": 7,
+      "firstMediaStartMs": 389.30000001192093,
+      "first2sMediaCount": 7,
+      "transferBytes": 3326282,
+      "transferBytesFirst2s": 3326282,
+      "samples": [
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.falaza.grid.webp",
+          "startTime": 389.30000001192093,
+          "transferSize": 57078,
+          "duration": 8.199999988079071,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.boarder.webp",
+          "startTime": 530.5,
+          "transferSize": 2330484,
+          "duration": 30.19999998807907,
+          "initiatorType": "css"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip2.poster.webp",
+          "startTime": 572.5999999940395,
+          "transferSize": 179290,
+          "duration": 7.4000000059604645,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip3.poster.webp",
+          "startTime": 572.6999999880791,
+          "transferSize": 133190,
+          "duration": 8.200000017881393,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip4.poster.webp",
+          "startTime": 572.9000000059605,
+          "transferSize": 32386,
+          "duration": 7.9000000059604645,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip1.poster.webp",
+          "startTime": 572.9000000059605,
+          "transferSize": 512876,
+          "duration": 9.400000005960464,
+          "initiatorType": "img"
+        },
+        {
+          "name": "http://127.0.0.1:5173/vkraynosti/tours/winter-3/gr.clip5.poster.webp",
+          "startTime": 573.0999999940395,
+          "transferSize": 80978,
+          "duration": 8.400000005960464,
+          "initiatorType": "img"
+        }
+      ]
+    }
+  ]
+}

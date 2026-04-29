@@ -7,8 +7,8 @@ const BASE = 'https://placehold.co';
 const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours`;
 
 /**
- * Стартовый экран главной (`HomeSeasonBanner`): `public/banners_winter/`, `banners_spring/`, …
- * Видео-лупы и постеры сезона — только в своей папке.
+ * Стартовый экран главной (`HomeSeasonBanner`): базовые папки сезона (`public/banners_*`).
+ * Зимние/весенние видео колонок — сжатые `*.grid.webm` из `public/tours/` (`HOME_SEASON_BANNER_*_LOOP_VIDEOS`).
  */
 export const HOME_SEASON_BANNER_MEDIA_BASE: Record<Season, string> = {
   winter: `${PUBLIC_ASSET_BASE}banners_winter`,
@@ -114,8 +114,7 @@ export const TOUR_WINTER_3_GALLERY_VIEWER = [
 
 /**
  * Те же индексы, что у `TOUR_WINTER_3_GALLERY_VIEWER`: сетка страницы / карточка (webp ≤900px, VP9 `*.grid.webm`).
- * Кадры склона, Эли и барбекю — только фото (`*.webp`); `*.grid.webm` для них ошибочно попадали в сетку как `GalleryGridVideo`
- * (сами файлы остаются в `public` — входы скриптов баннера главной).
+ * Кадры склона, Эли и барбекю в сетке — `*.webp`; VP9 для баннера главной — `TOUR_WINTER_3_BOARD_GRID_WEBM` и др. (`generate-winter-3-banner-stub-videos.ps1`).
  */
 export const TOUR_WINTER_3_GALLERY_GRID = [
   `${TOUR_WINTER_3}/gr.falaza.grid.webp`,
@@ -163,6 +162,14 @@ export const TOUR_WINTER_3_PREFACE_BACKGROUND = `${TOUR_WINTER_3}/gr.boarder.web
 /** Мобильная версия фона блока «О туре» (сниженный вес для раннего рендера tour detail). */
 export const TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE =
   `${TOUR_WINTER_3}/gr.boarder.mobile.webp` as const;
+
+/**
+ * Сжатые VP9 для баннера главной (склон / Эля / барбекю). В сетке страницы тура — только `*.webp` (`TOUR_WINTER_3_GALLERY_GRID`).
+ * Сборка: `scripts/generate-winter-3-banner-stub-videos.ps1`.
+ */
+export const TOUR_WINTER_3_BOARD_GRID_WEBM = `${TOUR_WINTER_3}/gr.board.grid.webm` as const;
+export const TOUR_WINTER_3_ELYA_GRID_WEBM = `${TOUR_WINTER_3}/gr.elya.grid.webm` as const;
+export const TOUR_WINTER_3_BBQ_GRID_WEBM = `${TOUR_WINTER_3}/gr.bbq.grid.webm` as const;
 
 const TOUR_WINTER_4 = `${TOURS_ASSET_BASE}/winter-4`;
 
@@ -719,42 +726,51 @@ export const TOUR_SPRING_10_VIEW2_GRID = `${TOUR_SPRING_10}/view2.webp` as const
 export const TOUR_SPRING_10_VIEW3_GRID = `${TOUR_SPRING_10}/view3.webp` as const;
 
 /**
- * Короткие лупы для баннера главной (колонки 0…9 ↔ `UI.homeSeasonBannerWordmark`).
- * Файлы в `public/banners_winter/`. Генерация: `npm run generate:banner-loops` / `scripts/generate-home-season-banner-loop-videos.ps1` (`-Posters`).
- * Синхронизировать таблицу нарезок в скриптах и `src/data/homeSeasonBannerClips.ts`.
+ * Секунда входа 5-секундного сегмента в исходном `*.grid.webm` для баннера зимы (колонки 0…9).
+ * Синхронно с `cuts[].startSec` в `scripts/generate-home-season-banner-loop-videos.cjs`.
  */
-const BANNER_WINTER = HOME_SEASON_BANNER_MEDIA_BASE.winter;
-
-export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS = [
-  `${BANNER_WINTER}/gr.clip1.banner-loop.webm`,
-  `${BANNER_WINTER}/gr.clip3.banner-loop.webm`,
-  `${BANNER_WINTER}/gr.clip4.banner-loop.webm`,
-  `${BANNER_WINTER}/gr.clip5.banner-loop.webm`,
-  `${BANNER_WINTER}/hs.clip1.banner-loop.webm`,
-  `${BANNER_WINTER}/ars.clip1.banner-loop.webm`,
-  `${BANNER_WINTER}/ars.clip2.banner-loop.webm`,
-  `${BANNER_WINTER}/gr.board.banner-loop.webm`,
-  `${BANNER_WINTER}/gr.elya.banner-loop.webm`,
-  `${BANNER_WINTER}/gr.bbq.banner-loop.webm`,
+export const HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC = [
+  3, 0, 16, 1, 5, 2, 7, 0, 0, 0,
 ] as const;
 
-/** Постеры для `<video poster>` лупов баннера (первый кадр нарезки). */
+/**
+ * Зимний баннер: те же сжатые `*.grid.webm`, что в турах (`public/tours/…`), без дублей в `banners_winter/`.
+ * Зацикливание сегмента — `BannerColumnVideo` (`startSec` + `HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC`).
+ * Раньше: отдельные `*.banner-loop.webm` из `npm run generate:banner-loops`.
+ */
+
+export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS = [
+  TOUR_WINTER_3_GALLERY_GRID[3],
+  TOUR_WINTER_3_GALLERY_GRID[9],
+  TOUR_WINTER_3_GALLERY_GRID[11],
+  TOUR_WINTER_3_GALLERY_GRID[12],
+  TOUR_WINTER_4_GALLERY_GRID[2],
+  TOUR_WINTER_5_GALLERY_GRID[4],
+  TOUR_WINTER_5_GALLERY_GRID[5],
+  TOUR_WINTER_3_BOARD_GRID_WEBM,
+  TOUR_WINTER_3_ELYA_GRID_WEBM,
+  TOUR_WINTER_3_BBQ_GRID_WEBM,
+] as const;
+
+/**
+ * Постеры для `<video poster>` зимних клипов баннера — те же webp, что в турах.
+ */
 export const HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS: Record<string, string> = {
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[0]]: `${BANNER_WINTER}/gr.clip1.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[1]]: `${BANNER_WINTER}/gr.clip3.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[2]]: `${BANNER_WINTER}/gr.clip4.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[3]]: `${BANNER_WINTER}/gr.clip5.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[4]]: `${BANNER_WINTER}/hs.clip1.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[5]]: `${BANNER_WINTER}/ars.clip1.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[6]]: `${BANNER_WINTER}/ars.clip2.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[7]]: `${BANNER_WINTER}/gr.board.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[8]]: `${BANNER_WINTER}/gr.elya.banner-loop.poster.webp`,
-  [HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[9]]: `${BANNER_WINTER}/gr.bbq.banner-loop.poster.webp`,
+  [TOUR_WINTER_3_GALLERY_GRID[3]]: TOUR_WINTER_3_GRID_VIDEO_POSTERS[TOUR_WINTER_3_GALLERY_GRID[3]],
+  [TOUR_WINTER_3_GALLERY_GRID[9]]: TOUR_WINTER_3_GRID_VIDEO_POSTERS[TOUR_WINTER_3_GALLERY_GRID[9]],
+  [TOUR_WINTER_3_GALLERY_GRID[11]]: TOUR_WINTER_3_GRID_VIDEO_POSTERS[TOUR_WINTER_3_GALLERY_GRID[11]],
+  [TOUR_WINTER_3_GALLERY_GRID[12]]: TOUR_WINTER_3_GRID_VIDEO_POSTERS[TOUR_WINTER_3_GALLERY_GRID[12]],
+  [TOUR_WINTER_4_GALLERY_GRID[2]]: TOUR_WINTER_4_GRID_VIDEO_POSTERS_MOBILE[TOUR_WINTER_4_GALLERY_GRID[2]],
+  [TOUR_WINTER_5_GALLERY_GRID[4]]: TOUR_WINTER_5_GRID_VIDEO_POSTERS[TOUR_WINTER_5_GALLERY_GRID[4]],
+  [TOUR_WINTER_5_GALLERY_GRID[5]]: TOUR_WINTER_5_GRID_VIDEO_POSTERS[TOUR_WINTER_5_GALLERY_GRID[5]],
+  [TOUR_WINTER_3_BOARD_GRID_WEBM]: TOUR_WINTER_3_GALLERY_GRID[4],
+  [TOUR_WINTER_3_ELYA_GRID_WEBM]: TOUR_WINTER_3_GALLERY_GRID[7],
+  [TOUR_WINTER_3_BBQ_GRID_WEBM]: TOUR_WINTER_3_GALLERY_GRID[10],
 };
 
 /**
- * Весна: баннер ворот главной из оптимизированных grid-клипов туров spring-2/spring-3.
- * До появления новых spring-лупов в `public/banners_spring/` дублируем клипы #2 и #5, чтобы закрыть 10 колонок.
+ * Весна: баннер ворот — только `*.grid.webm` туров (spring-2/3/4), без отдельной папки `banners_spring/`.
+ * Десять разных URL (раньше повторялись `ss.clip1` и `pd.clip4`).
  */
 export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS = [
   `${TOUR_SPRING_2}/olv.clip1.grid.webm`,
@@ -765,10 +781,11 @@ export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS = [
   `${TOUR_SPRING_3}/pd.clip3.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip6.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip7.grid.webm`,
-  TOUR_SPRING_4_CLIP1_GRID_WEBM,
-  `${TOUR_SPRING_3}/pd.clip4.grid.webm`,
+  TOUR_SPRING_4_CLIP3_GRID_WEBM,
+  TOUR_SPRING_4_CLIP5_GRID_WEBM,
 ] as const;
 
+/** Постеры — уже пути туров (`TOUR_SPRING_*`), дублей в `banners_spring/` нет. */
 export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS: Record<string, string> = {
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[0]]: `${TOUR_SPRING_2}/olv.clip1.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[1]]: TOUR_SPRING_4_CLIP1_POSTER_WEBP,
@@ -778,8 +795,8 @@ export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS: Record<string, string
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[5]]: `${TOUR_SPRING_3}/pd.clip3.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[6]]: `${TOUR_SPRING_3}/pd.clip6.poster.webp`,
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[7]]: `${TOUR_SPRING_3}/pd.clip7.poster.webp`,
-  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[8]]: TOUR_SPRING_4_CLIP1_POSTER_WEBP,
-  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[9]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[8]]: TOUR_SPRING_4_GRID_VIDEO_POSTERS[TOUR_SPRING_4_CLIP3_GRID_WEBM],
+  [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[9]]: TOUR_SPRING_4_GRID_VIDEO_POSTERS[TOUR_SPRING_4_CLIP5_GRID_WEBM],
 };
 
 /** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */

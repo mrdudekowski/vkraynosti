@@ -10,8 +10,8 @@ interface PageMetaProps {
   /** LCP: первый кадр героя / главное изображение страницы. */
   preloadHeroImageUrl?: string;
   /**
-   * Ранний fetch лупов баннера (главная, зима): в `<head>` раньше `preloadHeroImageUrl`.
-   * См. `getHomeSeasonBannerWinterVideoPreloadLinks`.
+   * Ранний fetch первых N лупов сезонного баннера ворот (главная): в `<head>` раньше `preloadHeroImageUrl`.
+   * Политика и лимит N — в `homeSeasonBannerVideoPreload.ts` (`getHomeSeasonBannerWinterVideoPreloadLinks` / spring).
    */
   priorityVideoPreloads?: readonly HomeSeasonBannerWinterVideoPreloadLink[];
   /** По умолчанию `high`, если нет `priorityVideoPreloads`; иначе `low` (ролики баннера впереди). */

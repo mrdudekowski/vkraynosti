@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -42,10 +43,13 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
+  const modalContextValue = useMemo(
+    () => ({ modal, openTeamModal, openTourRequestModal, closeModal }),
+    [modal, openTeamModal, openTourRequestModal, closeModal]
+  );
+
   return (
-    <ModalContext.Provider
-      value={{ modal, openTeamModal, openTourRequestModal, closeModal }}
-    >
+    <ModalContext.Provider value={modalContextValue}>
       {children}
     </ModalContext.Provider>
   );

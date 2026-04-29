@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -51,6 +51,19 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
   const [values, setValues] = useState<TourRequestFormInput>(defaultTourRequestFormValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const modalAliveRef = useRef(true);
+  const successCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    modalAliveRef.current = true;
+    return () => {
+      modalAliveRef.current = false;
+      if (successCloseTimerRef.current != null) {
+        window.clearTimeout(successCloseTimerRef.current);
+        successCloseTimerRef.current = null;
+      }
+    };
+  }, []);
 
   useBodyScrollLock(true);
   useModalFocusTrap(panelRef, closeModal);
@@ -76,6 +89,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
     await new Promise<void>(resolve => {
       window.setTimeout(resolve, SUBMIT_DELAY_MS);
     });
+    if (!modalAliveRef.current) return;
     const body = {
       ...parsed.data,
       tourId: payload.tourId,
@@ -91,8 +105,11 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
     console.log('[tourRequest]', safe);
     setIsSubmitting(false);
     setSubmitSuccess(true);
-    window.setTimeout(() => {
-      closeModal();
+    successCloseTimerRef.current = window.setTimeout(() => {
+      successCloseTimerRef.current = null;
+      if (modalAliveRef.current) {
+        closeModal();
+      }
     }, SUCCESS_CLOSE_MS);
   };
 

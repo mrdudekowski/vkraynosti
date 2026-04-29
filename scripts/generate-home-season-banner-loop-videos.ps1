@@ -2,7 +2,8 @@
 # Нарезает короткие лупы для баннера «В другой сезон» из существующих `*.grid.webm`.
 #
 # Синхронизировать таблицу $Cuts с `src/data/homeSeasonBannerClips.ts` (WINTER_CLIPS: startSec, источник).
-# Выход: `public/banners_winter/` — пути в `HOME_SEASON_BANNER_WINTER_LOOP_*` (`src/constants/images.ts`).
+# Выход (опционально): `public/banners_winter/*.banner-loop.webm` — нарезка для превью; на сайте — туровые `*.grid.webm` + `HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC`.
+# Постеры на сайте — из туров (`HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS`); `-Posters` только для локальной отладки.
 #
 # Seek: по умолчанию -ss ПОСЛЕ -i (точная отсечка по времени; медленнее на длинных файлах).
 param(
@@ -66,4 +67,4 @@ foreach ($row in $Cuts) {
   }
 }
 
-Write-Host "Done. Выход: public\banners_winter\. При смене нарезок — таблица в скрипте и `HOME_SEASON_BANNER_WINTER_LOOP_*` в `src/constants/images.ts`."
+Write-Host "Done. Выход: public\banners_winter (опционально). Сегменты баннера на сайте: `HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS` + `HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC` в `src/constants/images.ts`."

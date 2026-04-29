@@ -32,7 +32,11 @@ import {
   MODAL_CHUNK_LOADER_DURATION_MS,
   MODAL_CHUNK_LOADER_STAGGER_MS,
 } from './src/constants/modalLazyChunkLoaderAnimation'
-import { GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS } from './src/constants/galleryGridVideoLoop'
+import {
+  GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS,
+  GALLERY_GRID_VIDEO_POSTER_REVEAL_MS,
+} from './src/constants/galleryGridVideoLoop'
+import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
 import {
   TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
   TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
@@ -72,6 +76,9 @@ const HOME_GATE_SCROLL_HINT_BOB_DURATION = '2000ms' as const
 /** Лоадер ленивой модалки (`ModalLazyChunkFallback`); синхронно с `modalLazyChunkLoaderAnimation.ts`. */
 const MODAL_CHUNK_LOADER_DURATION = `${MODAL_CHUNK_LOADER_DURATION_MS}ms` as const
 const MODAL_CHUNK_LOADER_STAGGER = `${MODAL_CHUNK_LOADER_STAGGER_MS}ms` as const
+
+/** Плейсхолдер медиа-плитки до lazy-src (`mediaPlaceholderShimmer.ts`). */
+const MEDIA_PLACEHOLDER_SHIMMER_DURATION = `${MEDIA_PLACEHOLDER_SHIMMER_MS}ms` as const
 
 /** CTA: зелёный sweep поверх апельсинового `cta.fill` (согласовано с `.btn-cta-tour`). */
 const CTA_SWEEP_DURATION = '400ms' as const
@@ -325,6 +332,7 @@ const config: Config = {
     'lg:object-tour-detail-hero-desktop-spring-3-wide',
     'lg:object-tour-card-cover-desktop-spring-3-wide',
     'object-gallery-winter-4-gora',
+    'object-home-season-banner-spring-loop',
     'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
     { pattern: /^drop-shadow-tour-included-hover-/ },
@@ -333,6 +341,7 @@ const config: Config = {
     /** Чтобы `@keyframes cta-letter-pop` попали в бандл (используются из `index.css`, не из утилит). */
     'animate-cta-letter-pop',
     'animate-tour-meta-stagger-in',
+    'motion-safe:animate-media-placeholder-shimmer',
     'delay-tour-meta-0',
     'delay-tour-meta-1',
     'delay-tour-meta-2',
@@ -658,6 +667,10 @@ const config: Config = {
          * Аскольд (spring-10): `view2` / `view3` в вертикальной плитке 1×2 — центр кадра при `object-cover`.
          */
         'gallery-spring-10-tall-panorama': 'center center',
+        /**
+         * Главная, баннер весны: только колонка буквы «н» — правый край кадра loop-видео/постера при `object-cover`.
+         */
+        'home-season-banner-spring-loop': '100% 50%',
       },
       spacing: {
         /** Зазор между ячейками сетки фотогалереи на странице тура. */
@@ -964,6 +977,8 @@ const config: Config = {
         'home-season-banner-crossfade': `${HOME_SEASON_BANNER_CROSSFADE_MS}ms`,
         /** Зацикливание сеточного видео (`GalleryGridVideo`); синхронно с `GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS`. */
         'gallery-grid-video-loop-crossfade': `${GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS}ms`,
+        /** Постер → видео в плитке галереи; синхронно с `GALLERY_GRID_VIDEO_POSTER_REVEAL_MS`. */
+        'gallery-grid-video-poster-reveal': `${GALLERY_GRID_VIDEO_POSTER_REVEAL_MS}ms`,
         /** Fade in полоски видео; синхронно с `HOME_SEASON_BANNER_STRIP_FADE_IN_MS`. */
         'home-season-banner-strip-in': `${HOME_SEASON_BANNER_STRIP_FADE_IN_MS}ms`,
         /** Синхронный fade-out всех букв слова; синхронно с `HOME_SEASON_BANNER_LETTER_EXIT_MS`. */
@@ -1139,6 +1154,14 @@ const config: Config = {
           '50%': { transform: 'translate(-50%, 0%) scale(1)' },
           '100%': { transform: 'translate(-50%, -100%) scale(0)' },
         },
+        /**
+         * Ожидание intersection перед выставлением `src` у отложенных плиток галереи.
+         * Только opacity — без лишнего paint от градиентов.
+         */
+        'media-placeholder-shimmer': {
+          '0%, 100%': { opacity: '0.52' },
+          '50%': { opacity: '0.9' },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -1160,6 +1183,7 @@ const config: Config = {
         'home-hero-ceiling-bounce': `home-hero-ceiling-bounce ${HOME_HERO_CEILING_BOUNCE_DURATION} cubic-bezier(0.45, 0, 0.25, 1) forwards`,
         'home-gate-scroll-hint-bob': `home-gate-scroll-hint-bob ${HOME_GATE_SCROLL_HINT_BOB_DURATION} ease-in-out infinite`,
         'modal-chunk-loader-bubble': `modal-chunk-loader-bubble ${MODAL_CHUNK_LOADER_DURATION} linear infinite`,
+        'media-placeholder-shimmer': `media-placeholder-shimmer ${MEDIA_PLACEHOLDER_SHIMMER_DURATION} ease-in-out infinite`,
       },
       transitionDelay: {
         'tour-meta-0': '0ms',

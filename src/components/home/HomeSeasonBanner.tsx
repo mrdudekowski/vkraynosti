@@ -1,6 +1,10 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 import {
+  HOME_SEASON_BANNER_SPRING_N_COLUMN_LOOP_OBJECT_CLASS,
+  HOME_SEASON_BANNER_WORDMARK_N_LETTER_COLUMN_INDEX,
+} from '../../constants/homeSeasonBannerLayout';
+import {
   HOME_SEASON_BANNER_WORDMARK_GRADIENT_BG_CLASS,
   HOME_SEASON_BANNER_WORDMARK_SOLID_TEXT_CLASS,
 } from '../../constants/seasonTheme';
@@ -31,8 +35,8 @@ interface HomeSeasonBannerProps {
 }
 
 /**
- * Не вешаем `src` на все 10 `<video>` сразу: иначе десять параллельных буферизаций.
- * В `<head>` — только первые N лупов (`homeSeasonBannerVideoPreload.ts`); после первого hover колонку не размонтируем — иначе сброс буфера и долгий повторный fetch.
+ * Не вешаем `src` на все 10 `<video>` сразу: иначе много параллельных буферизаций и конкуренция за сеть/декод.
+ * В `<head>` — только первые N лупов, см. `homeSeasonBannerVideoPreload.ts`; после первого hover колонку не размонтируем — иначе сброс буфера и долгий повторный fetch.
  * Грузим: hover по колонке (статичный баннер: видео или постер), активная цепочка, следующая в hold, колонка 0 перед новым циклом слова.
  * При `timelineStatic` — только hover, без фоновой подгрузки колонки 0.
  */
@@ -80,9 +84,11 @@ interface BannerColumnVideoProps {
   playing: boolean;
   /** `metadata` для предзагрузки следующей полоски; `auto` у активного клипа для буфера перед play. */
   preloadHint: 'metadata' | 'auto';
+  /** Доп. `object-*` из темы (напр. весенний якорь справа). */
+  objectPositionClassName?: string;
 }
 
-const BannerColumnVideo = ({ clip, playing, preloadHint }: BannerColumnVideoProps) => {
+const BannerColumnVideo = ({ clip, playing, preloadHint, objectPositionClassName }: BannerColumnVideoProps) => {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -135,10 +141,13 @@ const BannerColumnVideo = ({ clip, playing, preloadHint }: BannerColumnVideoProp
     return null;
   }
 
+  const videoObjectClass =
+    `pointer-events-none h-full min-h-0 w-full object-cover${objectPositionClassName ? ` ${objectPositionClassName}` : ''}`.trim();
+
   return (
     <video
       ref={ref}
-      className="pointer-events-none h-full min-h-0 w-full object-cover"
+      className={videoObjectClass}
       src={clip.videoSrc}
       poster={clip.posterSrc}
       muted
@@ -343,7 +352,12 @@ const HomeSeasonBannerColumn = ({
   onColumnHoverStart,
   onColumnHoverEnd,
 }: HomeSeasonBannerColumnProps) => {
-  /** Статичный hover-режим: после первого наведения не снимаем `<video>`, чтобы не сбрасывать буфер (иначе 5–8 с при каждом входе). */
+  const springNColumnLoopObjectClass =
+    season === 'spring' && columnIndex === HOME_SEASON_BANNER_WORDMARK_N_LETTER_COLUMN_INDEX
+      ? HOME_SEASON_BANNER_SPRING_N_COLUMN_LOOP_OBJECT_CLASS
+      : undefined;
+
+  /** Статичный hover-режим: после первого наведения не снимаем `<video>`, чтобы не сбрасывать буфер (иначе снова долгая догрузка при каждом входе). */
   const [videoPrimedForColumn, setVideoPrimedForColumn] = useState(false);
 
   const media = getColumnMediaVisual(
@@ -488,12 +502,17 @@ const HomeSeasonBannerColumn = ({
       >
         <div className="pointer-events-none h-full min-h-0 w-full origin-center scale-home-season-banner-loop">
           {clip.videoSrc && shouldLoadVideo ? (
-            <BannerColumnVideo clip={clip} playing={effectivePlaying} preloadHint={videoPreloadHint} />
+            <BannerColumnVideo
+              clip={clip}
+              playing={effectivePlaying}
+              preloadHint={videoPreloadHint}
+              objectPositionClassName={springNColumnLoopObjectClass}
+            />
           ) : shouldLoadStaticPoster ? (
             <img
               src={clip.posterSrc}
               alt=""
-              className="pointer-events-none h-full min-h-0 w-full object-cover"
+              className={`pointer-events-none h-full min-h-0 w-full object-cover${springNColumnLoopObjectClass ? ` ${springNColumnLoopObjectClass}` : ''}`.trim()}
               loading={columnIndex === 0 ? 'eager' : 'lazy'}
               fetchPriority={columnIndex === 0 ? 'high' : 'low'}
               decoding="async"

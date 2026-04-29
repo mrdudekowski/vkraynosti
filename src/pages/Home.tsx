@@ -24,6 +24,7 @@ import {
   getHomeSeasonBannerSpringVideoPreloadLinks,
   getHomeSeasonBannerWinterVideoPreloadLinks,
 } from '../constants/homeSeasonBannerVideoPreload';
+import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfadeVideoIntersection';
 import { TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS } from '../constants/tourSpring3CoverCrop';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
@@ -200,19 +201,19 @@ const Home = () => {
           observer.disconnect();
         }
       },
-      { root: null, rootMargin: '300px 0px', threshold: 0.01 }
+      { root: null, rootMargin: CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN, threshold: 0.01 }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, [expandCardVideoInView]);
 
   useEffect(() => {
-    if (activeSeasonPromoVideoUrls.length <= 1) return;
+    if (activeSeasonPromoVideoUrls.length <= 1 || !isPageVisible) return;
     const intervalId = window.setInterval(() => {
       setToursPromoVideoIndex(prev => (prev + 1) % activeSeasonPromoVideoUrls.length);
     }, HOME_TOURS_PROMO_VIDEO_SWITCH_MS);
     return () => window.clearInterval(intervalId);
-  }, [activeSeasonPromoVideoUrls]);
+  }, [activeSeasonPromoVideoUrls, isPageVisible]);
 
   useEffect(() => {
     if (gridPhase !== 'fadingOut') return;

@@ -1,4 +1,4 @@
-import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import SeasonFlashOverlay from '../components/layout/SeasonFlashOverlay';
 import type { Season } from '../types';
@@ -32,8 +32,13 @@ export const SeasonProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [activeSeason]);
 
+  const seasonContextValue = useMemo(
+    () => ({ activeSeason, setActiveSeason }),
+    [activeSeason, setActiveSeason]
+  );
+
   return (
-    <SeasonContext.Provider value={{ activeSeason, setActiveSeason }}>
+    <SeasonContext.Provider value={seasonContextValue}>
       <Fragment>
         {children}
         {flashNonce > 0 && <SeasonFlashOverlay key={flashNonce} />}

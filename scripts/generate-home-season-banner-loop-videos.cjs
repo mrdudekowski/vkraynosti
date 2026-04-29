@@ -1,11 +1,14 @@
 /**
  * Нарезка лупов баннера зимы (та же таблица, что в `generate-home-season-banner-loop-videos.ps1`).
- * Вход: `public/tours/{winter-*}/…grid.webm`. Выход: `public/banners_winter/*.banner-loop.webm`.
+ * Вход: `public/tours/{winter-*}/…grid.webm`. Выход (опционально): `public/banners_winter/*.banner-loop.webm` — превью/архив;
+ * на сайте баннер зимы читает те же `*.grid.webm` + `HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC` в `src/constants/images.ts`.
  * Использует `ffmpeg-static` из devDependencies — не требует ffmpeg в PATH.
  * Кодирование: VP9 (пресет banner — CRF 33, max ширина 800px) — синхронно с `.ps1` и `WebmTourEncoding.ps1`.
  *
  *   node scripts/generate-home-season-banner-loop-videos.cjs
  *   node scripts/generate-home-season-banner-loop-videos.cjs --posters
+ * Флаг `--posters`: пишет кадры в `banners_winter/*.poster.webp` (локально/отладка). На сайте постеры лупов
+ * зимы — ассеты туров (`HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS` в `src/constants/images.ts`), не эти файлы.
  *   node scripts/generate-home-season-banner-loop-videos.cjs --dry-run
  */
 'use strict';

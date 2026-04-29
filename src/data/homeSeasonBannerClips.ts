@@ -2,6 +2,7 @@ import { HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC } from '../constants/homeSeaso
 import {
   HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS,
   HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS,
+  HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC,
   HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS,
   HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS,
   IMAGES,
@@ -33,15 +34,14 @@ const posterClip = (posterSrc: string): HomeSeasonBannerClip => ({
 const WINTER_BANNER_CLIP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 /**
- * Зима: десять `*.banner-loop.webm` в `public/banners_winter/` (нарезка из `public/tours/.../*.grid.webm` — `npm run generate:banner-loops`).
- * В рантайме фрагмент с начала файла (`startSec: 0`).
+ * Зима: те же `*.grid.webm`, что в турах; сегмент задаётся `startSec` (см. `HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC` в `images.ts`).
  */
 const WINTER_CLIPS: HomeSeasonBannerClip[] = WINTER_BANNER_CLIP_INDICES.map((i) => {
   const videoSrc = HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS[i];
   return {
     videoSrc,
     posterSrc: HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS[videoSrc]!,
-    startSec: 0,
+    startSec: HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC[i],
     durationSec: HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC,
   };
 });
@@ -49,7 +49,7 @@ const WINTER_CLIPS: HomeSeasonBannerClip[] = WINTER_BANNER_CLIP_INDICES.map((i) 
 const SPRING_BANNER_CLIP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 /**
- * Весна: 10 клипов из оптимизированных spring `*.grid.webm` (временный дубль #2 и #5 до расширения медиабазы сезона).
+ * Весна: 10 клипов из spring `*.grid.webm` туров (spring-2/3/4), без повторов URL.
  */
 const SPRING_CLIPS: HomeSeasonBannerClip[] = SPRING_BANNER_CLIP_INDICES.map((i) => {
   const videoSrc = HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[i];

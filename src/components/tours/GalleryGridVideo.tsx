@@ -5,8 +5,15 @@ import {
   useRef,
   useState,
   type TransitionEvent,
+  type TransitionEventHandler,
 } from 'react';
-import { GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS } from '../../constants/galleryGridVideoLoop';
+import {
+  GALLERY_GRID_VIDEO_LOOP_CROSSFADE_LEAD_MAX_FRACTION_OF_DURATION,
+  GALLERY_GRID_VIDEO_LOOP_CROSSFADE_LEAD_MIN_SECONDS,
+  GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS,
+  GALLERY_GRID_VIDEO_POSTER_REVEAL_END_SLACK_MS,
+  GALLERY_GRID_VIDEO_POSTER_REVEAL_MS,
+} from '../../constants/galleryGridVideoLoop';
 import { TOUR_GALLERY_TILE_IMAGE_ROOT_MARGIN } from '../../constants/reveal';
 import { useDocumentVisibility } from '../../hooks/useDocumentVisibility';
 
@@ -34,10 +41,13 @@ const GalleryGridVideoLoopCrossfade = ({
   gridSrc,
   inView,
   isPageVisible,
+  onActiveLayerReady,
 }: {
   gridSrc: string;
   inView: boolean;
   isPageVisible: boolean;
+  /** Один раз, когда активный слой может показать кадр (постер можно гасить поверх). */
+  onActiveLayerReady?: () => void;
 }) => {
   const [overIndex, setOverIndex] = useState<0 | 1>(0);
   const [fadeOutOver, setFadeOutOver] = useState(false);
@@ -46,6 +56,16 @@ const GalleryGridVideoLoopCrossfade = ({
   const crossfadeBusyRef = useRef(false);
   const v0Ref = useRef<HTMLVideoElement>(null);
   const v1Ref = useRef<HTMLVideoElement>(null);
+  const onReadyRef = useRef(onActiveLayerReady);
+  const layerReadyNotifiedRef = useRef(false);
+
+  useLayoutEffect(() => {
+    onReadyRef.current = onActiveLayerReady;
+  }, [onActiveLayerReady]);
+
+  useEffect(() => {
+    layerReadyNotifiedRef.current = false;
+  }, [gridSrc]);
 
   useLayoutEffect(() => {
     overIndexRef.current = overIndex;
@@ -54,20 +74,6 @@ const GalleryGridVideoLoopCrossfade = ({
   useLayoutEffect(() => {
     fadeOutOverRef.current = fadeOutOver;
   }, [fadeOutOver]);
-
-  useLayoutEffect(() => {
-    setOverIndex(0);
-    overIndexRef.current = 0;
-    setFadeOutOver(false);
-    fadeOutOverRef.current = false;
-    crossfadeBusyRef.current = false;
-    const a = v0Ref.current;
-    const b = v1Ref.current;
-    a?.pause();
-    b?.pause();
-    if (a) a.currentTime = 0;
-    if (b) b.currentTime = 0;
-  }, [gridSrc]);
 
   const tryBeginLoopCrossfade = useCallback(() => {
     if (crossfadeBusyRef.current || fadeOutOverRef.current) return;
@@ -79,7 +85,13 @@ const GalleryGridVideoLoopCrossfade = ({
     const duration = active.duration;
     if (!Number.isFinite(duration) || duration <= 0) return;
 
-    const lead = Math.min(crossfadeLeadSeconds, Math.max(0.08, duration * 0.2));
+    const lead = Math.min(
+      crossfadeLeadSeconds,
+      Math.max(
+        GALLERY_GRID_VIDEO_LOOP_CROSSFADE_LEAD_MIN_SECONDS,
+        duration * GALLERY_GRID_VIDEO_LOOP_CROSSFADE_LEAD_MAX_FRACTION_OF_DURATION
+      )
+    );
     if (duration <= lead * 2) return;
 
     const remaining = duration - active.currentTime;
@@ -148,6 +160,30 @@ const GalleryGridVideoLoopCrossfade = ({
     };
   }, [overIndex, tryBeginLoopCrossfade]);
 
+  useEffect(() => {
+    if (!onReadyRef.current) return;
+    if (!inView || !isPageVisible) return;
+
+    const over = overIndex === 0 ? v0Ref.current : v1Ref.current;
+    if (!over) return;
+
+    const notify = () => {
+      if (layerReadyNotifiedRef.current) return;
+      layerReadyNotifiedRef.current = true;
+      onReadyRef.current?.();
+    };
+
+    if (over.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      notify();
+      return;
+    }
+
+    over.addEventListener('canplay', notify, { once: true });
+    return () => {
+      over.removeEventListener('canplay', notify);
+    };
+  }, [gridSrc, inView, isPageVisible, overIndex]);
+
   const layerClass = (idx: 0 | 1) => {
     const isOver = idx === overIndex;
     const z = isOver ? 'z-gallery-grid-video-loop-over' : 'z-gallery-grid-video-loop-under';
@@ -181,9 +217,71 @@ const GalleryGridVideoLoopCrossfade = ({
   );
 };
 
+/** Состояние постера / готовности слоя сбрасывается перемонтированием (`key` у родителя), без `setState` в эффекте. */
+const GalleryGridVideoMotionBranch = ({
+  gridSrc,
+  posterSrc,
+  inView,
+  isPageVisible,
+}: {
+  gridSrc: string;
+  posterSrc: string | undefined;
+  inView: boolean;
+  isPageVisible: boolean;
+}) => {
+  const hasPoster = posterSrc != null && posterSrc.length > 0;
+  const [activeLayerReady, setActiveLayerReady] = useState(() => !hasPoster);
+  const [posterDismissed, setPosterDismissed] = useState(false);
+
+  const handlePosterFadeEnd = useCallback<TransitionEventHandler<HTMLImageElement>>(
+    event => {
+      if (event.propertyName !== 'opacity') return;
+      if (!activeLayerReady) return;
+      setPosterDismissed(true);
+    },
+    [activeLayerReady]
+  );
+
+  useEffect(() => {
+    if (!hasPoster || posterDismissed || !activeLayerReady) return;
+    const fallbackMs =
+      GALLERY_GRID_VIDEO_POSTER_REVEAL_MS + GALLERY_GRID_VIDEO_POSTER_REVEAL_END_SLACK_MS;
+    const id = window.setTimeout(() => {
+      setPosterDismissed(true);
+    }, fallbackMs);
+    return () => window.clearTimeout(id);
+  }, [hasPoster, posterDismissed, activeLayerReady]);
+
+  return (
+    <div className="relative min-h-0 h-full w-full">
+      <div className="relative z-10 min-h-0 h-full w-full">
+        <GalleryGridVideoLoopCrossfade
+          key={gridSrc}
+          gridSrc={gridSrc}
+          inView={inView}
+          isPageVisible={isPageVisible}
+          onActiveLayerReady={hasPoster ? () => setActiveLayerReady(true) : undefined}
+        />
+      </div>
+      {hasPoster && !posterDismissed ? (
+        <img
+          src={posterSrc}
+          alt=""
+          onTransitionEnd={handlePosterFadeEnd}
+          className={`pointer-events-none absolute inset-0 z-20 min-h-0 h-full w-full object-cover transition-opacity duration-gallery-grid-video-poster-reveal ease-standard motion-reduce:transition-none ${
+            activeLayerReady ? 'opacity-0' : 'opacity-100'
+          }`}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : null}
+    </div>
+  );
+};
+
 /**
  * Видео в сетке: до появления во viewport — постер; после — `<video>` с `preload="none"`.
- * При `prefers-reduced-motion` — только постер; иначе зацикливание через crossfade двух экземпляров одного клипа.
+ * При `prefers-reduced-motion` — статичный постер (`<img>`), без загрузки webm; иначе loop через crossfade двух экземпляров одного клипа.
  */
 const GalleryGridVideo = ({
   gridSrc,
@@ -199,7 +297,7 @@ const GalleryGridVideo = ({
   );
   const isPageVisible = useDocumentVisibility();
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const hasPoster = posterSrc != null && posterSrc.length > 0;
 
   useLayoutEffect(() => {
     if (typeof IntersectionObserver === 'undefined') {
@@ -219,19 +317,7 @@ const GalleryGridVideo = ({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [prefersReducedMotion]);
-
-  useLayoutEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (prefersReducedMotion || !inView || !isPageVisible) {
-      video.pause();
-      return;
-    }
-    void video.play().catch(() => {});
-  }, [inView, isPageVisible, prefersReducedMotion]);
-
-  const hasPoster = posterSrc != null && posterSrc.length > 0;
+  }, []);
 
   return (
     <div
@@ -241,19 +327,22 @@ const GalleryGridVideo = ({
     >
       {hasBeenVisible ? (
         prefersReducedMotion ? (
-          <video
-            ref={videoRef}
-            className="min-h-0 h-full w-full object-cover pointer-events-none"
-            src={gridSrc}
-            muted
-            loop
-            autoPlay={!prefersReducedMotion && inView && isPageVisible}
-            playsInline
-            preload="none"
-          />
+          hasPoster ? (
+            <img
+              src={posterSrc}
+              alt=""
+              className="min-h-0 h-full w-full object-cover pointer-events-none"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div className="h-full min-h-gallery-grid-video w-full bg-surface-light" />
+          )
         ) : (
-          <GalleryGridVideoLoopCrossfade
+          <GalleryGridVideoMotionBranch
+            key={`${gridSrc}\0${posterSrc ?? ''}`}
             gridSrc={gridSrc}
+            posterSrc={posterSrc}
             inView={inView}
             isPageVisible={isPageVisible}
           />

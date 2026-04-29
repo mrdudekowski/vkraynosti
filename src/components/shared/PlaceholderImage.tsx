@@ -55,7 +55,7 @@ const DeferredPlaceholderImage = ({
     return (
       <div
         ref={observerTargetRef}
-        className={`min-h-0 h-full w-full object-cover bg-surface-light ${imgClassName} ${className}`.trim()}
+        className={`min-h-0 h-full w-full object-cover bg-surface-light motion-safe:animate-media-placeholder-shimmer motion-reduce:opacity-100 ${imgClassName} ${className}`.trim()}
         aria-hidden
       />
     );

@@ -103,8 +103,8 @@
 - Массовая оптимизация:
   - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\batch-shrink-public-webm.ps1 -DryRun -MinSizeMb 10`
   - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\batch-shrink-public-webm.ps1 -MinSizeMb 10`
-- Баннерные лупы:
-  - `npm run generate:banner-loops`
+- Баннер зимы на сайте: туровые `*.grid.webm` + `HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC` в `src/constants/images.ts`.
+- `npm run generate:banner-loops` — опционально: нарезка превью в `public/banners_winter/*.banner-loop.webm` (не обязательна для продакшена).
 
 Примечание:
 - Сначала DryRun, затем реальный запуск.
@@ -131,7 +131,7 @@
 
 - `HomeSeasonBanner`:
   - не монтировать все video `src` одновременно,
-  - head preload держать минимальным (см. `homeSeasonBannerVideoPreload.ts`),
+  - head preload держать минимальным — см. комментарий в `homeSeasonBannerVideoPreload.ts` (сеть/приоритеты, не «все колонки из одного preload»),
   - eager/high только для реально критичных постеров.
 - Grid-видео (`GalleryGridVideo`):
   - `preload="none"`,

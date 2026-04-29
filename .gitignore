@@ -39,3 +39,6 @@ public/**/source-*
 /video-audit*.json
 /phase4-network-snapshot.json
 /test-results/
+
+# Docs can be generated / maintained externally; ignore folder by default.
+docs/

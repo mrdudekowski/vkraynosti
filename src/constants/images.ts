@@ -621,6 +621,8 @@ export const TOUR_SPRING_8_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 /** Карточка/hero spring-8: облегчили cover (было `view3.webp` ~457 KB, теперь `view.webp` ~67 KB). */
 export const TOUR_SPRING_8_COVER_GRID = `${TOUR_SPRING_8}/view.webp` as const;
+/** Отдельного `*.mobile.webp` пока нет; мобильный кандидат совпадает с облегчённым cover. */
+export const TOUR_SPRING_8_COVER_MOBILE = TOUR_SPRING_8_COVER_GRID;
 export const TOUR_SPRING_8_PREFACE_BACKGROUND = `${TOUR_SPRING_8}/view.webp` as const;
 
 /**
@@ -828,6 +830,7 @@ export const SPRING_TOUR_COVERS = {
 export const TOUR_MOBILE_IMAGE_VARIANTS: Record<string, string> = {
   [TOUR_WINTER_3_PREFACE_BACKGROUND]: TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE,
   [TOUR_SPRING_6_COVER_GRID]: TOUR_SPRING_6_COVER_MOBILE,
+  [TOUR_SPRING_8_COVER_GRID]: TOUR_SPRING_8_COVER_MOBILE,
   [TOUR_SPRING_9_COVER_GRID]: TOUR_SPRING_9_COVER_MOBILE,
   [TOUR_SPRING_10_COVER_GRID]: TOUR_SPRING_10_COVER_MOBILE,
   [TOUR_SPRING_10_PREFACE_BACKGROUND]: TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE,

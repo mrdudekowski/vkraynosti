@@ -5,6 +5,8 @@ import { DOM_DATA_HOME_HERO_ACTIVE_SLIDE } from '../../constants/homeHeroSnap';
 
 interface CarouselSlideProps {
   backgroundUrl: string;
+  backgroundSrcSet?: string;
+  backgroundSizes?: string;
   isActive: boolean;
   /** Фон подгружается для активного слайда и для уже посещённых (родитель хранит множество индексов). */
   shouldLoadBackground: boolean;
@@ -15,6 +17,8 @@ interface CarouselSlideProps {
 
 const CarouselSlide = ({
   backgroundUrl,
+  backgroundSrcSet,
+  backgroundSizes,
   isActive,
   shouldLoadBackground,
   backgroundPosition = 'center',
@@ -32,19 +36,23 @@ const CarouselSlide = ({
           ? 'opacity-100 z-10'
           : 'opacity-0 z-0 pointer-events-none'
       } transition-opacity duration-carousel ease-standard motion-reduce:transition-none`}
-      style={
-        shouldLoadBackground
-          ? {
-              backgroundImage: `url(${backgroundUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition,
-              backgroundRepeat: 'no-repeat',
-            }
-          : undefined
-      }
       inert={!isActive}
       {...activeSlideProps}
     >
+      {shouldLoadBackground ? (
+        <img
+          src={backgroundUrl}
+          srcSet={backgroundSrcSet}
+          sizes={backgroundSizes}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+          style={{ objectPosition: backgroundPosition }}
+          loading={isActive ? 'eager' : 'lazy'}
+          fetchPriority={isActive ? 'high' : 'auto'}
+          decoding="async"
+        />
+      ) : null}
       <div className="relative z-10 h-full flex flex-col items-center justify-end text-text-inverse px-4">
         {children}
       </div>

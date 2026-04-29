@@ -31,7 +31,9 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   const winterStruck = winterCardStruckPrice(tour);
   const mobileCoverSrc = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
   const coverSrcSet =
-    mobileCoverSrc != null ? `${mobileCoverSrc} 640w, ${tour.imageUrl} 1200w` : undefined;
+    mobileCoverSrc != null && mobileCoverSrc !== tour.imageUrl
+      ? `${mobileCoverSrc} 640w, ${tour.imageUrl} 1200w`
+      : undefined;
 
   return (
     <>

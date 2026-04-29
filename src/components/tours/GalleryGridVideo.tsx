@@ -32,6 +32,7 @@ const videoBaseClass =
 
 const overTransitionClass =
   'transition-opacity duration-gallery-grid-video-loop-crossfade ease-in-out';
+const GALLERY_GRID_VIDEO_UNMOUNT_GRACE_MS = 1400;
 
 /**
  * Два экземпляра одного клипа: нижний всегда непрозрачен, верхний только гаснет (`opacity` 1→0),
@@ -292,12 +293,19 @@ const GalleryGridVideo = ({
   const [inView, setInView] = useState(
     () => typeof IntersectionObserver === 'undefined'
   );
-  const [hasBeenVisible, setHasBeenVisible] = useState(
+  const [shouldRenderMotionVideo, setShouldRenderMotionVideo] = useState(
     () => typeof IntersectionObserver === 'undefined'
   );
   const isPageVisible = useDocumentVisibility();
   const containerRef = useRef<HTMLDivElement>(null);
+  const unmountMotionVideoTimerRef = useRef<number | null>(null);
   const hasPoster = posterSrc != null && posterSrc.length > 0;
+
+  const clearUnmountMotionVideoTimer = useCallback(() => {
+    if (unmountMotionVideoTimerRef.current == null) return;
+    window.clearTimeout(unmountMotionVideoTimerRef.current);
+    unmountMotionVideoTimerRef.current = null;
+  }, []);
 
   useLayoutEffect(() => {
     if (typeof IntersectionObserver === 'undefined') {
@@ -310,7 +318,7 @@ const GalleryGridVideo = ({
         const isIntersecting = entries[0]?.isIntersecting === true;
         setInView(isIntersecting);
         if (isIntersecting) {
-          setHasBeenVisible(true);
+          setShouldRenderMotionVideo(true);
         }
       },
       { rootMargin: TOUR_GALLERY_TILE_IMAGE_ROOT_MARGIN, threshold: 0 }
@@ -319,34 +327,49 @@ const GalleryGridVideo = ({
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    if (inView) {
+      clearUnmountMotionVideoTimer();
+      setShouldRenderMotionVideo(true);
+      return;
+    }
+    clearUnmountMotionVideoTimer();
+    unmountMotionVideoTimerRef.current = window.setTimeout(() => {
+      setShouldRenderMotionVideo(false);
+      unmountMotionVideoTimerRef.current = null;
+    }, GALLERY_GRID_VIDEO_UNMOUNT_GRACE_MS);
+    return clearUnmountMotionVideoTimer;
+  }, [prefersReducedMotion, inView, clearUnmountMotionVideoTimer]);
+
+  useEffect(() => clearUnmountMotionVideoTimer, [clearUnmountMotionVideoTimer]);
+
   return (
     <div
       ref={containerRef}
       className={`relative overflow-hidden rounded-card border-0 bg-transparent ${className}`}
       aria-hidden
     >
-      {hasBeenVisible ? (
-        prefersReducedMotion ? (
-          hasPoster ? (
-            <img
-              src={posterSrc}
-              alt=""
-              className="min-h-0 h-full w-full object-cover pointer-events-none"
-              loading="lazy"
-              decoding="async"
-            />
-          ) : (
-            <div className="h-full min-h-gallery-grid-video w-full bg-surface-light" />
-          )
-        ) : (
-          <GalleryGridVideoMotionBranch
-            key={`${gridSrc}\0${posterSrc ?? ''}`}
-            gridSrc={gridSrc}
-            posterSrc={posterSrc}
-            inView={inView}
-            isPageVisible={isPageVisible}
+      {prefersReducedMotion ? (
+        hasPoster ? (
+          <img
+            src={posterSrc}
+            alt=""
+            className="min-h-0 h-full w-full object-cover pointer-events-none"
+            loading="lazy"
+            decoding="async"
           />
+        ) : (
+          <div className="h-full min-h-gallery-grid-video w-full bg-surface-light" />
         )
+      ) : shouldRenderMotionVideo ? (
+        <GalleryGridVideoMotionBranch
+          key={`${gridSrc}\0${posterSrc ?? ''}`}
+          gridSrc={gridSrc}
+          posterSrc={posterSrc}
+          inView={inView}
+          isPageVisible={isPageVisible}
+        />
       ) : hasPoster ? (
         <img
           src={posterSrc}

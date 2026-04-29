@@ -284,7 +284,7 @@ const Home = () => {
         imageUrl={IMAGES.hero[activeSeason]}
         path={SEO_DEFAULTS.home.path}
         structuredData={[ORGANIZATION_SCHEMA, WEBSITE_SCHEMA]}
-        preloadHeroImageUrl={tours[0]?.imageUrl}
+        preloadHeroImageUrl={IMAGES.seasonSection[activeSeason]}
         priorityVideoPreloads={seasonBannerVideoPreloads}
       />
 

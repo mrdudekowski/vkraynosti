@@ -10,6 +10,7 @@ import { UI } from '../../constants/ui';
 import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { buildTourDetailPath } from '../../constants/routes';
 import { BREAKPOINT_LG_PX } from '../../constants/reveal';
+import { TOUR_MOBILE_IMAGE_VARIANTS } from '../../constants/images';
 import {
   resolveTourSpring3CoverBackgroundPosition,
   TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX,
@@ -57,10 +58,17 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
       {tours.map((tour, idx) => {
         const isActive = idx === current;
         const shouldLoadBackground = visitedSlideIndices.has(idx);
+        const mobileCoverSrc = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
+        const backgroundSrcSet =
+          mobileCoverSrc != null && mobileCoverSrc !== tour.imageUrl
+            ? `${mobileCoverSrc} 768w, ${tour.imageUrl} 1920w`
+            : undefined;
         return (
           <CarouselSlide
             key={tour.id}
             backgroundUrl={tour.imageUrl}
+            backgroundSrcSet={backgroundSrcSet}
+            backgroundSizes="100vw"
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
             backgroundPosition={

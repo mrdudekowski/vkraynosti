@@ -32,3 +32,10 @@ public/tours/**/*.mov
 public/tours/**/*.source.*
 public/**/source.*
 public/**/source-*
+
+# Local measurement / audit dumps (not source of truth; regenerate locally or in CI artifacts)
+/perf-*.json
+/lighthouse-report*.json
+/video-audit*.json
+/phase4-network-snapshot.json
+/test-results/

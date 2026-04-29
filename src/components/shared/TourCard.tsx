@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { KeyboardEvent } from 'react';
 import type { Tour } from '../../types';
+import { TOUR_MOBILE_IMAGE_VARIANTS } from '../../constants/images';
 import { buildTourDetailPath } from '../../constants/routes';
 import { TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS } from '../../constants/tourSpring3CoverCrop';
 import { UI } from '../../constants/ui';
@@ -28,6 +29,10 @@ const winterCardStruckPrice = (tour: Tour): string | null => {
 
 const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   const winterStruck = winterCardStruckPrice(tour);
+  const mobileCoverSrc = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
+  const coverSrcSet =
+    mobileCoverSrc != null ? `${mobileCoverSrc} 640w, ${tour.imageUrl} 1200w` : undefined;
+
   return (
     <>
       <div
@@ -41,7 +46,9 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
             tour.id === 'spring-3' ? TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS : undefined
           }
           loading={priorityImage ? 'eager' : 'lazy'}
-          fetchPriority={priorityImage ? 'high' : undefined}
+          fetchPriority={priorityImage ? 'high' : 'auto'}
+          srcSet={coverSrcSet}
+          sizes="(max-width: 639px) 100vw, (max-width: 1023px) calc(50vw - 1.5rem), calc(25vw - 2rem)"
         />
       </div>
       <div className="p-card-p">

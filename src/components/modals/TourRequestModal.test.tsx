@@ -50,9 +50,9 @@ describe('TourRequestModal', () => {
     expect(mockClose).toHaveBeenCalledTimes(1);
   });
 
-  it('logs sanitized payload on successful submit', async () => {
+  it('emits non-sensitive submit event on successful submit', async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
 
@@ -65,20 +65,12 @@ describe('TourRequestModal', () => {
 
     await waitFor(
       () => {
-        expect(logSpy).toHaveBeenCalled();
+        expect(infoSpy).toHaveBeenCalledWith(
+          '[tourRequest] validated payload accepted for client-side mock submit'
+        );
       },
       { timeout: 3000 }
     );
-
-    const logged = logSpy.mock.calls.find(c => c[0] === '[tourRequest]');
-    expect(logged).toBeDefined();
-    expect(logged?.[1]).toMatchObject({
-      tourId: 'winter-1',
-      name: 'Иван',
-      preferredMessenger: 'telegram',
-      question: 'Вопрос по туру',
-    });
-
-    logSpy.mockRestore();
+    infoSpy.mockRestore();
   });
 });

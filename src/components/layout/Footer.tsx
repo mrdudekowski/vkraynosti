@@ -7,6 +7,7 @@ import { faVk } from '@fortawesome/free-brands-svg-icons/faVk';
 import { UI } from '../../constants/ui';
 import { CONTACTS } from '../../constants/contacts';
 import { ROUTES } from '../../constants/routes';
+import { toSafeExternalHttpHref, toSafeMailtoHref, toSafePhoneHref } from '../../utils/safeHref';
 
 const Footer = () => (
   <footer className="bg-home-season-banner-stage text-text-inverse">
@@ -85,32 +86,34 @@ const Footer = () => (
           <h4 className="font-normal text-text-inverse mb-4">{UI.footer.contactHeading}</h4>
           <div className="flex flex-col gap-3">
             <a
-              href={CONTACTS.PHONE_HREF}
+              href={toSafePhoneHref(CONTACTS.PHONE_HREF)}
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
               <FontAwesomeIcon icon={faPhone} className="w-4 h-4" />
               {CONTACTS.PHONE_NUMBER}
             </a>
             <a
-              href={`mailto:${CONTACTS.EMAIL}`}
+              href={toSafeMailtoHref(`mailto:${CONTACTS.EMAIL}`)}
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
               <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4" />
               {CONTACTS.EMAIL}
             </a>
             <a
-              href={CONTACTS.TELEGRAM_HREF}
+              href={toSafeExternalHttpHref(CONTACTS.TELEGRAM_HREF)}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer external"
+              referrerPolicy="no-referrer"
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
               <FontAwesomeIcon icon={faTelegram} className="w-4 h-4" />
               {CONTACTS.TELEGRAM_HANDLE}
             </a>
             <a
-              href={CONTACTS.MAX_HREF}
+              href={toSafeExternalHttpHref(CONTACTS.MAX_HREF)}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer external"
+              referrerPolicy="no-referrer"
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
               <FontAwesomeIcon icon={faVk} className="w-4 h-4" />

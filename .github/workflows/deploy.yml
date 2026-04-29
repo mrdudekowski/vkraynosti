@@ -43,6 +43,12 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Generate sitemap
+        run: npm run generate:sitemap
+
+      - name: SEO checks
+        run: npm run seo:check
+
       - name: Build
         run: npm run build
 

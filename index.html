@@ -4,21 +4,46 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://placehold.co; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self'; media-src 'self' blob:; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), clipboard-read=(), clipboard-write=()"
+    />
     <title>Вкрайности</title>
     <script>
       // GitHub Pages SPA: restore path encoded by 404.html
       (function (l) {
-        if (l.search[1] === '/') {
-          var decoded = l.search.slice(1).split('&').map(function (s) {
+        var query = l.search;
+        if (!query) return;
+
+        // Support both SPA redirect formats:
+        // 1) legacy "?/path&query"
+        // 2) current "?p=/path&q=query" from public/404.html
+        if (query[1] === '/') {
+          var decodedLegacy = query.slice(1).split('&').map(function (s) {
             return s.replace(/~and~/g, '&');
           });
           window.history.replaceState(
-            null, null,
-            l.pathname.slice(0, -1) + decoded[0] +
-            (decoded[1] ? '?' + decoded[1] : '') +
+            null,
+            null,
+            l.pathname.slice(0, -1) + decodedLegacy[0] +
+            (decodedLegacy[1] ? '?' + decodedLegacy[1] : '') +
             l.hash
           );
+          return;
         }
+
+        var params = new URLSearchParams(query);
+        var encodedPath = params.get('p');
+        if (!encodedPath) return;
+        var encodedSearch = params.get('q');
+        var decodedPath = encodedPath.replace(/~and~/g, '&');
+        var decodedSearch = encodedSearch ? '?' + encodedSearch.replace(/~and~/g, '&') : '';
+        window.history.replaceState(null, null, l.pathname.slice(0, -1) + decodedPath + decodedSearch + l.hash);
       }(window.location));
     </script>
   </head>

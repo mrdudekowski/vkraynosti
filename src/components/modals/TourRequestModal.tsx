@@ -30,8 +30,6 @@ interface TourRequestModalProps {
 const SUBMIT_DELAY_MS = 600;
 const SUCCESS_CLOSE_MS = 1800;
 
-const sanitizeForLog = (s: string) => s.trim().replace(/[\r\n]+/g, ' ');
-
 const flattenFirstFieldErrors = (error: import('zod').ZodError<unknown>): Record<string, string> => {
   const flat = error.flatten();
   const out: Record<string, string> = {};
@@ -90,19 +88,9 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
       window.setTimeout(resolve, SUBMIT_DELAY_MS);
     });
     if (!modalAliveRef.current) return;
-    const body = {
-      ...parsed.data,
-      tourId: payload.tourId,
-      tourTitle: payload.title,
-      tourSubtitle: payload.subtitle,
-      season: payload.season,
-    };
-    const safe = {
-      ...body,
-      name: sanitizeForLog(body.name),
-      question: sanitizeForLog(body.question),
-    };
-    console.log('[tourRequest]', safe);
+    if (import.meta.env.DEV) {
+      console.info('[tourRequest] validated payload accepted for client-side mock submit');
+    }
     setIsSubmitting(false);
     setSubmitSuccess(true);
     successCloseTimerRef.current = window.setTimeout(() => {

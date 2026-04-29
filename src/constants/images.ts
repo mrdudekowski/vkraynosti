@@ -619,7 +619,8 @@ export const TOUR_SPRING_8_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_8}/flz.clip1.grid.webm`]: `${TOUR_SPRING_8}/flz.clip1.poster.webp`,
 };
 
-export const TOUR_SPRING_8_COVER_GRID = `${TOUR_SPRING_8}/view3.webp` as const;
+/** Карточка/hero spring-8: облегчили cover (было `view3.webp` ~457 KB, теперь `view.webp` ~67 KB). */
+export const TOUR_SPRING_8_COVER_GRID = `${TOUR_SPRING_8}/view.webp` as const;
 export const TOUR_SPRING_8_PREFACE_BACKGROUND = `${TOUR_SPRING_8}/view.webp` as const;
 
 /**

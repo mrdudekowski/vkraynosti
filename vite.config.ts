@@ -2,9 +2,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const securityHeaders = {
+  'Content-Security-Policy':
+    "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://placehold.co; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self'; media-src 'self' blob:; upgrade-insecure-requests",
+  'Referrer-Policy': 'no-referrer',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Permissions-Policy':
+    'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), clipboard-read=(), clipboard-write=()',
+} as const;
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    headers: securityHeaders,
+  },
+  preview: {
+    headers: securityHeaders,
+  },
   test: {
     globals: true,
     environment: 'jsdom',

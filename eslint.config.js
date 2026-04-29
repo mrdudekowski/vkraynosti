@@ -19,5 +19,20 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-restricted-properties': [
+        'error',
+        { object: 'window', property: 'eval', message: 'Use safe explicit functions instead of eval.' },
+        { object: 'document', property: 'write', message: 'Avoid document.write due to script injection risk.' },
+      ],
+    },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': ['error', { allow: ['info', 'warn', 'error'] }],
+    },
   },
 ])

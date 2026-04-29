@@ -43,6 +43,11 @@ import {
   resolveTourHeroImageUrl,
   resolveTourPrefaceBackgroundUrl,
 } from "../utils/getTourPrefaceBackgroundUrl";
+import {
+  getTourBreadcrumbSchema,
+  getTourSeoEntry,
+  getTourStructuredData,
+} from "../constants/seo";
 
 const TourDetailPage = () => {
   const { season = "", tourId = "" } = useParams<{
@@ -147,10 +152,9 @@ const TourDetailPage = () => {
   }
 
   const seasonInfo = UI.seasons[tour.season];
-  const metaSnippet = tour.program
-    .slice(0, 3)
-    .map((s) => s.description)
-    .join(", ");
+  const seoEntry = getTourSeoEntry(tour);
+  const tourStructuredData = getTourStructuredData(tour);
+  const breadcrumbStructuredData = getTourBreadcrumbSchema(tour);
 
   const includedRevealClassName =
     prefaceBackgroundUrl != null
@@ -187,10 +191,11 @@ const TourDetailPage = () => {
     <div className="relative" data-testid="tour-detail-main">
       <SeasonPageBackdrop season={tour.season} />
       <PageMeta
-        title={`${tour.title} | Вкрайности`}
-        description={`${tour.subtitle}. ${tour.duration}, ${tour.price}. ${metaSnippet}.`}
+        title={seoEntry.title}
+        description={seoEntry.description}
         imageUrl={heroImageUrl}
-        path={buildTourDetailPath(tour.season, tour.id)}
+        path={seoEntry.path}
+        structuredData={[tourStructuredData, breadcrumbStructuredData]}
       />
       <TourDetailHero
         key={tour.id}

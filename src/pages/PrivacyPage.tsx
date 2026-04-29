@@ -3,6 +3,7 @@ import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import PageMeta from '../components/shared/PageMeta';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
+import { SEO_DEFAULTS } from '../constants/seo';
 
 const PrivacyPage = () => {
   const { privacyPage: p } = UI;
@@ -10,9 +11,9 @@ const PrivacyPage = () => {
   return (
     <div className="bg-surface-light min-h-screen">
       <PageMeta
-        title={p.metaTitle}
-        description={p.metaDescription}
-        path={ROUTES.PRIVACY}
+        title={SEO_DEFAULTS.privacy.title}
+        description={SEO_DEFAULTS.privacy.description}
+        path={SEO_DEFAULTS.privacy.path}
       />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-section-y">
         <Link

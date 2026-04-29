@@ -28,6 +28,7 @@ import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfade
 import { TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS } from '../constants/tourSpring3CoverCrop';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
+import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
 import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
 import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
@@ -42,6 +43,7 @@ const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'))
 const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
 const HOME_TOURS_PREVIEW_LIMIT = 3;
+const HOME_TOURS_EXPANDED_PRIORITY_IMAGE_COUNT = 4;
 const HOME_TOURS_PROMO_VIDEO_SWITCH_MS = 3000;
 const GRID_FADE_OUT_DURATION_MS = 260;
 const GRID_REVEAL_DURATION_MS = 500;
@@ -60,7 +62,6 @@ const Home = () => {
   const isAllToursExpanded = expandedSeason === activeSeason;
   const [toursPromoVideoIndex, setToursPromoVideoIndex] = useState(0);
   const [gridPhase, setGridPhase] = useState<HomeToursGridPhase>('idle');
-  const [gridAnimationCycle, setGridAnimationCycle] = useState(0);
   const [pendingExpandedSeason, setPendingExpandedSeason] = useState<Season | null>(null);
   const shouldScrollAfterCollapseRef = useRef(false);
   const expandCardMediaViewportRef = useRef<HTMLDivElement | null>(null);
@@ -219,7 +220,6 @@ const Home = () => {
     if (gridPhase !== 'fadingOut') return;
     const timeoutId = window.setTimeout(() => {
       setExpandedSeason(pendingExpandedSeason);
-      setGridAnimationCycle(prev => prev + 1);
       setGridPhase('preFadeIn');
     }, GRID_FADE_OUT_DURATION_MS);
     return () => window.clearTimeout(timeoutId);
@@ -279,10 +279,11 @@ const Home = () => {
   return (
     <>
       <PageMeta
-        title="Вкрайности — Туры по дикой природе России"
-        description="Авторские туры по Алтаю, Байкалу, Камчатке и Кавказу. Зима, весна, лето, осень — четыре сезона приключений с опытными гидами."
+        title={SEO_DEFAULTS.home.title}
+        description={SEO_DEFAULTS.home.description}
         imageUrl={IMAGES.hero[activeSeason]}
-        path={ROUTES.HOME}
+        path={SEO_DEFAULTS.home.path}
+        structuredData={[ORGANIZATION_SCHEMA, WEBSITE_SCHEMA]}
         preloadHeroImageUrl={tours[0]?.imageUrl}
         priorityVideoPreloads={seasonBannerVideoPreloads}
       />
@@ -337,16 +338,23 @@ const Home = () => {
                 <RevealBox as="div" className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
                   {visibleTours.map((tour, index) => (
                     <div
-                      key={`${tour.id}-${gridAnimationCycle}`}
+                      key={tour.id}
                       className={getGridItemAnimation(index).className}
                       style={getGridItemAnimation(index).style}
                     >
-                      <TourCard tour={tour} priorityImage={index === 0} />
+                      <TourCard
+                        tour={tour}
+                        priorityImage={
+                          isAllToursExpanded
+                            ? index < HOME_TOURS_EXPANDED_PRIORITY_IMAGE_COUNT
+                            : index === 0
+                        }
+                      />
                     </div>
                   ))}
                   {shouldRenderExpandCard ? (
                     <div
-                      key={`expand-control-${gridAnimationCycle}`}
+                      key="expand-control"
                       className={getGridItemAnimation(visibleTours.length).className}
                       style={getGridItemAnimation(visibleTours.length).style}
                     >

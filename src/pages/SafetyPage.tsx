@@ -18,6 +18,7 @@ import fallSafety from '../data/safety/fall.json';
 import { useSeason } from '../context/useSeason';
 import type { Season } from '../types';
 import { scrollWindowToTopSmooth } from '../constants/smoothScroll';
+import { SEO_DEFAULTS } from '../constants/seo';
 
 type SafetyOverrides = {
   id: string;
@@ -61,10 +62,10 @@ const SafetyPage = () => {
   return (
     <div className="bg-surface-light min-h-screen">
       <PageMeta
-        title="Безопасность в наших походах | Вкрайности"
-        description="Как мы обеспечиваем безопасность: профессиональное снаряжение, GPS-навигация, врач в каждой группе, спутниковая связь и план эвакуации."
+        title={SEO_DEFAULTS.safety.title}
+        description={SEO_DEFAULTS.safety.description}
         imageUrl={IMAGES.hero[activeSeason]}
-        path={ROUTES.SAFETY}
+        path={SEO_DEFAULTS.safety.path}
       />
       {/* Hero */}
       <div className="bg-brand-primary py-20 px-4 text-center">

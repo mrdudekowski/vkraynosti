@@ -9,6 +9,7 @@ import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { UI } from '../../constants/ui';
 import { CONTACTS } from '../../constants/contacts';
 import { HOME_SECTION_CONTACT } from '../../constants/routes';
+import { toSafeExternalHttpHref, toSafePhoneHref } from '../../utils/safeHref';
 
 const ContactSection = forwardRef<HTMLElement>(function ContactSection(_, ref) {
   return (
@@ -42,7 +43,7 @@ const ContactSection = forwardRef<HTMLElement>(function ContactSection(_, ref) {
 
       <RevealBox as="div" className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
         <a
-          href={CONTACTS.PHONE_HREF}
+          href={toSafePhoneHref(CONTACTS.PHONE_HREF)}
           className="btn-primary flex items-center justify-center gap-3"
         >
           <FontAwesomeIcon icon={faPhone} />
@@ -50,9 +51,10 @@ const ContactSection = forwardRef<HTMLElement>(function ContactSection(_, ref) {
         </a>
 
         <a
-          href={CONTACTS.TELEGRAM_HREF}
+          href={toSafeExternalHttpHref(CONTACTS.TELEGRAM_HREF)}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer external"
+          referrerPolicy="no-referrer"
           className="btn-ghost text-text-inverse flex items-center justify-center gap-3"
         >
           <FontAwesomeIcon icon={faTelegram} />
@@ -60,9 +62,10 @@ const ContactSection = forwardRef<HTMLElement>(function ContactSection(_, ref) {
         </a>
 
         <a
-          href={CONTACTS.MAX_HREF}
+          href={toSafeExternalHttpHref(CONTACTS.MAX_HREF)}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer external"
+          referrerPolicy="no-referrer"
           className="btn-ghost text-text-inverse flex items-center justify-center gap-3"
         >
           <FontAwesomeIcon icon={faVk} />

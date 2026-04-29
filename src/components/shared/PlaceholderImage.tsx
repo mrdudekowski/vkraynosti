@@ -9,6 +9,10 @@ interface PlaceholderImageProps {
   imgClassName?: string;
   loading?: 'lazy' | 'eager';
   fetchPriority?: 'high' | 'low' | 'auto';
+  /** Responsive-кандидаты для `<img srcSet>` (например, mobile + desktop cover). */
+  srcSet?: string;
+  /** Правила выбора из `srcSet` в текущем лейауте. */
+  sizes?: string;
   /** Не задавать `src`, пока узел не приблизится к вьюпорту (IntersectionObserver). */
   deferSrcUntilVisible?: boolean;
 }
@@ -21,6 +25,8 @@ const DeferredPlaceholderImage = ({
   imgClassName = '',
   loading = 'lazy',
   fetchPriority,
+  srcSet,
+  sizes,
 }: Omit<PlaceholderImageProps, 'deferSrcUntilVisible'>) => {
   const [showSrc, setShowSrc] = useState(() =>
     typeof window !== 'undefined' &&
@@ -64,6 +70,8 @@ const DeferredPlaceholderImage = ({
   return (
     <img
       src={src}
+      srcSet={srcSet}
+      sizes={sizes}
       alt={alt}
       className={`object-cover ${imgClassName} ${className}`.trim()}
       loading={loading}
@@ -80,12 +88,16 @@ const PlaceholderImage = ({
   imgClassName = '',
   loading = 'lazy',
   fetchPriority,
+  srcSet,
+  sizes,
   deferSrcUntilVisible = false,
 }: PlaceholderImageProps) => {
   if (!deferSrcUntilVisible) {
     return (
       <img
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         className={`object-cover ${imgClassName} ${className}`.trim()}
         loading={loading}
@@ -104,6 +116,8 @@ const PlaceholderImage = ({
       imgClassName={imgClassName}
       loading={loading}
       fetchPriority={fetchPriority}
+      srcSet={srcSet}
+      sizes={sizes}
     />
   );
 };

@@ -3,6 +3,7 @@ import PageMeta from '../components/shared/PageMeta';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 import { UI } from '../constants/ui';
 import { ROUTES } from '../constants/routes';
+import { SEO_DEFAULTS } from '../constants/seo';
 
 const NotFoundPage = () => {
   const location = useLocation();
@@ -10,9 +11,11 @@ const NotFoundPage = () => {
   return (
     <>
       <PageMeta
-        title={UI.notFoundPage.metaTitle}
-        description={UI.notFoundPage.description}
+        title={SEO_DEFAULTS.notFound.title}
+        description={SEO_DEFAULTS.notFound.description}
         path={location.pathname}
+        canonicalPath={SEO_DEFAULTS.notFound.path}
+        robots={SEO_DEFAULTS.notFound.robots}
       />
       <div className="min-h-screen flex flex-col items-center justify-center bg-surface-light px-4">
         <div className="max-w-md w-full text-center">

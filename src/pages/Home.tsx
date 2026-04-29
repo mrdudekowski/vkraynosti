@@ -12,6 +12,7 @@ import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 import SeasonSwitcher from '../components/shared/SeasonSwitcher';
 import TourCard from '../components/shared/TourCard';
 import PlaceholderImage from '../components/shared/PlaceholderImage';
+import CrossfadeVideo from '../components/shared/CrossfadeVideo';
 import { HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS, IMAGES } from '../constants/images';
 import {
   HOME_GATE_STAGE_INTERSECT_ENTER,
@@ -34,6 +35,7 @@ import { SEASON_ORDER } from '../constants/seasonNavbarAppearance';
 import { BREAKPOINT_MD_PX, NAVBAR_SCROLL_OFFSET_PX } from '../constants/smoothScroll';
 import type { Season } from '../types';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
+import { useDocumentVisibility } from '../hooks/useDocumentVisibility';
 
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
 const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
@@ -69,19 +71,22 @@ const Home = () => {
   const [expandCardVideoInView, setExpandCardVideoInView] = useState(
     () => typeof IntersectionObserver === 'undefined'
   );
+  const [expandCardVideoActive, setExpandCardVideoActive] = useState(
+    () => typeof IntersectionObserver === 'undefined'
+  );
+  const isPageVisible = useDocumentVisibility();
   const homeGateScrollEnabled = location.pathname === ROUTES.HOME;
   const homeGateBannerColumnHover =
     UI.sections.homeGateSeasonBannerStaticPresentation &&
     UI.sections.homeGateSeasonBannerLetterHoverVideo;
   const { ref: homeSkyParallaxRef } = useHomeSkyParallax();
-  const { ref: expandOverlayRevealRef, directionalRevealClassName: expandOverlayRevealClassName } =
-    useRevealOnScroll({
-      once: false,
-      bidirectional: true,
-      directional: true,
-      threshold: 0.2,
-      rootMargin: '0px 0px -10% 0px',
-    });
+  const { ref: expandOverlayRevealRef } = useRevealOnScroll({
+    once: false,
+    bidirectional: true,
+    directional: true,
+    threshold: 0.2,
+    rootMargin: '0px 0px -10% 0px',
+  });
 
   useHomeNavbarChromeScroll({
     heroSectionRef,
@@ -216,6 +221,23 @@ const Home = () => {
     observer.observe(el);
     return () => observer.disconnect();
   }, [expandCardVideoInView]);
+
+  useEffect(() => {
+    const el = expandCardMediaViewportRef.current;
+    if (el == null) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setExpandCardVideoActive(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      entries => {
+        setExpandCardVideoActive(entries[0]?.isIntersecting === true);
+      },
+      { root: null, rootMargin: '100px 0px', threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (activeSeasonPromoVideoUrls.length <= 1) return;
@@ -371,19 +393,12 @@ const Home = () => {
                         {activeSeasonLeadTour != null ? (
                           <div className="absolute inset-0" aria-hidden>
                             <div ref={expandCardMediaViewportRef} className="h-full w-full">
-                            {activeSeasonPromoVideoUrl != null && expandCardVideoInView ? (
-                              <video
-                                key={activeSeasonPromoVideoUrl}
-                                className="h-full w-full object-cover opacity-60"
+                            {activeSeasonPromoVideoUrl != null && expandCardVideoInView && expandCardVideoActive && isPageVisible ? (
+                              <CrossfadeVideo
+                                src={activeSeasonPromoVideoUrl}
                                 poster={activeSeasonLeadTour.imageUrl}
-                                autoPlay
-                                muted
-                                playsInline
-                                preload="none"
-                                loop
-                              >
-                                <source src={activeSeasonPromoVideoUrl} />
-                              </video>
+                                className="h-full w-full object-cover opacity-60"
+                              />
                             ) : (
                               <PlaceholderImage
                                 src={activeSeasonLeadTour.imageUrl}
@@ -395,7 +410,7 @@ const Home = () => {
                             </div>
                             <div
                               ref={expandOverlayRevealRef}
-                              className={`absolute inset-0 bg-surface-dark/45 reveal-base ${expandOverlayRevealClassName}`}
+                              className="absolute inset-0 bg-surface-dark/45"
                             />
                           </div>
                         ) : null}

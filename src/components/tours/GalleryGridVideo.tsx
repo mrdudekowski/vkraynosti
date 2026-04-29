@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { TOUR_GALLERY_TILE_IMAGE_ROOT_MARGIN } from '../../constants/reveal';
+import { useDocumentVisibility } from '../../hooks/useDocumentVisibility';
 
 export interface GalleryGridVideoProps {
   gridSrc: string;
@@ -22,7 +23,12 @@ const GalleryGridVideo = ({
   const [inView, setInView] = useState(
     () => typeof IntersectionObserver === 'undefined'
   );
+  const [hasBeenVisible, setHasBeenVisible] = useState(
+    () => typeof IntersectionObserver === 'undefined'
+  );
+  const isPageVisible = useDocumentVisibility();
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useLayoutEffect(() => {
     if (typeof IntersectionObserver === 'undefined') {
@@ -32,9 +38,10 @@ const GalleryGridVideo = ({
     if (!el) return;
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0]?.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
+        const isIntersecting = entries[0]?.isIntersecting === true;
+        setInView(isIntersecting);
+        if (isIntersecting) {
+          setHasBeenVisible(true);
         }
       },
       { rootMargin: TOUR_GALLERY_TILE_IMAGE_ROOT_MARGIN, threshold: 0 }
@@ -42,6 +49,16 @@ const GalleryGridVideo = ({
     observer.observe(el);
     return () => observer.disconnect();
   }, [prefersReducedMotion]);
+
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (prefersReducedMotion || !inView || !isPageVisible) {
+      video.pause();
+      return;
+    }
+    void video.play().catch(() => {});
+  }, [inView, isPageVisible, prefersReducedMotion]);
 
   const hasPoster = posterSrc != null && posterSrc.length > 0;
 
@@ -51,13 +68,14 @@ const GalleryGridVideo = ({
       className={`overflow-hidden rounded-card border-0 bg-transparent ${className}`}
       aria-hidden
     >
-      {inView ? (
+      {hasBeenVisible ? (
         <video
+          ref={videoRef}
           className="min-h-0 h-full w-full object-cover pointer-events-none"
           src={gridSrc}
           muted
           loop
-          autoPlay={!prefersReducedMotion}
+          autoPlay={!prefersReducedMotion && inView && isPageVisible}
           playsInline
           preload="none"
         />

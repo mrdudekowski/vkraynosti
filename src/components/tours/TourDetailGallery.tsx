@@ -685,7 +685,7 @@ const TourDetailGalleryComponent = ({
   }
 
   /**
-   * Хаски-тур (winter-4): без верхней панорамы — сразу ролик слева на две строки сетки, справа doggo и doggos; ниже сетка clip2 / gora2 / `hs.gora.png`.
+   * Хаски-тур (winter-4): без верхней панорамы — сразу ролик слева на две строки сетки, справа doggo и doggos; ниже сетка clip2 / gora2 / `hs.gora.webp`.
    * Порядок в `images` после `slice(2)`: clip1, doggo, doggos, clip2, gora2, gora.
    */
   if (

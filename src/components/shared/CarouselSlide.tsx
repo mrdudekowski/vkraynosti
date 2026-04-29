@@ -25,8 +25,10 @@ const CarouselSlide = ({
   return (
     <div
       className={`absolute inset-0 ${
-        isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-      }`}
+        isActive
+          ? 'opacity-100 z-10'
+          : 'opacity-0 z-0 pointer-events-none'
+      } transition-opacity duration-carousel ease-standard motion-reduce:transition-none`}
       style={
         shouldLoadBackground
           ? {

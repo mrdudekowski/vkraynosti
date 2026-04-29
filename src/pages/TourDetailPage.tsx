@@ -15,13 +15,17 @@ import {
   TOUR_SPRING_4_GRID_VIDEO_POSTERS,
   TOUR_SPRING_5_GRID_VIDEO_POSTERS,
   TOUR_SPRING_6_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_6_GRID_VIDEO_POSTERS_MOBILE,
   TOUR_SPRING_7_GRID_VIDEO_POSTERS,
   TOUR_SPRING_8_GRID_VIDEO_POSTERS,
   TOUR_SPRING_9_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_9_GRID_VIDEO_POSTERS_MOBILE,
   TOUR_SPRING_10_GRID_VIDEO_POSTERS,
+  TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE,
   TOUR_WINTER_3_GRID_VIDEO_POSTERS,
   TOUR_WINTER_3_PREFACE_BACKGROUND,
   TOUR_WINTER_4_GRID_VIDEO_POSTERS,
+  TOUR_WINTER_4_GRID_VIDEO_POSTERS_MOBILE,
   TOUR_WINTER_5_GRID_VIDEO_POSTERS,
 } from "../constants/images";
 import { UI } from "../constants/ui";
@@ -49,6 +53,10 @@ import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { useTourProgramScrollReveal } from "../hooks/useTourProgramScrollReveal";
 import { useModal } from "../context/useModal";
 import { useBrowserBackToHomeTours } from "../hooks/useBrowserBackToHomeTours";
+import {
+  resolveTourHeroImageUrl,
+  resolveTourPrefaceBackgroundUrl,
+} from "../utils/getTourPrefaceBackgroundUrl";
 
 const TourDetailPage = () => {
   const { season = "", tourId = "" } = useParams<{
@@ -81,16 +89,26 @@ const TourDetailPage = () => {
   /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе второй кадр viewer-галереи. */
   const prefaceBackgroundUrl = useMemo(() => {
     if (tour == null) return null;
-    return (
-      tour.prefaceBackgroundImageUrl ??
-      (viewerGalleryUrls.length > 1 ? viewerGalleryUrls[1] : null)
-    );
-  }, [tour, viewerGalleryUrls]);
+    return resolveTourPrefaceBackgroundUrl({
+      tour,
+      viewerGalleryUrls,
+      gridGalleryUrls,
+      isLgOrAbove,
+    });
+  }, [gridGalleryUrls, isLgOrAbove, tour, viewerGalleryUrls]);
 
   const galleryGridImages = useMemo(() => {
     if (!tour || gridGalleryUrls.length <= 2) return [];
     return gridGalleryUrls.slice(2);
   }, [tour, gridGalleryUrls]);
+  const heroImageUrl = useMemo(() => {
+    if (tour == null) return '';
+    return resolveTourHeroImageUrl({
+      tour,
+      gridGalleryUrls,
+      isLgOrAbove,
+    });
+  }, [gridGalleryUrls, isLgOrAbove, tour]);
 
   const getVideoPosterForGridSrc = useMemo(():
     | ((src: string) => string | undefined)
@@ -99,7 +117,8 @@ const TourDetailPage = () => {
     if (tour.id === "winter-3")
       return (src) => TOUR_WINTER_3_GRID_VIDEO_POSTERS[src];
     if (tour.id === "winter-4")
-      return (src) => TOUR_WINTER_4_GRID_VIDEO_POSTERS[src];
+      return (src) =>
+        isLgOrAbove ? TOUR_WINTER_4_GRID_VIDEO_POSTERS[src] : TOUR_WINTER_4_GRID_VIDEO_POSTERS_MOBILE[src];
     if (tour.id === "winter-5")
       return (src) => TOUR_WINTER_5_GRID_VIDEO_POSTERS[src];
     if (tour.id === "spring-2")
@@ -111,17 +130,22 @@ const TourDetailPage = () => {
     if (tour.id === "spring-5")
       return (src) => TOUR_SPRING_5_GRID_VIDEO_POSTERS[src];
     if (tour.id === "spring-6")
-      return (src) => TOUR_SPRING_6_GRID_VIDEO_POSTERS[src];
+      return (src) =>
+        isLgOrAbove ? TOUR_SPRING_6_GRID_VIDEO_POSTERS[src] : TOUR_SPRING_6_GRID_VIDEO_POSTERS_MOBILE[src];
     if (tour.id === "spring-7")
       return (src) => TOUR_SPRING_7_GRID_VIDEO_POSTERS[src];
     if (tour.id === "spring-8")
       return (src) => TOUR_SPRING_8_GRID_VIDEO_POSTERS[src];
     if (tour.id === "spring-9")
-      return (src) => TOUR_SPRING_9_GRID_VIDEO_POSTERS[src];
+      return (src) =>
+        isLgOrAbove ? TOUR_SPRING_9_GRID_VIDEO_POSTERS[src] : TOUR_SPRING_9_GRID_VIDEO_POSTERS_MOBILE[src];
     if (tour.id === "spring-10")
-      return (src) => TOUR_SPRING_10_GRID_VIDEO_POSTERS[src];
+      return (src) =>
+        isLgOrAbove
+          ? TOUR_SPRING_10_GRID_VIDEO_POSTERS[src]
+          : TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE[src];
     return undefined;
-  }, [tour]);
+  }, [isLgOrAbove, tour]);
 
   const galleryLayoutVariant = useMemo((): TourGalleryLayoutVariant => {
     if (!tour) return "default";
@@ -227,7 +251,7 @@ const TourDetailPage = () => {
       />
       <TourDetailHero
         key={tour.id}
-        imageUrl={tour.imageUrl}
+        imageUrl={heroImageUrl}
         imageAlt={tour.title}
         title={tour.title}
         subtitle={tour.subtitle}

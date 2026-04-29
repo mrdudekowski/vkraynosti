@@ -160,6 +160,9 @@ export const TOUR_WINTER_3_GRID_VIDEO_POSTERS: Record<string, string> = {
 };
 /** `gr.boarder` — только фон блока «О туре» (`Tour.prefaceBackgroundImageUrl`), не в `TOUR_WINTER_3_GALLERY`. */
 export const TOUR_WINTER_3_PREFACE_BACKGROUND = `${TOUR_WINTER_3}/gr.boarder.webp` as const;
+/** Мобильная версия фона блока «О туре» (сниженный вес для раннего рендера tour detail). */
+export const TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE =
+  `${TOUR_WINTER_3}/gr.boarder.mobile.webp` as const;
 
 const TOUR_WINTER_4 = `${TOURS_ASSET_BASE}/winter-4`;
 
@@ -178,7 +181,7 @@ export const TOUR_WINTER_4_GALLERY_VIEWER = [
   `${TOUR_WINTER_4}/hs.doggos.webp`,
   `${TOUR_WINTER_4}/hs.clip2.webm`,
   `${TOUR_WINTER_4}/hs.gora2.webp`,
-  `${TOUR_WINTER_4}/hs.gora.png`,
+  `${TOUR_WINTER_4}/hs.gora.webp`,
 ] as const;
 
 /** Сетка: webp ≤900px, клипы — VP9 `*.grid.webm`. */
@@ -208,6 +211,10 @@ export const TOUR_WINTER_4_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_WINTER_4_GALLERY_GRID[2]]: `${TOUR_WINTER_4}/hs.clip1.poster.webp`,
   [TOUR_WINTER_4_GALLERY_GRID[5]]: `${TOUR_WINTER_4}/hs.clip2.poster.webp`,
 };
+export const TOUR_WINTER_4_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
+  [TOUR_WINTER_4_GALLERY_GRID[2]]: `${TOUR_WINTER_4}/hs.clip1.poster.mobile.webp`,
+  [TOUR_WINTER_4_GALLERY_GRID[5]]: `${TOUR_WINTER_4}/hs.clip2.poster.mobile.webp`,
+};
 
 const TOUR_WINTER_5 = `${TOURS_ASSET_BASE}/winter-5`;
 
@@ -223,7 +230,7 @@ export const TOUR_WINTER_5_GALLERY_VIEWER = [
   `${TOUR_WINTER_5}/ars.clip1.webm`,
   `${TOUR_WINTER_5}/ars.clip2.webm`,
   `${TOUR_WINTER_5}/ars.trans-tail.webp`,
-  `${TOUR_WINTER_5}/ars.team.png`,
+  `${TOUR_WINTER_5}/ars.team.webp`,
 ] as const;
 
 /** Те же индексы: сетка (webp ≤900px, VP9 для клипов). */
@@ -519,8 +526,16 @@ export const TOUR_SPRING_6_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_6}/mnd.clip4.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip4.poster.webp`,
   [`${TOUR_SPRING_6}/mnd.clip5.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip5.poster.webp`,
 };
+export const TOUR_SPRING_6_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
+  [`${TOUR_SPRING_6}/mnd.clip1.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip1.poster.mobile.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip2.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip2.poster.mobile.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip3.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip3.poster.mobile.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip4.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip4.poster.mobile.webp`,
+  [`${TOUR_SPRING_6}/mnd.clip5.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip5.poster.webp`,
+};
 
 export const TOUR_SPRING_6_COVER_GRID = `${TOUR_SPRING_6}/deerlol.webp` as const;
+export const TOUR_SPRING_6_COVER_MOBILE = `${TOUR_SPRING_6}/deerlol.mobile.webp` as const;
 
 const TOUR_SPRING_7 = `${TOURS_ASSET_BASE}/spring-7`;
 const TOUR_SPRING_8 = `${TOURS_ASSET_BASE}/spring-8`;
@@ -631,8 +646,14 @@ export const TOUR_SPRING_9_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_9}/vrb.clip2.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip2.poster.webp`,
   [`${TOUR_SPRING_9}/vrb.clip3.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip3.poster.webp`,
 };
+export const TOUR_SPRING_9_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
+  [`${TOUR_SPRING_9}/vrb.clip1.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip1.poster.mobile.webp`,
+  [`${TOUR_SPRING_9}/vrb.clip2.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip2.poster.mobile.webp`,
+  [`${TOUR_SPRING_9}/vrb.clip3.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip3.poster.mobile.webp`,
+};
 
 export const TOUR_SPRING_9_COVER_GRID = `${TOUR_SPRING_9}/top3.webp` as const;
+export const TOUR_SPRING_9_COVER_MOBILE = `${TOUR_SPRING_9}/top3.mobile.webp` as const;
 export const TOUR_SPRING_9_PREFACE_BACKGROUND = `${TOUR_SPRING_9}/wine.webp` as const;
 
 /**
@@ -674,9 +695,18 @@ export const TOUR_SPRING_10_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_10}/ask.clip5.grid.webm`]: `${TOUR_SPRING_10}/ask.clip5.poster.webp`,
   [`${TOUR_SPRING_10}/ask.clip6.grid.webm`]: `${TOUR_SPRING_10}/ask.clip6.poster.webp`,
 };
+export const TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
+  [`${TOUR_SPRING_10}/ask.intro.grid.webm`]: `${TOUR_SPRING_10}/ask.intro.poster.webp`,
+  [`${TOUR_SPRING_10}/ask.clip2.grid.webm`]: `${TOUR_SPRING_10}/ask.clip2.poster.mobile.webp`,
+  [`${TOUR_SPRING_10}/ask.clip4.grid.webm`]: `${TOUR_SPRING_10}/ask.clip4.poster.mobile.webp`,
+  [`${TOUR_SPRING_10}/ask.clip5.grid.webm`]: `${TOUR_SPRING_10}/ask.clip5.poster.mobile.webp`,
+  [`${TOUR_SPRING_10}/ask.clip6.grid.webm`]: `${TOUR_SPRING_10}/ask.clip6.poster.mobile.webp`,
+};
 
 export const TOUR_SPRING_10_COVER_GRID = `${TOUR_SPRING_10}/view.webp` as const;
+export const TOUR_SPRING_10_COVER_MOBILE = `${TOUR_SPRING_10}/view.mobile.webp` as const;
 export const TOUR_SPRING_10_PREFACE_BACKGROUND = `${TOUR_SPRING_10}/beach.webp` as const;
+export const TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE = `${TOUR_SPRING_10}/beach.mobile.webp` as const;
 
 /** Сетка `askold`: вертикальные панорамы — якорь обрезки в `TourDetailGallery`. */
 export const TOUR_SPRING_10_VIEW2_GRID = `${TOUR_SPRING_10}/view2.webp` as const;
@@ -749,8 +779,8 @@ export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS: Record<string, string
 /** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */
 export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-logo.svg` as const;
 
-/** Графический знак Вкрайности (лес), не текстовый вордмарк — `public/vkrai-logo.png`. */
-export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.png` as const;
+/** Графический знак Вкрайности (лес), не текстовый вордмарк — `public/vkrai-logo.webp`. */
+export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.webp` as const;
 
 /**
  * Обложки весенних туров: spring-1…4 — первый кадр сетки из `public/tours/spring-N/`;
@@ -770,6 +800,15 @@ export const SPRING_TOUR_COVERS = {
   'spring-10': TOUR_SPRING_10_COVER_GRID,
 } as const;
 
+/** Мобильные webp-варианты тяжёлых tour-изображений (hero/preface). */
+export const TOUR_MOBILE_IMAGE_VARIANTS: Record<string, string> = {
+  [TOUR_WINTER_3_PREFACE_BACKGROUND]: TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE,
+  [TOUR_SPRING_6_COVER_GRID]: TOUR_SPRING_6_COVER_MOBILE,
+  [TOUR_SPRING_9_COVER_GRID]: TOUR_SPRING_9_COVER_MOBILE,
+  [TOUR_SPRING_10_COVER_GRID]: TOUR_SPRING_10_COVER_MOBILE,
+  [TOUR_SPRING_10_PREFACE_BACKGROUND]: TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE,
+};
+
 export const IMAGES = {
   hero: {
     winter: `${BASE}/1920x1080/7BA7BC/ffffff?text=Зима+·+Вкрайности`,
@@ -780,10 +819,10 @@ export const IMAGES = {
   },
   /** Статичные постеры колонок баннера на стартовом экране (без видео-лупов). */
   seasonSection: {
-    winter: `${HOME_SEASON_BANNER_MEDIA_BASE.winter}/winter.png`,
-    spring: `${HOME_SEASON_BANNER_MEDIA_BASE.spring}/spring.png`,
-    summer: `${HOME_SEASON_BANNER_MEDIA_BASE.summer}/Summer.png`,
-    fall:   `${HOME_SEASON_BANNER_MEDIA_BASE.fall}/fall.png`,
+    winter: `${HOME_SEASON_BANNER_MEDIA_BASE.winter}/winter.webp`,
+    spring: `${HOME_SEASON_BANNER_MEDIA_BASE.spring}/spring.webp`,
+    summer: `${HOME_SEASON_BANNER_MEDIA_BASE.summer}/Summer.webp`,
+    fall:   `${HOME_SEASON_BANNER_MEDIA_BASE.fall}/fall.webp`,
   },
   team: {
     placeholder: `${BASE}/400x500/1A3C2E/C8A96E?text=Эксперт`,

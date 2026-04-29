@@ -11,6 +11,7 @@ import {
   type HomeSeasonBannerSoloPhase,
   type HomeSeasonBannerWordOverlay,
 } from '../../hooks/useHomeSeasonBannerSequence';
+import { useDocumentVisibility } from '../../hooks/useDocumentVisibility';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import type { Season } from '../../types';
 
@@ -311,6 +312,8 @@ interface HomeSeasonBannerColumnProps {
   wordExitWaveLastVisible: number | null;
   /** Системный reduced motion; видео по hover не включается. */
   systemPrefersReducedMotion: boolean;
+  /** Скрытая вкладка: останавливаем видео и фоновые декодеры. */
+  isPageVisible: boolean;
   /** Статичный таймлайн (ворота или reduced motion): без цикла полосок. */
   timelineStatic: boolean;
   /** Статичный баннер у ворот: hover по колонке с fade-in видео. */
@@ -333,6 +336,7 @@ const HomeSeasonBannerColumn = ({
   wordOverlayFadeInReady,
   wordExitWaveLastVisible,
   systemPrefersReducedMotion,
+  isPageVisible,
   timelineStatic,
   letterHoverVideoEnabled,
   isColumnHovered,
@@ -363,6 +367,7 @@ const HomeSeasonBannerColumn = ({
   const playing =
     (!systemPrefersReducedMotion && inVideoChain) ||
     (hoverVideoReveal && !systemPrefersReducedMotion);
+  const effectivePlaying = playing && isPageVisible;
 
   const baseShouldLoadVideo = shouldLoadHomeSeasonBannerColumnVideo(
     clip,
@@ -381,7 +386,14 @@ const HomeSeasonBannerColumn = ({
   const holdBufferWhilePrimed =
     timelineStatic && letterHoverVideoEnabled && Boolean(clip.videoSrc) && videoPrimedForColumn;
   const videoPreloadHint =
-    playing || holdBufferWhilePrimed ? ('auto' as const) : ('metadata' as const);
+    effectivePlaying || holdBufferWhilePrimed ? ('auto' as const) : ('metadata' as const);
+  const shouldLoadStaticPoster =
+    !clip.videoSrc ||
+    !timelineStatic ||
+    !letterHoverVideoEnabled ||
+    columnIndex === 0 ||
+    isColumnHovered ||
+    videoPrimedForColumn;
 
   const letterOpacity = wordLetterOpacityClass(
     wordOverlay,
@@ -476,8 +488,8 @@ const HomeSeasonBannerColumn = ({
       >
         <div className="pointer-events-none h-full min-h-0 w-full origin-center scale-home-season-banner-loop">
           {clip.videoSrc && shouldLoadVideo ? (
-            <BannerColumnVideo clip={clip} playing={playing} preloadHint={videoPreloadHint} />
-          ) : (
+            <BannerColumnVideo clip={clip} playing={effectivePlaying} preloadHint={videoPreloadHint} />
+          ) : shouldLoadStaticPoster ? (
             <img
               src={clip.posterSrc}
               alt=""
@@ -486,6 +498,8 @@ const HomeSeasonBannerColumn = ({
               fetchPriority={columnIndex === 0 ? 'high' : 'low'}
               decoding="async"
             />
+          ) : (
+            <div className="pointer-events-none h-full min-h-0 w-full bg-surface-dark" />
           )}
         </div>
       </div>
@@ -503,6 +517,7 @@ const HomeSeasonBannerComponent = ({
   staticPresentation = false,
 }: HomeSeasonBannerProps) => {
   const systemPrefersReducedMotion = usePrefersReducedMotion();
+  const isPageVisible = useDocumentVisibility();
   const timelineStatic = staticPresentation || systemPrefersReducedMotion;
   const letterHoverVideoEnabled =
     staticPresentation && !systemPrefersReducedMotion && UI.sections.homeGateSeasonBannerLetterHoverVideo;
@@ -576,6 +591,7 @@ const HomeSeasonBannerComponent = ({
                 wordOverlayFadeInReady={wordOverlayFadeInReady}
                 wordExitWaveLastVisible={wordExitWaveLastVisible}
                 systemPrefersReducedMotion={systemPrefersReducedMotion}
+                isPageVisible={isPageVisible}
                 timelineStatic={timelineStatic}
                 letterHoverVideoEnabled={letterHoverVideoEnabled}
                 isColumnHovered={hoveredColumnIndex === index}

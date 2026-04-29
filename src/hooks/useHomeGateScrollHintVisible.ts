@@ -31,7 +31,7 @@ export function useHomeGateScrollHintVisible(enabled: boolean): { visible: boole
       const next = readVisible();
       setScrollBasedVisible((prev) => (prev === next ? prev : next));
     });
-  }, [enabled, lenis, readVisible]);
+  }, [readVisible]);
 
   useLayoutEffect(() => {
     queueMicrotask(() => {

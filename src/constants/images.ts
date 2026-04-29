@@ -317,44 +317,48 @@ const TOUR_SPRING_3 = `${TOURS_ASSET_BASE}/spring-3`;
 const TOUR_SPRING_4 = `${TOURS_ASSET_BASE}/spring-4`;
 const TOUR_SPRING_5 = `${TOURS_ASSET_BASE}/spring-5`;
 
-/** Первый ролик «Сестра» (`ss.clip1.*`); постер — в плейсхолдере сетки «Пидан» и в баннере главной. */
+/** Первый ролик «Сестра» (`ss.clip1.*`); постер — для grid-webm в сетке и баннере главной. */
 export const TOUR_SPRING_4_CLIP1_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip1.grid.webm` as const;
 export const TOUR_SPRING_4_CLIP1_VIEWER_WEBM = `${TOUR_SPRING_4}/ss.clip1.webm` as const;
 export const TOUR_SPRING_4_CLIP1_POSTER_WEBP = `${TOUR_SPRING_4}/ss.clip1.poster.webp` as const;
 export const TOUR_SPRING_4_CLIP3_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip3.grid.webm` as const;
 export const TOUR_SPRING_4_CLIP5_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip5.grid.webm` as const;
 
-/** «Пидан» — полное качество (просмотрщик). */
+/** «Пидан» — полное качество (просмотрщик). `taiga` и `clip3` переставлены: клип в слоте бывшей тайги, тайга — на месте бывшего полноширинного клипа в сетке. */
 export const TOUR_SPRING_3_GALLERY_VIEWER = [
   `${TOUR_SPRING_3}/pd.hero.webp`,
   `${TOUR_SPRING_3}/pd.preface.webp`,
   `${TOUR_SPRING_3}/pd.group.webp`,
-  `${TOUR_SPRING_3}/pd.taiga.webp`,
-  TOUR_SPRING_4_CLIP1_POSTER_WEBP,
+  `${TOUR_SPRING_3}/pd.clip3.webm`,
+  TOUR_SPRING_4_CLIP1_VIEWER_WEBM,
   `${TOUR_SPRING_3}/pd.clip2.webm`,
   `${TOUR_SPRING_3}/pd.ridge.webp`,
   `${TOUR_SPRING_3}/pd.clip5.webm`,
   `${TOUR_SPRING_3}/pd.summit.webp`,
   `${TOUR_SPRING_3}/pd.clip4.webm`,
   `${TOUR_SPRING_3}/pd.sea.webp`,
-  `${TOUR_SPRING_3}/pd.clip3.webm`,
+  `${TOUR_SPRING_3}/pd.taiga.webp`,
   `${TOUR_SPRING_3}/pd.clip6.webm`,
   `${TOUR_SPRING_3}/pd.clip7.webm`,
 ] as const;
+
+/** Фон блока «О туре», когда hero/обложка берут кадр `pd.preface` (`tour.prefaceBackgroundImageUrl`). */
+export const TOUR_SPRING_3_PREFACE_BLOCK_BACKGROUND_VIEWER =
+  TOUR_SPRING_3_GALLERY_VIEWER[0];
 
 export const TOUR_SPRING_3_GALLERY_GRID = [
   `${TOUR_SPRING_3}/pd.hero.grid.webp`,
   `${TOUR_SPRING_3}/pd.preface.grid.webp`,
   `${TOUR_SPRING_3}/pd.group.grid.webp`,
-  `${TOUR_SPRING_3}/pd.taiga.grid.webp`,
-  TOUR_SPRING_4_CLIP1_POSTER_WEBP,
+  `${TOUR_SPRING_3}/pd.clip3.grid.webm`,
+  TOUR_SPRING_4_CLIP1_GRID_WEBM,
   `${TOUR_SPRING_3}/pd.clip2.grid.webm`,
   `${TOUR_SPRING_3}/pd.ridge.grid.webp`,
   `${TOUR_SPRING_3}/pd.clip5.grid.webm`,
   `${TOUR_SPRING_3}/pd.summit.grid.webp`,
   `${TOUR_SPRING_3}/pd.clip4.grid.webm`,
   `${TOUR_SPRING_3}/pd.sea.grid.webp`,
-  `${TOUR_SPRING_3}/pd.clip3.grid.webm`,
+  `${TOUR_SPRING_3}/pd.taiga.grid.webp`,
   `${TOUR_SPRING_3}/pd.clip6.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip7.grid.webm`,
 ] as const;
@@ -363,27 +367,29 @@ export const TOUR_SPRING_3_GALLERY_GRID = [
 export const TOUR_SPRING_3_GROUP_IMAGE = TOUR_SPRING_3_GALLERY_GRID[2];
 
 export const TOUR_SPRING_3_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [TOUR_SPRING_3_GALLERY_GRID[3]]: `${TOUR_SPRING_3}/pd.clip3.poster.webp`,
+  [TOUR_SPRING_3_GALLERY_GRID[4]]: TOUR_SPRING_4_CLIP1_POSTER_WEBP,
   [TOUR_SPRING_3_GALLERY_GRID[5]]: `${TOUR_SPRING_3}/pd.clip2.poster.webp`,
   [TOUR_SPRING_3_GALLERY_GRID[7]]: `${TOUR_SPRING_3}/pd.clip5.poster.webp`,
   [TOUR_SPRING_3_GALLERY_GRID[9]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
-  [TOUR_SPRING_3_GALLERY_GRID[11]]: `${TOUR_SPRING_3}/pd.clip3.poster.webp`,
   [TOUR_SPRING_3_GALLERY_GRID[12]]: `${TOUR_SPRING_3}/pd.clip6.poster.webp`,
   [TOUR_SPRING_3_GALLERY_GRID[13]]: `${TOUR_SPRING_3}/pd.clip7.poster.webp`,
 };
 
-export const TOUR_SPRING_3_COVER_GRID = TOUR_SPRING_3_GALLERY_GRID[0];
+/** Карточка и hero страницы — кадр «О туре» (`pd.preface.grid`); `pd.hero.grid` остаётся в сетке как [0]. */
+export const TOUR_SPRING_3_COVER_GRID = TOUR_SPRING_3_GALLERY_GRID[1];
 export const TOUR_SPRING_3_COVER = TOUR_SPRING_3_COVER_GRID;
 
-/** Обложка карточки и первый кадр сетки — панорама (`ss.pan`). */
-export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/ss.pan.grid.webp` as const;
+/** Обложка карточки и hero — вершина (`ss.topping`); панорама `ss.pan` — фон блока «О туре» (второй кадр viewer). */
+export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/ss.topping.grid.webp` as const;
 
 /**
  * «Сестра» — полное качество (просмотрщик). Макет `sestra` (как «Пидан»): после hero/preface
- * group, taiga, clip1…clip6 и clip8 в слотах 2,3,5,6,7,9,10,11; фото — pan, topping между роликами (clip7 исключён).
+ * group, taiga, clip1…clip6 и clip8 в слотах 2,3,5,6,7,9,10,11; фото — topping, pan между роликами (clip7 исключён).
  */
 export const TOUR_SPRING_4_GALLERY_VIEWER = [
-  `${TOUR_SPRING_4}/ss.pan.webp`,
   `${TOUR_SPRING_4}/ss.topping.webp`,
+  `${TOUR_SPRING_4}/ss.pan.webp`,
   `${TOUR_SPRING_4}/ss.team.webp`,
   `${TOUR_SPRING_4}/ss.taiga.webp`,
   TOUR_SPRING_4_CLIP1_VIEWER_WEBM,
@@ -399,8 +405,8 @@ export const TOUR_SPRING_4_GALLERY_VIEWER = [
 
 /** Сетка «Сестра» (VP9 grid-webm для клипов; clip7 исключён из тура). */
 export const TOUR_SPRING_4_GALLERY_GRID = [
-  `${TOUR_SPRING_4}/ss.pan.grid.webp`,
   `${TOUR_SPRING_4}/ss.topping.grid.webp`,
+  `${TOUR_SPRING_4}/ss.pan.grid.webp`,
   `${TOUR_SPRING_4}/ss.team.grid.webp`,
   `${TOUR_SPRING_4}/ss.taiga.grid.webp`,
   TOUR_SPRING_4_CLIP1_GRID_WEBM,

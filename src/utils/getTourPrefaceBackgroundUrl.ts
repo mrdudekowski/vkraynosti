@@ -63,6 +63,13 @@ export const resolveTourHeroImageUrl = ({
   if (explicitMobileVariant != null) {
     return explicitMobileVariant;
   }
+  /**
+   * Каноническая обложка (`tour.imageUrl`) может не совпадать с `gridGalleryUrls[0]` (например «Пидан»:
+   * hero — `pd.preface.grid`, первый кадр сетки — `pd.hero.grid`). На мобильных нельзя подменять её на [0].
+   */
+  if (!isVideoAssetUrl(tour.imageUrl)) {
+    return tour.imageUrl;
+  }
   const gridHeroCandidate = gridGalleryUrls[0];
   if (gridHeroCandidate != null && !isVideoAssetUrl(gridHeroCandidate)) {
     return TOUR_MOBILE_IMAGE_VARIANTS[gridHeroCandidate] ?? gridHeroCandidate;

@@ -32,6 +32,12 @@ import {
   MODAL_CHUNK_LOADER_DURATION_MS,
   MODAL_CHUNK_LOADER_STAGGER_MS,
 } from './src/constants/modalLazyChunkLoaderAnimation'
+import { GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS } from './src/constants/galleryGridVideoLoop'
+import {
+  TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
+  TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
+  TOUR_SPRING_3_COVER_OBJECT_POSITION_LT620,
+} from './src/constants/tourSpring3CoverCrop'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -304,7 +310,20 @@ const config: Config = {
     'bg-home-season-banner-stage',
     'from-home-season-strip-btn-from',
     'to-home-season-strip-btn-to',
-    { pattern: /^object-tour-detail-hero-desktop(-winter-[34])?$/, variants: ['lg'] },
+    {
+      pattern: /^object-tour-detail-hero-desktop(-winter-[34])?$/,
+      variants: ['lg'],
+    },
+    'object-tour-detail-hero-spring-3-tight',
+    'object-tour-detail-hero-spring-3-wide',
+    'object-tour-detail-hero-desktop-spring-3-wide',
+    'object-tour-card-cover-spring-3-tight',
+    'object-tour-card-cover-spring-3-wide',
+    'object-tour-card-cover-desktop-spring-3-wide',
+    'min-[620px]:object-tour-detail-hero-spring-3-wide',
+    'min-[620px]:object-tour-card-cover-spring-3-wide',
+    'lg:object-tour-detail-hero-desktop-spring-3-wide',
+    'lg:object-tour-card-cover-desktop-spring-3-wide',
     'object-gallery-winter-4-gora',
     'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
@@ -627,6 +646,15 @@ const config: Config = {
         /** Хаски-тур (winter-4): чуть ниже дефолтного hero, без обрезки голов (см. `tour-detail-hero-desktop`). */
         'tour-detail-hero-desktop-winter-4': 'center 58%',
         /**
+         * Пидан (spring-3): preface — брейкпоинт `620px` см. `TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX`.
+         */
+        'tour-detail-hero-spring-3-tight': TOUR_SPRING_3_COVER_OBJECT_POSITION_LT620,
+        'tour-detail-hero-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
+        'tour-detail-hero-desktop-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
+        'tour-card-cover-spring-3-tight': TOUR_SPRING_3_COVER_OBJECT_POSITION_LT620,
+        'tour-card-cover-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
+        'tour-card-cover-desktop-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
+        /**
          * Аскольд (spring-10): `view2` / `view3` в вертикальной плитке 1×2 — центр кадра при `object-cover`.
          */
         'gallery-spring-10-tall-panorama': 'center center',
@@ -903,6 +931,9 @@ const config: Config = {
         'home-gate-return-veil': '84',
         /** Кнопка «к hero» на стартовом экране — над баннером (`z-home-season-banner` ниже). */
         'home-gate-scroll-hint': '25',
+        /** Стек двух `<video>` в `GalleryGridVideo` (seamless loop): нижний кадр под верхним. */
+        'gallery-grid-video-loop-under': '1',
+        'gallery-grid-video-loop-over': '2',
       },
       transitionDuration: {
         'carousel':      '600ms',
@@ -931,6 +962,8 @@ const config: Config = {
         'tour-included-description-fade': TOUR_INCLUDED_DESCRIPTION_FADE,
         /** Crossfade соседних полосок медиа (out+in одновременно); синхронно с `HOME_SEASON_BANNER_CROSSFADE_MS`. */
         'home-season-banner-crossfade': `${HOME_SEASON_BANNER_CROSSFADE_MS}ms`,
+        /** Зацикливание сеточного видео (`GalleryGridVideo`); синхронно с `GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS`. */
+        'gallery-grid-video-loop-crossfade': `${GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS}ms`,
         /** Fade in полоски видео; синхронно с `HOME_SEASON_BANNER_STRIP_FADE_IN_MS`. */
         'home-season-banner-strip-in': `${HOME_SEASON_BANNER_STRIP_FADE_IN_MS}ms`,
         /** Синхронный fade-out всех букв слова; синхронно с `HOME_SEASON_BANNER_LETTER_EXIT_MS`. */

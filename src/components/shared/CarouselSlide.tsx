@@ -8,6 +8,8 @@ interface CarouselSlideProps {
   isActive: boolean;
   /** Фон подгружается для активного слайда и для уже посещённых (родитель хранит множество индексов). */
   shouldLoadBackground: boolean;
+  /** `background-position` при `background-size: cover` (см. `theme.extend.objectPosition`). */
+  backgroundPosition?: string;
   children: ReactNode;
 }
 
@@ -15,6 +17,7 @@ const CarouselSlide = ({
   backgroundUrl,
   isActive,
   shouldLoadBackground,
+  backgroundPosition = 'center',
   children,
 }: CarouselSlideProps) => {
   const activeSlideProps =
@@ -34,7 +37,7 @@ const CarouselSlide = ({
           ? {
               backgroundImage: `url(${backgroundUrl})`,
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              backgroundPosition,
               backgroundRepeat: 'no-repeat',
             }
           : undefined

@@ -24,6 +24,7 @@ import {
   getHomeSeasonBannerSpringVideoPreloadLinks,
   getHomeSeasonBannerWinterVideoPreloadLinks,
 } from '../constants/homeSeasonBannerVideoPreload';
+import { TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS } from '../constants/tourSpring3CoverCrop';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { getToursBySeason } from '../data/toursData';
@@ -31,7 +32,6 @@ import { useSeason } from '../context/useSeason';
 import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
 import { useHomeSkyParallax } from '../hooks/useHomeSkyParallax';
-import { SEASON_ORDER } from '../constants/seasonNavbarAppearance';
 import { BREAKPOINT_MD_PX, NAVBAR_SCROLL_OFFSET_PX } from '../constants/smoothScroll';
 import type { Season } from '../types';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
@@ -52,7 +52,7 @@ type HomeToursGridPhase = 'idle' | 'fadingOut' | 'preFadeIn' | 'fadingIn';
 const Home = () => {
   const location = useLocation();
   const lenis = useLenis();
-  const { activeSeason, setActiveSeason } = useSeason();
+  const { activeSeason } = useSeason();
   const tours = useMemo(() => getToursBySeason(activeSeason), [activeSeason]);
   const springTours = useMemo(() => getToursBySeason('spring'), []);
   const [expandedSeason, setExpandedSeason] = useState<Season | null>(null);
@@ -69,9 +69,6 @@ const Home = () => {
   const toursHeadingWrapRef = useRef<HTMLDivElement | null>(null);
   const [gateStageFocused, setGateStageFocused] = useState(false);
   const [expandCardVideoInView, setExpandCardVideoInView] = useState(
-    () => typeof IntersectionObserver === 'undefined'
-  );
-  const [expandCardVideoActive, setExpandCardVideoActive] = useState(
     () => typeof IntersectionObserver === 'undefined'
   );
   const isPageVisible = useDocumentVisibility();
@@ -162,13 +159,6 @@ const Home = () => {
     activeSeasonPromoVideoCount > 0 ? activeSeasonPromoVideoUrls[normalizedPromoVideoIndex] : null;
   const hasHiddenTours = tours.length > HOME_TOURS_PREVIEW_LIMIT;
   const shouldRenderExpandCard = hasHiddenTours;
-  const activeSeasonIndex = SEASON_ORDER.indexOf(activeSeason);
-  const nextSeason = SEASON_ORDER[(activeSeasonIndex + 1) % SEASON_ORDER.length];
-  const nextSeasonTours = useMemo(() => getToursBySeason(nextSeason), [nextSeason]);
-  const nextSeasonLeadTour = nextSeasonTours[0];
-  const gridItemsBeforeShadowCard = visibleTours.length + (shouldRenderExpandCard ? 1 : 0);
-  const shouldRenderNextSeasonShadowCard =
-    isAllToursExpanded && gridItemsBeforeShadowCard % 4 === 3 && nextSeasonLeadTour != null;
 
   const toggleToursVisibility = () => {
     if (gridPhase !== 'idle') return;
@@ -176,14 +166,6 @@ const Home = () => {
     shouldScrollAfterCollapseRef.current = isAllToursExpanded;
     setPendingExpandedSeason(nextExpandedSeason);
     setGridPhase('fadingOut');
-  };
-
-  const switchToNextSeason = () => {
-    setActiveSeason(nextSeason);
-    setExpandedSeason(null);
-    setPendingExpandedSeason(null);
-    shouldScrollAfterCollapseRef.current = false;
-    setGridPhase('idle');
   };
 
   const snapToCollapseTarget = useCallback(() => {
@@ -206,7 +188,9 @@ const Home = () => {
     const el = expandCardMediaViewportRef.current;
     if (el == null) return;
     if (typeof IntersectionObserver === 'undefined') {
-      setExpandCardVideoInView(true);
+      queueMicrotask(() => {
+        setExpandCardVideoInView(true);
+      });
       return;
     }
     const observer = new IntersectionObserver(
@@ -221,23 +205,6 @@ const Home = () => {
     observer.observe(el);
     return () => observer.disconnect();
   }, [expandCardVideoInView]);
-
-  useEffect(() => {
-    const el = expandCardMediaViewportRef.current;
-    if (el == null) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      setExpandCardVideoActive(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      entries => {
-        setExpandCardVideoActive(entries[0]?.isIntersecting === true);
-      },
-      { root: null, rootMargin: '100px 0px', threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     if (activeSeasonPromoVideoUrls.length <= 1) return;
@@ -272,8 +239,7 @@ const Home = () => {
 
   useEffect(() => {
     if (gridPhase !== 'fadingIn') return;
-    const renderedGridItemsCount =
-      visibleTours.length + (shouldRenderExpandCard ? 1 : 0) + (shouldRenderNextSeasonShadowCard ? 1 : 0);
+    const renderedGridItemsCount = visibleTours.length + (shouldRenderExpandCard ? 1 : 0);
     const cascadeDurationMs =
       GRID_REVEAL_DURATION_MS + Math.max(renderedGridItemsCount - 1, 0) * GRID_CASCADE_STEP_MS;
     const timeoutId = window.setTimeout(() => {
@@ -285,7 +251,6 @@ const Home = () => {
   }, [
     gridPhase,
     shouldRenderExpandCard,
-    shouldRenderNextSeasonShadowCard,
     visibleTours.length,
   ]);
 
@@ -393,7 +358,7 @@ const Home = () => {
                         {activeSeasonLeadTour != null ? (
                           <div className="absolute inset-0" aria-hidden>
                             <div ref={expandCardMediaViewportRef} className="h-full w-full">
-                            {activeSeasonPromoVideoUrl != null && expandCardVideoInView && expandCardVideoActive && isPageVisible ? (
+                            {activeSeasonPromoVideoUrl != null && expandCardVideoInView && isPageVisible ? (
                               <CrossfadeVideo
                                 src={activeSeasonPromoVideoUrl}
                                 poster={activeSeasonLeadTour.imageUrl}
@@ -404,6 +369,11 @@ const Home = () => {
                                 src={activeSeasonLeadTour.imageUrl}
                                 alt={`${UI.tourCard.nextSeasonCloneImageAltPrefix}: ${UI.sections.toursTitleBySeason[activeSeason]}`}
                                 className="h-full w-full opacity-50"
+                                imgClassName={
+                                  activeSeasonLeadTour.id === 'spring-3'
+                                    ? TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS
+                                    : undefined
+                                }
                                 loading="lazy"
                               />
                             )}
@@ -420,40 +390,6 @@ const Home = () => {
                           </span>
                           <span className="font-body text-sm text-text-inverse/90">
                             {UI.sections.toursTitleBySeason[activeSeason]}
-                          </span>
-                        </div>
-                      </button>
-                    </div>
-                  ) : null}
-                  {shouldRenderNextSeasonShadowCard ? (
-                    <div
-                      key={`next-season-clone-${gridAnimationCycle}`}
-                      className={
-                        getGridItemAnimation(visibleTours.length + (shouldRenderExpandCard ? 1 : 0)).className
-                      }
-                      style={getGridItemAnimation(visibleTours.length + (shouldRenderExpandCard ? 1 : 0)).style}
-                    >
-                      <button
-                        type="button"
-                        onClick={switchToNextSeason}
-                        className="card-base relative flex h-full w-full max-h-tour-card max-w-tour-card justify-self-center flex-col overflow-hidden border-dashed border-brand-secondary/50 bg-surface-light/70 text-center opacity-80 shadow-none transition-all duration-300 hover:opacity-100 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
-                        aria-label={UI.tourCard.nextSeasonCloneCta}
-                      >
-                        <div className="relative h-48 w-full overflow-hidden rounded-t-card">
-                          <PlaceholderImage
-                            src={nextSeasonLeadTour.imageUrl}
-                            alt={`${UI.tourCard.nextSeasonCloneImageAltPrefix}: ${UI.seasons[nextSeason].label}`}
-                            className="h-full w-full"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-surface-dark/60" aria-hidden />
-                        </div>
-                        <div className="relative z-10 flex w-full flex-col items-center gap-2 p-card-p">
-                          <span className="font-heading text-card text-text-inverse">
-                            {UI.tourCard.nextSeasonCloneCta}
-                          </span>
-                          <span className="font-body text-sm text-text-inverse/90">
-                            {UI.seasons[nextSeason].label}
                           </span>
                         </div>
                       </button>

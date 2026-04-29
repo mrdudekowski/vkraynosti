@@ -9,25 +9,13 @@ import {
   buildHomeSectionPath,
   buildTourDetailPath,
 } from "../constants/routes";
+import { TOUR_WINTER_3_PREFACE_BACKGROUND } from "../constants/images";
+import { getTourGridVideoPosterGetter } from "../constants/tourGridVideoPosterResolver";
 import {
-  TOUR_SPRING_2_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_3_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_4_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_5_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_6_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_6_GRID_VIDEO_POSTERS_MOBILE,
-  TOUR_SPRING_7_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_8_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_9_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_9_GRID_VIDEO_POSTERS_MOBILE,
-  TOUR_SPRING_10_GRID_VIDEO_POSTERS,
-  TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE,
-  TOUR_WINTER_3_GRID_VIDEO_POSTERS,
-  TOUR_WINTER_3_PREFACE_BACKGROUND,
-  TOUR_WINTER_4_GRID_VIDEO_POSTERS,
-  TOUR_WINTER_4_GRID_VIDEO_POSTERS_MOBILE,
-  TOUR_WINTER_5_GRID_VIDEO_POSTERS,
-} from "../constants/images";
+  getTourGalleryLayoutVariant,
+  type TourGalleryLayoutVariant,
+} from "../constants/tourGalleryLayoutVariant";
+import { TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring3CoverCrop";
 import { UI } from "../constants/ui";
 import {
   getTourGalleryGridUrls,
@@ -36,9 +24,7 @@ import {
 import { splitTourDescription } from "../utils/splitTourDescription";
 import PageMeta from "../components/shared/PageMeta";
 import TourDetailHero from "../components/tours/TourDetailHero";
-import TourDetailGallery, {
-  type TourGalleryLayoutVariant,
-} from "../components/tours/TourDetailGallery";
+import TourDetailGallery from "../components/tours/TourDetailGallery";
 import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
 import TourDetailSectionHeading from "../components/tours/TourDetailSectionHeading";
 import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
@@ -110,57 +96,14 @@ const TourDetailPage = () => {
     });
   }, [gridGalleryUrls, isLgOrAbove, tour]);
 
-  const getVideoPosterForGridSrc = useMemo(():
-    | ((src: string) => string | undefined)
-    | undefined => {
-    if (!tour) return undefined;
-    if (tour.id === "winter-3")
-      return (src) => TOUR_WINTER_3_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "winter-4")
-      return (src) =>
-        isLgOrAbove ? TOUR_WINTER_4_GRID_VIDEO_POSTERS[src] : TOUR_WINTER_4_GRID_VIDEO_POSTERS_MOBILE[src];
-    if (tour.id === "winter-5")
-      return (src) => TOUR_WINTER_5_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "spring-2")
-      return (src) => TOUR_SPRING_2_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "spring-3")
-      return (src) => TOUR_SPRING_3_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "spring-4")
-      return (src) => TOUR_SPRING_4_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "spring-5")
-      return (src) => TOUR_SPRING_5_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "spring-6")
-      return (src) =>
-        isLgOrAbove ? TOUR_SPRING_6_GRID_VIDEO_POSTERS[src] : TOUR_SPRING_6_GRID_VIDEO_POSTERS_MOBILE[src];
-    if (tour.id === "spring-7")
-      return (src) => TOUR_SPRING_7_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "spring-8")
-      return (src) => TOUR_SPRING_8_GRID_VIDEO_POSTERS[src];
-    if (tour.id === "spring-9")
-      return (src) =>
-        isLgOrAbove ? TOUR_SPRING_9_GRID_VIDEO_POSTERS[src] : TOUR_SPRING_9_GRID_VIDEO_POSTERS_MOBILE[src];
-    if (tour.id === "spring-10")
-      return (src) =>
-        isLgOrAbove
-          ? TOUR_SPRING_10_GRID_VIDEO_POSTERS[src]
-          : TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE[src];
-    return undefined;
+  const getVideoPosterForGridSrc = useMemo(() => {
+    if (tour == null) return undefined;
+    return getTourGridVideoPosterGetter(tour.id, isLgOrAbove);
   }, [isLgOrAbove, tour]);
 
   const galleryLayoutVariant = useMemo((): TourGalleryLayoutVariant => {
-    if (!tour) return "default";
-    if (tour.id === "winter-1") return "izubrinaya";
-    if (tour.id === "winter-5") return "arsgora";
-    if (tour.id === "spring-1") return "lysy-ded";
-    if (tour.id === "spring-2") return "olkhovaya";
-    if (tour.id === "spring-3") return "pidan";
-    if (tour.id === "spring-4") return "sestra";
-    if (tour.id === "spring-5" || tour.id === "spring-6") return "chitinza";
-    if (tour.id === "spring-7") return "dardanelles";
-    if (tour.id === "spring-8") return "falaza";
-    if (tour.id === "spring-9") return "vorobey-winery";
-    if (tour.id === "spring-10") return "askold";
-    return "default";
+    if (tour == null) return "default";
+    return getTourGalleryLayoutVariant(tour.id);
   }, [tour]);
 
   const handleOpenTourRequest = useCallback(() => {
@@ -246,7 +189,7 @@ const TourDetailPage = () => {
       <PageMeta
         title={`${tour.title} | Вкрайности`}
         description={`${tour.subtitle}. ${tour.duration}, ${tour.price}. ${metaSnippet}.`}
-        imageUrl={viewerGalleryUrls[0] ?? tour.imageUrl}
+        imageUrl={heroImageUrl}
         path={buildTourDetailPath(tour.season, tour.id)}
       />
       <TourDetailHero
@@ -257,6 +200,9 @@ const TourDetailPage = () => {
         subtitle={tour.subtitle}
         backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
         backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
+        heroImageObjectClassName={
+          tour.id === 'spring-3' ? TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS : undefined
+        }
         desktopHeroImgClassName={
           tour.id === 'winter-3'
             ? 'lg:object-tour-detail-hero-desktop-winter-3'

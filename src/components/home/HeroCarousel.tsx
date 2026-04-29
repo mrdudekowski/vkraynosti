@@ -9,6 +9,12 @@ import CarouselSlide from '../shared/CarouselSlide';
 import { UI } from '../../constants/ui';
 import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { buildTourDetailPath } from '../../constants/routes';
+import { BREAKPOINT_LG_PX } from '../../constants/reveal';
+import {
+  resolveTourSpring3CoverBackgroundPosition,
+  TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX,
+} from '../../constants/tourSpring3CoverCrop';
+import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
 import { getToursBySeason } from '../../data/toursData';
 import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
@@ -43,6 +49,8 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
     total: tours.length,
     autoplayMs: UI.hero.autoplayIntervalMs,
   });
+  const spring3GteLayoutMin = useMatchMinWidth(TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX);
+  const spring3Lg = useMatchMinWidth(BREAKPOINT_LG_PX);
 
   return (
     <>
@@ -55,6 +63,11 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             backgroundUrl={tour.imageUrl}
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
+            backgroundPosition={
+              tour.id === 'spring-3'
+                ? resolveTourSpring3CoverBackgroundPosition(spring3GteLayoutMin, spring3Lg)
+                : undefined
+            }
           >
             <div className="flex w-full max-w-home-hero-phrase mx-auto justify-center px-home-hero-carousel-text-gutter-x pb-24 md:px-4">
               <Link

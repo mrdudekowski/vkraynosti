@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  TOUR_SPRING_3_COVER,
+  TOUR_SPRING_3_GALLERY_GRID,
   TOUR_SPRING_10_COVER_GRID,
   TOUR_SPRING_10_COVER_MOBILE,
   TOUR_SPRING_10_PREFACE_BACKGROUND,
@@ -79,5 +81,20 @@ describe('resolveTourHeroImageUrl', () => {
       isLgOrAbove: false,
     });
     expect(value).toBe(TOUR_SPRING_10_COVER_MOBILE);
+  });
+
+  it('keeps tour.imageUrl on mobile when it differs from gridGalleryUrls[0] (spring-3 hero)', () => {
+    const tour = {
+      ...buildTour(),
+      id: 'spring-3',
+      imageUrl: TOUR_SPRING_3_COVER,
+    };
+    const value = resolveTourHeroImageUrl({
+      tour,
+      gridGalleryUrls: [...TOUR_SPRING_3_GALLERY_GRID],
+      isLgOrAbove: false,
+    });
+    expect(value).toBe(TOUR_SPRING_3_COVER);
+    expect(value).not.toBe(TOUR_SPRING_3_GALLERY_GRID[0]);
   });
 });

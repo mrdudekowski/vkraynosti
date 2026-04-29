@@ -1,6 +1,7 @@
-# Перекодировать «Сестра» ss.clip3 и ss.clip5 из исходных MOV (как `encode-sestra-tour-movs.ps1`).
+# Перекодировать «Сестра» ss.clip1, ss.clip3 и ss.clip5 из исходных MOV (как `encode-sestra-tour-movs.ps1`).
 # - Full: полная длина (восстановить «оригинал» в public после экспериментов с обрезкой в плеере).
-# - Trim: обрезка вступления на диске (clip3 с 4 с, clip5 с 4.2 с), те же имена файлов — нативный loop без seek в React.
+# - Trim: обрезка вступления на диске (clip1 с 2 с, clip3 с 4 с, clip5 с 4.2 с), те же имена файлов — нативный loop без seek в React.
+#   clip1.grid — плитка в галерее «Пидан» (spring-3) и в туре «Сестра».
 #
 # Usage:
 #   .\scripts\trim-sestra-clip3-clip5-from-mov.ps1 -Mode Full
@@ -66,20 +67,23 @@ function Encode-OneClip {
   Invoke-Ffmpeg @('-y', '-i', $grid, '-vframes', '1', '-q:v', '80', $poster)
 }
 
-# clip3 = MOV [2], clip5 = MOV [4]
+# clip1 = MOV [0], clip3 = MOV [2], clip5 = MOV [4]
+$p1 = Join-Path $SourceDir $orderedMovNames[0]
 $p3 = Join-Path $SourceDir $orderedMovNames[2]
 $p5 = Join-Path $SourceDir $orderedMovNames[4]
-foreach ($p in @($p3, $p5)) {
+foreach ($p in @($p1, $p3, $p5)) {
   if (-not (Test-Path -LiteralPath $p)) { throw "Missing: $p" }
 }
 
 if ($Mode -eq 'Full') {
+  Encode-OneClip -ClipNumber 1 -MovPath $p1 -SeekSeconds $null
   Encode-OneClip -ClipNumber 3 -MovPath $p3 -SeekSeconds $null
   Encode-OneClip -ClipNumber 5 -MovPath $p5 -SeekSeconds $null
 }
 else {
+  Encode-OneClip -ClipNumber 1 -MovPath $p1 -SeekSeconds 2
   Encode-OneClip -ClipNumber 3 -MovPath $p3 -SeekSeconds 4
   Encode-OneClip -ClipNumber 5 -MovPath $p5 -SeekSeconds 4.2
 }
 
-Write-Host "Done ($Mode): $($tourDir.Path) — ss.clip3, ss.clip5 (viewer + grid + poster)"
+Write-Host "Done ($Mode): $($tourDir.Path) — ss.clip1, ss.clip3, ss.clip5 (viewer + grid + poster)"

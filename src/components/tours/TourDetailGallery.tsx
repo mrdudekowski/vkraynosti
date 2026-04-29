@@ -22,20 +22,19 @@ import {
   TOUR_SPRING_10_VIEW3_GRID,
 } from '../../constants/images';
 import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';
+import type { TourGalleryLayoutVariant } from '../../constants/tourGalleryLayoutVariant';
+import {
+  GALLERY_GRID_BENTO_LEFT_BOTTOM_SQUARE,
+  GALLERY_GRID_BENTO_LEFT_TOP_SQUARE,
+  GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE,
+  GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE,
+  GALLERY_GRID_BENTO_TALL_LEFT,
+  GALLERY_GRID_BENTO_TALL_RIGHT,
+  GALLERY_GRID_FULL_WIDTH_SQUARE,
+  GALLERY_GRID_SQUARE_TILE,
+} from '../../constants/tourDetailGalleryGridClasses';
 
-export type TourGalleryLayoutVariant =
-  | 'default'
-  | 'izubrinaya'
-  | 'arsgora'
-  | 'lysy-ded'
-  | 'olkhovaya'
-  | 'pidan'
-  | 'sestra'
-  | 'chitinza'
-  | 'falaza'
-  | 'vorobey-winery'
-  | 'dardanelles'
-  | 'askold';
+export type { TourGalleryLayoutVariant } from '../../constants/tourGalleryLayoutVariant';
 
 export interface TourDetailGalleryProps {
   /** Кадры для сетки (без главного фото hero страницы). */
@@ -283,21 +282,17 @@ const TourDetailGalleryComponent = ({
    * Ровно 6 URL после `slice(2)` в `TourDetailPage`: lift, doggie, clip1, clip2, trans-tail, team.
    */
   if (layoutVariant === 'arsgora' && images.length === 6) {
-    const arsgoraBentoTallTile =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const arsgoraBentoTallTileRight =
-      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
     return (
       <div className="flex flex-col gap-gallery-gap">
         {renderTileButton(images[0], 0, 'aspect-gallery-portrait w-full')}
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[1], 1, arsgoraBentoTallTile)}
-          {renderTileButton(images[2], 2, arsgoraBentoTallTileRight)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[3], 3, arsgoraBentoTallTile)}
-          {renderTileButton(images[4], 4, 'col-start-2 row-start-1 aspect-square w-full')}
-          {renderTileButton(images[5], 5, 'col-start-2 row-start-2 aspect-square w-full')}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
       </div>
     );
@@ -310,13 +305,9 @@ const TourDetailGalleryComponent = ({
 
         {images.length >= 4 && (
           <div className="grid grid-cols-2 gap-gallery-gap">
-            {renderTileButton(
-              images[1],
-              1,
-              'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full'
-            )}
-            {renderTileButton(images[2], 2, 'col-start-2 row-start-1 aspect-square w-full')}
-            {renderTileButton(images[3], 3, 'col-start-2 row-start-2 aspect-square w-full')}
+            {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_TALL_LEFT)}
+            {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+            {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
           </div>
         )}
 
@@ -341,19 +332,17 @@ const TourDetailGalleryComponent = ({
    * Порядок: descent, ridge, summit, approach (`galleryGridUrls.slice(2)`).
    */
   if (layoutVariant === 'lysy-ded' && images.length === 4) {
-    const lysyBlockTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
-    const lysyTileOneByOne = 'aspect-square w-full min-w-0';
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, lysyBlockTwoByTwo)}
+          {renderTileButton(images[0], 0, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[1], 1, lysyTileOneByOne)}
-          {renderTileButton(images[2], 2, lysyTileOneByOne)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_SQUARE_TILE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[3], 3, lysyBlockTwoByTwo)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
       </div>
     );
@@ -368,106 +357,103 @@ const TourDetailGalleryComponent = ({
     images.length === 4 &&
     images[0] === TOUR_SPRING_2_LAKE1_IMAGE
   ) {
-    const olkhLakeTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
-    const olkhRidgeTallLeft =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, olkhLakeTwoByTwo)}
+          {renderTileButton(images[0], 0, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[1], 1, olkhRidgeTallLeft)}
-          {renderTileButton(images[2], 2, 'col-start-2 row-start-1 aspect-square w-full min-h-0')}
-          {renderTileButton(images[3], 3, 'col-start-2 row-start-2 aspect-square w-full min-h-0')}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
       </div>
     );
   }
 
   /**
-   * Пидан (spring-3): чередование 2×2 и bento 1×2 + два квадрата справа.
-   * Сверху — bento clip5 \| вершина \| clip4; групповое фото 2×2 — после гребня; внизу bento clip3 \| clip6 \| clip7.
-   * Порядок `slice(2)`: group, taiga, clip1_poster (файл в `tours/spring-4/`), clip2, ridge, clip5, summit, clip4, sea, clip3, clip6, clip7.
+   * Пидан (spring-3): открывающий `clip3` — полноширинный 2×2; под ним два столбца на 2 ряда — `clip5|summit` (тайга в макете не показываем);
+   * затем `clip1` 2×2; море 2×2; `clip6|clip7`; внизу bento `clip2|ridge|group` (слева `clip2` на 2 ряда, справа гребень и группа) (`clip4` не показываем).
+   * Порядок `slice(2)`: group, clip3, clip1_sister, clip2, ridge, clip5, summit, clip4, sea, taiga, clip6, clip7.
    */
   if (
     layoutVariant === 'pidan' &&
     images.length === 12 &&
     images[0] === TOUR_SPRING_3_GROUP_IMAGE
   ) {
-    const pidanTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
-    const pidanTallLeft =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const pidanRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
-    const pidanRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
-
     const pidanFullWidthSquare = (sliceIndex: number) => (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-        {renderTileButton(images[sliceIndex], sliceIndex, pidanTwoByTwo)}
+        {renderTileButton(images[sliceIndex], sliceIndex, GALLERY_GRID_FULL_WIDTH_SQUARE)}
       </div>
     );
 
     const pidanBentoRow = (left: number, rightTop: number, rightBottom: number) => (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-        {renderTileButton(images[left], left, pidanTallLeft)}
-        {renderTileButton(images[rightTop], rightTop, pidanRightTop)}
-        {renderTileButton(images[rightBottom], rightBottom, pidanRightBot)}
+        {renderTileButton(images[left], left, GALLERY_GRID_BENTO_TALL_LEFT)}
+        {renderTileButton(images[rightTop], rightTop, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+        {renderTileButton(images[rightBottom], rightBottom, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+      </div>
+    );
+
+    const pidanClip5SummitTwoTallColumns = (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_LEFT)}
+        {renderTileButton(images[6], 6, GALLERY_GRID_BENTO_TALL_RIGHT)}
+      </div>
+    );
+
+    const pidanClosingVideosRow = (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[10], 10, GALLERY_GRID_SQUARE_TILE)}
+        {renderTileButton(images[11], 11, GALLERY_GRID_SQUARE_TILE)}
       </div>
     );
 
     return (
       <div className="flex flex-col gap-gallery-gap">
-        {pidanBentoRow(5, 6, 7)}
-        {pidanBentoRow(1, 2, 3)}
-        {pidanFullWidthSquare(4)}
-        {pidanFullWidthSquare(0)}
+        {pidanFullWidthSquare(1)}
+        {pidanClip5SummitTwoTallColumns}
+        {pidanFullWidthSquare(2)}
         {pidanFullWidthSquare(8)}
-        {pidanBentoRow(9, 10, 11)}
+        {pidanClosingVideosRow}
+        {pidanBentoRow(3, 4, 0)}
       </div>
     );
   }
 
   /**
-   * Сестра (spring-4): как «Пидан» (`pidan`), другой якорный URL группового кадра; без clip7 (11 кадров после preface).
-   * Порядок `slice(2)`: group, taiga, clip1…clip6, clip8; фото — pan, topping; нижний ряд — clip6 и clip8 по высоте bento.
+   * Сестра (spring-4): `clip5` (2×2); bento clip3|clip2|team; bento clip1|pan|clip8;
+   * `clip4` 2×2 на всю ширину; ряд clip6 (высокий слева) | taiga и topping по 1×1 справа вертикально.
    */
   if (
     layoutVariant === 'sestra' &&
     images.length === 11 &&
     images[0] === TOUR_SPRING_4_GROUP_IMAGE
   ) {
-    const sestraTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
-    const sestraTallLeft =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const sestraTallRight =
-      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const sestraRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
-    const sestraRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
-
-    const sestraFullWidthSquare = (sliceIndex: number) => (
-      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-        {renderTileButton(images[sliceIndex], sliceIndex, sestraTwoByTwo)}
-      </div>
-    );
-
+    const sestraClipWideTwoByTwo =
+      'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0';
     const sestraBentoRow = (left: number, rightTop: number, rightBottom: number) => (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-        {renderTileButton(images[left], left, sestraTallLeft)}
-        {renderTileButton(images[rightTop], rightTop, sestraRightTop)}
-        {renderTileButton(images[rightBottom], rightBottom, sestraRightBot)}
+        {renderTileButton(images[left], left, GALLERY_GRID_BENTO_TALL_LEFT)}
+        {renderTileButton(images[rightTop], rightTop, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+        {renderTileButton(images[rightBottom], rightBottom, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
       </div>
     );
 
     return (
       <div className="flex flex-col gap-gallery-gap">
-        {sestraBentoRow(5, 6, 7)}
-        {sestraBentoRow(1, 2, 3)}
-        {sestraFullWidthSquare(4)}
-        {sestraFullWidthSquare(0)}
-        {sestraFullWidthSquare(8)}
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[9], 9, sestraTallLeft)}
-          {renderTileButton(images[10], 10, sestraTallRight)}
+          {renderTileButton(images[7], 7, sestraClipWideTwoByTwo)}
+        </div>
+        {sestraBentoRow(5, 3, 0)}
+        {sestraBentoRow(2, 4, 10)}
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[6], 6, sestraClipWideTwoByTwo)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[9], 9, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[8], 8, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
       </div>
     );
@@ -483,25 +469,17 @@ const TourDetailGalleryComponent = ({
     images.length === 11 &&
     (images[0] === TOUR_SPRING_5_GROUP_IMAGE || images[0] === TOUR_SPRING_6_GROUP_IMAGE)
   ) {
-    const chitinzaTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
-    const chitinzaTallLeft =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const chitinzaTallRight =
-      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const chitinzaRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
-    const chitinzaRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
-
     const chitinzaFullWidthSquare = (sliceIndex: number) => (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-        {renderTileButton(images[sliceIndex], sliceIndex, chitinzaTwoByTwo)}
+        {renderTileButton(images[sliceIndex], sliceIndex, GALLERY_GRID_FULL_WIDTH_SQUARE)}
       </div>
     );
 
     const chitinzaBentoRow = (left: number, rightTop: number, rightBottom: number) => (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-        {renderTileButton(images[left], left, chitinzaTallLeft)}
-        {renderTileButton(images[rightTop], rightTop, chitinzaRightTop)}
-        {renderTileButton(images[rightBottom], rightBottom, chitinzaRightBot)}
+        {renderTileButton(images[left], left, GALLERY_GRID_BENTO_TALL_LEFT)}
+        {renderTileButton(images[rightTop], rightTop, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+        {renderTileButton(images[rightBottom], rightBottom, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
       </div>
     );
 
@@ -513,8 +491,8 @@ const TourDetailGalleryComponent = ({
         {chitinzaFullWidthSquare(0)}
         {chitinzaFullWidthSquare(8)}
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[9], 9, chitinzaTallLeft)}
-          {renderTileButton(images[10], 10, chitinzaTallRight)}
+          {renderTileButton(images[9], 9, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[10], 10, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
       </div>
     );
@@ -530,14 +508,6 @@ const TourDetailGalleryComponent = ({
    * Порядок `slice(2)`: intro, clip2, clip4, clip5, clip6, beacon, rock, view2, view3.
    */
   if (layoutVariant === 'askold' && images.length === 9) {
-    const askoldPairTallLeft =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const askoldPairTallRight =
-      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const askoldRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
-    const askoldRightBottom = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
-    const askoldLeftTop = 'col-start-1 row-start-1 aspect-square w-full min-h-0';
-    const askoldLeftBottom = 'col-start-1 row-start-2 aspect-square w-full min-h-0';
     const askoldClip6WideTwoByTwo =
       'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0';
     return (
@@ -546,14 +516,14 @@ const TourDetailGalleryComponent = ({
           {renderTileButton(images[4], 4, askoldClip6WideTwoByTwo)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, askoldPairTallLeft)}
-          {renderTileButton(images[6], 6, askoldRightTop)}
-          {renderTileButton(images[3], 3, askoldRightBottom)}
+          {renderTileButton(images[0], 0, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[6], 6, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[2], 2, askoldLeftTop)}
-          {renderTileButton(images[7], 7, askoldLeftBottom)}
-          {renderTileButton(images[5], 5, askoldPairTallRight)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_LEFT_TOP_SQUARE)}
+          {renderTileButton(images[7], 7, GALLERY_GRID_BENTO_LEFT_BOTTOM_SQUARE)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[8], 8, askoldClip6WideTwoByTwo)}
@@ -568,22 +538,18 @@ const TourDetailGalleryComponent = ({
    * Порядок `slice(2)`: top, view2, clip1, top2, love_actually.
    */
   if (layoutVariant === 'falaza' && images.length === 5) {
-    const falazaTwoByTwo = 'col-span-2 aspect-square w-full min-w-0';
-    const falazaTallLeft = 'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const falazaRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
-    const falazaRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, falazaTwoByTwo)}
+          {renderTileButton(images[0], 0, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[2], 2, falazaTallLeft)}
-          {renderTileButton(images[1], 1, falazaRightTop)}
-          {renderTileButton(images[3], 3, falazaRightBot)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[4], 4, falazaTwoByTwo)}
+          {renderTileButton(images[4], 4, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
       </div>
     );
@@ -594,29 +560,22 @@ const TourDetailGalleryComponent = ({
    * Порядок `slice(2)`: top, view2, clip1, rocks, clip2, forest, clip3, sign, top2.
    */
   if (layoutVariant === 'vorobey-winery' && images.length === 9) {
-    const wineryTallLeft = 'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const wineryTallRight = 'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const wineryRightTop = 'col-start-2 row-start-1 aspect-square w-full min-h-0';
-    const wineryRightBot = 'col-start-2 row-start-2 aspect-square w-full min-h-0';
-    const wineryLeftTop = 'col-start-1 row-start-1 aspect-square w-full min-h-0';
-    const wineryLeftBot = 'col-start-1 row-start-2 aspect-square w-full min-h-0';
-
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[2], 2, wineryTallLeft)}
-          {renderTileButton(images[0], 0, wineryRightTop)}
-          {renderTileButton(images[1], 1, wineryRightBot)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[0], 0, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[3], 3, wineryLeftTop)}
-          {renderTileButton(images[5], 5, wineryLeftBot)}
-          {renderTileButton(images[4], 4, wineryTallRight)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_LEFT_TOP_SQUARE)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_LEFT_BOTTOM_SQUARE)}
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[6], 6, wineryTallLeft)}
-          {renderTileButton(images[7], 7, wineryRightTop)}
-          {renderTileButton(images[8], 8, wineryRightBot)}
+          {renderTileButton(images[6], 6, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[7], 7, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[8], 8, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
       </div>
     );
@@ -631,23 +590,17 @@ const TourDetailGalleryComponent = ({
   if (layoutVariant === 'dardanelles' && images.length === 6) {
     /** Полная ширина двух колонок, высота как у «двух квадратов» (`aspect-gallery-tile-2x2`). */
     const dardanellesCampTwoByTwo = 'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0';
-    const dardanellesTallLeft =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const dardanellesTallRight =
-      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const dardanellesLeftTop = 'col-start-1 row-start-1 aspect-square w-full min-h-0';
-    const dardanellesLeftBot = 'col-start-1 row-start-2 aspect-square w-full min-h-0';
 
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, dardanellesTallLeft)}
-          {renderTileButton(images[1], 1, dardanellesTallRight)}
+          {renderTileButton(images[0], 0, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[3], 3, dardanellesLeftTop)}
-          {renderTileButton(images[4], 4, dardanellesLeftBot)}
-          {renderTileButton(images[2], 2, dardanellesTallRight)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_LEFT_TOP_SQUARE)}
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_LEFT_BOTTOM_SQUARE)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[5], 5, dardanellesCampTwoByTwo)}
@@ -665,20 +618,19 @@ const TourDetailGalleryComponent = ({
     images.length === 6 &&
     images[3] === TOUR_WINTER_2_PEAK_IMAGE
   ) {
-    const golecTile = 'aspect-square w-full min-h-0';
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, `${golecTile} col-start-1`)}
-          {renderTileButton(images[1], 1, `${golecTile} col-start-2`)}
+          {renderTileButton(images[0], 0, `${GALLERY_GRID_SQUARE_TILE} col-start-1`)}
+          {renderTileButton(images[1], 1, `${GALLERY_GRID_SQUARE_TILE} col-start-2`)}
         </div>
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[2], 2, `${golecTile} col-start-1`)}
-          {renderTileButton(images[3], 3, `${golecTile} col-start-2`)}
+          {renderTileButton(images[2], 2, `${GALLERY_GRID_SQUARE_TILE} col-start-1`)}
+          {renderTileButton(images[3], 3, `${GALLERY_GRID_SQUARE_TILE} col-start-2`)}
         </div>
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[4], 4, `${golecTile} col-start-1`)}
-          {renderTileButton(images[5], 5, `${golecTile} col-start-2`)}
+          {renderTileButton(images[4], 4, `${GALLERY_GRID_SQUARE_TILE} col-start-1`)}
+          {renderTileButton(images[5], 5, `${GALLERY_GRID_SQUARE_TILE} col-start-2`)}
         </div>
       </div>
     );
@@ -695,14 +647,12 @@ const TourDetailGalleryComponent = ({
     images[1] === TOUR_WINTER_4_DOGGO_IMAGE &&
     images[2] === TOUR_WINTER_4_DOGGOS_IMAGE
   ) {
-    const huskyBentoTile =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, huskyBentoTile)}
-          {renderTileButton(images[1], 1, 'col-start-2 row-start-1 aspect-square w-full')}
-          {renderTileButton(images[2], 2, 'col-start-2 row-start-2 aspect-square w-full')}
+          {renderTileButton(images[0], 0, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
         {renderRestGrid(images.slice(3), 3)}
       </div>
@@ -721,35 +671,30 @@ const TourDetailGalleryComponent = ({
     images[4] === TOUR_WINTER_3_CLIP2_VIDEO &&
     images[7] === TOUR_WINTER_3_CLIP3_VIDEO
   ) {
-    const falazaBentoTallLeft =
-      'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const falazaBentoTallRight =
-      'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full';
-    const squareTile = 'aspect-square w-full min-h-0';
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[4], 4, falazaBentoTallLeft)}
-          {renderTileButton(images[7], 7, falazaBentoTallRight)}
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[7], 7, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
         <div className="grid grid-cols-4 gap-gallery-gap">
           {renderTileButton(images[0], 0, 'col-span-4 aspect-square w-full min-h-0')}
         </div>
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[2], 2, squareTile)}
-          {renderTileButton(images[3], 3, squareTile)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_SQUARE_TILE)}
         </div>
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[5], 5, squareTile)}
-          {renderTileButton(images[6], 6, squareTile)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[6], 6, GALLERY_GRID_SQUARE_TILE)}
         </div>
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[1], 1, squareTile)}
-          {renderTileButton(images[8], 8, squareTile)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[8], 8, GALLERY_GRID_SQUARE_TILE)}
         </div>
         <div className="grid grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[9], 9, squareTile)}
-          {renderTileButton(images[10], 10, squareTile)}
+          {renderTileButton(images[9], 9, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[10], 10, GALLERY_GRID_SQUARE_TILE)}
         </div>
       </div>
     );

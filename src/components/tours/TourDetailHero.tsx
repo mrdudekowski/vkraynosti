@@ -14,6 +14,11 @@ interface TourDetailHeroProps {
   backLinkLabel: string;
   /** Классы `object-position` на `lg+` (токены `object-tour-detail-hero-desktop*` из темы). */
   desktopHeroImgClassName?: string;
+  /**
+   * Полный набор классов `object-position` для `<img>` (все брейкпоинты). Если задан — вместо
+   * `object-center` + `desktopHeroImgClassName` / дефолтного `lg:object-tour-detail-hero-desktop`.
+   */
+  heroImageObjectClassName?: string;
   /** Первое фото галереи — полноэкранный просмотр (закрытие по клику вне кадра). */
   onOpenPhoto?: () => void;
   openPhotoAriaLabel?: string;
@@ -27,6 +32,7 @@ const TourDetailHeroComponent = ({
   backLinkTo,
   backLinkLabel,
   desktopHeroImgClassName,
+  heroImageObjectClassName,
   onOpenPhoto,
   openPhotoAriaLabel = '',
 }: TourDetailHeroProps) => (
@@ -35,7 +41,10 @@ const TourDetailHeroComponent = ({
       src={imageUrl}
       alt={imageAlt}
       className="h-full w-full min-h-0"
-      imgClassName={`object-center ${desktopHeroImgClassName ?? 'lg:object-tour-detail-hero-desktop'}`}
+      imgClassName={
+        heroImageObjectClassName ??
+        `object-center ${desktopHeroImgClassName ?? 'lg:object-tour-detail-hero-desktop'}`
+      }
       loading="eager"
       fetchPriority="high"
     />

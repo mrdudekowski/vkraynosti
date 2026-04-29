@@ -513,7 +513,7 @@ const TourDetailGalleryComponent = ({
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[4], 4, askoldClip6WideTwoByTwo)}
+          {renderTileButton(images[8], 8, askoldClip6WideTwoByTwo)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[0], 0, GALLERY_GRID_BENTO_TALL_LEFT)}
@@ -526,7 +526,7 @@ const TourDetailGalleryComponent = ({
           {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_RIGHT)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[8], 8, askoldClip6WideTwoByTwo)}
+          {renderTileButton(images[4], 4, askoldClip6WideTwoByTwo)}
         </div>
       </div>
     );

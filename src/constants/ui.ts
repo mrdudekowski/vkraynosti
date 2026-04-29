@@ -210,6 +210,7 @@ export const UI = {
     /** Текст перед нижним CTA «Уточнить про тур». */
     askQuestionFooterLead:
       'Остались вопросы по маршруту, датам или условиям — напишите, ответим.',
+    backToToursCta: 'Еще туры',
     notFound:        'Тур не найден',
     notFoundWithId:  'Тур с ID «{id}» не существует.',
     homeLink:   'На главную',

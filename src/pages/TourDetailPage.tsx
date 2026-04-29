@@ -48,6 +48,10 @@ import {
   getTourSeoEntry,
   getTourStructuredData,
 } from "../constants/seo";
+import {
+  SEASON_ICON,
+  SEASON_STYLE,
+} from "../constants/seasonNavbarAppearance";
 
 const TourDetailPage = () => {
   const { season = "", tourId = "" } = useParams<{
@@ -152,6 +156,19 @@ const TourDetailPage = () => {
   }
 
   const seasonInfo = UI.seasons[tour.season];
+  const seasonVisualStyle = SEASON_STYLE[tour.season];
+  const seasonButtonGradientClass = {
+    winter: 'bg-gradient-to-r from-season-winter/30 to-season-winter/15',
+    spring: 'bg-gradient-to-r from-season-spring/30 to-season-spring/15',
+    summer: 'bg-gradient-to-r from-season-summer/30 to-season-summer/15',
+    fall: 'bg-gradient-to-r from-season-fall/35 to-season-fall/20',
+  }[tour.season];
+  const seasonButtonTextClass = {
+    winter: 'text-surface-dark',
+    spring: 'text-surface-dark',
+    summer: 'text-surface-dark',
+    fall: 'text-text-inverse',
+  }[tour.season];
   const seoEntry = getTourSeoEntry(tour);
   const tourStructuredData = getTourStructuredData(tour);
   const breadcrumbStructuredData = getTourBreadcrumbSchema(tour);
@@ -315,6 +332,34 @@ const TourDetailPage = () => {
                     getVideoPosterForGridSrc={getVideoPosterForGridSrc}
                     layoutVariant={galleryLayoutVariant}
                   />
+                  <div className="mt-8">
+                    <Link
+                      to={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
+                      className={[
+                        'group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm backdrop-blur-sm transition-all duration-hover',
+                        seasonButtonGradientClass,
+                        seasonVisualStyle.border,
+                        seasonVisualStyle.hoverBorder,
+                        seasonVisualStyle.sectionHoverGlow,
+                        'bg-cover bg-center shadow-lg hover:shadow-xl hover:brightness-110',
+                        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary',
+                      ].join(' ')}
+                      prefetch="intent"
+                    >
+                      <FontAwesomeIcon
+                        icon={SEASON_ICON[tour.season]}
+                        className={[
+                          'transition-all duration-hover',
+                          seasonButtonTextClass,
+                          seasonVisualStyle.rotate,
+                        ].join(' ')}
+                        aria-hidden
+                      />
+                      <span className={`font-semibold ${seasonButtonTextClass}`}>
+                        {UI.tourDetail.backToToursCta}
+                      </span>
+                    </Link>
+                  </div>
                 </div>
               )}
               <div className="hidden lg:mt-10 lg:block">

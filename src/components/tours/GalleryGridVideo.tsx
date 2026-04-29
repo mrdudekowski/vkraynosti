@@ -331,7 +331,6 @@ const GalleryGridVideo = ({
     if (prefersReducedMotion) return;
     if (inView) {
       clearUnmountMotionVideoTimer();
-      setShouldRenderMotionVideo(true);
       return;
     }
     clearUnmountMotionVideoTimer();

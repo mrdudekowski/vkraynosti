@@ -237,7 +237,11 @@ const TourDetailPage = () => {
             ? 'lg:object-tour-detail-hero-desktop-winter-3'
             : tour.id === 'winter-4'
               ? 'lg:object-tour-detail-hero-desktop-winter-4'
-              : undefined
+              : tour.id === 'spring-1'
+                ? 'lg:object-tour-detail-hero-desktop-spring-1'
+                : tour.id === 'spring-4'
+                  ? 'lg:object-tour-detail-hero-desktop-spring-4'
+                  : undefined
         }
       />
 

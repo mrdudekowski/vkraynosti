@@ -322,7 +322,7 @@ const config: Config = {
     'from-home-season-strip-btn-from',
     'to-home-season-strip-btn-to',
     {
-      pattern: /^object-tour-detail-hero-desktop(-winter-[34])?$/,
+      pattern: /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[14])?$/,
       variants: ['lg'],
     },
     'object-tour-detail-hero-spring-3-tight',
@@ -664,6 +664,14 @@ const config: Config = {
         'tour-detail-hero-desktop-winter-3': 'center 77%',
         /** Хаски-тур (winter-4): чуть ниже дефолтного hero, без обрезки голов (см. `tour-detail-hero-desktop`). */
         'tour-detail-hero-desktop-winter-4': 'center 58%',
+        /**
+         * Лысый Дед (spring-1): только `lg+` — якорь ниже центра (`~70%` по Y; было у нижнего края, поднято на 30 п.п.).
+         */
+        'tour-detail-hero-desktop-spring-1': 'center 70%',
+        /**
+         * Сестра (spring-4): только `lg+` — то же кадрирование, что у spring-1.
+         */
+        'tour-detail-hero-desktop-spring-4': 'center 70%',
         /**
          * Пидан (spring-3): preface — брейкпоинт `620px` см. `TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX`.
          */

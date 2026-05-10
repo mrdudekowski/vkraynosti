@@ -384,8 +384,14 @@ export const TOUR_SPRING_3_GRID_VIDEO_POSTERS: Record<string, string> = {
 export const TOUR_SPRING_3_COVER_GRID = TOUR_SPRING_3_GALLERY_GRID[1];
 export const TOUR_SPRING_3_COVER = TOUR_SPRING_3_COVER_GRID;
 
-/** Обложка карточки и hero — вершина (`ss.topping`); панорама `ss.pan` — фон блока «О туре» (второй кадр viewer). */
-export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/ss.topping.grid.webp` as const;
+/**
+ * Обложка карточки и hero — панорама `ss.pan.grid`; вершина `ss.topping` — фон блока «О туре»
+ * (`tour.prefaceBackgroundImageUrl`, см. `toursData` spring-4).
+ */
+export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/ss.pan.grid.webp` as const;
+
+/** Фон блока «О туре» для «Сестры» (viewer, полное качество). */
+export const TOUR_SPRING_4_PREFACE_BACKGROUND = `${TOUR_SPRING_4}/ss.topping.webp` as const;
 
 /**
  * «Сестра» — полное качество (просмотрщик). Макет `sestra` (как «Пидан»): после hero/preface

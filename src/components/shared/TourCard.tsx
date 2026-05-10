@@ -29,6 +29,8 @@ const winterCardStruckPrice = (tour: Tour): string | null => {
 
 const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   const winterStruck = winterCardStruckPrice(tour);
+  const showAudienceLine =
+    tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0;
   const mobileCoverSrc = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
   const coverSrcSet =
     mobileCoverSrc != null && mobileCoverSrc !== tour.imageUrl
@@ -60,14 +62,10 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
           </h3>
           <span
             className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
-              tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0
-                ? UI.tourCard.audienceChipClasses
-                : UI.difficulty.styles[tour.difficulty]
+              showAudienceLine ? UI.tourCard.audienceChipClasses : UI.difficulty.styles[tour.difficulty]
             }`}
           >
-            {tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0
-              ? tour.metaAudienceLabel
-              : UI.difficulty.labels[tour.difficulty]}
+            {showAudienceLine ? tour.metaAudienceLabel : UI.difficulty.labels[tour.difficulty]}
           </span>
         </div>
         <p className="mb-3 text-sm text-text-muted">{tour.subtitle}</p>

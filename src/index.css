@@ -160,11 +160,32 @@
   }
 
   /**
-   * Две колонки «О туре» + «Что включено»: всегда 2 колонки в ряд; тонкая вертикаль между ними
-   * (`divide-tour-detail-heading-rule`).
+   * Секция «О туре» внутри основной колонки: сверху блок (1 или 2 колонки), снизу полоса «Что включено» на всю ширину.
    */
-  .tour-detail-about-included-grid {
-    @apply grid grid-cols-2 gap-x-0 gap-y-10 mb-10 items-start divide-x divide-tour-detail-heading-rule;
+  .tour-detail-about-section {
+    @apply grid grid-cols-1 gap-y-tour-detail-about-section-row-gap mb-tour-detail-about-section-mb min-w-0;
+  }
+
+  /** Верхняя часть: основной текст/CTA и при необходимости aside в двух колонках (от `md`). */
+  .tour-detail-about-top {
+    @apply min-w-0;
+  }
+
+  /**
+   * Две колонки с `md`: на мобильном — одна колонка сеткой, иначе aside прилипает к CTA без зазора.
+   */
+  .tour-detail-about-top--with-aside {
+    @apply grid grid-cols-1 gap-y-tour-detail-about-top-stack-gap md:grid-cols-2 md:gap-x-0 md:gap-y-0 md:items-start md:divide-x md:divide-tour-detail-heading-rule;
+  }
+
+  /** Правая колонка верхнего ряда (`descriptionAside`). */
+  .tour-detail-about-aside-column {
+    @apply min-w-0 pl-4 sm:pl-8 lg:pl-12;
+  }
+
+  /** Ячейка полосы «Что включено» под верхним блоком. */
+  .tour-detail-about-included-slot {
+    @apply min-w-0;
   }
 
   /**
@@ -187,8 +208,12 @@
     @apply relative z-10 min-w-0;
   }
 
-  .tour-detail-preface-bg .tour-detail-about-included-grid {
-    @apply mb-0 divide-white/25;
+  .tour-detail-preface-bg .tour-detail-about-section {
+    @apply mb-0;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-top--with-aside {
+    @apply md:divide-white/25;
   }
 
   .tour-detail-preface-bg .tour-detail-section-heading-row {
@@ -236,9 +261,9 @@
     @apply pr-4 sm:pr-8 lg:pr-12 min-w-0;
   }
 
-  /** Колонка «Что включено»: отступ от вертикали; на узких экранах компактнее. */
+  /** Обёртка `RevealBox` для «Что включено» (полоса на всю ширину секции «О туре»). */
   .tour-detail-included-column {
-    @apply pl-4 sm:pl-8 lg:pl-12 min-w-0;
+    @apply min-w-0;
   }
 
   /** Дополнительный текст в правой колонке верхнего блока деталей тура. */
@@ -257,9 +282,10 @@
 
   /**
    * Подложка ряда иконок: `flex-wrap` + `justify-center` в JSX — перенос на следующий ряд при нехватке ширины, без горизонтального скролла.
+   * Ширина по контенту (`w-max`), не шире колонки (`max-w-full`), по центру поперечной оси flex-колонки родителя (`self-center`).
    */
   .tour-included-icon-strip {
-    @apply w-full max-w-full min-w-0 overflow-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
+    @apply w-max max-w-full self-center min-w-0 overflow-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
   }
 
   /**

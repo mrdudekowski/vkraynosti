@@ -373,12 +373,12 @@ const TourDetailGalleryComponent = ({
 
   /**
    * Пидан (spring-3): открывающий `clip3` — полноширинный 2×2; под ним два столбца на 2 ряда — `clip5|summit` (тайга в макете не показываем);
-   * затем `clip1` 2×2; море 2×2; `clip6|clip7`; внизу bento `clip2|ridge|group` (слева `clip2` на 2 ряда, справа гребень и группа) (`clip4` не показываем).
-   * Порядок `slice(2)`: group, clip3, clip1_sister, clip2, ridge, clip5, summit, clip4, sea, taiga, clip6, clip7.
+   * море 2×2; `clip6|clip7`; внизу bento `clip2|ridge|group` (слева `clip2` на 2 ряда, справа гребень и группа) (`clip4` не показываем).
+   * Порядок `slice(2)`: group, clip3, clip2, ridge, clip5, summit, clip4, sea, taiga, clip6, clip7.
    */
   if (
     layoutVariant === 'pidan' &&
-    images.length === 12 &&
+    images.length === 11 &&
     images[0] === TOUR_SPRING_3_GROUP_IMAGE
   ) {
     const pidanFullWidthSquare = (sliceIndex: number) => (
@@ -397,15 +397,15 @@ const TourDetailGalleryComponent = ({
 
     const pidanClip5SummitTwoTallColumns = (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-        {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_LEFT)}
-        {renderTileButton(images[6], 6, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_TALL_LEFT)}
+        {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_RIGHT)}
       </div>
     );
 
     const pidanClosingVideosRow = (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[9], 9, GALLERY_GRID_SQUARE_TILE)}
         {renderTileButton(images[10], 10, GALLERY_GRID_SQUARE_TILE)}
-        {renderTileButton(images[11], 11, GALLERY_GRID_SQUARE_TILE)}
       </div>
     );
 
@@ -413,10 +413,9 @@ const TourDetailGalleryComponent = ({
       <div className="flex flex-col gap-gallery-gap">
         {pidanFullWidthSquare(1)}
         {pidanClip5SummitTwoTallColumns}
-        {pidanFullWidthSquare(2)}
-        {pidanFullWidthSquare(8)}
+        {pidanFullWidthSquare(7)}
         {pidanClosingVideosRow}
-        {pidanBentoRow(3, 4, 0)}
+        {pidanBentoRow(2, 3, 0)}
       </div>
     );
   }
@@ -460,7 +459,7 @@ const TourDetailGalleryComponent = ({
   }
 
   /**
-   * Читинза (spring-5) и Маралы × Драконы (spring-6): ритм как у «Сестра» (`sestra`), 11 кадров после hero/preface.
+   * Читинза (spring-5) и Маралы х Драконы (spring-6): ритм как у «Сестра» (`sestra`), 11 кадров после hero/preface.
    * spring-5 `slice(2)`: woods, yar, clip1…clip4, peak, forest, peak5, peak2, hike.
    * spring-6 `slice(2)`: hills, deer, clip1, clip2, drag, clip3, clip4, hills5, deer2, clip5, deer3.
    */

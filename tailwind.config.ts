@@ -103,10 +103,10 @@ const hamburgerTheme = {
 const SEASON_PAGE_GRADIENT_STOPS = {
   winter: { top: '#EEF6FC', bottom: '#C5DFF0' },
   /**
-   * Весна: аналоговая смесь персикового и розового (верх — тёплый персик, низ — дымчато-розовый).
-   * Такой дуэт часто используют для «цветения» / мягкой энергии без кислотности.
+   * Весна: спокойный вертикальный переход крем → мягкий беж/песок (верх якорь #FFF0E8 без изменений).
+   * Нижний стоп без розового «цветения» — только тёплая нейтраль для фона страницы и «неба» главной.
    */
-  spring: { top: '#FFF0E8', bottom: '#F0CCD8' },
+  spring: { top: '#FFF0E8', bottom: '#E8DCC8' },
   summer: { top: '#FFF5E6', bottom: '#F3DFB0' },
   fall: { top: '#FAE8DC', bottom: '#E8C4A8' },
 } as const
@@ -187,7 +187,7 @@ function buildTourIncludedActiveVolumeShadow(
  */
 const HOME_PAGE_SKY_INTENSE_HEX = {
   winter: '#0E4D7A',
-  /** Весна: глубокий розово-терракотовый к пастели «персик + роза». */
+  /** Весна: глубокий розово-терракотовый к пастели страницы «крем → беж» (см. `SEASON_PAGE_GRADIENT_STOPS.spring`). */
   spring: '#8E3E52',
   /** Тёплый янтарь к `colors.season.summer`. */
   summer: '#A16207',
@@ -242,7 +242,7 @@ const SEASON_PAGE_ATMOSPHERE = {
   winter:
     'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #D6E8F5 38%, transparent) 42%, transparent 72%)',
   spring:
-    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #E8B8C6 38%, transparent) 42%, transparent 72%)',
+    'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.48) 0%, color-mix(in srgb, #E8DCC8 38%, transparent) 42%, transparent 72%)',
   summer:
     'radial-gradient(ellipse 115% 85% at 50% -18%, rgba(255,255,255,0.5) 0%, color-mix(in srgb, #FDEBC8 40%, transparent) 42%, transparent 72%)',
   fall:
@@ -690,6 +690,15 @@ const config: Config = {
         'tour-detail-page-inner-pb': '3rem',
         /** Между мета-блоком и `tour-detail-preface-bg`. */
         'tour-detail-meta-to-preface': '1.5rem',
+        /** Вертикальный зазор между верхним блоком и полосой «Что включено» в секции «О туре». */
+        'tour-detail-about-section-row-gap': '2.5rem',
+        /** Нижний отступ секции «О туре» до галереи (как прежний `mb-10` у сетки). */
+        'tour-detail-about-section-mb': '2.5rem',
+        /**
+         * Узкая ширина: верх «О туре» с двумя колонками (основной текст + CTA | aside).
+         * Зазор между блоком с CTA и колонкой aside под ним (согласовано с `mt-8` у CTA).
+         */
+        'tour-detail-about-top-stack-gap': '2rem',
         /** Верхний паддинг контента `tour-detail-preface-bg`. */
         'tour-detail-preface-pt': '1.5rem',
         'tour-detail-preface-pt-sm': '2rem',

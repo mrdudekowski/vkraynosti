@@ -30,7 +30,7 @@ export interface UseHomeNavbarChromeScrollOptions {
 }
 
 function chromeSnapKey(s: HomeNavbarChromeSnap): string {
-  return `${s.topChromeOpacity}|${s.topChromeSurfaceOpacity}|${s.mainUsesNavbarTopPadding}|${s.gateStageFullBleedMinHeight}|${s.disableTopChromeTransition}`;
+  return `${s.topChromeOpacity}|${s.topChromeSurfaceOpacity}|${s.mainUsesNavbarTopPadding}|${s.gateStageFullBleedMinHeight}|${s.homeFlushWithViewportTop}|${s.disableTopChromeTransition}`;
 }
 
 function resolveLenisVirtualScrollDelta(lenis: Lenis, data: VirtualScrollData): number {

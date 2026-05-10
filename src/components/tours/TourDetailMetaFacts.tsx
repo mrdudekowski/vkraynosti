@@ -29,6 +29,8 @@ const TourDetailMetaFacts = ({
   const metaTextClass =
     size === "prominent" ? "text-tour-detail-meta-prominent" : "text-tour-detail-meta";
   const rowGapClass = size === "prominent" ? "gap-4" : "gap-2.5";
+  const hasAudienceMeta =
+    metaAudienceLabel != null && metaAudienceLabel.length > 0;
 
   return (
   <section
@@ -54,35 +56,29 @@ const TourDetailMetaFacts = ({
     <div
       className="tour-detail-key-facts__item tour-detail-key-facts__item--delay-1"
       aria-label={
-        metaAudienceLabel != null && metaAudienceLabel.length > 0
+        hasAudienceMeta && metaAudienceLabel != null
           ? `${UI.tourDetail.metaAudienceTitleAbove}: ${metaAudienceLabel}`
           : `${UI.tourDetail.metaLabelDifficulty}: ${UI.difficulty.labels[difficulty]}`
       }
     >
       <p className="tour-detail-key-facts__meta-title">
-        {metaAudienceLabel != null && metaAudienceLabel.length > 0
+        {hasAudienceMeta
           ? UI.tourDetail.metaAudienceTitleAbove
           : UI.tourDetail.metaDifficultyTitleAbove}
       </p>
       <span
         className={
-          metaAudienceLabel != null && metaAudienceLabel.length > 0
+          hasAudienceMeta
             ? `group flex w-max max-w-full cursor-default flex-wrap items-center ${rowGapClass} font-bold ${metaTextClass} text-text-primary transition-colors duration-hover hover:text-brand-primary`
             : `group flex w-max max-w-full cursor-default flex-wrap items-center ${rowGapClass} font-bold ${metaTextClass} transition-colors duration-hover hover:text-brand-primary ${DIFFICULTY_TEXT_FG[difficulty]}`
         }
       >
         <FontAwesomeIcon
-          icon={
-            metaAudienceLabel != null && metaAudienceLabel.length > 0
-              ? faUsers
-              : faMountain
-          }
+          icon={hasAudienceMeta ? faUsers : faMountain}
           className="shrink-0 transition-colors duration-hover group-hover:text-brand-secondary"
           aria-hidden
         />
-        {metaAudienceLabel != null && metaAudienceLabel.length > 0
-          ? metaAudienceLabel
-          : UI.difficulty.labels[difficulty]}
+        {hasAudienceMeta ? metaAudienceLabel : UI.difficulty.labels[difficulty]}
       </span>
     </div>
   </section>

@@ -178,6 +178,13 @@ const TourDetailPage = () => {
       ? "tour-detail-included-column tour-detail-included-on-preface min-w-0"
       : "tour-detail-included-column tour-detail-included-panel min-w-0";
 
+  const aboutTopClassName = [
+    "tour-detail-about-top",
+    descriptionColumns.asideText != null ? "tour-detail-about-top--with-aside" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   const includedPanel = (
     <RevealBox
       as="div"
@@ -185,11 +192,6 @@ const TourDetailPage = () => {
       disabled={isLgOrAbove}
     >
       <div className="min-w-0">
-        {descriptionColumns.asideText != null && (
-          <p className="tour-detail-about-aside-copy">
-            {descriptionColumns.asideText}
-          </p>
-        )}
         <TourDetailSectionHeading
           title={UI.tourDetail.includedHeading}
           season={tour.season}
@@ -264,57 +266,79 @@ const TourDetailPage = () => {
                   />
                   <div className="tour-detail-preface-bg__scrim" aria-hidden />
                   <div className="tour-detail-preface-bg__content">
-                    <div className="tour-detail-about-included-grid">
-                      <div className="tour-detail-about-column min-w-0">
-                        <p className="text-tour-detail-prose max-w-prose">
-                          {tour.descriptionLeadBold != null &&
-                            tour.descriptionLeadBold.length > 0 && (
-                              <strong className="font-bold">
-                                {tour.descriptionLeadBold}
-                              </strong>
-                            )}
-                          {tour.descriptionLeadBold != null &&
-                          tour.descriptionLeadBold.length > 0
-                            ? " — "
-                            : ""}
-                          {descriptionColumns.primaryText}
-                        </p>
-                        <div className="mt-8 max-w-prose">
-                          <TourRequestCtaButton
-                            onClick={handleOpenTourRequest}
-                          />
+                    <div className="tour-detail-about-section">
+                      <div className={aboutTopClassName}>
+                        <div className="tour-detail-about-column min-w-0">
+                          <p className="text-tour-detail-prose max-w-prose">
+                            {tour.descriptionLeadBold != null &&
+                              tour.descriptionLeadBold.length > 0 && (
+                                <strong className="font-bold">
+                                  {tour.descriptionLeadBold}
+                                </strong>
+                              )}
+                            {tour.descriptionLeadBold != null &&
+                            tour.descriptionLeadBold.length > 0
+                              ? " — "
+                              : ""}
+                            {descriptionColumns.primaryText}
+                          </p>
+                          <div className="mt-8 max-w-prose">
+                            <TourRequestCtaButton
+                              onClick={handleOpenTourRequest}
+                            />
+                          </div>
                         </div>
+                        {descriptionColumns.asideText != null && (
+                          <div className="tour-detail-about-aside-column">
+                            <p className="tour-detail-about-aside-copy">
+                              {descriptionColumns.asideText}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                      {includedPanel}
+                      <div className="tour-detail-about-included-slot">
+                        {includedPanel}
+                      </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="tour-detail-about-included-grid">
-                  <div className="tour-detail-about-column min-w-0">
-                    <TourDetailMetaFacts
-                      duration={tour.duration}
-                      difficulty={tour.difficulty}
-                      metaAudienceLabel={tour.metaAudienceLabel}
-                    />
-                    <p className="text-tour-detail-prose text-text-muted max-w-prose">
-                      {tour.descriptionLeadBold != null &&
-                        tour.descriptionLeadBold.length > 0 && (
-                          <strong className="font-bold">
-                            {tour.descriptionLeadBold}
-                          </strong>
-                        )}
-                      {tour.descriptionLeadBold != null &&
-                      tour.descriptionLeadBold.length > 0
-                        ? " — "
-                        : ""}
-                      {descriptionColumns.primaryText}
-                    </p>
-                    <div className="mt-8 max-w-prose">
-                      <TourRequestCtaButton onClick={handleOpenTourRequest} />
+                <div className="tour-detail-about-section">
+                  <div className={aboutTopClassName}>
+                    <div className="tour-detail-about-column min-w-0">
+                      <TourDetailMetaFacts
+                        duration={tour.duration}
+                        difficulty={tour.difficulty}
+                        metaAudienceLabel={tour.metaAudienceLabel}
+                      />
+                      <p className="text-tour-detail-prose text-text-muted max-w-prose">
+                        {tour.descriptionLeadBold != null &&
+                          tour.descriptionLeadBold.length > 0 && (
+                            <strong className="font-bold">
+                              {tour.descriptionLeadBold}
+                            </strong>
+                          )}
+                        {tour.descriptionLeadBold != null &&
+                        tour.descriptionLeadBold.length > 0
+                          ? " — "
+                          : ""}
+                        {descriptionColumns.primaryText}
+                      </p>
+                      <div className="mt-8 max-w-prose">
+                        <TourRequestCtaButton onClick={handleOpenTourRequest} />
+                      </div>
                     </div>
+                    {descriptionColumns.asideText != null && (
+                      <div className="tour-detail-about-aside-column">
+                        <p className="tour-detail-about-aside-copy">
+                          {descriptionColumns.asideText}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  {includedPanel}
+                  <div className="tour-detail-about-included-slot">
+                    {includedPanel}
+                  </div>
                 </div>
               )}
 

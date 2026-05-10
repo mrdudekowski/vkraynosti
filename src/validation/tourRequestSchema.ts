@@ -37,9 +37,13 @@ export const tourRequestFormSchema = z.object({
     .refine(value => phonePattern.test(value), { message: e.phoneRequired }),
   question: z
     .string()
-    .trim()
-    .min(1, { message: e.questionRequired })
-    .max(1200, { message: e.questionRequired }),
+    .transform(s => s.trim())
+    .pipe(
+      z.union([
+        z.literal(''),
+        z.string().min(1, { message: e.questionRequired }).max(1200, { message: e.questionTooLong }),
+      ])
+    ),
   privacyAccepted: z.boolean().refine((v): v is true => v === true, {
     message: e.privacyRequired,
   }),

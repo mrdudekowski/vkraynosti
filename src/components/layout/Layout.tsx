@@ -41,10 +41,20 @@ function LayoutChrome() {
 function LayoutMain() {
   const { pathname } = useLocation();
   const { snap } = useHomeNavbarChrome();
-  /** Главная: контент с верха вьюпорта — `Navbar` fixed накладывается на ворота и hero. */
+  /** Главная: оверлей под навбаром только при десктопных воротах; на мобильном — `pt-16` как на внутренних страницах. */
   const mainPad =
-    pathname === ROUTES.HOME ? 'pt-0' : snap.mainUsesNavbarTopPadding ? 'pt-16' : 'pt-0';
-  const mainHomeStartBg = pathname === ROUTES.HOME ? 'bg-home-gate-start-screen' : '';
+    pathname === ROUTES.HOME
+      ? snap.homeFlushWithViewportTop
+        ? 'pt-0'
+        : snap.mainUsesNavbarTopPadding
+          ? 'pt-16'
+          : 'pt-0'
+      : snap.mainUsesNavbarTopPadding
+        ? 'pt-16'
+        : 'pt-0';
+  /** Чёрный фон старта только при десктопных воротах; на мобильной главной — без полосы «gate» под навбаром. */
+  const mainHomeStartBg =
+    pathname === ROUTES.HOME && snap.homeFlushWithViewportTop ? 'bg-home-gate-start-screen' : '';
 
   return (
     <main className={`flex-1 ${mainPad} ${mainHomeStartBg}`.trim()}>

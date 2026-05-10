@@ -32,19 +32,22 @@ import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/
 import { getToursBySeason } from '../data/toursData';
 import { useSeason } from '../context/useSeason';
 import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
+import { useHomeGateDesktopLayout } from '../hooks/useHomeGateDesktopLayout';
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
 import { useHomeSkyParallax } from '../hooks/useHomeSkyParallax';
 import { BREAKPOINT_MD_PX, NAVBAR_SCROLL_OFFSET_PX } from '../constants/smoothScroll';
 import type { Season } from '../types';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
 import { useDocumentVisibility } from '../hooks/useDocumentVisibility';
+import {
+  HOME_TOURS_COLLAPSED_MAX_VISIBLE,
+  HOME_TOURS_PRIORITY_IMAGE_ABOVE_FOLD_COUNT,
+  HOME_TOURS_PROMO_VIDEO_SWITCH_MS,
+} from '../constants/homeToursGrid';
 
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
 const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
-const HOME_TOURS_PREVIEW_LIMIT = 3;
-const HOME_TOURS_EXPANDED_PRIORITY_IMAGE_COUNT = 4;
-const HOME_TOURS_PROMO_VIDEO_SWITCH_MS = 3000;
 const GRID_FADE_OUT_DURATION_MS = 260;
 const GRID_REVEAL_DURATION_MS = 500;
 const GRID_CASCADE_STEP_MS = 70;
@@ -69,12 +72,15 @@ const Home = () => {
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const expandControlButtonRef = useRef<HTMLButtonElement | null>(null);
   const toursHeadingWrapRef = useRef<HTMLDivElement | null>(null);
-  const [gateStageFocused, setGateStageFocused] = useState(false);
+  const [gateStageFocusedFromObserver, setGateStageFocusedFromObserver] = useState(false);
   const [expandCardVideoInView, setExpandCardVideoInView] = useState(
     () => typeof IntersectionObserver === 'undefined'
   );
   const isPageVisible = useDocumentVisibility();
   const homeGateScrollEnabled = location.pathname === ROUTES.HOME;
+  const isHomeGateDesktopLayout = useHomeGateDesktopLayout();
+  const homeGateChromeScrollActive = homeGateScrollEnabled && isHomeGateDesktopLayout;
+  const gateStageFocused = homeGateChromeScrollActive && gateStageFocusedFromObserver;
   const homeGateBannerColumnHover =
     UI.sections.homeGateSeasonBannerStaticPresentation &&
     UI.sections.homeGateSeasonBannerLetterHoverVideo;
@@ -89,23 +95,23 @@ const Home = () => {
 
   useHomeNavbarChromeScroll({
     heroSectionRef,
-    enabled: homeGateScrollEnabled,
+    enabled: homeGateChromeScrollActive,
   });
 
   useLayoutEffect(() => {
-    if (!homeGateScrollEnabled) return;
+    if (!homeGateChromeScrollActive) return;
     const el = gateIntersectRef.current;
     if (!el) return;
     const share = homeGateStageVisibleHeightShare(el.getBoundingClientRect(), window.innerHeight);
     if (share >= HOME_GATE_STAGE_INTERSECT_ENTER) {
       queueMicrotask(() => {
-        setGateStageFocused(true);
+        setGateStageFocusedFromObserver(true);
       });
     }
-  }, [homeGateScrollEnabled]);
+  }, [homeGateChromeScrollActive]);
 
   useEffect(() => {
-    if (!homeGateScrollEnabled) return;
+    if (!homeGateChromeScrollActive) return;
     const el = gateIntersectRef.current;
     if (!el) return;
     const thresholds = homeGateStageIntersectThresholds();
@@ -114,7 +120,7 @@ const Home = () => {
         const e = entries[0];
         if (!e) return;
         const r = e.intersectionRatio;
-        setGateStageFocused((prev) => {
+        setGateStageFocusedFromObserver((prev) => {
           if (!prev && r >= HOME_GATE_STAGE_INTERSECT_ENTER) return true;
           if (prev && r <= HOME_GATE_STAGE_INTERSECT_LEAVE) return false;
           return prev;
@@ -124,7 +130,7 @@ const Home = () => {
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [homeGateScrollEnabled]);
+  }, [homeGateChromeScrollActive]);
 
   const seasonBannerVideoPreloads = useMemo(
     () =>
@@ -136,7 +142,8 @@ const Home = () => {
     [activeSeason]
   );
 
-  const visibleTours = isAllToursExpanded ? tours : tours.slice(0, HOME_TOURS_PREVIEW_LIMIT);
+  const collapsedVisibleCount = Math.min(HOME_TOURS_COLLAPSED_MAX_VISIBLE, tours.length);
+  const visibleTours = isAllToursExpanded ? tours : tours.slice(0, collapsedVisibleCount);
   const activeSeasonLeadTour = tours[0];
   const springPromoVideoUrls = useMemo(
     () =>
@@ -159,7 +166,7 @@ const Home = () => {
     activeSeasonPromoVideoCount > 0 ? toursPromoVideoIndex % activeSeasonPromoVideoCount : 0;
   const activeSeasonPromoVideoUrl =
     activeSeasonPromoVideoCount > 0 ? activeSeasonPromoVideoUrls[normalizedPromoVideoIndex] : null;
-  const hasHiddenTours = tours.length > HOME_TOURS_PREVIEW_LIMIT;
+  const hasHiddenTours = tours.length > HOME_TOURS_COLLAPSED_MAX_VISIBLE;
   const shouldRenderExpandCard = hasHiddenTours;
 
   const toggleToursVisibility = () => {
@@ -297,30 +304,32 @@ const Home = () => {
         </div>
 
         <div className="relative z-10 flex w-full flex-col">
-          <div
-            ref={gateIntersectRef}
-            data-home-gate-intersect-root
-            className="shrink-0"
-          >
-            <div className="transition-none w-full shrink-0">
-              <div className="relative flex w-full shrink-0 flex-col items-center justify-center overflow-x-hidden bg-home-gate-start-screen min-h-home-gate-viewport">
-                <div
-                  data-home-gate-banner-wrap
-                  className={`flex w-full shrink-0 justify-center px-4 sm:px-6 lg:px-8 ${
-                    gateStageFocused || homeGateBannerColumnHover ? '' : 'pointer-events-none'
-                  }`}
-                >
-                  <HomeGateBannerShell>
-                    <HomeSeasonBanner
-                      season={activeSeason}
-                      staticPresentation={UI.sections.homeGateSeasonBannerStaticPresentation}
-                    />
-                  </HomeGateBannerShell>
+          {isHomeGateDesktopLayout ? (
+            <div
+              ref={gateIntersectRef}
+              data-home-gate-intersect-root
+              className="shrink-0"
+            >
+              <div className="transition-none w-full shrink-0">
+                <div className="relative flex w-full shrink-0 flex-col items-center justify-center overflow-x-hidden bg-home-gate-start-screen min-h-home-gate-viewport">
+                  <div
+                    data-home-gate-banner-wrap
+                    className={`flex w-full shrink-0 justify-center px-4 sm:px-6 lg:px-8 ${
+                      gateStageFocused || homeGateBannerColumnHover ? '' : 'pointer-events-none'
+                    }`}
+                  >
+                    <HomeGateBannerShell>
+                      <HomeSeasonBanner
+                        season={activeSeason}
+                        staticPresentation={UI.sections.homeGateSeasonBannerStaticPresentation}
+                      />
+                    </HomeGateBannerShell>
+                  </div>
+                  <HomeGateScrollToHeroLink />
                 </div>
-                <HomeGateScrollToHeroLink />
               </div>
             </div>
-          </div>
+          ) : null}
 
           <HeroCarousel ref={heroSectionRef} />
 
@@ -345,9 +354,7 @@ const Home = () => {
                       <TourCard
                         tour={tour}
                         priorityImage={
-                          isAllToursExpanded
-                            ? index < HOME_TOURS_EXPANDED_PRIORITY_IMAGE_COUNT
-                            : index === 0
+                          index < HOME_TOURS_PRIORITY_IMAGE_ABOVE_FOLD_COUNT
                         }
                       />
                     </div>

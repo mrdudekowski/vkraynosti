@@ -221,7 +221,6 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
               <FormField
                 id="tour-request-question"
                 label={UI.tourRequestModal.questionLabel}
-                required
                 hint={UI.tourRequestModal.questionHint}
                 error={fieldErrors.question}
               >

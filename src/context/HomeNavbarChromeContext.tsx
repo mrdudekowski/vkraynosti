@@ -18,6 +18,7 @@ export function HomeNavbarChromeProvider({ children }: { children: ReactNode }) 
         prev.topChromeSurfaceOpacity === next.topChromeSurfaceOpacity &&
         prev.mainUsesNavbarTopPadding === next.mainUsesNavbarTopPadding &&
         prev.gateStageFullBleedMinHeight === next.gateStageFullBleedMinHeight &&
+        prev.homeFlushWithViewportTop === next.homeFlushWithViewportTop &&
         prev.disableTopChromeTransition === next.disableTopChromeTransition
       ) {
         return prev;

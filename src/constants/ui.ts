@@ -10,6 +10,17 @@ export const UI = {
     viewTour:      'Подробнее о туре',
     /** Интервал автосмены слайдов героя (мс). */
     autoplayIntervalMs: 7000,
+    /** Кнопка «назад» карусели героя (desktop). */
+    carouselPrevious: 'Предыдущий слайд',
+    /** Кнопка «вперёд» карусели героя (desktop). */
+    carouselNext: 'Следующий слайд',
+    /**
+     * Верхняя зона слайда (кроме блока с ссылкой): тот же эффект, что «вперёд».
+     * Подставить `{title}` — название тура активного слайда для контекста.
+     */
+    carouselAdvanceImageArea: 'Следующий слайд. Сейчас: {title}',
+    /** Точка пагинации: `{n}` — номер слайда (1-based). */
+    carouselPaginationGoToSlide: 'Перейти к слайду {n}',
   },
   breadcrumbs: {
     navLabel: 'Хлебные крошки',
@@ -149,6 +160,7 @@ export const UI = {
       emailInvalid: 'Некорректный email',
       phoneRequired: 'Укажите телефон',
       questionRequired: 'Напишите вопрос',
+      questionTooLong: 'Вопрос слишком длинный (максимум 1200 символов)',
       messengerRequired: 'Выберите мессенджер',
       privacyRequired: 'Нужно согласие с политикой',
     },
@@ -170,6 +182,11 @@ export const UI = {
   tourCard: {
     /** Чип на карточке, когда у тура задан `metaAudienceLabel`. */
     audienceChipClasses: 'bg-brand-accent text-brand-primary',
+    /**
+     * Разделитель в подписи диапазона на чипе (как «Лёгкая / средняя» у Аскольда).
+     * В `toursData` собирать строку из `UI.difficulty.labels` и этого разделителя.
+     */
+    metaAudienceDifficultyRangeSeparator: ' / ',
     /** Карточка тура на главной (сезон «зима»): основная строка цены; ниже — зачёркнутая ранее указанная сумма. */
     winterPriceLead: 'Уточняйте стоимость',
     /** Значение `Tour.price`, когда вместо суммы — заглушка; на карточке не дублируем её в зачёркнутой строке. */

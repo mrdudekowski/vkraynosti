@@ -331,13 +331,12 @@ export const TOUR_SPRING_4_CLIP1_POSTER_WEBP = `${TOUR_SPRING_4}/ss.clip1.poster
 export const TOUR_SPRING_4_CLIP3_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip3.grid.webm` as const;
 export const TOUR_SPRING_4_CLIP5_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip5.grid.webm` as const;
 
-/** «Пидан» — полное качество (просмотрщик). `taiga` и `clip3` переставлены: клип в слоте бывшей тайги, тайга — на месте бывшего полноширинного клипа в сетке. */
+/** «Пидан» — полное качество (просмотрщик). `taiga` и `clip3` переставлены относительно исходного порядка ассетов. */
 export const TOUR_SPRING_3_GALLERY_VIEWER = [
   `${TOUR_SPRING_3}/pd.hero.webp`,
   `${TOUR_SPRING_3}/pd.preface.webp`,
   `${TOUR_SPRING_3}/pd.group.webp`,
   `${TOUR_SPRING_3}/pd.clip3.webm`,
-  TOUR_SPRING_4_CLIP1_VIEWER_WEBM,
   `${TOUR_SPRING_3}/pd.clip2.webm`,
   `${TOUR_SPRING_3}/pd.ridge.webp`,
   `${TOUR_SPRING_3}/pd.clip5.webm`,
@@ -358,7 +357,6 @@ export const TOUR_SPRING_3_GALLERY_GRID = [
   `${TOUR_SPRING_3}/pd.preface.grid.webp`,
   `${TOUR_SPRING_3}/pd.group.grid.webp`,
   `${TOUR_SPRING_3}/pd.clip3.grid.webm`,
-  TOUR_SPRING_4_CLIP1_GRID_WEBM,
   `${TOUR_SPRING_3}/pd.clip2.grid.webm`,
   `${TOUR_SPRING_3}/pd.ridge.grid.webp`,
   `${TOUR_SPRING_3}/pd.clip5.grid.webm`,
@@ -375,12 +373,11 @@ export const TOUR_SPRING_3_GROUP_IMAGE = TOUR_SPRING_3_GALLERY_GRID[2];
 
 export const TOUR_SPRING_3_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SPRING_3_GALLERY_GRID[3]]: `${TOUR_SPRING_3}/pd.clip3.poster.webp`,
-  [TOUR_SPRING_3_GALLERY_GRID[4]]: TOUR_SPRING_4_CLIP1_POSTER_WEBP,
-  [TOUR_SPRING_3_GALLERY_GRID[5]]: `${TOUR_SPRING_3}/pd.clip2.poster.webp`,
-  [TOUR_SPRING_3_GALLERY_GRID[7]]: `${TOUR_SPRING_3}/pd.clip5.poster.webp`,
-  [TOUR_SPRING_3_GALLERY_GRID[9]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
-  [TOUR_SPRING_3_GALLERY_GRID[12]]: `${TOUR_SPRING_3}/pd.clip6.poster.webp`,
-  [TOUR_SPRING_3_GALLERY_GRID[13]]: `${TOUR_SPRING_3}/pd.clip7.poster.webp`,
+  [TOUR_SPRING_3_GALLERY_GRID[4]]: `${TOUR_SPRING_3}/pd.clip2.poster.webp`,
+  [TOUR_SPRING_3_GALLERY_GRID[6]]: `${TOUR_SPRING_3}/pd.clip5.poster.webp`,
+  [TOUR_SPRING_3_GALLERY_GRID[8]]: `${TOUR_SPRING_3}/pd.clip4.poster.webp`,
+  [TOUR_SPRING_3_GALLERY_GRID[11]]: `${TOUR_SPRING_3}/pd.clip6.poster.webp`,
+  [TOUR_SPRING_3_GALLERY_GRID[12]]: `${TOUR_SPRING_3}/pd.clip7.poster.webp`,
 };
 
 /** Карточка и hero страницы — кадр «О туре» (`pd.preface.grid`); `pd.hero.grid` остаётся в сетке как [0]. */
@@ -491,7 +488,7 @@ export const TOUR_SPRING_5_COVER_GRID = `${TOUR_SPRING_5}/top.webp` as const;
 const TOUR_SPRING_6 = `${TOURS_ASSET_BASE}/spring-6`;
 
 /**
- * «Мараловая ферма и Парк Драконов» (spring-6). Исходники: `content/МаралыXДраконы/webp/`.
+ * «Маралы х Драконы» (spring-6). Исходники: `content/МаралыXДраконы/webp/`.
  * Клипы: `scripts/encode-spring-6-maral-dragon-movs.ps1` → `mnd.clip1..5`.
  * Макет сетки — как «Читинза» (`chitinza`): 11 кадров после hero/preface; `hills3` только фон «О туре».
  */

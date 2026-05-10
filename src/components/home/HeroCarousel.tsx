@@ -16,6 +16,7 @@ import {
   TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX,
 } from '../../constants/tourSpring3CoverCrop';
 import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { getToursBySeason } from '../../data/toursData';
 import { useSeason } from '../../context/useSeason';
 import type { Season } from '../../types';
@@ -52,6 +53,8 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
   });
   const spring3GteLayoutMin = useMatchMinWidth(TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX);
   const spring3Lg = useMatchMinWidth(BREAKPOINT_LG_PX);
+  const showDesktopArrows = useMatchMinWidth(BREAKPOINT_LG_PX);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
     <>
@@ -76,6 +79,13 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
                 ? resolveTourSpring3CoverBackgroundPosition(spring3GteLayoutMin, spring3Lg)
                 : undefined
             }
+            onAdvanceNext={next}
+            onAdvancePrev={prev}
+            swipeEnabled={!prefersReducedMotion}
+            imageAdvanceAriaLabel={UI.hero.carouselAdvanceImageArea.replace(
+              '{title}',
+              tour.title
+            )}
           >
             <div className="flex w-full max-w-home-hero-phrase mx-auto justify-center px-home-hero-carousel-text-gutter-x pb-24 md:px-4">
               <Link
@@ -97,20 +107,26 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
         );
       })}
 
-      <button
-        onClick={prev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all duration-hover"
-        aria-label="Предыдущий"
-      >
-        <FontAwesomeIcon icon={faChevronLeft} />
-      </button>
-      <button
-        onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all duration-hover"
-        aria-label="Следующий"
-      >
-        <FontAwesomeIcon icon={faChevronRight} />
-      </button>
+      {showDesktopArrows ? (
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            className="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white transition-all duration-hover hover:bg-black/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+            aria-label={UI.hero.carouselPrevious}
+          >
+            <FontAwesomeIcon icon={faChevronLeft} aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            className="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white transition-all duration-hover hover:bg-black/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+            aria-label={UI.hero.carouselNext}
+          >
+            <FontAwesomeIcon icon={faChevronRight} aria-hidden />
+          </button>
+        </>
+      ) : null}
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {tours.map((_, idx) => (
@@ -122,7 +138,11 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
                 ? `${HERO_PAGINATION_ACTIVE_DOT_CLASS[activeSeason]} scale-125`
                 : `bg-white/50 ${HERO_PAGINATION_INACTIVE_DOT_HOVER_CLASS[activeSeason]}`
             }`}
-            aria-label={`Слайд ${idx + 1}`}
+            type="button"
+            aria-label={UI.hero.carouselPaginationGoToSlide.replace(
+              '{n}',
+              String(idx + 1)
+            )}
           />
         ))}
       </div>

@@ -73,4 +73,27 @@ describe('TourRequestModal', () => {
     );
     infoSpy.mockRestore();
   });
+
+  it('submits without question when other fields are valid', async () => {
+    const user = userEvent.setup();
+    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+
+    render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
+
+    await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`)), 'Иван');
+    await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.phoneLabel}`)), '+79991234567');
+    await user.click(screen.getByRole('radio', { name: UI.tourRequestModal.messengerTelegramAria }));
+    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('button', { name: UI.tourRequestModal.submit }));
+
+    await waitFor(
+      () => {
+        expect(infoSpy).toHaveBeenCalledWith(
+          '[tourRequest] validated payload accepted for client-side mock submit'
+        );
+      },
+      { timeout: 3000 }
+    );
+    infoSpy.mockRestore();
+  });
 });

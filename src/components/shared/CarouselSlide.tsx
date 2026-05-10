@@ -1,5 +1,6 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useRef } from 'react';
 import { DOM_DATA_HOME_HERO_ACTIVE_SLIDE } from '../../constants/homeHeroSnap';
+import { useHeroCarouselSwipe } from '../../hooks/useHeroCarouselSwipe';
 
 /** Слайд героя: неактивные — `inert` (не `aria-hidden` на предке с фокусом у Link при смене слайда). */
 
@@ -12,6 +13,13 @@ interface CarouselSlideProps {
   shouldLoadBackground: boolean;
   /** `background-position` при `background-size: cover` (см. `theme.extend.objectPosition`). */
   backgroundPosition?: string;
+  /** Клик по верхней зоне (фон) — следующий слайд; не перекрывает нижний блок с `Link`. */
+  onAdvanceNext: () => void;
+  onAdvancePrev: () => void;
+  /** Свайп на touch при активном слайде; выключать при `prefers-reduced-motion`. */
+  swipeEnabled: boolean;
+  /** `aria-label` для кнопки верхней зоны (из `UI.hero`). */
+  imageAdvanceAriaLabel: string;
   children: ReactNode;
 }
 
@@ -22,12 +30,24 @@ const CarouselSlide = ({
   isActive,
   shouldLoadBackground,
   backgroundPosition = 'center',
+  onAdvanceNext,
+  onAdvancePrev,
+  swipeEnabled,
+  imageAdvanceAriaLabel,
   children,
 }: CarouselSlideProps) => {
   const activeSlideProps =
     isActive === true
       ? { [DOM_DATA_HOME_HERO_ACTIVE_SLIDE]: 'true' as const }
       : undefined;
+
+  const imageAdvanceRef = useRef<HTMLButtonElement>(null);
+
+  useHeroCarouselSwipe(imageAdvanceRef, {
+    enabled: isActive && swipeEnabled,
+    onSwipeNext: onAdvanceNext,
+    onSwipePrev: onAdvancePrev,
+  });
 
   return (
     <div
@@ -53,8 +73,17 @@ const CarouselSlide = ({
           decoding="async"
         />
       ) : null}
-      <div className="relative z-10 h-full flex flex-col items-center justify-end text-text-inverse px-4">
-        {children}
+      <div className="absolute inset-0 z-stack-base flex min-h-0 min-w-0 flex-col">
+        <button
+          ref={imageAdvanceRef}
+          type="button"
+          className="min-h-0 w-full flex-1 cursor-pointer border-0 bg-transparent p-0 max-lg:cursor-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+          aria-label={imageAdvanceAriaLabel}
+          onClick={onAdvanceNext}
+        />
+        <div className="relative flex shrink-0 flex-col items-center justify-end px-4 text-text-inverse">
+          {children}
+        </div>
       </div>
     </div>
   );

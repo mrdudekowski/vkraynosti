@@ -5,6 +5,7 @@
 
 import { clamp01 } from './homeGateScroll';
 import { ROUTES } from './routes';
+import { BREAKPOINT_MD_PX } from './smoothScroll';
 
 /** Снимок для Layout / Navbar / дока (главная). */
 export interface HomeNavbarChromeSnap {
@@ -19,6 +20,11 @@ export interface HomeNavbarChromeSnap {
   mainUsesNavbarTopPadding: boolean;
   /** Зона ворот: под навбаром/доком непрозрачный слой `bg-home-gate-start-screen` (как у старта). */
   gateStageFullBleedMinHeight: boolean;
+  /**
+   * Главная: `true` — `main` без `pt-16`, контент под оверлеем фикс. навбара (десктопные ворота).
+   * `false` — отступ под навбар, как на внутренних страницах (мобильный поток).
+   */
+  homeFlushWithViewportTop: boolean;
   /** Без transition opacity у фона (`prefers-reduced-motion`). */
   disableTopChromeTransition: boolean;
 }
@@ -56,6 +62,7 @@ export const HOME_NAVBAR_CHROME_LAYOUT_DEFAULT: HomeNavbarChromeSnap = {
   topChromeSurfaceOpacity: 1,
   mainUsesNavbarTopPadding: true,
   gateStageFullBleedMinHeight: false,
+  homeFlushWithViewportTop: false,
   disableTopChromeTransition: false,
 };
 
@@ -83,11 +90,19 @@ export function readInitialHomeNavbarChromeSnap(): HomeNavbarChromeSnap {
   const path = spaPathWithoutRouterBasename(window.location.pathname);
   const isProbablyHome = path === ROUTES.HOME || path === '';
   if (isProbablyHome) {
+    const isMdOrAbove = window.innerWidth >= BREAKPOINT_MD_PX;
+    if (isMdOrAbove) {
+      return {
+        ...HOME_NAVBAR_CHROME_LAYOUT_DEFAULT,
+        topChromeOpacity: 0,
+        topChromeSurfaceOpacity: 0,
+        gateStageFullBleedMinHeight: true,
+        homeFlushWithViewportTop: true,
+      };
+    }
     return {
       ...HOME_NAVBAR_CHROME_LAYOUT_DEFAULT,
-      topChromeOpacity: 0,
-      topChromeSurfaceOpacity: 0,
-      gateStageFullBleedMinHeight: true,
+      homeFlushWithViewportTop: false,
     };
   }
   return { ...HOME_NAVBAR_CHROME_LAYOUT_DEFAULT };
@@ -165,6 +180,7 @@ export function computeHomeNavbarChromeSnap(p: ComputeHomeNavbarChromeParams): H
     topChromeSurfaceOpacity,
     mainUsesNavbarTopPadding: true,
     gateStageFullBleedMinHeight,
+    homeFlushWithViewportTop: true,
     disableTopChromeTransition: p.reducedMotion,
   };
 }

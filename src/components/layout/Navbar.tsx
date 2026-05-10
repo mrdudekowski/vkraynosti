@@ -44,7 +44,11 @@ const Navbar = () => {
   const activeSeasonStyle = SEASON_STYLE[activeSeason];
   const brandWordmark = UI.nav.brand;
   const brandFirstLetter = brandWordmark.slice(0, 1);
-  const brandRest = brandWordmark.slice(1);
+  const brandRestRaw = brandWordmark.slice(1);
+  const brandRest =
+    brandRestRaw.length === 0
+      ? ''
+      : brandRestRaw[0].toLocaleUpperCase('ru-RU') + brandRestRaw.slice(1);
 
   const openMenu = () => {
     setMenuOpen(true);
@@ -181,10 +185,17 @@ const Navbar = () => {
             >
               {activeSeasonUi.label}
             </span>
-            <div
-              role="group"
-              aria-label={`${UI.nav.seasonNavCurrentSeasonGroup}: ${activeSeasonUi.label}`}
-              className="inline-flex season-md:hidden shrink-0 items-center gap-0.5"
+            <button
+              type="button"
+              data-testid="season-nav-toggle"
+              data-season-nav-toggle
+              className="inline-flex season-md:hidden shrink-0 items-center gap-0.5 rounded-md p-0 text-text-inverse/70 transition-colors duration-hover hover:text-text-inverse focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
+              aria-expanded={seasonMenuOpen}
+              aria-controls="season-nav-dock-panel"
+              aria-label={
+                seasonMenuOpen ? UI.nav.seasonNavMenuToggleCollapse : UI.nav.seasonDockExpand
+              }
+              onClick={handleSeasonNavButtonClick}
             >
               <span
                 aria-hidden
@@ -207,27 +218,19 @@ const Navbar = () => {
                   ].join(' ')}
                 />
               </span>
-              <button
-                type="button"
-                data-testid="season-nav-toggle"
-                data-season-nav-toggle
-                className="inline-flex shrink-0 items-center justify-center rounded-md p-1 text-text-inverse/70 hover:text-text-inverse transition-colors duration-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
-                aria-expanded={seasonMenuOpen}
-                aria-controls="season-nav-dock-panel"
-                aria-label={
-                  seasonMenuOpen ? UI.nav.seasonNavMenuToggleCollapse : UI.nav.seasonDockExpand
-                }
-                onClick={handleSeasonNavButtonClick}
+              <span
+                aria-hidden
+                className="inline-flex shrink-0 items-center justify-center rounded-md p-1"
               >
                 <FontAwesomeIcon
                   icon={faChevronDown}
                   className={[
-                    'w-4 h-4 transition-transform duration-hover',
+                    'h-4 w-4 transition-transform duration-hover',
                     seasonMenuOpen ? '-rotate-180' : '',
                   ].join(' ')}
                 />
-              </button>
-            </div>
+              </span>
+            </button>
           </div>
 
           {/* Center: Desktop nav links */}

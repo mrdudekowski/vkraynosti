@@ -26,6 +26,7 @@ import {
 } from '../constants/homeSeasonBannerVideoPreload';
 import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfadeVideoIntersection';
 import { TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS } from '../constants/tourSpring3CoverCrop';
+import { TOUR_SPRING_6_COVER_CARD_IMG_OBJECT_CLASS } from '../constants/tourSpring6CoverCrop';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
@@ -388,7 +389,9 @@ const Home = () => {
                                 imgClassName={
                                   activeSeasonLeadTour.id === 'spring-3'
                                     ? TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS
-                                    : undefined
+                                    : activeSeasonLeadTour.id === 'spring-6'
+                                      ? TOUR_SPRING_6_COVER_CARD_IMG_OBJECT_CLASS
+                                      : undefined
                                 }
                                 loading="lazy"
                               />

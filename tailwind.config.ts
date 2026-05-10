@@ -42,6 +42,10 @@ import {
   TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
   TOUR_SPRING_3_COVER_OBJECT_POSITION_LT620,
 } from './src/constants/tourSpring3CoverCrop'
+import {
+  TOUR_SPRING_6_COVER_OBJECT_POSITION_GTE620,
+  TOUR_SPRING_6_COVER_OBJECT_POSITION_LT620,
+} from './src/constants/tourSpring6CoverCrop'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -331,6 +335,12 @@ const config: Config = {
     'min-[620px]:object-tour-card-cover-spring-3-wide',
     'lg:object-tour-detail-hero-desktop-spring-3-wide',
     'lg:object-tour-card-cover-desktop-spring-3-wide',
+    'object-tour-detail-hero-spring-6-tight',
+    'object-tour-detail-hero-spring-6-wide',
+    'object-tour-card-cover-spring-6-tight',
+    'object-tour-card-cover-spring-6-wide',
+    'min-[620px]:object-tour-detail-hero-spring-6-wide',
+    'min-[620px]:object-tour-card-cover-spring-6-wide',
     'object-gallery-winter-4-gora',
     'object-home-season-banner-spring-loop',
     'bg-preface-winter-3-boarder',
@@ -663,6 +673,13 @@ const config: Config = {
         'tour-card-cover-spring-3-tight': TOUR_SPRING_3_COVER_OBJECT_POSITION_LT620,
         'tour-card-cover-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
         'tour-card-cover-desktop-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
+        /**
+         * Маралы х Драконы (spring-6): оленёнок слева на узком экране; от `620px` — центр.
+         */
+        'tour-detail-hero-spring-6-tight': TOUR_SPRING_6_COVER_OBJECT_POSITION_LT620,
+        'tour-detail-hero-spring-6-wide': TOUR_SPRING_6_COVER_OBJECT_POSITION_GTE620,
+        'tour-card-cover-spring-6-tight': TOUR_SPRING_6_COVER_OBJECT_POSITION_LT620,
+        'tour-card-cover-spring-6-wide': TOUR_SPRING_6_COVER_OBJECT_POSITION_GTE620,
         /**
          * Аскольд (spring-10): `view2` / `view3` в вертикальной плитке 1×2 — центр кадра при `object-cover`.
          */

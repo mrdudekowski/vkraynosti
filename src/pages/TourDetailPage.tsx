@@ -16,6 +16,7 @@ import {
   type TourGalleryLayoutVariant,
 } from "../constants/tourGalleryLayoutVariant";
 import { TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring3CoverCrop";
+import { TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring6CoverCrop";
 import { UI } from "../constants/ui";
 import {
   getTourGalleryGridUrls,
@@ -225,7 +226,11 @@ const TourDetailPage = () => {
         backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
         backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
         heroImageObjectClassName={
-          tour.id === 'spring-3' ? TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS : undefined
+          tour.id === 'spring-3'
+            ? TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS
+            : tour.id === 'spring-6'
+              ? TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS
+              : undefined
         }
         desktopHeroImgClassName={
           tour.id === 'winter-3'

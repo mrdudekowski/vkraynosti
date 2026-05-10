@@ -623,7 +623,7 @@ export const TOUR_SPRING_8_COVER_MOBILE = TOUR_SPRING_8_COVER_GRID;
 export const TOUR_SPRING_8_PREFACE_BACKGROUND = `${TOUR_SPRING_8}/view.webp` as const;
 
 /**
- * «Восхождение на г. Воробей + Винодельня» (spring-9).
+ * «Восхождение на г. Воробей + Дегустация» (spring-9).
  * Макет: hero вершины + отдельный preface кадр винодельни, далее 9 кадров сетки с 3 вертикальными клипами.
  */
 export const TOUR_SPRING_9_GALLERY_VIEWER = [

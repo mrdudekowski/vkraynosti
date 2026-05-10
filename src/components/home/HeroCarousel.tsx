@@ -15,6 +15,7 @@ import {
   resolveTourSpring3CoverBackgroundPosition,
   TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX,
 } from '../../constants/tourSpring3CoverCrop';
+import { resolveTourSpring6CoverBackgroundPosition } from '../../constants/tourSpring6CoverCrop';
 import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { getToursBySeason } from '../../data/toursData';
@@ -51,7 +52,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
     total: tours.length,
     autoplayMs: UI.hero.autoplayIntervalMs,
   });
-  const spring3GteLayoutMin = useMatchMinWidth(TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX);
+  const heroCoverGteLayoutMin620 = useMatchMinWidth(TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX);
   const spring3Lg = useMatchMinWidth(BREAKPOINT_LG_PX);
   const showDesktopArrows = useMatchMinWidth(BREAKPOINT_LG_PX);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -76,8 +77,10 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             shouldLoadBackground={shouldLoadBackground}
             backgroundPosition={
               tour.id === 'spring-3'
-                ? resolveTourSpring3CoverBackgroundPosition(spring3GteLayoutMin, spring3Lg)
-                : undefined
+                ? resolveTourSpring3CoverBackgroundPosition(heroCoverGteLayoutMin620, spring3Lg)
+                : tour.id === 'spring-6'
+                  ? resolveTourSpring6CoverBackgroundPosition(heroCoverGteLayoutMin620)
+                  : undefined
             }
             onAdvanceNext={next}
             onAdvancePrev={prev}

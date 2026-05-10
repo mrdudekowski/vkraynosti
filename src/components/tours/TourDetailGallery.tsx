@@ -555,7 +555,7 @@ const TourDetailGalleryComponent = ({
   }
 
   /**
-   * Воробей + Винодельня (spring-9): 9 кадров после hero/preface, где все 3 вертикальных видео идут как 1x2.
+   * Воробей + дегустация (spring-9): 9 кадров после hero/preface, где все 3 вертикальных видео идут как 1x2.
    * Порядок `slice(2)`: top, view2, clip1, rocks, clip2, forest, clip3, sign, top2.
    */
   if (layoutVariant === 'vorobey-winery' && images.length === 9) {

@@ -42,3 +42,8 @@ public/**/source-*
 
 # Docs can be generated / maintained externally; ignore folder by default.
 docs/
+
+# Template / temporary project artifacts
+/pred-plan.md
+/public/vite.svg
+/public/spring tours/

@@ -445,10 +445,11 @@ export const TOUR_SPRING_4_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 /**
  * «Читинза» (spring-5): порядок как у макета `sestra` — hero/preface, затем 11 кадров сетки.
+ * Hero — `peak5` (вершина); бывший hero `top` — в полноширинной плитке сетки (слот бывшего `peak5`).
  * Клипы: `scripts/encode-chitinza-tour-movs.ps1` → `ctz.clip1..4` (.webm / .grid.webm / .poster.webp).
  */
 export const TOUR_SPRING_5_GALLERY_VIEWER = [
-  `${TOUR_SPRING_5}/top.webp`,
+  `${TOUR_SPRING_5}/peak5.webp`,
   `${TOUR_SPRING_5}/view.webp`,
   `${TOUR_SPRING_5}/woods.webp`,
   `${TOUR_SPRING_5}/yar.webp`,
@@ -458,13 +459,13 @@ export const TOUR_SPRING_5_GALLERY_VIEWER = [
   `${TOUR_SPRING_5}/ctz.clip3.webm`,
   `${TOUR_SPRING_5}/ctz.clip4.webm`,
   `${TOUR_SPRING_5}/forest.webp`,
-  `${TOUR_SPRING_5}/peak5.webp`,
+  `${TOUR_SPRING_5}/top.webp`,
   `${TOUR_SPRING_5}/peak2.webp`,
   `${TOUR_SPRING_5}/hike.webp`,
 ] as const;
 
 export const TOUR_SPRING_5_GALLERY_GRID = [
-  `${TOUR_SPRING_5}/top.webp`,
+  `${TOUR_SPRING_5}/peak5.webp`,
   `${TOUR_SPRING_5}/view.webp`,
   `${TOUR_SPRING_5}/woods.webp`,
   `${TOUR_SPRING_5}/yar.webp`,
@@ -474,7 +475,7 @@ export const TOUR_SPRING_5_GALLERY_GRID = [
   `${TOUR_SPRING_5}/ctz.clip3.grid.webm`,
   `${TOUR_SPRING_5}/ctz.clip4.grid.webm`,
   `${TOUR_SPRING_5}/forest.webp`,
-  `${TOUR_SPRING_5}/peak5.webp`,
+  `${TOUR_SPRING_5}/top.webp`,
   `${TOUR_SPRING_5}/peak2.webp`,
   `${TOUR_SPRING_5}/hike.webp`,
 ] as const;
@@ -489,7 +490,7 @@ export const TOUR_SPRING_5_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_5}/ctz.clip4.grid.webm`]: `${TOUR_SPRING_5}/ctz.clip4.poster.webp`,
 };
 
-export const TOUR_SPRING_5_COVER_GRID = `${TOUR_SPRING_5}/top.webp` as const;
+export const TOUR_SPRING_5_COVER_GRID = `${TOUR_SPRING_5}/peak5.webp` as const;
 
 const TOUR_SPRING_6 = `${TOURS_ASSET_BASE}/spring-6`;
 

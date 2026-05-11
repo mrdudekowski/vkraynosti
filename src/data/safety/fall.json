@@ -1,33 +1,33 @@
 [
   {
     "id": "safety-1",
-    "summary": "TODO: заполнить сезонный осенний summary для блока Снаряжение",
-    "details": "TODO: заполнить сезонный осенний details для блока Снаряжение"
+    "summary": "",
+    "details": ""
   },
   {
     "id": "safety-2",
-    "summary": "TODO: заполнить сезонный осенний summary для блока Навигация",
-    "details": "TODO: заполнить сезонный осенний details для блока Навигация"
+    "summary": "",
+    "details": ""
   },
   {
     "id": "safety-3",
-    "summary": "TODO: заполнить сезонный осенний summary для блока Медицинская подготовка",
-    "details": "TODO: заполнить сезонный осенний details для блока Медицинская подготовка"
+    "summary": "",
+    "details": ""
   },
   {
     "id": "safety-4",
-    "summary": "TODO: заполнить сезонный осенний summary для блока Прогноз погоды",
-    "details": "TODO: заполнить сезонный осенний details для блока Прогноз погоды"
+    "summary": "",
+    "details": ""
   },
   {
     "id": "safety-5",
-    "summary": "TODO: заполнить сезонный осенний summary для блока Связь",
-    "details": "TODO: заполнить сезонный осенний details для блока Связь"
+    "summary": "",
+    "details": ""
   },
   {
     "id": "safety-6",
-    "summary": "TODO: заполнить сезонный осенний summary для блока Эвакуация",
-    "details": "TODO: заполнить сезонный осенний details для блока Эвакуация"
+    "summary": "",
+    "details": ""
   }
 ]
 

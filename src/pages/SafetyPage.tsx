@@ -46,16 +46,15 @@ const SafetyPage = () => {
     overrides.map(item => [item.id, item])
   );
 
-  const PLACEHOLDER_PREFIX = 'TODO';
-  const isRealContent = (text: string) => text.length > 0 && !text.startsWith(PLACEHOLDER_PREFIX);
+  const hasSeasonContent = (text: string) => text.trim().length > 0;
 
   const items = SAFETY_ITEMS.map(baseItem => {
     const seasonOverride = overrideById.get(baseItem.id);
     if (!seasonOverride) return baseItem;
     return {
       ...baseItem,
-      summary: isRealContent(seasonOverride.summary) ? seasonOverride.summary : baseItem.summary,
-      details: isRealContent(seasonOverride.details) ? seasonOverride.details : baseItem.details,
+      summary: hasSeasonContent(seasonOverride.summary) ? seasonOverride.summary : baseItem.summary,
+      details: hasSeasonContent(seasonOverride.details) ? seasonOverride.details : baseItem.details,
     };
   });
 

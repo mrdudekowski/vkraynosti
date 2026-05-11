@@ -26,3 +26,10 @@ export const GALLERY_GRID_SQUARE_TILE = 'aspect-square w-full min-h-0' as const;
 
 export const GALLERY_GRID_FULL_WIDTH_SQUARE =
   'col-span-2 aspect-square w-full min-w-0' as const;
+
+/**
+ * Вся ширина `grid-cols-2`, высота как у двух квадратных рядов (`aspect-gallery-tile-2x2`).
+ * Первый ряд «Читинза» / «Маралы»: широкий клип вместо пары квадратов справа от вертикали.
+ */
+export const GALLERY_GRID_FULL_WIDTH_TILE_2X2 =
+  'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0' as const;

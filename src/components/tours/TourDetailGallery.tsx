@@ -31,6 +31,7 @@ import {
   GALLERY_GRID_BENTO_TALL_LEFT,
   GALLERY_GRID_BENTO_TALL_RIGHT,
   GALLERY_GRID_FULL_WIDTH_SQUARE,
+  GALLERY_GRID_FULL_WIDTH_TILE_2X2,
   GALLERY_GRID_SQUARE_TILE,
 } from '../../constants/tourDetailGalleryGridClasses';
 
@@ -460,6 +461,7 @@ const TourDetailGalleryComponent = ({
 
   /**
    * Читинза (spring-5) и Маралы х Драконы (spring-6): ритм как у «Сестра» (`sestra`), 11 кадров после hero/preface.
+   * Первый блок: клип `images[6]` на всю ширину (`aspect-gallery-tile-2x2`), под ним — вертикали `images[5]` и `images[7]`.
    * spring-5 `slice(2)`: woods, yar, clip1…clip4, peak, forest, top (бывший hero), peak2, hike.
    * spring-6 `slice(2)`: hills, deer, clip1, clip2, drag, clip3, clip4, hills5, deer2, clip5, deer3.
    */
@@ -484,7 +486,13 @@ const TourDetailGalleryComponent = ({
 
     return (
       <div className="flex flex-col gap-gallery-gap">
-        {chitinzaBentoRow(5, 6, 7)}
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[6], 6, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[7], 7, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        </div>
         {chitinzaBentoRow(1, 2, 3)}
         {chitinzaFullWidthSquare(4)}
         {chitinzaFullWidthSquare(0)}

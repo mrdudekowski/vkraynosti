@@ -462,7 +462,7 @@ const TourDetailGalleryComponent = ({
   /**
    * Читинза (spring-5) и Маралы х Драконы (spring-6): ритм как у «Сестра» (`sestra`), 11 кадров после hero/preface.
    * Первый блок: клип `images[6]` на всю ширину (`aspect-gallery-tile-2x2`), под ним — вертикали `images[5]` и `images[7]`.
-   * spring-5 `slice(2)`: woods, yar, clip1…clip4, peak, forest, top (бывший hero), peak2, hike.
+   * spring-5 `slice(2)`: woods, yar, clip1…clip4, peak, forest, top, peak5, hike (`peak2` — hero).
    * spring-6 `slice(2)`: hills, deer, clip1, clip2, drag, clip3, clip4, hills5, deer2, clip5, deer3.
    */
   if (

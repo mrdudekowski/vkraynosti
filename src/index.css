@@ -370,7 +370,7 @@
 
   /**
    * CTA страницы тура: апельсиновый `cta.fill`, начальный текст — `text.inverse` (кремовый белый: читаемо на оранжевом).
-   * `cta.sweep` при hover; dual — те же правила.
+   * `cta.sweep` при hover; dual — те же правила, шрифт как у одиночной CTA (`font-body`).
    */
   .btn-cta-tour {
     position: relative;
@@ -427,7 +427,7 @@
   }
 
   .btn-cta-tour--dual {
-    @apply font-heading font-normal;
+    @apply font-body font-semibold;
     --cta-letter-stagger-duration: theme('transitionDuration.cta-letter-stagger');
     --cta-letter-pop-duration: theme('transitionDuration.cta-letter-pop');
   }

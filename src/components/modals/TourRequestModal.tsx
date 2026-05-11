@@ -17,6 +17,7 @@ import FormCheckbox from '../form/FormCheckbox';
 import TextInput from '../form/TextInput';
 import TextArea from '../form/TextArea';
 import MaxMessengerIcon from '../icons/MaxMessengerIcon';
+import { sendTourRequestLead } from '../../services/sendTourRequestLead';
 import {
   tourRequestFormSchema,
   defaultTourRequestFormValues,
@@ -49,6 +50,7 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
   const [values, setValues] = useState<TourRequestFormInput>(defaultTourRequestFormValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const modalAliveRef = useRef(true);
   const successCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -83,14 +85,29 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
     e.preventDefault();
     const parsed = tourRequestFormSchema.safeParse(values);
     if (!parsed.success) return;
+
     setIsSubmitting(true);
-    await new Promise<void>(resolve => {
-      window.setTimeout(resolve, SUBMIT_DELAY_MS);
-    });
-    if (!modalAliveRef.current) return;
-    if (import.meta.env.DEV) {
-      console.info('[tourRequest] validated payload accepted for client-side mock submit');
+    setSubmitError('');
+
+    try {
+      await Promise.all([
+        sendTourRequestLead(payload, parsed.data),
+        new Promise<void>(resolve => {
+          window.setTimeout(resolve, SUBMIT_DELAY_MS);
+        }),
+      ]);
+    } catch (err) {
+      if (import.meta.env.DEV) {
+        console.error('[tourRequest] lead submit failed', err);
+      }
+      if (modalAliveRef.current) {
+        setSubmitError(UI.tourRequestModal.submitError);
+        setIsSubmitting(false);
+      }
+      return;
     }
+
+    if (!modalAliveRef.current) return;
     setIsSubmitting(false);
     setSubmitSuccess(true);
     successCloseTimerRef.current = window.setTimeout(() => {
@@ -375,6 +392,11 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                   <>{UI.tourRequestModal.submit}</>
                 )}
               </button>
+              {submitError ? (
+                <p role="alert" className="text-sm text-difficulty-hard-fg">
+                  {submitError}
+                </p>
+              ) : null}
             </form>
           )}
         </div>

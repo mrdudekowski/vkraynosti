@@ -155,6 +155,7 @@ export const UI = {
     submit: 'Отправить заявку',
     sending: 'Отправка…',
     success: 'Заявка отправлена. Мы свяжемся с вами.',
+    submitError: 'Не получилось отправить заявку. Попробуйте ещё раз или напишите нам в Telegram.',
     errors: {
       nameRequired: 'Укажите имя',
       emailInvalid: 'Некорректный email',

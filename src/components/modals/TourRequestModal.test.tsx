@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import TourRequestModal from './TourRequestModal';
 import { UI } from '../../constants/ui';
+import { sendTourRequestLead } from '../../services/sendTourRequestLead';
 
 const mockClose = vi.fn();
 
@@ -14,6 +15,10 @@ vi.mock('../../context/useModal', () => ({
     openTourRequestModal: vi.fn(),
     modal: { type: null },
   }),
+}));
+
+vi.mock('../../services/sendTourRequestLead', () => ({
+  sendTourRequestLead: vi.fn(),
 }));
 
 const payload = {
@@ -30,10 +35,12 @@ const RouterWrap = ({ children }: { children: React.ReactNode }) => (
 describe('TourRequestModal', () => {
   beforeEach(() => {
     mockClose.mockClear();
+    vi.mocked(sendTourRequestLead).mockReset();
+    vi.mocked(sendTourRequestLead).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('opens dialog with title and tour line', () => {
@@ -52,7 +59,6 @@ describe('TourRequestModal', () => {
 
   it('emits non-sensitive submit event on successful submit', async () => {
     const user = userEvent.setup();
-    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
 
@@ -65,18 +71,26 @@ describe('TourRequestModal', () => {
 
     await waitFor(
       () => {
-        expect(infoSpy).toHaveBeenCalledWith(
-          '[tourRequest] validated payload accepted for client-side mock submit'
+        expect(sendTourRequestLead).toHaveBeenCalledWith(
+          payload,
+          expect.objectContaining({
+            name: 'Иван',
+            phone: '+79991234567',
+            question: 'Вопрос по туру',
+            preferredMessenger: 'telegram',
+            privacyAccepted: true,
+          })
         );
       },
       { timeout: 3000 }
     );
-    infoSpy.mockRestore();
+    expect(await screen.findByRole('status', undefined, { timeout: 3000 })).toHaveTextContent(
+      UI.tourRequestModal.success
+    );
   });
 
   it('submits without question when other fields are valid', async () => {
     const user = userEvent.setup();
-    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
 
@@ -88,12 +102,21 @@ describe('TourRequestModal', () => {
 
     await waitFor(
       () => {
-        expect(infoSpy).toHaveBeenCalledWith(
-          '[tourRequest] validated payload accepted for client-side mock submit'
+        expect(sendTourRequestLead).toHaveBeenCalledWith(
+          payload,
+          expect.objectContaining({
+            name: 'Иван',
+            phone: '+79991234567',
+            question: '',
+            preferredMessenger: 'telegram',
+            privacyAccepted: true,
+          })
         );
       },
       { timeout: 3000 }
     );
-    infoSpy.mockRestore();
+    expect(await screen.findByRole('status', undefined, { timeout: 3000 })).toHaveTextContent(
+      UI.tourRequestModal.success
+    );
   });
 });

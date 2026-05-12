@@ -4,11 +4,11 @@
 
 /** Высокая плитка слева в сетке 2×2 (два ряда). */
 export const GALLERY_GRID_BENTO_TALL_LEFT =
-  'col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full' as const;
+  'col-start-1 row-span-2 row-start-1 aspect-gallery-bento-tall h-full min-h-0 w-full' as const;
 
 /** Высокая плитка справа на две строки (вся правая колонка). */
 export const GALLERY_GRID_BENTO_TALL_RIGHT =
-  'col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full' as const;
+  'col-start-2 row-span-2 row-start-1 aspect-gallery-bento-tall h-full min-h-0 w-full' as const;
 
 export const GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE =
   'col-start-2 row-start-1 aspect-square w-full min-h-0' as const;

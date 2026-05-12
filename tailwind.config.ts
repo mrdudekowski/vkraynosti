@@ -636,6 +636,11 @@ const config: Config = {
          */
         'gallery-tile-2x2': '1 / 1',
         /**
+         * Высокая колонка bento в `grid-cols-2`: ширина половины сетки, высота двух квадратов
+         * (нужна для видео без intrinsic height, иначе ряд схлопывается).
+         */
+        'gallery-bento-tall': '1 / 2',
+        /**
          * Плитка на всю ширину двухколоночной сетки, низкая панорама (ширина : высота = 2 : 1).
          * `TourDetailGallery` — маяк Аскольда (`spring-10`, `askold`).
          */
@@ -661,7 +666,7 @@ const config: Config = {
         /**
          * Фалаза × Грибановка (winter-3): якорь ниже центра кадра (lg+), чтобы в обрезке hero оставались люди.
          */
-        'tour-detail-hero-desktop-winter-3': 'center 77%',
+        'tour-detail-hero-desktop-winter-3': 'center 57%',
         /** Хаски-тур (winter-4): чуть ниже дефолтного hero, без обрезки голов (см. `tour-detail-hero-desktop`). */
         'tour-detail-hero-desktop-winter-4': 'center 58%',
         /**

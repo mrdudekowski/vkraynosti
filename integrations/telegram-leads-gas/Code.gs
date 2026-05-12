@@ -3,26 +3,27 @@
  *
  * --- Быстрый старт ---
  * 1) Вставьте этот файл в Apps Script.
- * 2) Запустите функцию installDefaultSettings().
- * 3) В Project Settings → Script properties добавьте:
+ * 2) В Project Settings → Script properties добавьте:
  *    TELEGRAM_BOT_TOKEN — токен от @BotFather.
+ *    TELEGRAM_CHAT_ID   — id группы (число; супергруппа со знаком «-»).
  *    WEBHOOK_SECRET     — любая длинная строка-пароль.
+ * 3) Опционально запустите installDefaultSettings(), чтобы задать TTL идемпотентности.
  * 4) Запустите функцию sendTestLead().
  * 5) Если тест пришёл в Telegram — Deploy → New deployment → Web app.
  *
  * --- Script Properties (Project Settings → Script properties) ---
  * TELEGRAM_BOT_TOKEN  — токен от @BotFather (не коммитить в git).
  * TELEGRAM_CHAT_ID    — id группы (число; супергруппа со знаком «-»).
- * WEBHOOK_SECRET      — общий секрет; должен совпадать с полем в JSON.
+ * WEBHOOK_SECRET      — общий секрет; должен совпадать с заголовком/полем в JSON.
  *
  * Опционально:
  * IDEMPOTENCY_TTL_SECONDS — 60…21600 (лимит CacheService), по умолчанию 21600 (6 ч).
  *
  * --- Важно про секрет и заголовки ---
- * У опубликованного Web App в doPost(e) НЕТ доступа к произвольным HTTP-заголовкам
+ * У опубликованного Web App в doPost(e) обычно НЕТ доступа к произвольным HTTP-заголовкам
  * (см. документацию Web Apps: только queryString, parameter, postData…).
- * Поэтому X-Webhook-Secret из запроса сюда не попадёт: секрет передавайте в теле
- * (поле webhookSecret) или проксируйте с бэкенда, подставляя секрет в JSON.
+ * Поэтому X-Webhook-Secret может не попасть в скрипт: для прямого вызова GAS
+ * передавайте секрет в теле (поле webhookSecret) или через backend/serverless proxy.
  *
  * --- Деплой ---
  * Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone
@@ -31,7 +32,8 @@
  * --- Пример curl (подставьте URL деплоя /exec) ---
  * curl -sS -X POST 'https://script.google.com/macros/s/AKfycb.../exec' \
  *   -H 'Content-Type: application/json' \
- *   -d '{"webhookSecret":"ВАШ_СЕКРЕТ","tourId":"spring-6","tourTitle":"…","name":"Иван","phone":"+79001234567","email":"","preferredMessenger":"telegram","question":"Вопрос","privacyAccepted":true,"sourceUrl":"https://…","submittedAt":"2026-05-11T12:00:00.000Z"}'
+ *   -H 'X-Webhook-Secret: ВАШ_СЕКРЕТ' \
+ *   -d '{"webhookSecret":"ВАШ_СЕКРЕТ","tourId":"spring-6","tourTitle":"Мараловая ферма и Парк Драконов","season":"spring","name":"Иван","phone":"+79001234567","email":"","preferredMessenger":"telegram","question":"Вопрос","privacyAccepted":true,"sourceUrl":"https://…","submittedAt":"2026-05-11T12:00:00.000Z","userAgent":"curl"}'
  *
  * --- Чеклист ---
  * [ ] Бот создан, TELEGRAM_BOT_TOKEN в свойствах.
@@ -49,23 +51,20 @@
 
 var TELEGRAM_TEXT_LIMIT = 4096;
 var SAFE_CHUNK = 4000;
-var DEFAULT_TELEGRAM_CHAT_ID = '-5169157772';
 var DEFAULT_IDEMPOTENCY_TTL_SECONDS = '21600';
 
 /**
  * Запустите один раз из Apps Script.
- * Эта функция запишет chat_id и TTL в Script Properties.
- * Токен бота и секрет нужно добавить вручную, чтобы не хранить их в коде.
+ * Эта функция запишет только TTL идемпотентности.
+ * Токен бота, chat_id и секрет нужно добавить вручную, чтобы не хранить их в коде.
  */
 function installDefaultSettings() {
   var props = PropertiesService.getScriptProperties();
-  props.setProperty('TELEGRAM_CHAT_ID', DEFAULT_TELEGRAM_CHAT_ID);
-
   if (!props.getProperty('IDEMPOTENCY_TTL_SECONDS')) {
     props.setProperty('IDEMPOTENCY_TTL_SECONDS', DEFAULT_IDEMPOTENCY_TTL_SECONDS);
   }
 
-  Logger.log('Готово: TELEGRAM_CHAT_ID установлен. Теперь добавьте TELEGRAM_BOT_TOKEN и WEBHOOK_SECRET.');
+  Logger.log('Готово: IDEMPOTENCY_TTL_SECONDS установлен. Теперь добавьте TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID и WEBHOOK_SECRET.');
 }
 
 /**
@@ -78,6 +77,10 @@ function sendTestLead() {
 
   if (!props.getProperty('TELEGRAM_BOT_TOKEN')) {
     Logger.log('Не найден TELEGRAM_BOT_TOKEN. Добавьте токен бота в Script Properties.');
+    return;
+  }
+  if (!props.getProperty('TELEGRAM_CHAT_ID')) {
+    Logger.log('Не найден TELEGRAM_CHAT_ID. Добавьте id группы в Script Properties.');
     return;
   }
 
@@ -233,6 +236,10 @@ function parseIdempotencyTtl_(raw) {
  * @return {string}
  */
 function getProvidedSecret_(e, body) {
+  if (e && e.headers) {
+    var headerSecret = e.headers['X-Webhook-Secret'] || e.headers['x-webhook-secret'];
+    if (headerSecret) return String(headerSecret);
+  }
   if (body && typeof body.webhookSecret === 'string' && body.webhookSecret) return body.webhookSecret;
   if (body && typeof body.secret === 'string' && body.secret) return body.secret;
   if (e && e.parameter) {
@@ -249,6 +256,12 @@ function getProvidedSecret_(e, body) {
 function validatePayload_(body) {
   if (!body.tourId || typeof body.tourId !== 'string' || !String(body.tourId).trim()) {
     return 'tourId is required';
+  }
+  if (body.tourTitle != null && typeof body.tourTitle !== 'string') {
+    return 'tourTitle must be a string when provided';
+  }
+  if (body.season != null && typeof body.season !== 'string') {
+    return 'season must be a string when provided';
   }
   if (!body.name || typeof body.name !== 'string' || !String(body.name).trim()) {
     return 'name is required';
@@ -271,15 +284,20 @@ function validatePayload_(body) {
  * @return {string}
  */
 function buildLeadMessage_(body) {
-  var tourTitle = body.tourTitle ? escapeHtml_(String(body.tourTitle).trim()) : '—';
+  var tourId = escapeHtml_(String(body.tourId).trim());
+  var tourTitle = body.tourTitle ? escapeHtml_(String(body.tourTitle).trim()) : 'Без названия';
   var season = body.season ? escapeHtml_(seasonLabel_(String(body.season))) : '—';
   var email = body.email != null && String(body.email).trim() ? escapeHtml_(String(body.email).trim()) : '—';
   var question = body.question != null && String(body.question).trim() ? escapeHtml_(String(body.question).trim()) : '—';
   var sourceUrl = body.sourceUrl ? escapeHtml_(String(body.sourceUrl)) : '—';
+  var submittedAt = body.submittedAt ? escapeHtml_(String(body.submittedAt)) : '—';
+  var userAgent = body.userAgent ? escapeHtml_(String(body.userAgent)) : '—';
+  var idempotencyKey = body.idempotencyKey ? escapeHtml_(String(body.idempotencyKey)) : '—';
+  var privacyAccepted = body.privacyAccepted === true ? 'Да' : 'Нет';
 
   var lines = [
     '<b>Новая заявка с сайта</b>',
-    '<b>Тур:</b> ' + tourTitle,
+    '<b>Тур:</b> ' + tourTitle + ' (id: ' + tourId + ')',
     '<b>Сезон:</b> ' + season,
     '',
     '<b>Имя:</b> ' + escapeHtml_(String(body.name).trim()),
@@ -289,8 +307,15 @@ function buildLeadMessage_(body) {
     '<b>Вопрос:</b>',
     question,
     '',
+    '<b>Согласие с политикой:</b> ' + privacyAccepted,
+    '<b>Отправлено:</b> ' + submittedAt,
+    '<b>Idempotency key:</b> <code>' + idempotencyKey + '</code>',
+    '',
     '<b>Ссылка на страницу с которой была оставлена заявка:</b>',
     sourceUrl,
+    '',
+    '<b>User-Agent:</b>',
+    userAgent,
   ];
 
   return lines.join('\n');

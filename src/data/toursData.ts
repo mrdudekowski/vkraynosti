@@ -72,6 +72,15 @@ import {
   TOUR_SPRING_10_GALLERY_GRID,
   TOUR_SPRING_10_GALLERY_VIEWER,
   TOUR_SPRING_10_PREFACE_BACKGROUND,
+  TOUR_SPRING_11_GALLERY_GRID,
+  TOUR_SPRING_11_GALLERY_VIEWER,
+  TOUR_SPRING_11_PREFACE_BACKGROUND,
+  TOUR_SPRING_12_GALLERY_GRID,
+  TOUR_SPRING_12_GALLERY_VIEWER,
+  TOUR_SPRING_12_PREFACE_BACKGROUND,
+  TOUR_SPRING_13_GALLERY_GRID,
+  TOUR_SPRING_13_GALLERY_VIEWER,
+  TOUR_SPRING_13_PREFACE_BACKGROUND,
 } from '../constants/images';
 import { UI } from '../constants/ui';
 
@@ -584,6 +593,160 @@ export const TOURS: Tour[] = [
     prefaceBackgroundImageUrl: TOUR_SPRING_10_PREFACE_BACKGROUND,
     galleryImages: [...TOUR_SPRING_10_GALLERY_VIEWER],
     galleryGridUrls: [...TOUR_SPRING_10_GALLERY_GRID],
+  },
+  {
+    id: 'spring-11',
+    season: 'spring',
+    title: 'Путешествие на остров Шкота',
+    subtitle: 'Необитаемый остров с маяком и морскими котиками',
+    heroPhrase:
+      'Переход вброд по косе, обед с морепродуктами и купание в лазурной воде',
+    duration: '8–10 часов',
+    difficulty: 'Easy',
+    price: '5 000 ₽',
+    priceFootnote: 'Для группы от 3 до 8 человек.',
+    descriptionLeadBold: 'Остров Шкота',
+    description:
+      ' — маленький необитаемый остров к югу от Русского, куда летом можно перейти вброд по каменистой косе. За один день пройдём к заброшенному маяку, увидим скалы, кекуры и, если повезёт, лежбище ларг. В финале — спуск в бухту по стационарной верёвке, купание в чистой воде и обед с морепродуктами для вашей компании.',
+    program: [
+      { timeLabel: '09:00', description: 'Выезд из Владивостока через Русский мост' },
+      {
+        timeLabel: '10:00',
+        description: 'Прибытие к косе и переход вброд на остров Шкота',
+      },
+      {
+        timeLabel: '10:15–12:30',
+        description:
+          'Пешая прогулка: заброшенный военный городок, батарея, старый маяк, скалы и море',
+      },
+      {
+        timeLabel: '12:30–13:30',
+        description:
+          'Спуск в бухту по верёвке для желающих, купание и отдых у воды',
+      },
+      {
+        timeLabel: '13:30–14:30',
+        description: 'Обед с морепродуктами на берегу, готовим на месте',
+      },
+      {
+        timeLabel: '14:30–15:30',
+        description: 'Отдых, фотосессия и купание',
+      },
+      { timeLabel: '15:30–16:30', description: 'Обратный путь до косы' },
+      { timeLabel: '16:30–17:30', description: 'Возвращение во Владивосток' },
+    ],
+    includedInPrice: [
+      inc('Индивидуальный трансфер Владивосток — остров Шкота — Владивосток', faShuttleVan),
+      inc('Сопровождение гида-проводника', faUserTie),
+      inc('Обед с морепродуктами на берегу', faUtensils),
+      inc('Горячие напитки (чай/кофе)', faMugHot),
+      inc('Истории об острове, маяке, батареях и морских котиках', faBookOpen),
+      inc('Забота команды и индивидуальный подход', faHeart),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-11'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_11_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_11_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_11_GALLERY_GRID],
+  },
+  {
+    id: 'spring-12',
+    season: 'spring',
+    title: 'Путешествие на мыс Тобизина',
+    subtitle: 'Край земли с каменной «шахматной доской»',
+    heroPhrase:
+      'Скалы-исполины, бескрайнее море, купание в бухте и обед с морепродуктами — индивидуально для вашей компании',
+    duration: '6–8 часов',
+    difficulty: 'Easy',
+    price: '5 000 ₽',
+    priceFootnote: 'Для группы от 4 до 10 человек.',
+    descriptionLeadBold: 'Мыс Тобизина',
+    description:
+      ' — самая южная точка острова Русский: лесная тропа, скалы до 30 м и каменное плато, похожее на шахматную доску. Дойдём до края моря, пройдём небольшой верёвочный участок, летом искупаемся в бухте Карпинского и устроим обед с морепродуктами на берегу.',
+    program: [
+      { timeLabel: '10:00', description: 'Выезд из Владивостока через Русский мост' },
+      {
+        timeLabel: '10:40',
+        description: 'Прибытие к бухте Карпинского, инструктаж и подготовка',
+      },
+      {
+        timeLabel: '11:00–13:00',
+        description:
+          'Пешая прогулка к мысу: лесная тропа, скалы, каменный перешеек и верёвочный участок',
+      },
+      {
+        timeLabel: '13:00–14:00',
+        description:
+          'Свободное время на мысе: фото на каменном плато, виды на море и отдых',
+      },
+      { timeLabel: '14:00–15:30', description: 'Обратный путь к бухте Карпинского' },
+      {
+        timeLabel: '15:30–16:30',
+        description: 'Купание в бухте Карпинского в тёплое время года',
+      },
+      {
+        timeLabel: '16:30–17:30',
+        description: 'Обед с морепродуктами на берегу, готовим на месте',
+      },
+      { timeLabel: '17:30–18:30', description: 'Возвращение во Владивосток' },
+    ],
+    includedInPrice: [
+      inc('Индивидуальный трансфер Владивосток — мыс Тобизина — Владивосток', faShuttleVan),
+      inc('Сопровождение гида-проводника', faUserTie),
+      inc('Обед с морепродуктами на берегу', faUtensils),
+      inc('Горячие напитки (чай/кофе)', faMugHot),
+      inc('Помощь на верёвочном участке маршрута', faHelmetSafety),
+      inc('Истории об острове Русский и мысе Тобизина', faBookOpen),
+      inc('Забота команды и индивидуальный формат', faHeart),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-12'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_12_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_12_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_12_GALLERY_GRID],
+  },
+  {
+    id: 'spring-13',
+    season: 'spring',
+    title: 'Полуостров Гамова',
+    subtitle: 'Райский уголок на юге Приморья',
+    heroPhrase: 'Скалистые мысы, реликтовый лес и бескрайнее море!',
+    duration: '15 часов',
+    difficulty: 'Easy',
+    metaAudienceLabel: 'Лёгкий хайкинг, релакс',
+    price: '6 500 ₽',
+    priceFootnote: 'Июль-август: 7 200 ₽.',
+    descriptionLeadBold: 'Полуостров Гамова',
+    description:
+      ' — джип-тур по югу Приморья, где за один день собраны бухты Витязь, Теляковского и Астафьева, реликтовые сосны, скалистые мысы и видовые точки над морем. Маршрут для тех, кто хочет увидеть дикое Приморье без суеты: прозрачную воду, вековой маяк, легенды старого края и пикник на берегу.',
+    program: [
+      { timeLabel: '06:00', description: 'Выезд из Владивостока' },
+      {
+        timeLabel: '10:30',
+        description: 'Бухта Витязь и её главные достопримечательности',
+      },
+      {
+        timeLabel: '12:00',
+        description:
+          'Полуостров Гамова: остров Томящегося сердца, бухта Теляковского и реликтовые сосны',
+      },
+      {
+        timeLabel: '15:00',
+        description: 'Дзен в бухте Астафьева и пикник на берегу',
+      },
+      { timeLabel: '17:00', description: 'Выезд в город' },
+      { timeLabel: '21:00', description: 'Прибытие во Владивосток' },
+    ],
+    includedInPrice: [
+      inc('Индивидуальный трансфер из Владивостока', faShuttleVan),
+      inc('Сопровождение гида-проводника', faUserTie),
+      inc('Обед на берегу', faUtensils),
+      inc('Горячие напитки (чай/кофе)', faMugHot),
+      inc('Истории о крае, полуострове, бухтах и окрестностях', faBookOpen),
+      inc('Забота команды и индивидуальный подход', faHeart),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-13'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_13_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_13_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_13_GALLERY_GRID],
   },
   {
     id: 'spring-4',

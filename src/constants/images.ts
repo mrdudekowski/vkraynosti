@@ -559,6 +559,9 @@ const TOUR_SPRING_7 = `${TOURS_ASSET_BASE}/spring-7`;
 const TOUR_SPRING_8 = `${TOURS_ASSET_BASE}/spring-8`;
 const TOUR_SPRING_9 = `${TOURS_ASSET_BASE}/spring-9`;
 const TOUR_SPRING_10 = `${TOURS_ASSET_BASE}/spring-10`;
+export const TOUR_SPRING_11_ASSET_BASE = `${TOURS_ASSET_BASE}/spring-11` as const;
+export const TOUR_SPRING_12_ASSET_BASE = `${TOURS_ASSET_BASE}/spring-12` as const;
+export const TOUR_SPRING_13_ASSET_BASE = `${TOURS_ASSET_BASE}/spring-13` as const;
 
 /**
  * «Ущелье Дарданеллы» (spring-7). Исходники: `content/Дарданелла (все сезоны кроме зимы)/`.
@@ -734,6 +737,109 @@ export const TOUR_SPRING_10_VIEW2_GRID = `${TOUR_SPRING_10}/view2.webp` as const
 export const TOUR_SPRING_10_VIEW3_GRID = `${TOUR_SPRING_10}/view3.webp` as const;
 
 /**
+ * «Остров Шкота» (spring-11).
+ * Фото: `content/Шкота/webp/`, hero: `content/HERO/Весна/shkota.webp`.
+ * Видео: `scripts/encode-spring-11-shkota-movs.ps1` -> `shk.clip1..3`.
+ */
+export const TOUR_SPRING_11_COVER_GRID =
+  `${TOUR_SPRING_11_ASSET_BASE}/hero.webp` as const;
+export const TOUR_SPRING_11_PREFACE_BACKGROUND =
+  `${TOUR_SPRING_11_ASSET_BASE}/view.webp` as const;
+
+export const TOUR_SPRING_11_CLIP1_GRID_WEBM =
+  `${TOUR_SPRING_11_ASSET_BASE}/shk.clip1.grid.webm` as const;
+export const TOUR_SPRING_11_CLIP2_GRID_WEBM =
+  `${TOUR_SPRING_11_ASSET_BASE}/shk.clip2.grid.webm` as const;
+export const TOUR_SPRING_11_CLIP3_GRID_WEBM =
+  `${TOUR_SPRING_11_ASSET_BASE}/shk.clip3.grid.webm` as const;
+
+export const TOUR_SPRING_11_GALLERY_VIEWER = [
+  TOUR_SPRING_11_COVER_GRID,
+  TOUR_SPRING_11_PREFACE_BACKGROUND,
+  `${TOUR_SPRING_11_ASSET_BASE}/shk.clip1.webm`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view2.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view3.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/shk.clip2.webm`,
+  `${TOUR_SPRING_11_ASSET_BASE}/climb.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view4.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/shk.clip3.webm`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view5.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view6.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/wow.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/scallops.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/earchin.webp`,
+] as const;
+
+export const TOUR_SPRING_11_GALLERY_GRID = [
+  TOUR_SPRING_11_COVER_GRID,
+  TOUR_SPRING_11_PREFACE_BACKGROUND,
+  TOUR_SPRING_11_CLIP1_GRID_WEBM,
+  `${TOUR_SPRING_11_ASSET_BASE}/view2.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view3.webp`,
+  TOUR_SPRING_11_CLIP2_GRID_WEBM,
+  `${TOUR_SPRING_11_ASSET_BASE}/climb.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view4.webp`,
+  TOUR_SPRING_11_CLIP3_GRID_WEBM,
+  `${TOUR_SPRING_11_ASSET_BASE}/view5.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/view6.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/wow.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/scallops.webp`,
+  `${TOUR_SPRING_11_ASSET_BASE}/earchin.webp`,
+] as const;
+
+export const TOUR_SPRING_11_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [TOUR_SPRING_11_CLIP1_GRID_WEBM]: `${TOUR_SPRING_11_ASSET_BASE}/shk.clip1.poster.webp`,
+  [TOUR_SPRING_11_CLIP2_GRID_WEBM]: `${TOUR_SPRING_11_ASSET_BASE}/shk.clip2.poster.webp`,
+  [TOUR_SPRING_11_CLIP3_GRID_WEBM]: `${TOUR_SPRING_11_ASSET_BASE}/shk.clip3.poster.webp`,
+};
+
+/**
+ * «Мыс Тобизина» (spring-12).
+ * TODO media: заменить placeholder URL на реальные файлы из `public/tours/spring-12/`:
+ * `cover.webp`, `preface.webp`, `trail.webp`, `stone-plateau.webp`, `cliffs.webp`, `karpinsky-bay.webp`, `seafood-lunch.webp`.
+ * Пока файлов нет в репозитории, используем явные placehold.co-заглушки, чтобы не оставлять битые пути.
+ */
+export const TOUR_SPRING_12_COVER_GRID =
+  `${BASE}/1200x800/C76B7E/ffffff?text=Мыс+Тобизина` as const;
+export const TOUR_SPRING_12_PREFACE_BACKGROUND =
+  `${BASE}/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря` as const;
+
+export const TOUR_SPRING_12_GALLERY_VIEWER = [
+  TOUR_SPRING_12_COVER_GRID,
+  TOUR_SPRING_12_PREFACE_BACKGROUND,
+  `${BASE}/900x900/7BA7BC/ffffff?text=Тропа+к+мысу`,
+  `${BASE}/900x900/1A3C2E/ffffff?text=Каменное+плато`,
+  `${BASE}/900x900/C8A96E/1A3C2E?text=Скалы`,
+  `${BASE}/1200x800/7BA7BC/ffffff?text=Бухта+Карпинского`,
+  `${BASE}/900x900/E8A838/1A3C2E?text=Обед+на+берегу`,
+] as const;
+
+export const TOUR_SPRING_12_GALLERY_GRID = TOUR_SPRING_12_GALLERY_VIEWER;
+
+/**
+ * «Полуостров Гамова» (spring-13).
+ * TODO media: заменить placeholder URL на реальные файлы из `public/tours/spring-13/`:
+ * `cover.webp`, `preface.webp`, `vityaz-bay.webp`, `gamov-cliffs.webp`, `relict-pines.webp`, `telyakovsky-bay.webp`, `astafiev-bay.webp`.
+ * Пока файлов нет в репозитории, используем явные placehold.co-заглушки, чтобы не оставлять битые пути.
+ */
+export const TOUR_SPRING_13_COVER_GRID =
+  `${BASE}/1200x800/C76B7E/ffffff?text=Полуостров+Гамова` as const;
+export const TOUR_SPRING_13_PREFACE_BACKGROUND =
+  `${BASE}/1200x800/1A3C2E/ffffff?text=Гамова+·+море+и+мысы` as const;
+
+export const TOUR_SPRING_13_GALLERY_VIEWER = [
+  TOUR_SPRING_13_COVER_GRID,
+  TOUR_SPRING_13_PREFACE_BACKGROUND,
+  `${BASE}/900x900/7BA7BC/ffffff?text=Бухта+Витязь`,
+  `${BASE}/900x900/1A3C2E/ffffff?text=Скалы+и+мысы`,
+  `${BASE}/900x900/C8A96E/1A3C2E?text=Реликтовые+сосны`,
+  `${BASE}/1200x800/7BA7BC/ffffff?text=Бухта+Теляковского`,
+  `${BASE}/900x900/E8A838/1A3C2E?text=Пикник+в+Астафьева`,
+] as const;
+
+export const TOUR_SPRING_13_GALLERY_GRID = TOUR_SPRING_13_GALLERY_VIEWER;
+
+/**
  * Секунда входа 5-секундного сегмента в исходном `*.grid.webm` для баннера зимы (колонки 0…9).
  * Синхронно с `cuts[].startSec` в `scripts/generate-home-season-banner-loop-videos.cjs`.
  */
@@ -829,6 +935,9 @@ export const SPRING_TOUR_COVERS = {
   'spring-8': TOUR_SPRING_8_COVER_GRID,
   'spring-9': TOUR_SPRING_9_COVER_GRID,
   'spring-10': TOUR_SPRING_10_COVER_GRID,
+  'spring-11': TOUR_SPRING_11_COVER_GRID,
+  'spring-12': TOUR_SPRING_12_COVER_GRID,
+  'spring-13': TOUR_SPRING_13_COVER_GRID,
 } as const;
 
 /** Мобильные webp-варианты тяжёлых tour-изображений (hero/preface). */

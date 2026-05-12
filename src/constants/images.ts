@@ -55,7 +55,7 @@ export const TOUR_WINTER_1_REST4_IMAGE = TOUR_WINTER_1_GALLERY_GRID[8];
 export const TOUR_WINTER_1_GALLERY = TOUR_WINTER_1_GALLERY_VIEWER;
 
 export const TOUR_WINTER_1_COVER_GRID = TOUR_WINTER_1_GALLERY_GRID[0];
-export const TOUR_WINTER_1_COVER = TOUR_WINTER_1_COVER_GRID;
+export const TOUR_WINTER_1_COVER = `${TOUR_WINTER_1}/hero.webp` as const;
 
 const TOUR_WINTER_2 = `${TOURS_ASSET_BASE}/winter-2`;
 
@@ -88,7 +88,7 @@ export const TOUR_WINTER_2_PEAK_IMAGE = TOUR_WINTER_2_GALLERY_GRID[5];
 export const TOUR_WINTER_2_GALLERY = TOUR_WINTER_2_GALLERY_VIEWER;
 
 export const TOUR_WINTER_2_COVER_GRID = TOUR_WINTER_2_GALLERY_GRID[0];
-export const TOUR_WINTER_2_COVER = TOUR_WINTER_2_COVER_GRID;
+export const TOUR_WINTER_2_COVER = `${TOUR_WINTER_2}/hero.webp` as const;
 
 const TOUR_WINTER_3 = `${TOURS_ASSET_BASE}/winter-3`;
 
@@ -138,7 +138,7 @@ export const TOUR_WINTER_3_GALLERY = TOUR_WINTER_3_GALLERY_VIEWER;
 /** Обложка карточки и hero: оптимизированный кадр. */
 export const TOUR_WINTER_3_COVER_GRID = TOUR_WINTER_3_GALLERY_GRID[0];
 
-export const TOUR_WINTER_3_COVER = TOUR_WINTER_3_COVER_GRID;
+export const TOUR_WINTER_3_COVER = `${TOUR_WINTER_3}/hero.webp` as const;
 
 /** После `galleryGridUrls.slice(2)` — ветка `TourDetailGallery` сравнивает с этими **grid**-URL. */
 export const TOUR_WINTER_3_LIFT_IMAGE = TOUR_WINTER_3_GALLERY_GRID[2];
@@ -174,7 +174,7 @@ export const TOUR_WINTER_3_BBQ_GRID_WEBM = `${TOUR_WINTER_3}/gr.bbq.grid.webm` a
 const TOUR_WINTER_4 = `${TOURS_ASSET_BASE}/winter-4`;
 
 /** Главный кадр hero / карточка (полное качество; не обязан совпадать с [0] галереи). */
-export const TOUR_WINTER_4_COVER = `${TOUR_WINTER_4}/hs.doggos2.webp` as const;
+export const TOUR_WINTER_4_COVER = `${TOUR_WINTER_4}/hero.webp` as const;
 
 /**
  * Галерея «Хаски-тур» — полное качество (просмотрщик).
@@ -256,7 +256,7 @@ export const TOUR_WINTER_5_GALLERY_GRID = [
 export const TOUR_WINTER_5_GALLERY = TOUR_WINTER_5_GALLERY_VIEWER;
 
 export const TOUR_WINTER_5_COVER_GRID = TOUR_WINTER_5_GALLERY_GRID[0];
-export const TOUR_WINTER_5_COVER = TOUR_WINTER_5_COVER_GRID;
+export const TOUR_WINTER_5_COVER = `${TOUR_WINTER_5}/hero.webp` as const;
 
 /** Постеры для ленивого видео в сетке (winter-5). */
 export const TOUR_WINTER_5_GRID_VIDEO_POSTERS: Record<string, string> = {
@@ -287,7 +287,7 @@ export const TOUR_SPRING_1_GALLERY_GRID = [
 ] as const;
 
 export const TOUR_SPRING_1_COVER_GRID = TOUR_SPRING_1_GALLERY_GRID[0];
-export const TOUR_SPRING_1_COVER = TOUR_SPRING_1_COVER_GRID;
+export const TOUR_SPRING_1_COVER = `${TOUR_SPRING_1}/hero.webp` as const;
 
 const TOUR_SPRING_2 = `${TOURS_ASSET_BASE}/spring-2`;
 
@@ -318,7 +318,7 @@ export const TOUR_SPRING_2_GRID_VIDEO_POSTERS: Record<string, string> = {
 };
 
 export const TOUR_SPRING_2_COVER_GRID = TOUR_SPRING_2_GALLERY_GRID[0];
-export const TOUR_SPRING_2_COVER = TOUR_SPRING_2_COVER_GRID;
+export const TOUR_SPRING_2_COVER = `${TOUR_SPRING_2}/hero.webp` as const;
 
 const TOUR_SPRING_3 = `${TOURS_ASSET_BASE}/spring-3`;
 const TOUR_SPRING_4 = `${TOURS_ASSET_BASE}/spring-4`;
@@ -382,13 +382,13 @@ export const TOUR_SPRING_3_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 /** Карточка и hero страницы — кадр «О туре» (`pd.preface.grid`); `pd.hero.grid` остаётся в сетке как [0]. */
 export const TOUR_SPRING_3_COVER_GRID = TOUR_SPRING_3_GALLERY_GRID[1];
-export const TOUR_SPRING_3_COVER = TOUR_SPRING_3_COVER_GRID;
+export const TOUR_SPRING_3_COVER = `${TOUR_SPRING_3}/hero.webp` as const;
 
 /**
- * Обложка карточки и hero — панорама `ss.pan.grid`; вершина `ss.topping` — фон блока «О туре»
+ * Обложка карточки и hero — отдельный hero-баннер; вершина `ss.topping` — фон блока «О туре»
  * (`tour.prefaceBackgroundImageUrl`, см. `toursData` spring-4).
  */
-export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/ss.pan.grid.webp` as const;
+export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/hero.webp` as const;
 
 /** Фон блока «О туре» для «Сестры» (viewer, полное качество). */
 export const TOUR_SPRING_4_PREFACE_BACKGROUND = `${TOUR_SPRING_4}/ss.topping.webp` as const;
@@ -491,7 +491,7 @@ export const TOUR_SPRING_5_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_5}/ctz.clip4.grid.webm`]: `${TOUR_SPRING_5}/ctz.clip4.poster.webp`,
 };
 
-export const TOUR_SPRING_5_COVER_GRID = `${TOUR_SPRING_5}/peak2.webp` as const;
+export const TOUR_SPRING_5_COVER_GRID = `${TOUR_SPRING_5}/hero.webp` as const;
 
 const TOUR_SPRING_6 = `${TOURS_ASSET_BASE}/spring-6`;
 
@@ -552,8 +552,8 @@ export const TOUR_SPRING_6_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
   [`${TOUR_SPRING_6}/mnd.clip5.grid.webm`]: `${TOUR_SPRING_6}/mnd.clip5.poster.webp`,
 };
 
-export const TOUR_SPRING_6_COVER_GRID = `${TOUR_SPRING_6}/deerlol.webp` as const;
-export const TOUR_SPRING_6_COVER_MOBILE = `${TOUR_SPRING_6}/deerlol.mobile.webp` as const;
+export const TOUR_SPRING_6_COVER_GRID = `${TOUR_SPRING_6}/hero.webp` as const;
+export const TOUR_SPRING_6_COVER_MOBILE = TOUR_SPRING_6_COVER_GRID;
 
 const TOUR_SPRING_7 = `${TOURS_ASSET_BASE}/spring-7`;
 const TOUR_SPRING_8 = `${TOURS_ASSET_BASE}/spring-8`;
@@ -596,7 +596,7 @@ export const TOUR_SPRING_7_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_7}/ddn.clip2.grid.webm`]: `${TOUR_SPRING_7}/ddn.clip2.poster.webp`,
 };
 
-export const TOUR_SPRING_7_COVER_GRID = `${TOUR_SPRING_7}/view.webp` as const;
+export const TOUR_SPRING_7_COVER_GRID = `${TOUR_SPRING_7}/hero.webp` as const;
 export const TOUR_SPRING_7_PREFACE_BACKGROUND = `${TOUR_SPRING_7}/view3.webp` as const;
 
 /**
@@ -627,8 +627,8 @@ export const TOUR_SPRING_8_GRID_VIDEO_POSTERS: Record<string, string> = {
   [`${TOUR_SPRING_8}/flz.clip1.grid.webm`]: `${TOUR_SPRING_8}/flz.clip1.poster.webp`,
 };
 
-/** Карточка/hero spring-8: облегчили cover (было `view3.webp` ~457 KB, теперь `view.webp` ~67 KB). */
-export const TOUR_SPRING_8_COVER_GRID = `${TOUR_SPRING_8}/view.webp` as const;
+/** Карточка/hero spring-8: отдельный hero-баннер. */
+export const TOUR_SPRING_8_COVER_GRID = `${TOUR_SPRING_8}/hero.webp` as const;
 /** Отдельного `*.mobile.webp` пока нет; мобильный кандидат совпадает с облегчённым cover. */
 export const TOUR_SPRING_8_COVER_MOBILE = TOUR_SPRING_8_COVER_GRID;
 export const TOUR_SPRING_8_PREFACE_BACKGROUND = `${TOUR_SPRING_8}/view.webp` as const;
@@ -676,8 +676,8 @@ export const TOUR_SPRING_9_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
   [`${TOUR_SPRING_9}/vrb.clip3.grid.webm`]: `${TOUR_SPRING_9}/vrb.clip3.poster.mobile.webp`,
 };
 
-export const TOUR_SPRING_9_COVER_GRID = `${TOUR_SPRING_9}/top3.webp` as const;
-export const TOUR_SPRING_9_COVER_MOBILE = `${TOUR_SPRING_9}/top3.mobile.webp` as const;
+export const TOUR_SPRING_9_COVER_GRID = `${TOUR_SPRING_9}/hero.webp` as const;
+export const TOUR_SPRING_9_COVER_MOBILE = TOUR_SPRING_9_COVER_GRID;
 export const TOUR_SPRING_9_PREFACE_BACKGROUND = `${TOUR_SPRING_9}/wine.webp` as const;
 
 /**
@@ -727,8 +727,8 @@ export const TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = 
   [`${TOUR_SPRING_10}/ask.clip6.grid.webm`]: `${TOUR_SPRING_10}/ask.clip6.poster.mobile.webp`,
 };
 
-export const TOUR_SPRING_10_COVER_GRID = `${TOUR_SPRING_10}/view.webp` as const;
-export const TOUR_SPRING_10_COVER_MOBILE = `${TOUR_SPRING_10}/view.mobile.webp` as const;
+export const TOUR_SPRING_10_COVER_GRID = `${TOUR_SPRING_10}/hero.webp` as const;
+export const TOUR_SPRING_10_COVER_MOBILE = TOUR_SPRING_10_COVER_GRID;
 export const TOUR_SPRING_10_PREFACE_BACKGROUND = `${TOUR_SPRING_10}/beach.webp` as const;
 export const TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE = `${TOUR_SPRING_10}/beach.mobile.webp` as const;
 
@@ -920,9 +920,8 @@ export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-l
 export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.webp` as const;
 
 /**
- * Обложки весенних туров: spring-1…4 — первый кадр сетки из `public/tours/spring-N/`;
- * spring-5 — `public/tours/spring-5/`; spring-6 — `public/tours/spring-6/`; spring-7 — `public/tours/spring-7/` (VP9 `ddn.clip*`);
- * spring-10 — `public/tours/spring-10/` (`content/Аскольд/webp`, MOV → `encode-spring-10-askold-movs.ps1`).
+ * Обложки весенних туров: spring-1…11 — отдельные `hero.webp` в `public/tours/spring-N/`.
+ * spring-12…13 — временные placeholder URL до добавления hero-файлов.
  */
 export const SPRING_TOUR_COVERS = {
   'spring-1': TOUR_SPRING_1_COVER,

@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { ROUTES } from './constants/routes';
 import Layout from './components/layout/Layout';
+import RouteErrorFallback from './components/errors/RouteErrorFallback';
 import Home from './pages/Home';
 
 const WinterPage = lazy(() => import('./pages/seasons/WinterPage'));
@@ -18,6 +19,7 @@ export const router = createBrowserRouter(
     {
       path: ROUTES.HOME,
       element: <Layout />,
+      errorElement: <RouteErrorFallback />,
       children: [
         { index: true,              element: <Home /> },
         { path: ROUTES.WINTER,      element: <WinterPage /> },

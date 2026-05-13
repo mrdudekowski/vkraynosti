@@ -7,6 +7,9 @@ import {
   TOUR_SPRING_4_GROUP_IMAGE,
   TOUR_SPRING_5_GROUP_IMAGE,
   TOUR_SPRING_6_GROUP_IMAGE,
+  TOUR_SPRING_11_CLIP1_GRID_WEBM,
+  TOUR_SPRING_13_CLIP1_GRID_WEBM,
+  TOUR_SPRING_13_CLIP2_GRID_WEBM,
   TOUR_WINTER_1_REST4_IMAGE,
   TOUR_WINTER_1_TOP_IMAGE,
   TOUR_WINTER_2_PEAK_IMAGE,
@@ -540,6 +543,45 @@ const TourDetailGalleryComponent = ({
   }
 
   /**
+   * Остров Шкота (spring-11): 12 кадров после hero/preface.
+   * Порядок `slice(2)`: clip1, view2, view3, clip2, climb, view4, clip3, view5, view6, wow, scallops, earchin.
+   */
+  if (
+    layoutVariant === 'shkota' &&
+    images.length === 12 &&
+    images[0] === TOUR_SPRING_11_CLIP1_GRID_WEBM
+  ) {
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_LEFT_TOP_SQUARE)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_LEFT_BOTTOM_SQUARE)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[6], 6, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[7], 7, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[8], 8, GALLERY_GRID_SQUARE_TILE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[9], 9, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[10], 10, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[11], 11, GALLERY_GRID_SQUARE_TILE)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
    * Фалаза (spring-8): сторителлинг из 5 кадров после hero/preface —
    * 2x2 панорама, затем bento с клипом слева (1x2), справа два квадрата, и финальный широкий кадр.
    * Порядок `slice(2)`: top, view2, clip1, top2, love_actually.
@@ -557,6 +599,43 @@ const TourDetailGalleryComponent = ({
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[4], 4, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Полуостров Гамова (spring-13): 10 кадров после hero/preface.
+   * Порядок `slice(2)`: clip2, vityaz-bay, gamov-view, gamov-panorama, telyakovsky-bay, clip1, clip3, summit-view, astafiev-bay, clip4.
+   * Bento: clip2 открывает сетку 2×2; кадр Витязя с человеком — высокий 1×2; clip3 — квадратная плитка.
+   */
+  if (
+    layoutVariant === 'gamova' &&
+    images.length === 10 &&
+    images[0] === TOUR_SPRING_13_CLIP2_GRID_WEBM &&
+    images[5] === TOUR_SPRING_13_CLIP1_GRID_WEBM
+  ) {
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[6], 6, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[7], 7, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[9], 9, GALLERY_GRID_SQUARE_TILE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[8], 8, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
       </div>
     );

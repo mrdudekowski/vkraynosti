@@ -795,12 +795,11 @@ export const TOUR_SPRING_11_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 /**
  * «Мыс Тобизина» (spring-12).
- * TODO media: заменить placeholder URL на реальные файлы из `public/tours/spring-12/`:
- * `cover.webp`, `preface.webp`, `trail.webp`, `stone-plateau.webp`, `cliffs.webp`, `karpinsky-bay.webp`, `seafood-lunch.webp`.
- * Пока файлов нет в репозитории, используем явные placehold.co-заглушки, чтобы не оставлять битые пути.
+ * Cover: `content/HERO/Весна/tobizina.webp` -> `public/tours/spring-12/cover.webp`.
+ * Остальные кадры пока placeholder до добавления материалов тура.
  */
 export const TOUR_SPRING_12_COVER_GRID =
-  `${BASE}/1200x800/C76B7E/ffffff?text=Мыс+Тобизина` as const;
+  `${TOUR_SPRING_12_ASSET_BASE}/cover.webp` as const;
 export const TOUR_SPRING_12_PREFACE_BACKGROUND =
   `${BASE}/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря` as const;
 
@@ -816,28 +815,57 @@ export const TOUR_SPRING_12_GALLERY_VIEWER = [
 
 export const TOUR_SPRING_12_GALLERY_GRID = TOUR_SPRING_12_GALLERY_VIEWER;
 
-/**
- * «Полуостров Гамова» (spring-13).
- * TODO media: заменить placeholder URL на реальные файлы из `public/tours/spring-13/`:
- * `cover.webp`, `preface.webp`, `vityaz-bay.webp`, `gamov-cliffs.webp`, `relict-pines.webp`, `telyakovsky-bay.webp`, `astafiev-bay.webp`.
- * Пока файлов нет в репозитории, используем явные placehold.co-заглушки, чтобы не оставлять битые пути.
- */
+/** «Полуостров Гамова» (spring-13). Исходники: `content/Весна/Гамова 1 д/`. */
 export const TOUR_SPRING_13_COVER_GRID =
-  `${BASE}/1200x800/C76B7E/ffffff?text=Полуостров+Гамова` as const;
+  `${TOUR_SPRING_13_ASSET_BASE}/cover.webp` as const;
 export const TOUR_SPRING_13_PREFACE_BACKGROUND =
-  `${BASE}/1200x800/1A3C2E/ffffff?text=Гамова+·+море+и+мысы` as const;
+  `${TOUR_SPRING_13_ASSET_BASE}/preface.webp` as const;
+
+export const TOUR_SPRING_13_CLIP1_GRID_WEBM =
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.grid.webm` as const;
+export const TOUR_SPRING_13_CLIP2_GRID_WEBM =
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.grid.webm` as const;
+export const TOUR_SPRING_13_CLIP3_GRID_WEBM =
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.grid.webm` as const;
+export const TOUR_SPRING_13_CLIP4_GRID_WEBM =
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.grid.webm` as const;
 
 export const TOUR_SPRING_13_GALLERY_VIEWER = [
   TOUR_SPRING_13_COVER_GRID,
   TOUR_SPRING_13_PREFACE_BACKGROUND,
-  `${BASE}/900x900/7BA7BC/ffffff?text=Бухта+Витязь`,
-  `${BASE}/900x900/1A3C2E/ffffff?text=Скалы+и+мысы`,
-  `${BASE}/900x900/C8A96E/1A3C2E?text=Реликтовые+сосны`,
-  `${BASE}/1200x800/7BA7BC/ffffff?text=Бухта+Теляковского`,
-  `${BASE}/900x900/E8A838/1A3C2E?text=Пикник+в+Астафьева`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.webm`,
+  `${TOUR_SPRING_13_ASSET_BASE}/vityaz-bay.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gamov-view.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gamov-panorama.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/telyakovsky-bay.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.webm`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.webm`,
+  `${TOUR_SPRING_13_ASSET_BASE}/summit-view.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/astafiev-bay.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.webm`,
 ] as const;
 
-export const TOUR_SPRING_13_GALLERY_GRID = TOUR_SPRING_13_GALLERY_VIEWER;
+export const TOUR_SPRING_13_GALLERY_GRID = [
+  TOUR_SPRING_13_COVER_GRID,
+  TOUR_SPRING_13_PREFACE_BACKGROUND,
+  TOUR_SPRING_13_CLIP2_GRID_WEBM,
+  `${TOUR_SPRING_13_ASSET_BASE}/vityaz-bay.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gamov-view.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gamov-panorama.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/telyakovsky-bay.webp`,
+  TOUR_SPRING_13_CLIP1_GRID_WEBM,
+  TOUR_SPRING_13_CLIP3_GRID_WEBM,
+  `${TOUR_SPRING_13_ASSET_BASE}/summit-view.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/astafiev-bay.webp`,
+  TOUR_SPRING_13_CLIP4_GRID_WEBM,
+] as const;
+
+export const TOUR_SPRING_13_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [TOUR_SPRING_13_CLIP1_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.poster.webp`,
+  [TOUR_SPRING_13_CLIP2_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.poster.webp`,
+  [TOUR_SPRING_13_CLIP3_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.poster.webp`,
+  [TOUR_SPRING_13_CLIP4_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.poster.webp`,
+};
 
 /**
  * Секунда входа 5-секундного сегмента в исходном `*.grid.webm` для баннера зимы (колонки 0…9).
@@ -920,8 +948,7 @@ export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-l
 export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.webp` as const;
 
 /**
- * Обложки весенних туров: spring-1…11 — отдельные `hero.webp` в `public/tours/spring-N/`.
- * spring-12…13 — временные placeholder URL до добавления hero-файлов.
+ * Обложки весенних туров: spring-1…13 — реальные файлы в `public/tours/spring-N/`.
  */
 export const SPRING_TOUR_COVERS = {
   'spring-1': TOUR_SPRING_1_COVER,

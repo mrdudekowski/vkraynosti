@@ -32,11 +32,6 @@ const ImageWithLoadPlaceholder = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    setIsLoaded(false);
-    setHasError(false);
-  }, [src]);
-
   const imageStateClassName = isLoaded && !hasError ? 'opacity-100' : 'opacity-0';
 
   return (
@@ -115,6 +110,7 @@ const DeferredPlaceholderImage = ({
 
   return (
     <ImageWithLoadPlaceholder
+      key={`${src}\0${srcSet ?? ''}`}
       src={src}
       srcSet={srcSet}
       sizes={sizes}

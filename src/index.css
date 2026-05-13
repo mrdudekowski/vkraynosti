@@ -546,6 +546,34 @@
            transition-all duration-hover hover:-translate-y-1 hover:shadow-xl;
   }
 
+  .tour-card-skeleton-line {
+    @apply rounded-full bg-skeleton-line;
+  }
+
+  .tour-card-skeleton-line-muted {
+    @apply rounded-full bg-skeleton-lineMuted;
+  }
+
+  .tour-card-skeleton-media {
+    @apply bg-skeleton-media;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tour-card-skeleton-line,
+    .tour-card-skeleton-line-muted,
+    .tour-card-skeleton-media {
+      animation: theme('animation.media-placeholder-shimmer');
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-card-skeleton-line,
+    .tour-card-skeleton-line-muted,
+    .tour-card-skeleton-media {
+      opacity: 1;
+    }
+  }
+
   /** Scroll-reveal: только opacity + transform (композитинг). */
   .reveal-base {
     @apply transition-[opacity,transform,filter] duration-reveal ease-reveal-out;

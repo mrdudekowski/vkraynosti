@@ -405,6 +405,12 @@ const config: Config = {
           dark:  '#0D0D0D',
           light: '#F7F5F0',
         },
+        /** Скелеты загрузки: один shimmer-паттерн, разная плотность для медиа и текстовых линий. */
+        skeleton: {
+          media:     'color-mix(in srgb, #F7F5F0 78%, #0D0D0D 22%)',
+          line:      'color-mix(in srgb, #F7F5F0 86%, #0D0D0D 14%)',
+          lineMuted: 'color-mix(in srgb, #F7F5F0 91%, #0D0D0D 9%)',
+        },
         /**
          * Базовый интенсивный тон для «неба» главной; фактический низ — смешение с пастелью (`HOME_PAGE_SKY_FINAL_INTENSE_RATIO`).
          */

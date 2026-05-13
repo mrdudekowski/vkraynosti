@@ -711,7 +711,7 @@ export const TOURS: Tour[] = [
     heroPhrase: 'Скалистые мысы, реликтовый лес и бескрайнее море!',
     duration: '15 часов',
     difficulty: 'Easy',
-    metaAudienceLabel: 'Лёгкий хайкинг, релакс',
+    metaAudienceLabel: 'Легкий хайкинг',
     price: '6 500 ₽',
     priceFootnote: 'Июль-август: 7 200 ₽.',
     descriptionLeadBold: 'Полуостров Гамова',

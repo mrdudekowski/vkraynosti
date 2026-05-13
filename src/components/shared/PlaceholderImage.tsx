@@ -17,6 +17,52 @@ interface PlaceholderImageProps {
   deferSrcUntilVisible?: boolean;
 }
 
+const placeholderClassName = 'tour-card-skeleton-media min-h-0 h-full w-full object-cover';
+
+const ImageWithLoadPlaceholder = ({
+  src,
+  alt,
+  className = '',
+  imgClassName = '',
+  loading = 'lazy',
+  fetchPriority,
+  srcSet,
+  sizes,
+}: Omit<PlaceholderImageProps, 'deferSrcUntilVisible'>) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(false);
+    setHasError(false);
+  }, [src]);
+
+  const imageStateClassName = isLoaded && !hasError ? 'opacity-100' : 'opacity-0';
+
+  return (
+    <div className={`relative overflow-hidden ${className}`.trim()}>
+      {(!isLoaded || hasError) && (
+        <div
+          className="tour-card-skeleton-media absolute inset-0 min-h-0 h-full w-full"
+          aria-hidden
+        />
+      )}
+      <img
+        src={src}
+        srcSet={srcSet}
+        sizes={sizes}
+        alt={alt}
+        className={`absolute inset-0 min-h-0 h-full w-full object-cover transition-opacity duration-hover motion-reduce:transition-none ${imageStateClassName} ${imgClassName}`.trim()}
+        loading={loading}
+        fetchPriority={fetchPriority}
+        decoding="async"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
+      />
+    </div>
+  );
+};
+
 /** `key={src}` на уровне вызывающего не обязателен — сброс при смене `src` через remount здесь. */
 const DeferredPlaceholderImage = ({
   src,
@@ -61,22 +107,22 @@ const DeferredPlaceholderImage = ({
     return (
       <div
         ref={observerTargetRef}
-        className={`min-h-0 h-full w-full object-cover bg-surface-light motion-safe:animate-media-placeholder-shimmer motion-reduce:opacity-100 ${imgClassName} ${className}`.trim()}
+        className={`${placeholderClassName} ${imgClassName} ${className}`.trim()}
         aria-hidden
       />
     );
   }
 
   return (
-    <img
+    <ImageWithLoadPlaceholder
       src={src}
       srcSet={srcSet}
       sizes={sizes}
       alt={alt}
-      className={`object-cover ${imgClassName} ${className}`.trim()}
+      className={className}
+      imgClassName={imgClassName}
       loading={loading}
       fetchPriority={fetchPriority}
-      decoding="async"
     />
   );
 };
@@ -94,15 +140,16 @@ const PlaceholderImage = ({
 }: PlaceholderImageProps) => {
   if (!deferSrcUntilVisible) {
     return (
-      <img
+      <ImageWithLoadPlaceholder
+        key={`${src}\0${srcSet ?? ''}`}
         src={src}
         srcSet={srcSet}
         sizes={sizes}
         alt={alt}
-        className={`object-cover ${imgClassName} ${className}`.trim()}
+        className={className}
+        imgClassName={imgClassName}
         loading={loading}
         fetchPriority={fetchPriority}
-        decoding="async"
       />
     );
   }

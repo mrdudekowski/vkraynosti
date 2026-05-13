@@ -13,26 +13,27 @@ import {
  * Колонки баннера — разные URL (`HOME_SEASON_BANNER_*_LOOP_VIDEOS`); preload касается только
  * первых N файлов. Остальные клипы при hover идут отдельными запросами; кэш HTTP помогает только если URL
  * уже был загружен. Повторное использование соединения к origin ≠ кэш сущности.
+ * Video preload вторичен относительно LCP image, поэтому его priority всегда low.
  */
 export const HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
 export const HOME_SEASON_BANNER_SPRING_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
 
-export interface HomeSeasonBannerWinterVideoPreloadLink {
+export interface HomeSeasonBannerVideoPreloadLink {
   href: string;
   fetchPriority: 'high' | 'low';
 }
 
 /**
- * Только первые N лупов (левые колонки вордмарка), все с `fetchPriority="high"`.
+ * Только первые N лупов (левые колонки вордмарка), все с `fetchPriority="low"`.
  */
-export function getHomeSeasonBannerWinterVideoPreloadLinks(): readonly HomeSeasonBannerWinterVideoPreloadLink[] {
+export function getHomeSeasonBannerWinterVideoPreloadLinks(): readonly HomeSeasonBannerVideoPreloadLink[] {
   return HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT).map(
-    (href) => ({ href, fetchPriority: 'high' as const })
+    (href) => ({ href, fetchPriority: 'low' as const })
   );
 }
 
-export function getHomeSeasonBannerSpringVideoPreloadLinks(): readonly HomeSeasonBannerWinterVideoPreloadLink[] {
+export function getHomeSeasonBannerSpringVideoPreloadLinks(): readonly HomeSeasonBannerVideoPreloadLink[] {
   return HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_SPRING_HEAD_PRELOAD_CLIP_COUNT).map(
-    (href) => ({ href, fetchPriority: 'high' as const })
+    (href) => ({ href, fetchPriority: 'low' as const })
   );
 }

@@ -18,10 +18,11 @@ export const HOME_SEASON_BANNER_MEDIA_BASE: Record<Season, string> = {
 } as const;
 
 const TOUR_WINTER_1 = `${TOURS_ASSET_BASE}/winter-1`;
+export const TOUR_WINTER_1_COVER = `${TOUR_WINTER_1}/hero.webp` as const;
 
-/** Галерея «Восхождение на Изюбриную» — полное качество (просмотрщик). */
+/** Галерея «Восхождение на Изюбриную» — качественные фото и полные видео. */
 export const TOUR_WINTER_1_GALLERY_VIEWER = [
-  `${TOUR_WINTER_1}/iz.ava.webp`,
+  TOUR_WINTER_1_COVER,
   `${TOUR_WINTER_1}/iz.close.webp`,
   `${TOUR_WINTER_1}/iz.peoplewalk.webp`,
   `${TOUR_WINTER_1}/trees2.webp`,
@@ -32,18 +33,8 @@ export const TOUR_WINTER_1_GALLERY_VIEWER = [
   `${TOUR_WINTER_1}/iz.rest4.webp`,
 ] as const;
 
-/** Сетка: webp ≤900px — сравнение веток в `TourDetailGallery` только по grid-URL. */
-export const TOUR_WINTER_1_GALLERY_GRID = [
-  `${TOUR_WINTER_1}/iz.ava.grid.webp`,
-  `${TOUR_WINTER_1}/iz.close.grid.webp`,
-  `${TOUR_WINTER_1}/iz.peoplewalk.grid.webp`,
-  `${TOUR_WINTER_1}/trees2.grid.webp`,
-  `${TOUR_WINTER_1}/trees.grid.webp`,
-  `${TOUR_WINTER_1}/iz.top.grid.webp`,
-  `${TOUR_WINTER_1}/iz.rest2.grid.webp`,
-  `${TOUR_WINTER_1}/iz.pan2.grid.webp`,
-  `${TOUR_WINTER_1}/iz.rest4.grid.webp`,
-] as const;
+/** Медиа для сетки: фото берём из качественной галереи; grid-варианты оставляем только для видео. */
+export const TOUR_WINTER_1_GALLERY_GRID = TOUR_WINTER_1_GALLERY_VIEWER;
 
 /** Верхний ряд рядом с панорамой — растягивание по высоте строки (`sm+`). */
 export const TOUR_WINTER_1_TOP_IMAGE = TOUR_WINTER_1_GALLERY_GRID[5];
@@ -55,11 +46,10 @@ export const TOUR_WINTER_1_REST4_IMAGE = TOUR_WINTER_1_GALLERY_GRID[8];
 export const TOUR_WINTER_1_GALLERY = TOUR_WINTER_1_GALLERY_VIEWER;
 
 export const TOUR_WINTER_1_COVER_GRID = TOUR_WINTER_1_GALLERY_GRID[0];
-export const TOUR_WINTER_1_COVER = `${TOUR_WINTER_1}/hero.webp` as const;
 
 const TOUR_WINTER_2 = `${TOURS_ASSET_BASE}/winter-2`;
 
-/** Галерея «Восхождение на г. Голец» — полное качество. */
+/** Галерея «Восхождение на г. Голец» — качественные фото и полные видео. */
 export const TOUR_WINTER_2_GALLERY_VIEWER = [
   `${TOUR_WINTER_2}/les.webp`,
   `${TOUR_WINTER_2}/podnimaem.webp`,
@@ -71,16 +61,7 @@ export const TOUR_WINTER_2_GALLERY_VIEWER = [
   `${TOUR_WINTER_2}/kushat2.webp`,
 ] as const;
 
-export const TOUR_WINTER_2_GALLERY_GRID = [
-  `${TOUR_WINTER_2}/les.grid.webp`,
-  `${TOUR_WINTER_2}/podnimaem.grid.webp`,
-  `${TOUR_WINTER_2}/les2.grid.webp`,
-  `${TOUR_WINTER_2}/les3.grid.webp`,
-  `${TOUR_WINTER_2}/les4.grid.webp`,
-  `${TOUR_WINTER_2}/peak.grid.webp`,
-  `${TOUR_WINTER_2}/kushat.grid.webp`,
-  `${TOUR_WINTER_2}/kushat2.grid.webp`,
-] as const;
+export const TOUR_WINTER_2_GALLERY_GRID = TOUR_WINTER_2_GALLERY_VIEWER;
 
 /** Кадр вершины — полная ширина сетки (`TourDetailGallery`, Голец). */
 export const TOUR_WINTER_2_PEAK_IMAGE = TOUR_WINTER_2_GALLERY_GRID[5];
@@ -93,7 +74,7 @@ export const TOUR_WINTER_2_COVER = `${TOUR_WINTER_2}/hero.webp` as const;
 const TOUR_WINTER_3 = `${TOURS_ASSET_BASE}/winter-3`;
 
 /**
- * Галерея «Фалаза × Грибановка» — полное качество (просмотрщик, индексы как в данных тура).
+ * Галерея «Фалаза × Грибановка» — качественные фото и полные видео.
  * [0] обложка, [1] второй кадр; `gr.boarder` не в массиве — `TOUR_WINTER_3_PREFACE_BACKGROUND`.
  */
 export const TOUR_WINTER_3_GALLERY_VIEWER = [
@@ -113,21 +94,21 @@ export const TOUR_WINTER_3_GALLERY_VIEWER = [
 ] as const;
 
 /**
- * Те же индексы, что у `TOUR_WINTER_3_GALLERY_VIEWER`: сетка страницы / карточка (webp ≤900px, VP9 `*.grid.webm`).
- * Кадры склона, Эли и барбекю в сетке — `*.webp`; VP9 для баннера главной — `TOUR_WINTER_3_BOARD_GRID_WEBM` и др. (`generate-winter-3-banner-stub-videos.ps1`).
+ * Те же индексы, что у `TOUR_WINTER_3_GALLERY_VIEWER`: фото качественные, видео — VP9 `*.grid.webm`.
+ * Кадры склона, Эли и барбекю в сетке — `*.webp`; VP9 для баннера главной — `TOUR_WINTER_3_BOARD_GRID_WEBM` и др.
  */
 export const TOUR_WINTER_3_GALLERY_GRID = [
-  `${TOUR_WINTER_3}/gr.falaza.grid.webp`,
-  `${TOUR_WINTER_3}/gr.griba.grid.webp`,
-  `${TOUR_WINTER_3}/gr.lift.grid.webp`,
+  TOUR_WINTER_3_GALLERY_VIEWER[0],
+  TOUR_WINTER_3_GALLERY_VIEWER[1],
+  TOUR_WINTER_3_GALLERY_VIEWER[2],
   `${TOUR_WINTER_3}/gr.clip1.grid.webm`,
-  `${TOUR_WINTER_3}/gr.board.webp`,
-  `${TOUR_WINTER_3}/gr.board2.grid.webp`,
+  TOUR_WINTER_3_GALLERY_VIEWER[4],
+  TOUR_WINTER_3_GALLERY_VIEWER[5],
   `${TOUR_WINTER_3}/gr.clip2.grid.webm`,
-  `${TOUR_WINTER_3}/gr.elya.webp`,
-  `${TOUR_WINTER_3}/gr.instr.grid.webp`,
+  TOUR_WINTER_3_GALLERY_VIEWER[7],
+  TOUR_WINTER_3_GALLERY_VIEWER[8],
   `${TOUR_WINTER_3}/gr.clip3.grid.webm`,
-  `${TOUR_WINTER_3}/gr.bbq.webp`,
+  TOUR_WINTER_3_GALLERY_VIEWER[10],
   `${TOUR_WINTER_3}/gr.clip4.grid.webm`,
   `${TOUR_WINTER_3}/gr.clip5.grid.webm`,
 ] as const;
@@ -140,7 +121,7 @@ export const TOUR_WINTER_3_COVER_GRID = TOUR_WINTER_3_GALLERY_GRID[0];
 
 export const TOUR_WINTER_3_COVER = `${TOUR_WINTER_3}/hero.webp` as const;
 
-/** После `galleryGridUrls.slice(2)` — ветка `TourDetailGallery` сравнивает с этими **grid**-URL. */
+/** После `galleryGridUrls.slice(2)` — ветка `TourDetailGallery` сравнивает с URL сеточного массива. */
 export const TOUR_WINTER_3_LIFT_IMAGE = TOUR_WINTER_3_GALLERY_GRID[2];
 
 /** Главная: секция «Безопасность» — герой (инструктаж в кадре, `gr.instr` сетки). */
@@ -164,7 +145,7 @@ export const TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE =
   `${TOUR_WINTER_3}/gr.boarder.mobile.webp` as const;
 
 /**
- * Сжатые VP9 для баннера главной (склон / Эля / барбекю). В сетке страницы тура — только `*.webp` (`TOUR_WINTER_3_GALLERY_GRID`).
+ * Сжатые VP9 для баннера главной (склон / Эля / барбекю). В сетке страницы тура — качественные `*.webp`.
  * Сборка: `scripts/generate-winter-3-banner-stub-videos.ps1`.
  */
 export const TOUR_WINTER_3_BOARD_GRID_WEBM = `${TOUR_WINTER_3}/gr.board.grid.webm` as const;
@@ -177,7 +158,7 @@ const TOUR_WINTER_4 = `${TOURS_ASSET_BASE}/winter-4`;
 export const TOUR_WINTER_4_COVER = `${TOUR_WINTER_4}/hero.webp` as const;
 
 /**
- * Галерея «Хаски-тур» — полное качество (просмотрщик).
+ * Галерея «Хаски-тур» — качественные фото и полные видео.
  * [0] первый кадр после hero, [1] фон «О туре»; ролики `.webm` в просмотрщике — полные файлы (VP9).
  */
 export const TOUR_WINTER_4_GALLERY_VIEWER = [
@@ -191,16 +172,16 @@ export const TOUR_WINTER_4_GALLERY_VIEWER = [
   `${TOUR_WINTER_4}/hs.gora.webp`,
 ] as const;
 
-/** Сетка: webp ≤900px, клипы — VP9 `*.grid.webm`. */
+/** Сетка: фото качественные, клипы — VP9 `*.grid.webm`. */
 export const TOUR_WINTER_4_GALLERY_GRID = [
-  `${TOUR_WINTER_4}/hs.team.grid.webp`,
-  `${TOUR_WINTER_4}/hs.uprazh.grid.webp`,
+  TOUR_WINTER_4_GALLERY_VIEWER[0],
+  TOUR_WINTER_4_GALLERY_VIEWER[1],
   `${TOUR_WINTER_4}/hs.clip1.grid.webm`,
-  `${TOUR_WINTER_4}/hs.doggo.grid.webp`,
-  `${TOUR_WINTER_4}/hs.doggos.grid.webp`,
+  TOUR_WINTER_4_GALLERY_VIEWER[3],
+  TOUR_WINTER_4_GALLERY_VIEWER[4],
   `${TOUR_WINTER_4}/hs.clip2.grid.webm`,
-  `${TOUR_WINTER_4}/hs.gora2.grid.webp`,
-  `${TOUR_WINTER_4}/hs.gora.grid.webp`,
+  TOUR_WINTER_4_GALLERY_VIEWER[6],
+  TOUR_WINTER_4_GALLERY_VIEWER[7],
 ] as const;
 
 export const TOUR_WINTER_4_GALLERY = TOUR_WINTER_4_GALLERY_VIEWER;
@@ -226,7 +207,7 @@ export const TOUR_WINTER_4_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
 const TOUR_WINTER_5 = `${TOURS_ASSET_BASE}/winter-5`;
 
 /**
- * Галерея «АрсГора» — полное качество (просмотрщик).
+ * Галерея «АрсГора» — качественные фото и полные видео.
  * [0] обложка, [1] preface; сетка `arsgora` — портрет; bento doggie|clip1; низ — clip2, trans-tail, team.
  */
 export const TOUR_WINTER_5_GALLERY_VIEWER = [
@@ -240,16 +221,16 @@ export const TOUR_WINTER_5_GALLERY_VIEWER = [
   `${TOUR_WINTER_5}/ars.team.webp`,
 ] as const;
 
-/** Те же индексы: сетка (webp ≤900px, VP9 для клипов). */
+/** Те же индексы: фото качественные, для клипов — VP9 `*.grid.webm`. */
 export const TOUR_WINTER_5_GALLERY_GRID = [
-  `${TOUR_WINTER_5}/ars.main.grid.webp`,
-  `${TOUR_WINTER_5}/ars.preface.grid.webp`,
-  `${TOUR_WINTER_5}/ars.lift.grid.webp`,
-  `${TOUR_WINTER_5}/ars.doggie.grid.webp`,
+  TOUR_WINTER_5_GALLERY_VIEWER[0],
+  TOUR_WINTER_5_GALLERY_VIEWER[1],
+  TOUR_WINTER_5_GALLERY_VIEWER[2],
+  TOUR_WINTER_5_GALLERY_VIEWER[3],
   `${TOUR_WINTER_5}/ars.clip1.grid.webm`,
   `${TOUR_WINTER_5}/ars.clip2.grid.webm`,
-  `${TOUR_WINTER_5}/ars.trans-tail.grid.webp`,
-  `${TOUR_WINTER_5}/ars.team.grid.webp`,
+  TOUR_WINTER_5_GALLERY_VIEWER[6],
+  TOUR_WINTER_5_GALLERY_VIEWER[7],
 ] as const;
 
 /** Совпадает с `TOUR_WINTER_5_GALLERY_VIEWER`. */
@@ -266,7 +247,7 @@ export const TOUR_WINTER_5_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 const TOUR_SPRING_1 = `${TOURS_ASSET_BASE}/spring-1`;
 
-/** «Лысый Дед» — полное качество (просмотрщик). */
+/** «Лысый Дед» — качественные фото. */
 export const TOUR_SPRING_1_GALLERY_VIEWER = [
   `${TOUR_SPRING_1}/ld.hero.webp`,
   `${TOUR_SPRING_1}/ld.preface.webp`,
@@ -276,22 +257,15 @@ export const TOUR_SPRING_1_GALLERY_VIEWER = [
   `${TOUR_SPRING_1}/ld.approach.webp`,
 ] as const;
 
-/** Сетка: webp ≤900px (`scripts/generate-spring-1-2-3-grid-assets.ps1`). */
-export const TOUR_SPRING_1_GALLERY_GRID = [
-  `${TOUR_SPRING_1}/ld.hero.grid.webp`,
-  `${TOUR_SPRING_1}/ld.preface.grid.webp`,
-  `${TOUR_SPRING_1}/ld.descent.grid.webp`,
-  `${TOUR_SPRING_1}/ld.ridge.grid.webp`,
-  `${TOUR_SPRING_1}/ld.summit.grid.webp`,
-  `${TOUR_SPRING_1}/ld.approach.grid.webp`,
-] as const;
+/** Медиа для сетки: фото берём из качественной галереи. */
+export const TOUR_SPRING_1_GALLERY_GRID = TOUR_SPRING_1_GALLERY_VIEWER;
 
 export const TOUR_SPRING_1_COVER_GRID = TOUR_SPRING_1_GALLERY_GRID[0];
 export const TOUR_SPRING_1_COVER = `${TOUR_SPRING_1}/hero.webp` as const;
 
 const TOUR_SPRING_2 = `${TOURS_ASSET_BASE}/spring-2`;
 
-/** «Ольховая» — полное качество (просмотрщик). */
+/** «Ольховая» — качественные фото и полные видео. */
 export const TOUR_SPRING_2_GALLERY_VIEWER = [
   `${TOUR_SPRING_2}/olv.hero.webp`,
   `${TOUR_SPRING_2}/olv.preface.webp`,
@@ -302,11 +276,11 @@ export const TOUR_SPRING_2_GALLERY_VIEWER = [
 ] as const;
 
 export const TOUR_SPRING_2_GALLERY_GRID = [
-  `${TOUR_SPRING_2}/olv.hero.grid.webp`,
-  `${TOUR_SPRING_2}/olv.preface.grid.webp`,
-  `${TOUR_SPRING_2}/olv.lake1.grid.webp`,
-  `${TOUR_SPRING_2}/olv.ridge.grid.webp`,
-  `${TOUR_SPRING_2}/olv.summit.grid.webp`,
+  TOUR_SPRING_2_GALLERY_VIEWER[0],
+  TOUR_SPRING_2_GALLERY_VIEWER[1],
+  TOUR_SPRING_2_GALLERY_VIEWER[2],
+  TOUR_SPRING_2_GALLERY_VIEWER[3],
+  TOUR_SPRING_2_GALLERY_VIEWER[4],
   `${TOUR_SPRING_2}/olv.clip1.grid.webm`,
 ] as const;
 
@@ -331,7 +305,7 @@ export const TOUR_SPRING_4_CLIP1_POSTER_WEBP = `${TOUR_SPRING_4}/ss.clip1.poster
 export const TOUR_SPRING_4_CLIP3_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip3.grid.webm` as const;
 export const TOUR_SPRING_4_CLIP5_GRID_WEBM = `${TOUR_SPRING_4}/ss.clip5.grid.webm` as const;
 
-/** «Пидан» — полное качество (просмотрщик). `taiga` и `clip3` переставлены относительно исходного порядка ассетов. */
+/** «Пидан» — качественные фото и полные видео. `taiga` и `clip3` переставлены относительно исходного порядка ассетов. */
 export const TOUR_SPRING_3_GALLERY_VIEWER = [
   `${TOUR_SPRING_3}/pd.hero.webp`,
   `${TOUR_SPRING_3}/pd.preface.webp`,
@@ -353,17 +327,17 @@ export const TOUR_SPRING_3_PREFACE_BLOCK_BACKGROUND_VIEWER =
   TOUR_SPRING_3_GALLERY_VIEWER[0];
 
 export const TOUR_SPRING_3_GALLERY_GRID = [
-  `${TOUR_SPRING_3}/pd.hero.grid.webp`,
-  `${TOUR_SPRING_3}/pd.preface.grid.webp`,
-  `${TOUR_SPRING_3}/pd.group.grid.webp`,
+  TOUR_SPRING_3_GALLERY_VIEWER[0],
+  TOUR_SPRING_3_GALLERY_VIEWER[1],
+  TOUR_SPRING_3_GALLERY_VIEWER[2],
   `${TOUR_SPRING_3}/pd.clip3.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip2.grid.webm`,
-  `${TOUR_SPRING_3}/pd.ridge.grid.webp`,
+  TOUR_SPRING_3_GALLERY_VIEWER[5],
   `${TOUR_SPRING_3}/pd.clip5.grid.webm`,
-  `${TOUR_SPRING_3}/pd.summit.grid.webp`,
+  TOUR_SPRING_3_GALLERY_VIEWER[7],
   `${TOUR_SPRING_3}/pd.clip4.grid.webm`,
-  `${TOUR_SPRING_3}/pd.sea.grid.webp`,
-  `${TOUR_SPRING_3}/pd.taiga.grid.webp`,
+  TOUR_SPRING_3_GALLERY_VIEWER[9],
+  TOUR_SPRING_3_GALLERY_VIEWER[10],
   `${TOUR_SPRING_3}/pd.clip6.grid.webm`,
   `${TOUR_SPRING_3}/pd.clip7.grid.webm`,
 ] as const;
@@ -380,7 +354,7 @@ export const TOUR_SPRING_3_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SPRING_3_GALLERY_GRID[12]]: `${TOUR_SPRING_3}/pd.clip7.poster.webp`,
 };
 
-/** Карточка и hero страницы — кадр «О туре» (`pd.preface.grid`); `pd.hero.grid` остаётся в сетке как [0]. */
+/** Карточка и hero страницы — отдельный hero-баннер; `pd.hero` остаётся в сетке как [0]. */
 export const TOUR_SPRING_3_COVER_GRID = TOUR_SPRING_3_GALLERY_GRID[1];
 export const TOUR_SPRING_3_COVER = `${TOUR_SPRING_3}/hero.webp` as const;
 
@@ -394,7 +368,7 @@ export const TOUR_SPRING_4_COVER_GRID = `${TOUR_SPRING_4}/hero.webp` as const;
 export const TOUR_SPRING_4_PREFACE_BACKGROUND = `${TOUR_SPRING_4}/ss.topping.webp` as const;
 
 /**
- * «Сестра» — полное качество (просмотрщик). Макет `sestra` (как «Пидан»): после hero/preface
+ * «Сестра» — качественные фото и полные видео. Макет `sestra` (как «Пидан»): после hero/preface
  * group, taiga, clip1…clip6 и clip8 в слотах 2,3,5,6,7,9,10,11; фото — topping, pan между роликами (clip7 исключён).
  */
 export const TOUR_SPRING_4_GALLERY_VIEWER = [
@@ -413,19 +387,19 @@ export const TOUR_SPRING_4_GALLERY_VIEWER = [
   `${TOUR_SPRING_4}/ss.clip8.webm`,
 ] as const;
 
-/** Сетка «Сестра» (VP9 grid-webm для клипов; clip7 исключён из тура). */
+/** Сетка «Сестра»: фото качественные, VP9 grid-webm для клипов; clip7 исключён из тура. */
 export const TOUR_SPRING_4_GALLERY_GRID = [
-  `${TOUR_SPRING_4}/ss.topping.grid.webp`,
-  `${TOUR_SPRING_4}/ss.pan.grid.webp`,
-  `${TOUR_SPRING_4}/ss.team.grid.webp`,
-  `${TOUR_SPRING_4}/ss.taiga.grid.webp`,
+  TOUR_SPRING_4_GALLERY_VIEWER[0],
+  TOUR_SPRING_4_GALLERY_VIEWER[1],
+  TOUR_SPRING_4_GALLERY_VIEWER[2],
+  TOUR_SPRING_4_GALLERY_VIEWER[3],
   TOUR_SPRING_4_CLIP1_GRID_WEBM,
   `${TOUR_SPRING_4}/ss.clip2.grid.webm`,
-  `${TOUR_SPRING_4}/ss.pan.grid.webp`,
+  TOUR_SPRING_4_GALLERY_VIEWER[6],
   TOUR_SPRING_4_CLIP3_GRID_WEBM,
   `${TOUR_SPRING_4}/ss.clip4.grid.webm`,
   TOUR_SPRING_4_CLIP5_GRID_WEBM,
-  `${TOUR_SPRING_4}/ss.topping.grid.webp`,
+  TOUR_SPRING_4_GALLERY_VIEWER[10],
   `${TOUR_SPRING_4}/ss.clip6.grid.webm`,
   `${TOUR_SPRING_4}/ss.clip8.grid.webm`,
 ] as const;
@@ -820,6 +794,18 @@ export const TOUR_SPRING_13_COVER_GRID =
   `${TOUR_SPRING_13_ASSET_BASE}/cover.webp` as const;
 export const TOUR_SPRING_13_PREFACE_BACKGROUND =
   `${TOUR_SPRING_13_ASSET_BASE}/preface.webp` as const;
+export const TOUR_SPRING_13_VIEW7_IMAGE =
+  `${TOUR_SPRING_13_ASSET_BASE}/view7.webp` as const;
+export const TOUR_SPRING_13_ROCKS_IMAGE =
+  `${TOUR_SPRING_13_ASSET_BASE}/rocks.webp` as const;
+/** Галерея Гамова: кадр с сосной (исходник `SOSNA.webp`). */
+export const TOUR_SPRING_13_VIEW3_IMAGE =
+  `${TOUR_SPRING_13_ASSET_BASE}/sosna.webp` as const;
+export const TOUR_SPRING_13_SOSNA2_IMAGE =
+  `${TOUR_SPRING_13_ASSET_BASE}/sosna2.webp` as const;
+/** Две сосны — исходник `dve_sosna.webp`. */
+export const TOUR_SPRING_13_DVE_SOSNA_IMAGE =
+  `${TOUR_SPRING_13_ASSET_BASE}/dve-sosna.webp` as const;
 
 export const TOUR_SPRING_13_CLIP1_GRID_WEBM =
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.grid.webm` as const;
@@ -829,19 +815,29 @@ export const TOUR_SPRING_13_CLIP3_GRID_WEBM =
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.grid.webm` as const;
 export const TOUR_SPRING_13_CLIP4_GRID_WEBM =
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.grid.webm` as const;
+/** Исходник: `2022-07-20 13-29-54.MOV`. */
+export const TOUR_SPRING_13_CLIP5_GRID_WEBM =
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip5.grid.webm` as const;
+/** Исходник: `GX012405.MP4`. */
+export const TOUR_SPRING_13_CLIP6_GRID_WEBM =
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip6.grid.webm` as const;
 
 export const TOUR_SPRING_13_GALLERY_VIEWER = [
   TOUR_SPRING_13_COVER_GRID,
   TOUR_SPRING_13_PREFACE_BACKGROUND,
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.webm`,
   `${TOUR_SPRING_13_ASSET_BASE}/vityaz-bay.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/gamov-view.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/gamov-panorama.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/telyakovsky-bay.webp`,
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.webm`,
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.webm`,
+  TOUR_SPRING_13_VIEW7_IMAGE,
+  TOUR_SPRING_13_ROCKS_IMAGE,
+  TOUR_SPRING_13_VIEW3_IMAGE,
+  TOUR_SPRING_13_SOSNA2_IMAGE,
+  TOUR_SPRING_13_DVE_SOSNA_IMAGE,
   `${TOUR_SPRING_13_ASSET_BASE}/summit-view.webp`,
   `${TOUR_SPRING_13_ASSET_BASE}/astafiev-bay.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip5.webm`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip6.webm`,
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.webm`,
 ] as const;
 
@@ -850,13 +846,17 @@ export const TOUR_SPRING_13_GALLERY_GRID = [
   TOUR_SPRING_13_PREFACE_BACKGROUND,
   TOUR_SPRING_13_CLIP2_GRID_WEBM,
   `${TOUR_SPRING_13_ASSET_BASE}/vityaz-bay.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/gamov-view.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/gamov-panorama.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/telyakovsky-bay.webp`,
   TOUR_SPRING_13_CLIP1_GRID_WEBM,
   TOUR_SPRING_13_CLIP3_GRID_WEBM,
+  TOUR_SPRING_13_VIEW7_IMAGE,
+  TOUR_SPRING_13_ROCKS_IMAGE,
+  TOUR_SPRING_13_VIEW3_IMAGE,
+  TOUR_SPRING_13_SOSNA2_IMAGE,
+  TOUR_SPRING_13_DVE_SOSNA_IMAGE,
   `${TOUR_SPRING_13_ASSET_BASE}/summit-view.webp`,
   `${TOUR_SPRING_13_ASSET_BASE}/astafiev-bay.webp`,
+  TOUR_SPRING_13_CLIP5_GRID_WEBM,
+  TOUR_SPRING_13_CLIP6_GRID_WEBM,
   TOUR_SPRING_13_CLIP4_GRID_WEBM,
 ] as const;
 
@@ -865,6 +865,8 @@ export const TOUR_SPRING_13_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SPRING_13_CLIP2_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.poster.webp`,
   [TOUR_SPRING_13_CLIP3_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.poster.webp`,
   [TOUR_SPRING_13_CLIP4_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.poster.webp`,
+  [TOUR_SPRING_13_CLIP5_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip5.poster.webp`,
+  [TOUR_SPRING_13_CLIP6_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip6.poster.webp`,
 };
 
 /**

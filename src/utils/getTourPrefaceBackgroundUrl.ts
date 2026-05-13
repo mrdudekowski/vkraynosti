@@ -9,19 +9,16 @@ import type { Tour } from '../types';
 interface ResolveTourPrefaceBackgroundUrlParams {
   tour: Tour;
   viewerGalleryUrls: string[];
-  gridGalleryUrls: string[];
   isLgOrAbove: boolean;
 }
 
 export const resolveTourPrefaceBackgroundUrl = ({
   tour,
   viewerGalleryUrls,
-  gridGalleryUrls,
   isLgOrAbove,
 }: ResolveTourPrefaceBackgroundUrlParams): string | null => {
   const explicitPrefaceUrl = tour.prefaceBackgroundImageUrl ?? null;
   const viewerFallback = viewerGalleryUrls.length > 1 ? viewerGalleryUrls[1] : null;
-  const gridFallback = gridGalleryUrls.length > 1 ? gridGalleryUrls[1] : null;
 
   if (isLgOrAbove) {
     return explicitPrefaceUrl ?? viewerFallback;
@@ -36,13 +33,10 @@ export const resolveTourPrefaceBackgroundUrl = ({
     if (explicitMobileVariant != null) {
       return explicitMobileVariant;
     }
-    if (viewerFallback != null && gridFallback != null && explicitPrefaceUrl === viewerFallback) {
-      return gridFallback;
-    }
     return explicitPrefaceUrl;
   }
 
-  return gridFallback ?? viewerFallback;
+  return viewerFallback;
 };
 
 interface ResolveTourHeroImageUrlParams {

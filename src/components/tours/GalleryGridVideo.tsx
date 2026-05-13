@@ -15,6 +15,7 @@ import {
   GALLERY_GRID_VIDEO_POSTER_REVEAL_MS,
 } from '../../constants/galleryGridVideoLoop';
 import { TOUR_GALLERY_TILE_IMAGE_ROOT_MARGIN } from '../../constants/reveal';
+import { useActiveMediaSlot } from '../../hooks/useActiveMediaSlot';
 import { useDocumentVisibility } from '../../hooks/useDocumentVisibility';
 
 export interface GalleryGridVideoProps {
@@ -300,6 +301,10 @@ const GalleryGridVideo = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const unmountMotionVideoTimerRef = useRef<number | null>(null);
   const hasPoster = posterSrc != null && posterSrc.length > 0;
+  const shouldRequestMotionVideoSlot =
+    shouldRenderMotionVideo && inView && isPageVisible && !prefersReducedMotion;
+  const activeMediaSlotGranted = useActiveMediaSlot(shouldRequestMotionVideoSlot);
+  const canPlayMotionVideo = shouldRenderMotionVideo && activeMediaSlotGranted;
 
   const clearUnmountMotionVideoTimer = useCallback(() => {
     if (unmountMotionVideoTimerRef.current == null) return;
@@ -361,7 +366,7 @@ const GalleryGridVideo = ({
         ) : (
           <div className="h-full min-h-gallery-grid-video w-full bg-surface-light" />
         )
-      ) : shouldRenderMotionVideo ? (
+      ) : canPlayMotionVideo ? (
         <GalleryGridVideoMotionBranch
           key={`${gridSrc}\0${posterSrc ?? ''}`}
           gridSrc={gridSrc}

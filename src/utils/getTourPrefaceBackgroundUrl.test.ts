@@ -38,23 +38,20 @@ describe('resolveTourPrefaceBackgroundUrl', () => {
     const value = resolveTourPrefaceBackgroundUrl({
       tour: winterTour,
       viewerGalleryUrls: ['/a.webp', '/b.webp'],
-      gridGalleryUrls: ['/a.grid.webp', '/b.grid.webp'],
       isLgOrAbove: false,
     });
     expect(value).toBe(TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE);
   });
 
-  it('uses grid preface fallback on mobile when explicit preface matches viewer index 1', () => {
+  it('keeps quality preface fallback on mobile when explicit preface matches viewer index 1', () => {
     const viewer = ['/cover.webp', '/preface.webp'];
-    const grid = ['/cover.grid.webp', '/preface.grid.webp'];
     const tour = buildTour('/preface.webp');
     const value = resolveTourPrefaceBackgroundUrl({
       tour,
       viewerGalleryUrls: viewer,
-      gridGalleryUrls: grid,
       isLgOrAbove: false,
     });
-    expect(value).toBe('/preface.grid.webp');
+    expect(value).toBe('/preface.webp');
   });
 
   it('uses mapped mobile preface variant on mobile when available', () => {
@@ -62,7 +59,6 @@ describe('resolveTourPrefaceBackgroundUrl', () => {
     const value = resolveTourPrefaceBackgroundUrl({
       tour,
       viewerGalleryUrls: ['/cover.webp', TOUR_SPRING_10_PREFACE_BACKGROUND],
-      gridGalleryUrls: ['/cover.grid.webp', '/preface.grid.webp'],
       isLgOrAbove: false,
     });
     expect(value).toBe(TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE);

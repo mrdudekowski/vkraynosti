@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import type { HomeSeasonBannerWinterVideoPreloadLink } from '../../constants/homeSeasonBannerVideoPreload';
+import type { HomeSeasonBannerVideoPreloadLink } from '../../constants/homeSeasonBannerVideoPreload';
 import { SEO_DEFAULTS, getCanonicalUrl, type RobotsDirective } from '../../constants/seo';
 
 interface PageMetaProps {
@@ -13,11 +13,11 @@ interface PageMetaProps {
   /** LCP: первый кадр героя / главное изображение страницы. */
   preloadHeroImageUrl?: string;
   /**
-   * Ранний fetch первых N лупов сезонного баннера ворот (главная): в `<head>` раньше `preloadHeroImageUrl`.
+   * Ранний fetch первых N лупов сезонного баннера ворот (главная).
    * Политика и лимит N — в `homeSeasonBannerVideoPreload.ts` (`getHomeSeasonBannerWinterVideoPreloadLinks` / spring).
    */
-  priorityVideoPreloads?: readonly HomeSeasonBannerWinterVideoPreloadLink[];
-  /** По умолчанию `high`, если нет `priorityVideoPreloads`; иначе `low` (ролики баннера впереди). */
+  priorityVideoPreloads?: readonly HomeSeasonBannerVideoPreloadLink[];
+  /** По умолчанию `high`: LCP image не должен уступать декоративным video preload. */
   preloadHeroImageFetchPriority?: 'high' | 'low' | 'auto';
 }
 
@@ -33,20 +33,18 @@ const PageMeta = ({
   priorityVideoPreloads,
   preloadHeroImageFetchPriority,
 }: PageMetaProps) => {
-  const heroPreloadPriority =
-    preloadHeroImageFetchPriority ??
-    (priorityVideoPreloads != null && priorityVideoPreloads.length > 0 ? 'low' : 'high');
+  const heroPreloadPriority = preloadHeroImageFetchPriority ?? 'high';
 
   const canonicalUrl = getCanonicalUrl(canonicalPath ?? path);
 
   return (
     <Helmet>
-      {priorityVideoPreloads?.map(({ href, fetchPriority }) => (
-        <link key={href} rel="preload" as="video" href={href} fetchPriority={fetchPriority} />
-      ))}
       {preloadHeroImageUrl ? (
         <link rel="preload" as="image" href={preloadHeroImageUrl} fetchPriority={heroPreloadPriority} />
       ) : null}
+      {priorityVideoPreloads?.map(({ href, fetchPriority }) => (
+        <link key={href} rel="preload" as="video" href={href} fetchPriority={fetchPriority} />
+      ))}
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="robots" content={robots} />

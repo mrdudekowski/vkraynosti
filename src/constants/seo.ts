@@ -151,6 +151,9 @@ export const getTourStructuredData = (tour: Tour) => {
       name: SEO_DEFAULTS.siteName,
       url: SITE_URL,
     },
-    touristType: tour.metaAudienceLabel ?? 'Для взрослых путешественников',
+    touristType:
+      tour.metaAudienceLabel ??
+      tour.difficultyDisplayLabel ??
+      'Для взрослых путешественников',
   } as const;
 };

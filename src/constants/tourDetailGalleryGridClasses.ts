@@ -33,3 +33,9 @@ export const GALLERY_GRID_FULL_WIDTH_SQUARE =
  */
 export const GALLERY_GRID_FULL_WIDTH_TILE_2X2 =
   'col-span-2 aspect-gallery-tile-2x2 w-full min-w-0' as const;
+
+/**
+ * Вся ширина `grid-cols-2`, низкая панорама (`aspect-gallery-tile-2x1` в теме).
+ */
+export const GALLERY_GRID_FULL_WIDTH_TILE_2X1 =
+  'col-span-2 aspect-gallery-tile-2x1 w-full min-w-0' as const;

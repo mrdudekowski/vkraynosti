@@ -32,6 +32,10 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   const winterStruck = winterCardStruckPrice(tour);
   const showAudienceLine =
     tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0;
+  const showCustomDifficultyChip =
+    !showAudienceLine &&
+    tour.difficultyDisplayLabel != null &&
+    tour.difficultyDisplayLabel.length > 0;
   const mobileCoverSrc = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
   const coverSrcSet =
     mobileCoverSrc != null && mobileCoverSrc !== tour.imageUrl
@@ -70,7 +74,11 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
               showAudienceLine ? UI.tourCard.audienceChipClasses : UI.difficulty.styles[tour.difficulty]
             }`}
           >
-            {showAudienceLine ? tour.metaAudienceLabel : UI.difficulty.labels[tour.difficulty]}
+            {showAudienceLine
+              ? tour.metaAudienceLabel
+              : showCustomDifficultyChip
+                ? tour.difficultyDisplayLabel
+                : UI.difficulty.labels[tour.difficulty]}
           </span>
         </div>
         <p className="mb-3 text-sm text-text-muted">{tour.subtitle}</p>

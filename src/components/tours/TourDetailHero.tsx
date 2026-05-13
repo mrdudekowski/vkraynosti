@@ -19,7 +19,7 @@ interface TourDetailHeroProps {
    * `object-center` + `desktopHeroImgClassName` / дефолтного `lg:object-tour-detail-hero-desktop`.
    */
   heroImageObjectClassName?: string;
-  /** Первое фото галереи — полноэкранный просмотр (закрытие по клику вне кадра). */
+  /** Опциональное открытие фото, если у страницы есть отдельный viewer. */
   onOpenPhoto?: () => void;
   openPhotoAriaLabel?: string;
 }

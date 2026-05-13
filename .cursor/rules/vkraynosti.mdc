@@ -1,52 +1,114 @@
 ---
-description: Vkraynosti Travel Agency — Project Coding Rules
-globs: ["**/*.tsx", "**/*.ts", "**/*.jsx", "**/*.js", "**/*.css"]
+description: Vkraynosti — системный промпт (SSOT, No Hardcode, архитектура, UX); project rules для Agent
 alwaysApply: true
 ---
 
-# Vkraynosti Project Rules
+# Vkraynosti — системные правила для агентов
 
-## Architecture
-- SPA with React + TypeScript + Vite + Tailwind CSS v3
-- React Router v7 for routing
-- All pages live in src/pages/, all components in src/components/
-- Global state via React Context only (no Redux)
-- Data layer: src/data/*.ts — all tour/team/safety data as typed constants
+Ты работаешь в репозитории **«Вкрайности» (vkraynosti)** — SPA туристического агентства. Соблюдай этот документ как **обязательный контракт** для задач в этом репозитории: архитектура, Single Source of Truth, запрет хардкода, модульность и качество UX — не ослабляй без явного согласования с пользователем.
 
-## No Hardcode Policy (CRITICAL)
-- NEVER hardcode colors, font sizes, spacing, z-index, breakpoints inline
-- ALL design tokens defined in tailwind.config.ts under `theme.extend`
-- ALL text content (names, descriptions, labels) comes from src/data/*.ts or src/constants/ui.ts
-- ALL image paths defined in src/constants/images.ts as named exports
-- ALL route paths defined in src/constants/routes.ts
-- ALL external links (phone, telegram, max) defined in src/constants/contacts.ts
+## 0. Охват в Cursor и приоритет правил
 
-## Component Rules
-- Every component receives typed props — no `any`
-- No logic in JSX — extract to hooks or helpers
-- Modal state managed in src/context/ModalContext.tsx
-- Carousel logic extracted to src/hooks/useCarousel.ts
-- All icons from FontAwesome via @fortawesome/react-fontawesome
+- Это **Project Rules** (файл в `.cursor/rules/`). Поведение подмешивания в контекст описано в официальной документации: [Rules (Cursor Docs)](https://cursor.com/docs/context/rules).
+- При **`alwaysApply: true`** правило **всегда включается в контекст Agent (Chat)**; поля **`globs` и `description` не управляют активацией** (см. таблицу «Rule anatomy» в документации) — не рассчитывай на «узкое» включение через glob для этого файла.
+- **Конфликт с другими правилами:** по документации Cursor порядок приоритета такой: **Team Rules → Project Rules → User Rules** (ранний источник сильнее при противоречиях). Этот файл не отменяет организационные Team Rules.
+- **Ограничение продуктов Cursor:** в FAQ к Rules указано, что **правила не влияют на Cursor Tab и ряд других AI-режимов**; **User Rules** не применяются к **Inline Edit (Cmd/Ctrl+K)**. Не ожидай, что текст ниже автоматически соблюдается во всех режимах IDE — для них нужны линтер, ревью и привычки команды.
+- **Рекомендация Cursor:** держи project rules **короткими и проверяемыми**, по возможности **ссылаться на файлы в чате** (`@путь`) вместо копирования больших листингов в правило; при разрастании **разбей на несколько правил** в `.cursor/rules/` (в документации — ориентир **до ~500 строк** на правило).
 
-## Tailwind Rules
-- Use only classes defined in tailwind.config.ts custom theme
-- Responsive: mobile-first, breakpoints: sm(640) md(768) lg(1024) xl(1280)
-- Dark sections use bg-surface-dark, light sections use bg-surface-light
-- Animations defined in tailwind.config.ts keyframes section
+## 1. Продукт и контекст
 
-## File Naming
-- Components: PascalCase (HeroCarousel.tsx)
-- Hooks: camelCase with use prefix (useCarousel.ts)
-- Data files: camelCase (toursData.ts)
-- Constants: camelCase (routes.ts)
+- Публичный сайт: сезоны, списки туров, **детальная страница тура** (галерея, мета-факты, программа, CTA), команда, безопасность, юридические страницы, формы и модалки заявок.
+- Потоки: главная → сезон → тур → заявка/контакт; согласуй навигацию, SEO и данные.
 
-## Commit Checkpoints
-After each phase, verify: TypeScript compiles, no console errors, routing works, no hardcoded values remain.
+## 2. Стек и слои (где что искать)
 
-## Tech Notes
-- React 19: Use functional components with hooks; Context + useReducer for state; createPortal for modals
-- React Router v7: createBrowserRouter with nested routes and Layout outlet; useParams for dynamic segments
-- Tailwind CSS v3: All custom tokens in theme.extend; use @layer components for reusable classes; content paths must include ./src/**/*.{ts,tsx}
-- FontAwesome React: Install @fortawesome/react-fontawesome + icon packs; import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; use library.add() or direct icon imports
-- Vite: Fast HMR dev server; env vars via import.meta.env; build output to dist/
-- TypeScript: Strict interfaces for all data shapes; use `as const` for constant objects; avoid `any` — use `unknown` + type guards instead
+- **Стек:** React 19, TypeScript, Vite, Tailwind v3, React Router v7, react-helmet-async, Lenis, FontAwesome React; **Zod** — только там, где в репозитории уже есть схемы/валидация (формы, лиды и т.п.); не вводи Zod «по умолчанию» во все слои без причины.
+- **Роутинг:** `src/router.tsx` + **`src/constants/routes.ts`** (канон путей).
+- **Страницы:** `src/pages/` — композиция, минимум бизнес-логики.
+- **Компоненты:** `src/components/` (`layout/`, `home/`, `tours/`, `seasons/`, `modals/`, `form/`, `shared/`).
+- **Данные:** `src/data/*.ts` — туры, команда, безопасность (**канон текста и структурированного контента**).
+- **Константы:** `src/constants/*.ts` — UI-строки общего назначения (**`ui.ts`**), SEO (**`seo.ts`**), тайминги анимаций, классы сеток и т.д.; **`tailwind.config.ts`** тянет числа из `src/constants` — новые тайминги в том же стиле (константа → theme), без дубля «магических» чисел.
+- **Типы:** `src/types/`; **состояние:** `src/context/` (без Redux); **поведение:** `src/hooks/`; **чистые функции:** `src/utils/`; **сеть/лиды:** `src/services/`.
+- **Статика:** `public/`; в коде пути к медиа — через **`src/constants/images.ts`** и утилиты (`tourGalleryUrls.ts`, `getTourPrefaceBackgroundUrl.ts` и др.), а не сырые строки.
+- **Вне приложения:** `integrations/` (GAS и т.д.), `scripts/` — не дублируй бизнес-логику приложения в скриптах без необходимости.
+
+**Канонические файлы для точечного `@` в чате (не вшивай большие листинги в ответ):** `src/constants/routes.ts`, `src/constants/contacts.ts`, `src/constants/images.ts`, `src/constants/ui.ts`, `src/data/toursData.ts`, `src/context/ModalContext.tsx`, `tailwind.config.ts` (смотри `theme.extend`; файл большой — только выборочно).
+
+## 3. Single Source of Truth (SSOT)
+
+1. Контент туров/команды/безопасности — только **`src/data/*.ts`** (+ типы), не строки в JSX.
+2. Общие подписи UI — **`src/constants/ui.ts`** или узкие константы по принятому в проекте паттерну.
+3. Маршруты — **`routes.ts`**; контакты и внешние ссылки — **`contacts.ts`**.
+4. Пути медиа для UI — **`images.ts`** и хелперы; не плодить `/tours/...` в компонентах.
+5. SEO/мета — через **`PageMeta`** и **`seo.ts`** (и связанные модули), без дублирования title/description.
+6. Числа для анимаций — по возможности **одна константа в `src/constants`, импорт в `tailwind.config.ts`**, как у существующих анимаций.
+7. Один факт — один источник; остальное — импорт или вычисление.
+
+## 4. No Hardcode (критично)
+
+Без явного исключения в задаче запрещено:
+
+- Инлайн **цвета, типографика, отступы, z-index, breakpoints** — только токены/`theme.extend` и принятые классы; секции: **`bg-surface-light` / `bg-surface-dark`**.
+- Пользовательские **тексты** в JSX (исключение — узкие технические aria; тогда вынести строку в константу).
+- **Пути медиа** сырыми строками в компонентах.
+- **`any`** — строгие типы, `unknown` + сужение.
+
+Исключения: временный дебаг (удалить до сдачи), сгенерированные артефакты вне `src/`.
+
+## 5. Компоненты и модульность
+
+- Типизированные props; **тяжёлую логику не держать в JSX** — **`src/hooks/`** или **`src/utils/`**.
+- Модалки — **`ModalContext.tsx`** и `src/components/modals/`.
+- Карусели — **`useCarousel.ts`** и существующие обёртки.
+- Иконки — **FontAwesome** (`@fortawesome/react-fontawesome`).
+- Новые npm-зависимости — только с запись в **`package.json`** и обоснованием.
+- Дифф — **минимальный**, без рефакторинга несвязанного кода.
+
+## 6. Tailwind и дизайн-система
+
+- Mobile-first; брейкпоинты: **sm 640, md 768, lg 1024, xl 1280**.
+- Повторяемые блоки — `@layer components` в **`src/index.css`** или утилиты темы, а не копипаста длинных className.
+- Анимации — keyframes в конфиге; синхрон с TS-константами сохраняй.
+
+## 7. UX, UI, a11y
+
+- Согласованность с существующими секциями и карточками.
+- Семантика, видимый **focus**, подписи полей, осмысленные **aria-label**; для видео/медиа — **poster**; **`prefers-reduced-motion`** — где в проекте уже заложен паттерн.
+- Формы — компоненты **`src/components/form/`**.
+- Не ломай **Lenis** и провайдеры layout без проверки регрессий.
+
+## 8. Производительность и медиа
+
+- Крупные файлы в **`public/`**; учитывай скрипты из **`package.json`** (например `media:budget`, генераторы).
+- Не ухудшай LCP без необходимости; сохраняй ленивую загрузку модалок и тяжёлых чанков.
+
+## 9. Тесты и качество
+
+- После нетривиальных изменений: **`npm run build`** и точечно **`npm test`**; при риске регрессий — **`npm run test:e2e`**.
+- Новая сложная логика — тесты рядом (`*.test.ts` / `*.test.tsx`) в стиле репозитория.
+
+## 10. Безопасность и данные
+
+- Секреты не в git; ориентир — **`.env.example`**.
+- Не логируй персональные данные из форм в консоль.
+- Внешние вызовы (лиды) — через **`src/services/`**, не размазывать `fetch` по UI.
+
+## 11. Именование
+
+- Компоненты: **PascalCase**; хуки: **`use` + camelCase**; данные и константы: **camelCase**.
+
+## 12. Рабочий процесс
+
+1. Прочитай затронутые файлы и данные; выровняй стиль с существующим кодом.
+2. Выбери **один канонический источник** для нового знания.
+3. Правь точечно; не удаляй чужие комментарии и несвязанный код.
+4. Проверь типы и линтер для изменённых файлов.
+5. В ответе пользователю кратко: **что** и **зачем**; цитаты кода — с путём и номерами строк, как принято в клиенте.
+
+## 13. Завершение задачи
+
+- Сборка проходит, нет новых ошибок в консоли из-за твоих правок, маршруты живы, **хардкод не добавлен**.
+
+---
+
+**Чеклист:** SSOT → нет хардкода токенов/текстов/URL → логика в хуках/утилитах → строгие типы → build/tests по необходимости.

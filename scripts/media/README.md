@@ -1,9 +1,9 @@
-# Оптимизация медиа для страницы тура (grid + viewer)
+# Оптимизация медиа для страницы тура
 
 ## Идея
 
-- **Viewer** (`tour.galleryImages`) — полное качество для полноэкранного просмотра и метаданных.
-- **Grid** (`tour.galleryGridUrls`) — уменьшенные WebP и VP9 WebM для сетки галереи и карточек; видео в сетке монтируется лениво с постером.
+- **Фото** (`tour.galleryImages`) — качественные WebP для страницы тура, префейса и метаданных.
+- **Grid-медиа** (`tour.galleryGridUrls`) — тот же порядок, что у `galleryImages`; фото остаются качественными, а видео заменяются на VP9 `*.grid.webm` для сетки.
 
 Длины массивов **обязаны совпадать** по индексам 1:1. Проверка: `src/data/tourGalleryParity.test.ts`.
 
@@ -11,9 +11,8 @@
 
 | Файл | Назначение |
 |------|------------|
-| `name.webp` | Исходник для viewer (фото) |
-| `name.grid.webp` | Сетка: webp после `scale` ≤900px по ширине |
-| `clip.webm` | Viewer: VP9 из исходного `*.mov` / `*.mp4` (`WebmTourEncoding.ps1`, пресет `full`) |
+| `name.webp` | Качественное фото для страницы тура |
+| `clip.webm` | Полная VP9-версия из исходного `*.mov` / `*.mp4` (`WebmTourEncoding.ps1`, пресет `full`) |
 | `name.grid.webm` | Сетка: VP9, пресет `grid`, без аудио |
 | `name.poster.webp` | Кадр из `*.grid.webm` для ленивого `<video>` |
 
@@ -28,8 +27,6 @@
 Скрипты по турам (из корня репозитория):
 
 ```powershell
-.\scripts\generate-winter-1-grid-assets.ps1
-.\scripts\generate-winter-2-grid-assets.ps1
 .\scripts\generate-winter-3-grid-assets.ps1
 .\scripts\generate-winter-4-grid-assets.ps1
 .\scripts\generate-winter-5-grid-assets.ps1
@@ -40,7 +37,7 @@ npm run generate:banner-loops
 ## Новый тур
 
 1. Положить исходники в `public/tours/{id}/`.
-2. В [`src/constants/images.ts`](../../src/constants/images.ts): пары `*_GALLERY_VIEWER` и `*_GALLERY_GRID` (одинаковый порядок). Константы веток в [`TourDetailGallery`](../../src/components/tours/TourDetailGallery.tsx) — только из **grid**.
+2. В [`src/constants/images.ts`](../../src/constants/images.ts): пары `*_GALLERY_VIEWER` и `*_GALLERY_GRID` (одинаковый порядок). Для фото в `*_GALLERY_GRID` используйте элементы viewer-массива, для видео — `*.grid.webm`.
 3. В [`src/data/toursData.ts`](../../src/data/toursData.ts): `galleryImages: [...VIEWER]`, `galleryGridUrls: [...GRID]`, `imageUrl` — обложка (часто `GRID[0]` или отдельный кадр).
 4. Если в сетке есть видео: `TOUR_*_GRID_VIDEO_POSTERS` и в [`TourDetailPage`](../../src/pages/TourDetailPage.tsx) передача `getVideoPosterForGridSrc` для `tour.id`.
-5. Скопировать ближайший `generate-winter-*-grid-assets.ps1`, подставить список файлов и вызовы `Invoke-Ffmpeg` / `WebmTourEncoding.ps1`.
+5. Скопировать ближайший видео-скрипт, подставить список клипов и вызовы `Invoke-Ffmpeg` / `WebmTourEncoding.ps1`.

@@ -24,6 +24,11 @@ export interface Tour {
    * вместо уровня сложности (например диапазон «Лёгкий / Средний» или «Лёгкий / Сложный» из `UI.difficulty.labels`).
    */
   metaAudienceLabel?: string;
+  /**
+   * Текст сложности под заголовком «Сложность» (`UI.tourDetail.metaLabelDifficulty`) в мета-блоке
+   * и в чипе карточки. Не сочетать с `metaAudienceLabel`.
+   */
+  difficultyDisplayLabel?: string;
   price: string;
   /** Зачёркнутая «старая» цена под основной (например, до обновления прайса). */
   pricePrevious?: string;
@@ -41,19 +46,15 @@ export interface Tour {
   includedInPrice: TourIncludedItem[];
   imageUrl: string;
   /**
-   * Канонический порядок медиа: полное качество для просмотрщика и префейса по индексу.
+   * Канонический порядок медиа: качественные фото и полные видео.
    * Длина совпадает с `galleryGridUrls`, если он задан.
    */
   galleryImages: string[];
   /**
-   * Оптимизированные URL для сетки страницы тура и карточек (webp / VP9 webm).
+   * URL для сетки страницы тура: те же качественные фото, но VP9 `*.grid.webm` для видео.
    * При отсутствии для сетки используется `galleryImages`.
    */
   galleryGridUrls?: string[];
-  /**
-   * Явный список URL для полноэкранного просмотра; иначе — `galleryImages`.
-   */
-  galleryViewerUrls?: string[];
   /**
    * Если задано — фон блока «О туре» (`tour-detail-preface-bg`) вместо `galleryImages[1]`.
    * URL из `src/constants/images.ts` или того же массива, что и `galleryImages`.

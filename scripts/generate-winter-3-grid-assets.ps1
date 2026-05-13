@@ -1,23 +1,10 @@
 # `Invoke-Ffmpeg`: ffmpeg из PATH или bundled (`node_modules/@ffmpeg-installer/...` на Windows).
-# Создаёт `*.grid.webp`, полноразмерные `*.webm`, `*.grid.webm`, `*.poster.webp` в `public/tours/winter-3/`.
+# Создаёт полноразмерные `*.webm`, `*.grid.webm`, `*.poster.webp` в `public/tours/winter-3/`.
 $ErrorActionPreference = "Stop"
 $dir = Join-Path $PSScriptRoot "..\public\tours\winter-3" | Resolve-Path
 Set-Location $dir
 . (Join-Path $PSScriptRoot "media\Invoke-Ffmpeg.ps1")
 . (Join-Path $PSScriptRoot "media\WebmTourEncoding.ps1")
-
-# gr.board / gr.elya / gr.bbq — в сетке `*.grid.webm` из `generate-winter-3-banner-stub-videos.ps1`, не из webp.
-$images = @(
-  "gr.falaza.webp", "gr.griba.webp", "gr.lift.webp", "gr.board2.webp",
-  "gr.instr.webp"
-)
-
-foreach ($f in $images) {
-  if (-not (Test-Path $f)) { Write-Warning "Skip missing: $f"; continue }
-  $base = [System.IO.Path]::GetFileNameWithoutExtension($f)
-  $out = "${base}.grid.webp"
-  Invoke-Ffmpeg @('-y', '-i', $f, '-vf', "scale='min(900,iw)':-1", '-q:v', '82', $out)
-}
 
 $videos = @(
   @{ In = "gr.clip1.mov"; Base = "gr.clip1" },
@@ -43,4 +30,4 @@ foreach ($p in $posters) {
   Invoke-Ffmpeg @('-y', '-i', $webm, '-vframes', '1', '-q:v', '80', $webp)
 }
 
-Write-Host "Done winter-3 grid assets in $dir"
+Write-Host "Done winter-3 video assets in $dir"

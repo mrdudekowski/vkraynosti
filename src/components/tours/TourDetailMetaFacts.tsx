@@ -16,6 +16,7 @@ export interface TourDetailMetaFactsProps {
   duration: string;
   difficulty: Tour["difficulty"];
   metaAudienceLabel?: string;
+  difficultyDisplayLabel?: string;
   /** Крупный ряд под hero: ~1.3× к базовому мета (двойной размер минус 35%). */
   size?: "default" | "prominent";
 }
@@ -24,6 +25,7 @@ const TourDetailMetaFacts = ({
   duration,
   difficulty,
   metaAudienceLabel,
+  difficultyDisplayLabel,
   size = "default",
 }: TourDetailMetaFactsProps) => {
   const metaTextClass =
@@ -31,6 +33,18 @@ const TourDetailMetaFacts = ({
   const rowGapClass = size === "prominent" ? "gap-4" : "gap-2.5";
   const hasAudienceMeta =
     metaAudienceLabel != null && metaAudienceLabel.length > 0;
+  const customDifficultyText =
+    !hasAudienceMeta &&
+    difficultyDisplayLabel != null &&
+    difficultyDisplayLabel.length > 0
+      ? difficultyDisplayLabel
+      : null;
+  const difficultyFactValue =
+    hasAudienceMeta && metaAudienceLabel != null
+      ? metaAudienceLabel
+      : customDifficultyText != null
+        ? customDifficultyText
+        : UI.difficulty.labels[difficulty];
 
   return (
   <section
@@ -58,13 +72,15 @@ const TourDetailMetaFacts = ({
       aria-label={
         hasAudienceMeta && metaAudienceLabel != null
           ? `${UI.tourDetail.metaAudienceTitleAbove}: ${metaAudienceLabel}`
-          : `${UI.tourDetail.metaLabelDifficulty}: ${UI.difficulty.labels[difficulty]}`
+          : `${UI.tourDetail.metaLabelDifficulty}: ${difficultyFactValue}`
       }
     >
       <p className="tour-detail-key-facts__meta-title">
         {hasAudienceMeta
           ? UI.tourDetail.metaAudienceTitleAbove
-          : UI.tourDetail.metaDifficultyTitleAbove}
+          : customDifficultyText != null
+            ? UI.tourDetail.metaLabelDifficulty
+            : UI.tourDetail.metaDifficultyTitleAbove}
       </p>
       <span
         className={
@@ -78,7 +94,7 @@ const TourDetailMetaFacts = ({
           className="shrink-0 transition-colors duration-hover group-hover:text-brand-secondary"
           aria-hidden
         />
-        {hasAudienceMeta ? metaAudienceLabel : UI.difficulty.labels[difficulty]}
+        {difficultyFactValue}
       </span>
     </div>
   </section>

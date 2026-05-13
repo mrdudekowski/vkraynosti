@@ -6,7 +6,6 @@
  * 2) В Project Settings → Script properties добавьте:
  *    TELEGRAM_BOT_TOKEN — токен от @BotFather.
  *    TELEGRAM_CHAT_ID   — id группы (число; супергруппа со знаком «-»).
- *    WEBHOOK_SECRET     — любая длинная строка-пароль.
  * 3) Опционально запустите installDefaultSettings(), чтобы задать TTL идемпотентности.
  * 4) Запустите функцию sendTestLead().
  * 5) Если тест пришёл в Telegram — Deploy → New deployment → Web app.
@@ -14,16 +13,14 @@
  * --- Script Properties (Project Settings → Script properties) ---
  * TELEGRAM_BOT_TOKEN  — токен от @BotFather (не коммитить в git).
  * TELEGRAM_CHAT_ID    — id группы (число; супергруппа со знаком «-»).
- * WEBHOOK_SECRET      — общий секрет; должен совпадать с заголовком/полем в JSON.
  *
  * Опционально:
  * IDEMPOTENCY_TTL_SECONDS — 60…21600 (лимит CacheService), по умолчанию 21600 (6 ч).
  *
- * --- Важно про секрет и заголовки ---
- * У опубликованного Web App в doPost(e) обычно НЕТ доступа к произвольным HTTP-заголовкам
- * (см. документацию Web Apps: только queryString, parameter, postData…).
- * Поэтому X-Webhook-Secret может не попасть в скрипт: для прямого вызова GAS
- * передавайте секрет в теле (поле webhookSecret) или через backend/serverless proxy.
+ * --- Важно про публичный endpoint ---
+ * Этот скрипт рассчитан на прямую отправку из браузера, поэтому endpoint публичный.
+ * Защита здесь ограничена валидацией payload и идемпотентностью; для строгой модели доверия
+ * поставьте перед GAS serverless proxy, который хранит приватные ключи вне браузера.
  *
  * --- Деплой ---
  * Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone
@@ -32,21 +29,19 @@
  * --- Пример curl (подставьте URL деплоя /exec) ---
  * curl -sS -X POST 'https://script.google.com/macros/s/AKfycb.../exec' \
  *   -H 'Content-Type: application/json' \
- *   -H 'X-Webhook-Secret: ВАШ_СЕКРЕТ' \
- *   -d '{"webhookSecret":"ВАШ_СЕКРЕТ","tourId":"spring-6","tourTitle":"Мараловая ферма и Парк Драконов","season":"spring","name":"Иван","phone":"+79001234567","email":"","preferredMessenger":"telegram","question":"Вопрос","privacyAccepted":true,"sourceUrl":"https://…","submittedAt":"2026-05-11T12:00:00.000Z","userAgent":"curl"}'
+ *   -d '{"tourId":"spring-6","tourTitle":"Мараловая ферма и Парк Драконов","season":"spring","name":"Иван","phone":"+79001234567","email":"","preferredMessenger":"telegram","question":"Вопрос","privacyAccepted":true,"sourceUrl":"https://…","submittedAt":"2026-05-11T12:00:00.000Z","userAgent":"curl"}'
  *
  * --- Чеклист ---
  * [ ] Бот создан, TELEGRAM_BOT_TOKEN в свойствах.
  * [ ] Бот добавлен в группу, может писать сообщения.
  * [ ] TELEGRAM_CHAT_ID верный (для супергруппы отрицательный id).
- * [ ] WEBHOOK_SECRET задан и совпадает с тем, что шлёт сайт/бэкенд.
- * [ ] Web App задеплоен, URL с /exec скопирован на сервер.
- * [ ] CORS: прямой POST из браузера на script.google.com проблематичен — шлите с бэкенда.
+ * [ ] Web App задеплоен, URL с /exec скопирован в VITE_TOUR_REQUEST_ENDPOINT_URL.
+ * [ ] CORS: прямой POST из браузера на script.google.com остается opaque; сайт не читает JSON-статус.
  *
  * --- HTTP-статусы ---
  * У Web App ответ через ContentService обычно отдаётся с кодом 200 даже при ошибке.
  * Семантика ошибок — в JSON: ok, error, code (FORBIDDEN, BAD_REQUEST, UPSTREAM…).
- * Если нужны реальные 403/502, поставьте перед GAS обратный прокси (Cloudflare Worker и т.п.).
+ * Если нужны реальные 403/502 и приватная проверка, поставьте перед GAS обратный прокси.
  */
 
 var TELEGRAM_TEXT_LIMIT = 4096;
@@ -64,16 +59,15 @@ function installDefaultSettings() {
     props.setProperty('IDEMPOTENCY_TTL_SECONDS', DEFAULT_IDEMPOTENCY_TTL_SECONDS);
   }
 
-  Logger.log('Готово: IDEMPOTENCY_TTL_SECONDS установлен. Теперь добавьте TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID и WEBHOOK_SECRET.');
+  Logger.log('Готово: IDEMPOTENCY_TTL_SECONDS установлен. Теперь добавьте TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID.');
 }
 
 /**
- * Запустите после заполнения TELEGRAM_BOT_TOKEN и WEBHOOK_SECRET.
+ * Запустите после заполнения TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID.
  * В Telegram должно прийти тестовое сообщение.
  */
 function sendTestLead() {
   var props = PropertiesService.getScriptProperties();
-  var secret = props.getProperty('WEBHOOK_SECRET');
 
   if (!props.getProperty('TELEGRAM_BOT_TOKEN')) {
     Logger.log('Не найден TELEGRAM_BOT_TOKEN. Добавьте токен бота в Script Properties.');
@@ -84,13 +78,7 @@ function sendTestLead() {
     return;
   }
 
-  if (!secret) {
-    Logger.log('Не найден WEBHOOK_SECRET. Добавьте любую длинную строку-пароль в Script Properties.');
-    return;
-  }
-
   var testPayload = {
-    webhookSecret: secret,
     idempotencyKey: 'gas-test-' + new Date().toISOString(),
     tourId: 'winter-1',
     tourTitle: 'Тестовый тур',
@@ -172,18 +160,6 @@ function handleLeadPost_(e) {
   }
 
   var props = PropertiesService.getScriptProperties();
-  var expectedSecret = props.getProperty('WEBHOOK_SECRET');
-  if (!expectedSecret) {
-    Logger.log('WEBHOOK_SECRET is not configured');
-    return { ok: false, error: 'Server misconfiguration', code: 'INTERNAL' };
-  }
-
-  var provided = getProvidedSecret_(e, body);
-  if (!provided || provided !== expectedSecret) {
-    Logger.log('Invalid webhook secret');
-    return { ok: false, error: 'Forbidden', code: 'FORBIDDEN' };
-  }
-
   var idemKey = typeof body.idempotencyKey === 'string' ? body.idempotencyKey.trim() : '';
   if (idemKey) {
     var ttl = parseIdempotencyTtl_(props.getProperty('IDEMPOTENCY_TTL_SECONDS'));
@@ -228,25 +204,6 @@ function parseIdempotencyTtl_(raw) {
   if (isNaN(n) || n < 60) return 21600;
   if (n > 21600) return 21600;
   return n;
-}
-
-/**
- * @param {GoogleAppsScript.Events.DoPost} e
- * @param {Object} body
- * @return {string}
- */
-function getProvidedSecret_(e, body) {
-  if (e && e.headers) {
-    var headerSecret = e.headers['X-Webhook-Secret'] || e.headers['x-webhook-secret'];
-    if (headerSecret) return String(headerSecret);
-  }
-  if (body && typeof body.webhookSecret === 'string' && body.webhookSecret) return body.webhookSecret;
-  if (body && typeof body.secret === 'string' && body.secret) return body.secret;
-  if (e && e.parameter) {
-    if (e.parameter.webhookSecret) return String(e.parameter.webhookSecret);
-    if (e.parameter.secret) return String(e.parameter.secret);
-  }
-  return '';
 }
 
 /**

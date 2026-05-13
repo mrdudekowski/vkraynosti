@@ -363,6 +363,26 @@
     @apply border border-divider bg-surface-light rounded-card p-card-p sticky top-24;
   }
 
+  .tour-detail-program-card-reveal {
+    @apply flex flex-col overflow-hidden;
+    max-height: calc(100vh - theme('spacing.24') - theme('spacing.6'));
+  }
+
+  .tour-detail-program-card-reveal .tour-detail-program-viewport {
+    @apply min-h-0 overflow-hidden;
+    flex: 1 1 auto;
+  }
+
+  .tour-detail-program-track {
+    position: relative;
+  }
+
+  .tour-detail-program-card-reveal .tour-detail-program-track {
+    transform: translateY(var(--tour-program-track-offset-y, 0px));
+    transition: transform theme('transitionDuration.reveal') theme('transitionTimingFunction.reveal-out');
+    will-change: transform;
+  }
+
   .btn-primary {
     @apply bg-brand-secondary text-surface-dark font-semibold px-6 py-3 rounded-full
            transition-all duration-hover hover:brightness-110 hover:scale-105 active:scale-95;
@@ -613,7 +633,7 @@
     }
   }
 
-  /** Этапы программы тура: только opacity + translate (без `invisible`), текст остаётся в дереве доступности. */
+  /** Этапы программы тура монтируются по мере scroll-reveal, поэтому скрытые шаги не занимают layout. */
   .reveal-program-step-base {
     @apply transition-[opacity,transform,filter] duration-reveal ease-reveal-out;
   }
@@ -623,7 +643,25 @@
   }
   .reveal-program-step-visible {
     @apply opacity-100 translate-y-0;
+    animation: reveal-program-item-in theme('transitionDuration.reveal') theme('transitionTimingFunction.reveal-out') both;
     filter: brightness(1);
+  }
+
+  .reveal-program-footer {
+    animation: reveal-program-item-in theme('transitionDuration.reveal') theme('transitionTimingFunction.reveal-out') both;
+  }
+
+  @keyframes reveal-program-item-in {
+    0% {
+      opacity: 0;
+      transform: translateY(theme('spacing.reveal-y'));
+      filter: brightness(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: brightness(1);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -632,6 +670,22 @@
     }
     .reveal-program-step-hidden {
       @apply opacity-100 translate-y-0;
+    }
+    .reveal-program-step-visible,
+    .reveal-program-footer {
+      animation: none !important;
+    }
+    .tour-detail-program-card-reveal {
+      max-height: none;
+      overflow: visible;
+    }
+    .tour-detail-program-card-reveal .tour-detail-program-viewport {
+      overflow: visible;
+    }
+    .tour-detail-program-card-reveal .tour-detail-program-track {
+      transform: none !important;
+      transition: none !important;
+      will-change: auto;
     }
   }
 

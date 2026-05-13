@@ -13,23 +13,23 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-function computeRevealedCount(
+function computeRevealedItemCount(
   mainColumnEl: HTMLElement,
-  stepCount: number,
+  itemCount: number,
   scrollY: number
 ): number {
-  if (stepCount <= 0) return 0;
+  if (itemCount <= 0) return 0;
   const rect = mainColumnEl.getBoundingClientRect();
   const startTop = rect.top + scrollY;
   const endBottom = rect.bottom + scrollY;
   const range = endBottom - startTop;
   if (range < TOUR_PROGRAM_REVEAL_MIN_RANGE_PX) {
-    return stepCount;
+    return itemCount;
   }
   const viewportHeight = window.innerHeight;
   const progress = (scrollY + viewportHeight - startTop) / range;
   const clamped = clamp(progress, 0, 1);
-  return Math.min(stepCount, Math.ceil(clamped * stepCount));
+  return Math.min(itemCount, Math.ceil(clamped * itemCount));
 }
 
 export interface UseTourProgramScrollRevealOptions {
@@ -37,6 +37,11 @@ export interface UseTourProgramScrollRevealOptions {
   /** lg+ и не prefers-reduced-motion */
   enabled: boolean;
   mainColumnRef: RefObject<HTMLElement | null>;
+}
+
+export interface UseTourProgramScrollRevealResult {
+  revealedCount: number;
+  showProgramFooter: boolean;
 }
 
 /**
@@ -47,26 +52,41 @@ export function useTourProgramScrollReveal({
   stepCount,
   enabled,
   mainColumnRef,
-}: UseTourProgramScrollRevealOptions): { revealedCount: number } {
+}: UseTourProgramScrollRevealOptions): UseTourProgramScrollRevealResult {
   const lenis = useLenis();
-  const [scrollRevealedCount, setScrollRevealedCount] = useState(0);
+  const [scrollRevealedItemCount, setScrollRevealedItemCount] = useState(0);
   const rafIdRef = useRef<number | null>(null);
+  const revealItemCount = stepCount > 0 ? stepCount + 1 : 0;
 
-  const revealedCount = useMemo(() => {
-    if (!enabled) return stepCount;
-    if (stepCount === 0) return 0;
-    return scrollRevealedCount;
-  }, [enabled, stepCount, scrollRevealedCount]);
+  const { revealedCount, showProgramFooter } = useMemo(() => {
+    if (!enabled) {
+      return {
+        revealedCount: stepCount,
+        showProgramFooter: true,
+      };
+    }
+    if (stepCount === 0) {
+      return {
+        revealedCount: 0,
+        showProgramFooter: false,
+      };
+    }
+
+    return {
+      revealedCount: Math.min(stepCount, scrollRevealedItemCount),
+      showProgramFooter: scrollRevealedItemCount > stepCount,
+    };
+  }, [enabled, stepCount, scrollRevealedItemCount]);
 
   const runCompute = useCallback(() => {
     const el = mainColumnRef.current;
     if (!el) return;
     const scrollY = lenis?.scroll ?? window.scrollY;
-    const nextCount = computeRevealedCount(el, stepCount, scrollY);
-    setScrollRevealedCount((prev) =>
+    const nextCount = computeRevealedItemCount(el, revealItemCount, scrollY);
+    setScrollRevealedItemCount((prev) =>
       prev === nextCount ? prev : nextCount
     );
-  }, [lenis, mainColumnRef, stepCount]);
+  }, [lenis, mainColumnRef, revealItemCount]);
 
   const scheduleCompute = useCallback(() => {
     if (rafIdRef.current != null) return;
@@ -77,7 +97,7 @@ export function useTourProgramScrollReveal({
   }, [runCompute]);
 
   useLayoutEffect(() => {
-    if (!enabled || stepCount === 0) {
+    if (!enabled || revealItemCount === 0) {
       return;
     }
 
@@ -109,7 +129,7 @@ export function useTourProgramScrollReveal({
         rafIdRef.current = null;
       }
     };
-  }, [enabled, stepCount, lenis, mainColumnRef, runCompute, scheduleCompute]);
+  }, [enabled, revealItemCount, lenis, mainColumnRef, runCompute, scheduleCompute]);
 
-  return { revealedCount };
+  return { revealedCount, showProgramFooter };
 }

@@ -322,7 +322,8 @@ const config: Config = {
     'from-home-season-strip-btn-from',
     'to-home-season-strip-btn-to',
     {
-      pattern: /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145])?$/,
+      pattern:
+        /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13)?$/,
       variants: ['lg'],
     },
     'object-tour-detail-hero-spring-3-tight',
@@ -342,6 +343,9 @@ const config: Config = {
     'min-[620px]:object-tour-detail-hero-spring-6-wide',
     'min-[620px]:object-tour-card-cover-spring-6-wide',
     'object-gallery-winter-4-gora',
+    'object-gallery-gamova-view7',
+    'object-gallery-gamova-rocks',
+    'object-gallery-gamova-view3',
     'object-home-season-banner-spring-loop',
     'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
@@ -647,8 +651,8 @@ const config: Config = {
          */
         'gallery-bento-tall': '1 / 2',
         /**
-         * Плитка на всю ширину двухколоночной сетки, низкая панорама (ширина : высота = 2 : 1).
-         * `TourDetailGallery` — маяк Аскольда (`spring-10`, `askold`).
+         * Плитка на всю ширину двухколоночной сетки, низкая панорама (`2 : 1`).
+         * `TourDetailGallery` — маяк Аскольда (`spring-10`).
          */
         'gallery-tile-2x1': '2 / 1',
         /** Баннер 10 колонок внутри `max-w-7xl`: шире колонки, умеренная высота. */
@@ -665,6 +669,10 @@ const config: Config = {
         'gallery-winter-rest4': '50% 43%',
         /** Галерея хаски-тур: кадр `hs.gora` (квадрат внизу сетки) — якорь при `object-cover`. */
         'gallery-winter-4-gora': 'center 73%',
+        /** Гамова: `view7` в квадрате — оставляем береговую линию и верхнюю крону в балансе. */
+        'gallery-gamova-view7': '50% 46%',
+        /** Гамова: `rocks` в малой плитке — фокус ниже центра, чтобы не срезать фактуру скал. */
+        'gallery-gamova-rocks': '50% 58%',
         /**
          * Hero страницы тура (lg+): вертикальный якорь `calc(51% + 100px)` (база 36%+100px + 15 п.п. по вертикали).
          */
@@ -687,6 +695,11 @@ const config: Config = {
          * Читинза (spring-5): hero — `peak5`; якорь чуть ниже геометрического центра кадра (lg+).
          */
         'tour-detail-hero-desktop-spring-5': 'center 58%',
+        /**
+         * Гамова (spring-13): cover — широкий морской кадр; якорь выше дефолтного `tour-detail-hero-desktop`,
+         * чтобы в lg-hero оставались крона переднего плана и горизонт.
+         */
+        'tour-detail-hero-desktop-spring-13': 'center 25%',
         /**
          * Пидан (spring-3): preface — брейкпоинт `620px` см. `TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX`.
          */

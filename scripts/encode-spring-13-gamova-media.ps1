@@ -1,5 +1,5 @@
 # Encodes spring-13 Gamova media to public/tours/spring-13.
-# Photos -> webp; MOV clips -> .webm, .grid.webm, .poster.webp.
+# Photos -> webp; MOV / MP4 -> .webm, .grid.webm, .poster.webp.
 #
 # Usage:
 #   .\scripts\encode-spring-13-gamova-media.ps1
@@ -78,6 +78,9 @@ $photoMap = @(
   @{ SourcePath = $coverSource.FullName; Source = 'Gamova.webp'; Output = 'cover.webp'; MaxLongSide = 1600 },
   @{ Source = 'view.webp'; Output = 'gamov-view.webp'; MaxLongSide = 1400 },
   @{ Source = 'View3.webp'; Output = 'preface.webp'; MaxLongSide = 1600 },
+  @{ Source = 'SOSNA.webp'; Output = 'sosna.webp'; MaxLongSide = 1400 },
+  @{ Source = 'sosna2.webp'; Output = 'sosna2.webp'; MaxLongSide = 1400 },
+  @{ Source = 'dve_sosna.webp'; Output = 'dve-sosna.webp'; MaxLongSide = 1400 },
   @{ Source = 'view6.webp'; Output = 'vityaz-bay.webp'; MaxLongSide = 1400 },
   @{ Source = 'view5.webp'; Output = 'gamov-panorama.webp'; MaxLongSide = 1400 },
   @{ Source = 'view4.webp'; Output = 'telyakovsky-bay.webp'; MaxLongSide = 1400 },
@@ -89,8 +92,12 @@ $orderedMovNames = @(
   '2022-07-19 11-22-44.MOV',
   '2022-07-19 12-54-50.MOV',
   '2022-07-19 13-55-09.MOV',
-  '2022-07-19 17-00-52.MOV'
+  '2022-07-19 17-00-52.MOV',
+  '2022-07-20 13-29-54.MOV',
+  'GX012405.MP4'
 )
+
+$orderedMovCount = $orderedMovNames.Count
 
 foreach ($entry in $photoMap) {
   $p = if ($entry.SourcePath) { $entry.SourcePath } else { Join-Path $SourceDir $entry.Source }
@@ -128,7 +135,7 @@ foreach ($name in $orderedMovNames) {
   $viewer = Join-Path $tourDir.Path ('{0}.webm' -f $base)
   $gridWebm = Join-Path $tourDir.Path ('{0}.grid.webm' -f $base)
   $poster = Join-Path $tourDir.Path ('{0}.poster.webp' -f $base)
-  Write-Host ('video [{0}/4] {1} from {2}' -f $i, $base, $name)
+  Write-Host ('video [{0}/{1}] {2} from {3}' -f $i, $orderedMovCount, $base, $name)
   Invoke-LocalFfmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-LocalFfmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($gridWebm))
   Invoke-LocalFfmpeg @('-y', '-ss', '1', '-i', $gridWebm, '-vframes', '1', '-q:v', '80', $poster)

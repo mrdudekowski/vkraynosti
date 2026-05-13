@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons/faCircleQuestion';
@@ -13,15 +13,11 @@ import { TOUR_WINTER_3_PREFACE_BACKGROUND } from "../constants/images";
 import { getTourGridVideoPosterGetter } from "../constants/tourGridVideoPosterResolver";
 import {
   getTourGalleryLayoutVariant,
-  type TourGalleryLayoutVariant,
 } from "../constants/tourGalleryLayoutVariant";
 import { TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring3CoverCrop";
 import { TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring6CoverCrop";
 import { UI } from "../constants/ui";
-import {
-  getTourGalleryGridUrls,
-  getTourGalleryViewerUrls,
-} from "../utils/tourGalleryUrls";
+import { getTourGalleryGridUrls } from "../utils/tourGalleryUrls";
 import { splitTourDescription } from "../utils/splitTourDescription";
 import PageMeta from "../components/shared/PageMeta";
 import TourDetailHero from "../components/tours/TourDetailHero";
@@ -38,6 +34,7 @@ import { BREAKPOINT_LG_PX } from "../constants/reveal";
 import { useMatchMinWidth } from "../hooks/useMatchMinWidth";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { useTourProgramScrollReveal } from "../hooks/useTourProgramScrollReveal";
+import { useTourProgramViewportTrack } from "../hooks/useTourProgramViewportTrack";
 import { useModal } from "../context/useModal";
 import { useBrowserBackToHomeTours } from "../hooks/useBrowserBackToHomeTours";
 import {
@@ -64,59 +61,61 @@ const TourDetailPage = () => {
   useBrowserBackToHomeTours({ enabled: tour != null });
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const programRevealEnabled = !prefersReducedMotion && tour != null;
+  const programRevealEnabled = isLgOrAbove && !prefersReducedMotion && tour != null;
   const mainColumnRef = useRef<HTMLDivElement>(null);
-  const programCardRef = useRef<HTMLDivElement>(null);
-  const revealProgressRef = isLgOrAbove ? mainColumnRef : programCardRef;
-  const { revealedCount } = useTourProgramScrollReveal({
+  const programViewportRef = useRef<HTMLDivElement>(null);
+  const programTrackRef = useRef<HTMLDivElement>(null);
+  const activeProgramItemRef = useRef<HTMLElement>(null);
+  const { revealedCount, showProgramFooter } = useTourProgramScrollReveal({
     stepCount: tour?.program.length ?? 0,
     enabled: programRevealEnabled,
-    mainColumnRef: revealProgressRef,
+    mainColumnRef,
   });
-  const viewerGalleryUrls = useMemo(
-    () => (tour == null ? [] : getTourGalleryViewerUrls(tour)),
-    [tour]
-  );
-  const gridGalleryUrls = useMemo(
-    () => (tour == null ? [] : getTourGalleryGridUrls(tour)),
-    [tour]
-  );
+  const { trackOffsetY } = useTourProgramViewportTrack({
+    enabled: programRevealEnabled,
+    viewportRef: programViewportRef,
+    trackRef: programTrackRef,
+    activeItemRef: activeProgramItemRef,
+    updateKey: `${revealedCount}-${showProgramFooter ? 'footer' : 'steps'}`,
+  });
+  const visibleProgramSteps = tour?.program.slice(0, revealedCount) ?? [];
+  const programCardClassName = programRevealEnabled
+    ? "tour-detail-program-card tour-detail-program-card-reveal"
+    : "tour-detail-program-card";
+  const programTrackStyle = {
+    '--tour-program-track-offset-y': `${trackOffsetY}px`,
+  } as CSSProperties;
+  const viewerGalleryUrls = tour?.galleryImages ?? [];
+  const gridGalleryUrls = tour == null ? [] : getTourGalleryGridUrls(tour);
 
   /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе второй кадр viewer-галереи. */
-  const prefaceBackgroundUrl = useMemo(() => {
-    if (tour == null) return null;
-    return resolveTourPrefaceBackgroundUrl({
+  const prefaceBackgroundUrl =
+    tour == null
+      ? null
+      : resolveTourPrefaceBackgroundUrl({
       tour,
       viewerGalleryUrls,
-      gridGalleryUrls,
       isLgOrAbove,
-    });
-  }, [gridGalleryUrls, isLgOrAbove, tour, viewerGalleryUrls]);
+      });
 
-  const galleryGridImages = useMemo(() => {
-    if (!tour || gridGalleryUrls.length <= 2) return [];
-    return gridGalleryUrls.slice(2);
-  }, [tour, gridGalleryUrls]);
-  const heroImageUrl = useMemo(() => {
-    if (tour == null) return '';
-    return resolveTourHeroImageUrl({
+  const galleryGridImages =
+    !tour || gridGalleryUrls.length <= 2 ? [] : gridGalleryUrls.slice(2);
+  const heroImageUrl =
+    tour == null
+      ? ''
+      : resolveTourHeroImageUrl({
       tour,
       gridGalleryUrls,
       isLgOrAbove,
-    });
-  }, [gridGalleryUrls, isLgOrAbove, tour]);
+      });
 
-  const getVideoPosterForGridSrc = useMemo(() => {
-    if (tour == null) return undefined;
-    return getTourGridVideoPosterGetter(tour.id, isLgOrAbove);
-  }, [isLgOrAbove, tour]);
+  const getVideoPosterForGridSrc =
+    tour == null ? undefined : getTourGridVideoPosterGetter(tour.id, isLgOrAbove);
 
-  const galleryLayoutVariant = useMemo((): TourGalleryLayoutVariant => {
-    if (tour == null) return "default";
-    return getTourGalleryLayoutVariant(tour.id);
-  }, [tour]);
+  const galleryLayoutVariant =
+    tour == null ? "default" : getTourGalleryLayoutVariant(tour.id);
 
-  const handleOpenTourRequest = useCallback(() => {
+  const handleOpenTourRequest = () => {
     if (!tour) return;
     openTourRequestModal({
       tourId: tour.id,
@@ -124,15 +123,11 @@ const TourDetailPage = () => {
       subtitle: tour.subtitle,
       season: tour.season,
     });
-  }, [tour, openTourRequestModal]);
+  };
 
-  const descriptionColumns = useMemo(
-    () =>
-      splitTourDescription(
-        tour?.description ?? "",
-        tour?.descriptionAside
-      ),
-    [tour?.description, tour?.descriptionAside]
+  const descriptionColumns = splitTourDescription(
+    tour?.description ?? "",
+    tour?.descriptionAside
   );
 
   if (!tour) {
@@ -243,7 +238,9 @@ const TourDetailPage = () => {
                   ? 'lg:object-tour-detail-hero-desktop-spring-4'
                   : tour.id === 'spring-5'
                     ? 'lg:object-tour-detail-hero-desktop-spring-5'
-                    : undefined
+                    : tour.id === 'spring-13'
+                      ? 'lg:object-tour-detail-hero-desktop-spring-13'
+                      : undefined
         }
       />
 
@@ -261,6 +258,7 @@ const TourDetailPage = () => {
                     duration={tour.duration}
                     difficulty={tour.difficulty}
                     metaAudienceLabel={tour.metaAudienceLabel}
+                    difficultyDisplayLabel={tour.difficultyDisplayLabel}
                   />
                 </div>
               )}
@@ -321,6 +319,7 @@ const TourDetailPage = () => {
                         duration={tour.duration}
                         difficulty={tour.difficulty}
                         metaAudienceLabel={tour.metaAudienceLabel}
+                        difficultyDisplayLabel={tour.difficultyDisplayLabel}
                       />
                       <p className="text-tour-detail-prose text-text-muted max-w-prose">
                         {tour.descriptionLeadBold != null &&
@@ -409,50 +408,70 @@ const TourDetailPage = () => {
             </div>
 
             <div>
-              <div ref={programCardRef} className="tour-detail-program-card">
+              <div className={programCardClassName}>
                 <TourDetailSectionHeading
                   title={UI.tourDetail.programHeading}
                   season={tour.season}
                   size="program"
                   className="mb-4"
                 />
-                <ol className="border-l border-divider pl-4 ml-2 space-y-6">
-                  {tour.program.map((step, idx) => (
-                    <li
-                      key={`${step.timeLabel}-${idx}`}
-                      className={`flex gap-3 reveal-program-step-base ${
-                        !programRevealEnabled || idx < revealedCount
-                          ? "reveal-program-step-visible"
-                          : "reveal-program-step-hidden"
-                      }`}
-                    >
-                      <FontAwesomeIcon
-                        icon={faClock}
-                        className="text-brand-primary mt-1 shrink-0"
-                        aria-hidden
-                      />
-                      <div>
-                        <p className="text-tooltip text-text-muted">
-                          {step.timeLabel}
-                        </p>
-                        <p className="text-tour-detail-program-body text-text-muted">
-                          {step.description}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-                <p className="text-tooltip text-text-muted mt-8 lg:mt-10 leading-relaxed">
-                  {UI.tourDetail.programTimeDisclaimer}
-                </p>
-                {tour.programAdditionalNotes?.map((note, noteIdx) => (
-                  <p
-                    key={`program-note-${noteIdx}`}
-                    className="text-tooltip text-text-muted mt-4 leading-relaxed"
+                <div ref={programViewportRef} className="tour-detail-program-viewport">
+                  <div
+                    ref={programTrackRef}
+                    className="tour-detail-program-track"
+                    style={programTrackStyle}
                   >
-                    {note}
-                  </p>
-                ))}
+                    <ol className="border-l border-divider pl-4 ml-2 space-y-6">
+                      {visibleProgramSteps.map((step, idx) => (
+                        <li
+                          key={`${step.timeLabel}-${idx}`}
+                          ref={
+                            !showProgramFooter && idx === visibleProgramSteps.length - 1
+                              ? (node) => {
+                                  activeProgramItemRef.current = node;
+                                }
+                              : undefined
+                          }
+                          className="flex gap-3 reveal-program-step-base reveal-program-step-visible"
+                        >
+                          <FontAwesomeIcon
+                            icon={faClock}
+                            className="text-brand-primary mt-1 shrink-0"
+                            aria-hidden
+                          />
+                          <div>
+                            <p className="text-tooltip text-text-muted">
+                              {step.timeLabel}
+                            </p>
+                            <p className="text-tour-detail-program-body text-text-muted">
+                              {step.description}
+                            </p>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                    {showProgramFooter && (
+                      <div
+                        ref={(node) => {
+                          activeProgramItemRef.current = node;
+                        }}
+                        className="reveal-program-footer"
+                      >
+                        <p className="text-tooltip text-text-muted mt-8 lg:mt-10 leading-relaxed">
+                          {UI.tourDetail.programTimeDisclaimer}
+                        </p>
+                        {tour.programAdditionalNotes?.map((note, noteIdx) => (
+                          <p
+                            key={`program-note-${noteIdx}`}
+                            className="text-tooltip text-text-muted mt-4 leading-relaxed"
+                          >
+                            {note}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -10,6 +10,13 @@ import {
   TOUR_SPRING_11_CLIP1_GRID_WEBM,
   TOUR_SPRING_13_CLIP1_GRID_WEBM,
   TOUR_SPRING_13_CLIP2_GRID_WEBM,
+  TOUR_SPRING_13_CLIP4_GRID_WEBM,
+  TOUR_SPRING_13_CLIP5_GRID_WEBM,
+  TOUR_SPRING_13_DVE_SOSNA_IMAGE,
+  TOUR_SPRING_13_ROCKS_IMAGE,
+  TOUR_SPRING_13_SOSNA2_IMAGE,
+  TOUR_SPRING_13_VIEW3_IMAGE,
+  TOUR_SPRING_13_VIEW7_IMAGE,
   TOUR_WINTER_1_REST4_IMAGE,
   TOUR_WINTER_1_TOP_IMAGE,
   TOUR_WINTER_2_PEAK_IMAGE,
@@ -75,6 +82,15 @@ const TourDetailGalleryComponent = ({
     if (imageSrc === TOUR_WINTER_4_GORA_IMAGE) return 'object-gallery-winter-4-gora';
     if (imageSrc === TOUR_SPRING_10_VIEW2_GRID || imageSrc === TOUR_SPRING_10_VIEW3_GRID) {
       return 'object-gallery-spring-10-tall-panorama';
+    }
+    if (imageSrc === TOUR_SPRING_13_VIEW7_IMAGE) return 'object-gallery-gamova-view7';
+    if (imageSrc === TOUR_SPRING_13_ROCKS_IMAGE) return 'object-gallery-gamova-rocks';
+    if (
+      imageSrc === TOUR_SPRING_13_VIEW3_IMAGE ||
+      imageSrc === TOUR_SPRING_13_SOSNA2_IMAGE ||
+      imageSrc === TOUR_SPRING_13_DVE_SOSNA_IMAGE
+    ) {
+      return 'object-gallery-gamova-view3';
     }
     return '';
   };
@@ -605,37 +621,54 @@ const TourDetailGalleryComponent = ({
   }
 
   /**
-   * Полуостров Гамова (spring-13): 10 кадров после hero/preface.
-   * Порядок `slice(2)`: clip2, vityaz-bay, gamov-view, gamov-panorama, telyakovsky-bay, clip1, clip3, summit-view, astafiev-bay, clip4.
-   * Bento: clip2 открывает сетку 2×2; кадр Витязя с человеком — высокий 1×2; clip3 — квадратная плитка.
+   * Полуостров Гамова (spring-13): 14 кадров после hero/preface.
+   * Порядок `slice(2)`: clip2, vityaz-bay, clip1, clip3, view7, rocks,
+   * sosna, sosna2, dve-sosna, summit-view, astafiev-bay, clip5, clip6, clip4.
+   * `view7` (2×2), затем bento: вертикаль `summit` слева, справа `rocks` и `clip3`; ниже кадр `sosna`
+   * на всю ширину (`2×2`); затем две «сосны» квадратами; далее ряд `clip1` и Витязь, широкий Астафьева;
+   * перед финалом пара клипов (`clip5`, `clip6`); затем широкие `clip2` и `clip4`.
    */
   if (
     layoutVariant === 'gamova' &&
-    images.length === 10 &&
+    images.length === 14 &&
     images[0] === TOUR_SPRING_13_CLIP2_GRID_WEBM &&
-    images[5] === TOUR_SPRING_13_CLIP1_GRID_WEBM
+    images[2] === TOUR_SPRING_13_CLIP1_GRID_WEBM &&
+    images[11] === TOUR_SPRING_13_CLIP5_GRID_WEBM &&
+    images[13] === TOUR_SPRING_13_CLIP4_GRID_WEBM
   ) {
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[0], 0, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+          {renderTileButton(images[4], 4, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[1], 1, GALLERY_GRID_BENTO_TALL_LEFT)}
-          {renderTileButton(images[2], 2, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
-          {renderTileButton(images[6], 6, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+          {renderTileButton(images[9], 9, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_LEFT)}
-          {renderTileButton(images[3], 3, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
-          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+          {renderTileButton(images[6], 6, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[7], 7, GALLERY_GRID_SQUARE_TILE)}
-          {renderTileButton(images[9], 9, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[8], 8, GALLERY_GRID_SQUARE_TILE)}
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[8], 8, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[1], 1, GALLERY_GRID_SQUARE_TILE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[10], 10, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[11], 11, GALLERY_GRID_SQUARE_TILE)}
+          {renderTileButton(images[12], 12, GALLERY_GRID_SQUARE_TILE)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[13], 13, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
       </div>
     );

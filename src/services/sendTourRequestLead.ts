@@ -2,7 +2,6 @@ import type { TourRequestModalPayload } from '../types';
 import type { TourRequestFormValues } from '../validation/tourRequestSchema';
 
 interface TourRequestLeadPayload extends TourRequestFormValues {
-  webhookSecret: string;
   idempotencyKey: string;
   tourId: string;
   tourTitle?: string;
@@ -12,8 +11,7 @@ interface TourRequestLeadPayload extends TourRequestFormValues {
   userAgent: string;
 }
 
-const webhookUrl = import.meta.env.VITE_TOUR_REQUEST_WEBHOOK_URL;
-const webhookSecret = import.meta.env.VITE_TOUR_REQUEST_WEBHOOK_SECRET;
+const tourRequestEndpointUrl = import.meta.env.VITE_TOUR_REQUEST_ENDPOINT_URL;
 
 const createIdempotencyKey = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -32,7 +30,6 @@ const buildLeadPayload = (
   values: TourRequestFormValues
 ): TourRequestLeadPayload => ({
   ...values,
-  webhookSecret,
   idempotencyKey: createIdempotencyKey(),
   tourId: tour.tourId,
   tourTitle: getTourTitle(tour),
@@ -46,18 +43,18 @@ export const sendTourRequestLead = async (
   tour: TourRequestModalPayload,
   values: TourRequestFormValues
 ) => {
-  if (!webhookUrl || !webhookSecret) {
-    throw new Error('Tour request webhook is not configured');
+  if (!tourRequestEndpointUrl) {
+    throw new Error('Tour request endpoint is not configured');
   }
 
   const body = JSON.stringify(buildLeadPayload(tour, values));
 
   if (navigator.sendBeacon) {
-    const queued = navigator.sendBeacon(webhookUrl, new Blob([body], { type: 'text/plain;charset=utf-8' }));
+    const queued = navigator.sendBeacon(tourRequestEndpointUrl, new Blob([body], { type: 'text/plain;charset=utf-8' }));
     if (queued) return;
   }
 
-  await fetch(webhookUrl, {
+  await fetch(tourRequestEndpointUrl, {
     method: 'POST',
     mode: 'no-cors',
     redirect: 'manual',

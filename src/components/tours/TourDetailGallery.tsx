@@ -31,11 +31,12 @@ import {
   TOUR_WINTER_4_GORA_IMAGE,
   TOUR_SPRING_10_VIEW2_GRID,
   TOUR_SPRING_10_VIEW3_GRID,
-  TOUR_SUMMER_1_CAVE_IMAGE,
   TOUR_SUMMER_1_CLIP1_GRID_WEBM,
-  TOUR_SUMMER_1_CLIP5_GRID_WEBM,
-  TOUR_SUMMER_1_SHIROKI2_IMAGE,
+  TOUR_SUMMER_1_CLIP3_GRID_WEBM,
+  TOUR_SUMMER_1_CLIP4_GRID_WEBM,
+  TOUR_SUMMER_1_CLIP7_GRID_WEBM,
 } from '../../constants/images';
+import { TOUR_SUMMER_1_CLIP4_GRID_VIDEO_OBJECT_CLASS } from '../../constants/tourSummer1GalleryCrop';
 import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';
 import type { TourGalleryLayoutVariant } from '../../constants/tourGalleryLayoutVariant';
 import {
@@ -88,18 +89,22 @@ const TourDetailGalleryComponent = ({
     if (imageSrc === TOUR_SPRING_10_VIEW2_GRID || imageSrc === TOUR_SPRING_10_VIEW3_GRID) {
       return 'object-gallery-spring-10-tall-panorama';
     }
-    if (imageSrc === TOUR_SPRING_13_VIEW7_IMAGE || imageSrc === TOUR_SUMMER_1_CAVE_IMAGE) {
+    if (imageSrc === TOUR_SPRING_13_VIEW7_IMAGE) {
       return 'object-gallery-gamova-view7';
     }
     if (imageSrc === TOUR_SPRING_13_ROCKS_IMAGE) return 'object-gallery-gamova-rocks';
-    if (imageSrc === TOUR_SUMMER_1_SHIROKI2_IMAGE) {
-      return 'object-gallery-spring-10-tall-panorama';
-    }
     if (
       imageSrc === TOUR_SPRING_13_SOSNA2_IMAGE ||
       imageSrc === TOUR_SPRING_13_DVE_SOSNA_IMAGE
     ) {
       return 'object-gallery-gamova-view3';
+    }
+    return '';
+  };
+
+  const videoObjectClassesForGallery = (assetSrc: string) => {
+    if (assetSrc === TOUR_SUMMER_1_CLIP4_GRID_WEBM) {
+      return TOUR_SUMMER_1_CLIP4_GRID_VIDEO_OBJECT_CLASS;
     }
     return '';
   };
@@ -123,12 +128,16 @@ const TourDetailGalleryComponent = ({
 
     if (isVideoAssetUrl(src)) {
       const poster = getVideoPosterForGridSrc?.(src);
+      const videoObjectClassName = videoObjectClassesForGallery(src);
       return (
         <GalleryGridVideo
           key={`${src}-${indexInGrid}`}
           gridSrc={src}
           posterSrc={poster}
           className={resolvedTileClass}
+          videoObjectClassName={
+            videoObjectClassName.length > 0 ? videoObjectClassName : undefined
+          }
           prefersReducedMotion={prefersReducedMotion}
         />
       );
@@ -534,18 +543,16 @@ const TourDetailGalleryComponent = ({
   }
 
   /**
-   * Та-Чингоуза (summer-1): 18 кадров после hero/preface.
-   * Порядок `slice(2)`: clip1, clip2, voda, clip3, pesochek, clip4, clip5, first, clip6, skala, clip7,
-   * cave, dlinni, most, saponi, shiroki2, stoit, stone.
-   * Сверху — широкий `clip5`; два bento (волны, пляж); `cave` 2×2; bento скалы; панорама `shiroki2`;
-   * пара квадратов; финальный bento; `stone` на всю ширину.
+   * Та-Чингоуза (summer-1): 15 кадров после hero/preface (без `hero.webp`, `shiroki2.webp`, `cave.webp`).
+   * Порядок `slice(2)`: clip1–clip7, voda, pesochek, dlinni, most, saponi, stoit, stone.
+   * Сверху `clip3` 2×2; `clip1`/`clip2` bento (`clip5` 1×1); `voda` 2×2; `clip6` bento; `most` 2×2, под ним `saponi`/`stoit` 1×2; внизу `stone`.
    */
   if (
     layoutVariant === 'tachingouza' &&
-    images.length === 18 &&
+    images.length === 15 &&
     images[0] === TOUR_SUMMER_1_CLIP1_GRID_WEBM &&
-    images[6] === TOUR_SUMMER_1_CLIP5_GRID_WEBM &&
-    images[11] === TOUR_SUMMER_1_CAVE_IMAGE
+    images[3] === TOUR_SUMMER_1_CLIP3_GRID_WEBM &&
+    images[9] === TOUR_SUMMER_1_CLIP7_GRID_WEBM
   ) {
     const tachingouzaBentoRow = (left: number, rightTop: number, rightBottom: number) => (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
@@ -558,24 +565,25 @@ const TourDetailGalleryComponent = ({
     return (
       <div className="flex flex-col gap-gallery-gap">
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[6], 6, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+          {renderTileButton(images[3], 3, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
         </div>
-        {tachingouzaBentoRow(0, 1, 2)}
-        {tachingouzaBentoRow(3, 4, 5)}
+        {tachingouzaBentoRow(0, 4, 9)}
+        {tachingouzaBentoRow(1, 5, 6)}
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[11], 11, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+          {renderTileButton(images[2], 2, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
         </div>
-        {tachingouzaBentoRow(8, 10, 9)}
-        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[15], 15, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+        {tachingouzaBentoRow(7, 8, 10)}
+        <div className="flex flex-col gap-gallery-gap">
+          <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+            {renderTileButton(images[11], 11, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+          </div>
+          <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+            {renderTileButton(images[12], 12, GALLERY_GRID_BENTO_TALL_LEFT)}
+            {renderTileButton(images[13], 13, GALLERY_GRID_BENTO_TALL_RIGHT)}
+          </div>
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[7], 7, GALLERY_GRID_SQUARE_TILE)}
-          {renderTileButton(images[14], 14, GALLERY_GRID_SQUARE_TILE)}
-        </div>
-        {tachingouzaBentoRow(13, 12, 16)}
-        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
-          {renderTileButton(images[17], 17, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+          {renderTileButton(images[14], 14, GALLERY_GRID_FULL_WIDTH_SQUARE)}
         </div>
       </div>
     );

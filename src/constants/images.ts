@@ -862,8 +862,6 @@ export const TOUR_SUMMER_1_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-1` as const;
 /** Hero карточки и страницы тура — бухта с бирюзовой водой (`first.webp`). */
 export const TOUR_SUMMER_1_FIRST_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/first.webp` as const;
 export const TOUR_SUMMER_1_COVER_GRID = TOUR_SUMMER_1_FIRST_IMAGE;
-/** Бывшая обложка из `HERO/tachingouza.webp` — в сетке вместо дубля `first`. */
-export const TOUR_SUMMER_1_LEGACY_HERO_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/hero.webp` as const;
 
 export const TOUR_SUMMER_1_PREFACE_BACKGROUND =
   `${TOUR_SUMMER_1_ASSET_BASE}/preface.webp` as const;
@@ -871,11 +869,9 @@ export const TOUR_SUMMER_1_PREFACE_BACKGROUND =
 export const TOUR_SUMMER_1_VODA_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/voda.webp` as const;
 export const TOUR_SUMMER_1_PESOCHEK_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/pesochek.webp` as const;
 export const TOUR_SUMMER_1_SKALA_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/skala.webp` as const;
-export const TOUR_SUMMER_1_CAVE_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/cave.webp` as const;
 export const TOUR_SUMMER_1_DLINNI_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/dlinni.webp` as const;
 export const TOUR_SUMMER_1_MOST_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/most.webp` as const;
 export const TOUR_SUMMER_1_SAPONI_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/saponi.webp` as const;
-export const TOUR_SUMMER_1_SHIROKI2_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/shiroki2.webp` as const;
 export const TOUR_SUMMER_1_STOIT_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/stoit.webp` as const;
 export const TOUR_SUMMER_1_STONE_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/stone.webp` as const;
 
@@ -896,8 +892,8 @@ export const TOUR_SUMMER_1_CLIP7_GRID_WEBM =
 
 /**
  * Порядок: обложка → префейс → кадры для bento `tachingouza` в `TourDetailGallery`.
- * После `slice(2)` (18 слотов): clip1–clip5, voda, pesochek, first, clip6–clip7, skala, cave,
- * legacy hero, clip6–clip7, skala, cave, dlinni, most, saponi, shiroki2, stoit, stone.
+ * После `slice(2)` (15 слотов): clip1–clip7, voda, pesochek, dlinni, most, saponi, stoit, stone.
+ * Без `hero.webp`, `shiroki2.webp`, `cave.webp`. Bento: clip3 2×2 → clip4|pesochek+clip7 → …
  */
 export const TOUR_SUMMER_1_GALLERY_VIEWER = [
   TOUR_SUMMER_1_COVER_GRID,
@@ -909,15 +905,12 @@ export const TOUR_SUMMER_1_GALLERY_VIEWER = [
   TOUR_SUMMER_1_PESOCHEK_IMAGE,
   `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip4.webm`,
   `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip5.webm`,
-  TOUR_SUMMER_1_LEGACY_HERO_IMAGE,
   `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip6.webm`,
   TOUR_SUMMER_1_SKALA_IMAGE,
   `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip7.webm`,
-  TOUR_SUMMER_1_CAVE_IMAGE,
   TOUR_SUMMER_1_DLINNI_IMAGE,
   TOUR_SUMMER_1_MOST_IMAGE,
   TOUR_SUMMER_1_SAPONI_IMAGE,
-  TOUR_SUMMER_1_SHIROKI2_IMAGE,
   TOUR_SUMMER_1_STOIT_IMAGE,
   TOUR_SUMMER_1_STONE_IMAGE,
 ] as const;
@@ -932,15 +925,12 @@ export const TOUR_SUMMER_1_GALLERY_GRID = [
   TOUR_SUMMER_1_PESOCHEK_IMAGE,
   TOUR_SUMMER_1_CLIP4_GRID_WEBM,
   TOUR_SUMMER_1_CLIP5_GRID_WEBM,
-  TOUR_SUMMER_1_LEGACY_HERO_IMAGE,
   TOUR_SUMMER_1_CLIP6_GRID_WEBM,
   TOUR_SUMMER_1_SKALA_IMAGE,
   TOUR_SUMMER_1_CLIP7_GRID_WEBM,
-  TOUR_SUMMER_1_CAVE_IMAGE,
   TOUR_SUMMER_1_DLINNI_IMAGE,
   TOUR_SUMMER_1_MOST_IMAGE,
   TOUR_SUMMER_1_SAPONI_IMAGE,
-  TOUR_SUMMER_1_SHIROKI2_IMAGE,
   TOUR_SUMMER_1_STOIT_IMAGE,
   TOUR_SUMMER_1_STONE_IMAGE,
 ] as const;

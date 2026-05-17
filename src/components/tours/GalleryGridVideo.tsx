@@ -23,6 +23,8 @@ export interface GalleryGridVideoProps {
   /** Если не задан — до появления во viewport показывается нейтральный плейсхолдер. */
   posterSrc?: string;
   className: string;
+  /** Доп. классы `object-position` для `<video>` и постера (токены темы). */
+  videoObjectClassName?: string;
   prefersReducedMotion: boolean;
 }
 
@@ -44,12 +46,14 @@ const GalleryGridVideoLoopCrossfade = ({
   inView,
   isPageVisible,
   onActiveLayerReady,
+  videoObjectClassName,
 }: {
   gridSrc: string;
   inView: boolean;
   isPageVisible: boolean;
   /** Один раз, когда активный слой может показать кадр (постер можно гасить поверх). */
   onActiveLayerReady?: () => void;
+  videoObjectClassName?: string;
 }) => {
   const [overIndex, setOverIndex] = useState<0 | 1>(0);
   const [fadeOutOver, setFadeOutOver] = useState(false);
@@ -192,7 +196,7 @@ const GalleryGridVideoLoopCrossfade = ({
     const opacity =
       isOver && fadeOutOver ? 'opacity-0' : 'opacity-100';
     const transition = isOver ? overTransitionClass : '';
-    return `${videoBaseClass} ${z} ${opacity} ${transition}`.trim();
+    return `${videoBaseClass}${videoObjectClassName ? ` ${videoObjectClassName}` : ''} ${z} ${opacity} ${transition}`.trim();
   };
 
   return (
@@ -225,11 +229,13 @@ const GalleryGridVideoMotionBranch = ({
   posterSrc,
   inView,
   isPageVisible,
+  videoObjectClassName,
 }: {
   gridSrc: string;
   posterSrc: string | undefined;
   inView: boolean;
   isPageVisible: boolean;
+  videoObjectClassName?: string;
 }) => {
   const hasPoster = posterSrc != null && posterSrc.length > 0;
   const [activeLayerReady, setActiveLayerReady] = useState(() => !hasPoster);
@@ -263,6 +269,7 @@ const GalleryGridVideoMotionBranch = ({
           inView={inView}
           isPageVisible={isPageVisible}
           onActiveLayerReady={hasPoster ? () => setActiveLayerReady(true) : undefined}
+          videoObjectClassName={videoObjectClassName}
         />
       </div>
       {hasPoster && !posterDismissed ? (
@@ -270,7 +277,7 @@ const GalleryGridVideoMotionBranch = ({
           src={posterSrc}
           alt=""
           onTransitionEnd={handlePosterFadeEnd}
-          className={`pointer-events-none absolute inset-0 z-20 min-h-0 h-full w-full object-cover transition-opacity duration-gallery-grid-video-poster-reveal ease-standard motion-reduce:transition-none ${
+          className={`pointer-events-none absolute inset-0 z-20 min-h-0 h-full w-full object-cover${videoObjectClassName ? ` ${videoObjectClassName}` : ''} transition-opacity duration-gallery-grid-video-poster-reveal ease-standard motion-reduce:transition-none ${
             activeLayerReady ? 'opacity-0' : 'opacity-100'
           }`}
           loading="lazy"
@@ -285,10 +292,14 @@ const GalleryGridVideoMotionBranch = ({
  * Видео в сетке: до появления во viewport — постер; после — `<video>` с `preload="none"`.
  * При `prefers-reduced-motion` — статичный постер (`<img>`), без загрузки webm; иначе loop через crossfade двух экземпляров одного клипа.
  */
+const coverMediaClass = (videoObjectClassName?: string) =>
+  `min-h-0 h-full w-full object-cover pointer-events-none${videoObjectClassName ? ` ${videoObjectClassName}` : ''}`;
+
 const GalleryGridVideo = ({
   gridSrc,
   posterSrc,
   className,
+  videoObjectClassName,
   prefersReducedMotion,
 }: GalleryGridVideoProps) => {
   const [inView, setInView] = useState(
@@ -360,7 +371,7 @@ const GalleryGridVideo = ({
           <img
             src={posterSrc}
             alt=""
-            className="min-h-0 h-full w-full object-cover pointer-events-none"
+            className={coverMediaClass(videoObjectClassName)}
             loading="lazy"
             decoding="async"
           />
@@ -374,12 +385,13 @@ const GalleryGridVideo = ({
           posterSrc={posterSrc}
           inView={inView}
           isPageVisible={isPageVisible}
+          videoObjectClassName={videoObjectClassName}
         />
       ) : hasPoster ? (
         <img
           src={posterSrc}
           alt=""
-          className="min-h-0 h-full w-full object-cover pointer-events-none"
+          className={coverMediaClass(videoObjectClassName)}
           loading="lazy"
           decoding="async"
         />

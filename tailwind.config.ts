@@ -45,8 +45,14 @@ import {
 } from './src/constants/tourSpring3CoverCrop'
 import {
   TOUR_SPRING_6_COVER_OBJECT_POSITION_GTE620,
+  TOUR_SPRING_6_COVER_OBJECT_POSITION_LG,
   TOUR_SPRING_6_COVER_OBJECT_POSITION_LT620,
 } from './src/constants/tourSpring6CoverCrop'
+import {
+  TOUR_SUMMER_1_CLIP4_GRID_OBJECT_POSITION,
+  TOUR_SUMMER_1_COVER_OBJECT_POSITION,
+  TOUR_SUMMER_1_COVER_OBJECT_POSITION_LG,
+} from './src/constants/tourSummer1GalleryCrop'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -327,7 +333,7 @@ const config: Config = {
     'to-home-season-strip-btn-to',
     {
       pattern:
-        /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13)?$/,
+        /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13|-summer-1-cover)?$/,
       variants: ['lg'],
     },
     'object-tour-detail-hero-spring-3-tight',
@@ -344,12 +350,19 @@ const config: Config = {
     'object-tour-detail-hero-spring-6-wide',
     'object-tour-card-cover-spring-6-tight',
     'object-tour-card-cover-spring-6-wide',
+    'object-tour-detail-hero-desktop-spring-6-wide',
+    'object-tour-card-cover-desktop-spring-6-wide',
     'min-[620px]:object-tour-detail-hero-spring-6-wide',
     'min-[620px]:object-tour-card-cover-spring-6-wide',
+    'lg:object-tour-detail-hero-desktop-spring-6-wide',
+    'lg:object-tour-card-cover-desktop-spring-6-wide',
     'object-gallery-winter-4-gora',
     'object-gallery-gamova-view7',
     'object-gallery-gamova-rocks',
     'object-gallery-gamova-view3',
+    'object-gallery-summer-1-clip4-tall',
+    'object-tour-detail-hero-summer-1-cover',
+    'lg:object-tour-detail-hero-desktop-summer-1-cover',
     'object-home-season-banner-spring-loop',
     'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
@@ -718,16 +731,27 @@ const config: Config = {
         'tour-card-cover-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
         'tour-card-cover-desktop-spring-3-wide': TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
         /**
-         * Маралы х Драконы (spring-6): оленёнок слева на узком экране; от `620px` — центр.
+         * Маралы х Драконы (spring-6): mobile/tablet — якорь левее; от `lg` — центр.
          */
         'tour-detail-hero-spring-6-tight': TOUR_SPRING_6_COVER_OBJECT_POSITION_LT620,
         'tour-detail-hero-spring-6-wide': TOUR_SPRING_6_COVER_OBJECT_POSITION_GTE620,
+        'tour-detail-hero-desktop-spring-6-wide': TOUR_SPRING_6_COVER_OBJECT_POSITION_LG,
         'tour-card-cover-spring-6-tight': TOUR_SPRING_6_COVER_OBJECT_POSITION_LT620,
         'tour-card-cover-spring-6-wide': TOUR_SPRING_6_COVER_OBJECT_POSITION_GTE620,
+        'tour-card-cover-desktop-spring-6-wide': TOUR_SPRING_6_COVER_OBJECT_POSITION_LG,
         /**
          * Аскольд (spring-10): `view2` / `view3` в вертикальной плитке 1×2 — центр кадра при `object-cover`.
          */
         'gallery-spring-10-tall-panorama': 'center center',
+        /**
+         * Та-Чингоуза (summer-1): `tch.clip4` в высокой плитке bento — +10% по X от центра.
+         */
+        'gallery-summer-1-clip4-tall': TOUR_SUMMER_1_CLIP4_GRID_OBJECT_POSITION,
+        /**
+         * Та-Чингоуза (summer-1): hero `first.webp` — +15% по X от центра.
+         */
+        'tour-detail-hero-summer-1-cover': TOUR_SUMMER_1_COVER_OBJECT_POSITION,
+        'tour-detail-hero-desktop-summer-1-cover': TOUR_SUMMER_1_COVER_OBJECT_POSITION_LG,
         /**
          * Главная, баннер весны: только колонка буквы «н» — правый край кадра loop-видео/постера при `object-cover`.
          */

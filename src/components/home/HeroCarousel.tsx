@@ -79,7 +79,10 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
               tour.id === 'spring-3'
                 ? resolveTourSpring3CoverBackgroundPosition(heroCoverGteLayoutMin620, spring3Lg)
                 : tour.id === 'spring-6'
-                  ? resolveTourSpring6CoverBackgroundPosition(heroCoverGteLayoutMin620)
+                  ? resolveTourSpring6CoverBackgroundPosition(
+                      heroCoverGteLayoutMin620,
+                      spring3Lg
+                    )
                   : undefined
             }
             onAdvanceNext={next}

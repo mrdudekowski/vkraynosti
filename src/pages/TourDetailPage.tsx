@@ -16,6 +16,7 @@ import {
 } from "../constants/tourGalleryLayoutVariant";
 import { TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring3CoverCrop";
 import { TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring6CoverCrop";
+import { TOUR_SUMMER_1_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSummer1GalleryCrop";
 import { UI } from "../constants/ui";
 import { getTourGalleryGridUrls } from "../utils/tourGalleryUrls";
 import { splitTourDescription } from "../utils/splitTourDescription";
@@ -225,7 +226,9 @@ const TourDetailPage = () => {
             ? TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS
             : tour.id === 'spring-6'
               ? TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS
-              : undefined
+              : tour.id === 'summer-1'
+                ? TOUR_SUMMER_1_COVER_HERO_IMG_OBJECT_CLASS
+                : undefined
         }
         desktopHeroImgClassName={
           tour.id === 'winter-3'

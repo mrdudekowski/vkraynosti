@@ -16,6 +16,12 @@ export const GALLERY_GRID_VIDEO_POSTER_REVEAL_MS = 360 as const;
  */
 export const GALLERY_GRID_VIDEO_POSTER_REVEAL_END_SLACK_MS = 80 as const;
 
+/**
+ * Сколько плиток `GalleryGridVideo` могут одновременно держать декодер/сеть (глобальный пул в `useActiveMediaSlot`).
+ * Слишком мало — «залипание» на постере при нескольких видео во viewport; слишком много — нагрузка на CPU/батарею.
+ */
+export const GALLERY_GRID_VIDEO_MAX_CONCURRENT_SLOTS = 3 as const;
+
 /** Минимальный lead (сек.) перед концом клипа при расчёте окна crossfade. */
 export const GALLERY_GRID_VIDEO_LOOP_CROSSFADE_LEAD_MIN_SECONDS = 0.08 as const;
 

@@ -3,6 +3,7 @@ import {
   TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE,
   TOUR_SPRING_11_GRID_VIDEO_POSTERS,
   TOUR_SPRING_13_GRID_VIDEO_POSTERS,
+  TOUR_SUMMER_1_GRID_VIDEO_POSTERS,
   TOUR_SPRING_2_GRID_VIDEO_POSTERS,
   TOUR_SPRING_3_GRID_VIDEO_POSTERS,
   TOUR_SPRING_4_GRID_VIDEO_POSTERS,
@@ -58,8 +59,16 @@ const TOUR_GRID_VIDEO_POSTER_STRATEGY_BY_ID: Record<string, TourGridVideoPosterS
     desktop: TOUR_SPRING_10_GRID_VIDEO_POSTERS,
     mobile: TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE,
   },
+  'summer-3': {
+    mode: 'breakpoint',
+    desktop: TOUR_SPRING_10_GRID_VIDEO_POSTERS,
+    mobile: TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE,
+  },
   'spring-11': { mode: 'fixed', posters: TOUR_SPRING_11_GRID_VIDEO_POSTERS },
+  'summer-4': { mode: 'fixed', posters: TOUR_SPRING_11_GRID_VIDEO_POSTERS },
   'spring-13': { mode: 'fixed', posters: TOUR_SPRING_13_GRID_VIDEO_POSTERS },
+  'summer-1': { mode: 'fixed', posters: TOUR_SUMMER_1_GRID_VIDEO_POSTERS },
+  'summer-5': { mode: 'fixed', posters: TOUR_SPRING_13_GRID_VIDEO_POSTERS },
 };
 
 export function resolveTourGridVideoPoster(

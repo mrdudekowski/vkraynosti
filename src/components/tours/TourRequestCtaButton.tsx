@@ -32,15 +32,17 @@ const TourRequestCtaButton = ({
       <span className="btn-cta-tour__default">{UI.tourDetail.requestTourCta}</span>
       <span className="btn-cta-tour__hover" aria-hidden>
         <span className="btn-cta-tour__hover-inner">
-          {hoverWordChars.map((char, index) => (
-            <span
-              key={`${char}-${index}`}
-              className="btn-cta-tour__letter"
-              style={ctaLetterIndexStyle(index)}
-            >
-              {char}
-            </span>
-          ))}
+          <span className="btn-cta-tour__wordmark" aria-hidden>
+            {hoverWordChars.map((char, index) => (
+              <span
+                key={`${char}-${index}`}
+                className="btn-cta-tour__letter"
+                style={ctaLetterIndexStyle(index)}
+              >
+                {char}
+              </span>
+            ))}
+          </span>
           <span
             className="btn-cta-tour__arrow"
             style={ctaLetterIndexStyle(hoverWordChars.length)}

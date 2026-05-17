@@ -40,7 +40,7 @@ export const TOUR_INCLUDED_HOVER_DROP_SHADOW_CLASS: Record<Season, string> = {
 };
 
 /**
- * Классы `text-tourIncludedIcon-active-*` для иконки в активной строке (контраст к `seasonBg` сезона).
+ * Классы `text-tourIncludedIcon-active-*` для иконки в активной строке (лето/осень — `colors.season.*`; зима/весна — отдельные насыщенные тона).
  */
 export const TOUR_INCLUDED_ICON_ACTIVE_TEXT_CLASS: Record<Season, string> = {
   winter: "text-tourIncludedIcon-active-winter",

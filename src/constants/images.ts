@@ -789,7 +789,7 @@ export const TOUR_SPRING_12_GALLERY_VIEWER = [
 
 export const TOUR_SPRING_12_GALLERY_GRID = TOUR_SPRING_12_GALLERY_VIEWER;
 
-/** «Полуостров Гамова» (spring-13). Исходники: `content/Весна/Гамова 1 д/`. */
+/** «Полуостров Гамова» (spring-13). Исходники: `content/Весна/Гамова 1 д/`. Полный прогон фото+видео — `encode-spring-13-gamova-media.ps1`; только `gam.clip5`/`gam.clip6` — `encode-spring-13-gamova-two-clips.ps1`. */
 export const TOUR_SPRING_13_COVER_GRID =
   `${TOUR_SPRING_13_ASSET_BASE}/cover.webp` as const;
 export const TOUR_SPRING_13_PREFACE_BACKGROUND =
@@ -798,9 +798,10 @@ export const TOUR_SPRING_13_VIEW7_IMAGE =
   `${TOUR_SPRING_13_ASSET_BASE}/view7.webp` as const;
 export const TOUR_SPRING_13_ROCKS_IMAGE =
   `${TOUR_SPRING_13_ASSET_BASE}/rocks.webp` as const;
-/** Галерея Гамова: кадр с сосной (исходник `SOSNA.webp`). */
-export const TOUR_SPRING_13_VIEW3_IMAGE =
-  `${TOUR_SPRING_13_ASSET_BASE}/sosna.webp` as const;
+export const TOUR_SPRING_13_SUMMIT_VIEW_IMAGE =
+  `${TOUR_SPRING_13_ASSET_BASE}/summit-view.webp` as const;
+export const TOUR_SPRING_13_ASTAFIEV_BAY_IMAGE =
+  `${TOUR_SPRING_13_ASSET_BASE}/astafiev-bay.webp` as const;
 export const TOUR_SPRING_13_SOSNA2_IMAGE =
   `${TOUR_SPRING_13_ASSET_BASE}/sosna2.webp` as const;
 /** Две сосны — исходник `dve_sosna.webp`. */
@@ -809,12 +810,8 @@ export const TOUR_SPRING_13_DVE_SOSNA_IMAGE =
 
 export const TOUR_SPRING_13_CLIP1_GRID_WEBM =
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.grid.webm` as const;
-export const TOUR_SPRING_13_CLIP2_GRID_WEBM =
-  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.grid.webm` as const;
 export const TOUR_SPRING_13_CLIP3_GRID_WEBM =
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.grid.webm` as const;
-export const TOUR_SPRING_13_CLIP4_GRID_WEBM =
-  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.grid.webm` as const;
 /** Исходник: `2022-07-20 13-29-54.MOV`. */
 export const TOUR_SPRING_13_CLIP5_GRID_WEBM =
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip5.grid.webm` as const;
@@ -825,48 +822,137 @@ export const TOUR_SPRING_13_CLIP6_GRID_WEBM =
 export const TOUR_SPRING_13_GALLERY_VIEWER = [
   TOUR_SPRING_13_COVER_GRID,
   TOUR_SPRING_13_PREFACE_BACKGROUND,
-  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.webm`,
-  `${TOUR_SPRING_13_ASSET_BASE}/vityaz-bay.webp`,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip6.webm`,
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.webm`,
   `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.webm`,
   TOUR_SPRING_13_VIEW7_IMAGE,
   TOUR_SPRING_13_ROCKS_IMAGE,
-  TOUR_SPRING_13_VIEW3_IMAGE,
+  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip5.webm`,
   TOUR_SPRING_13_SOSNA2_IMAGE,
   TOUR_SPRING_13_DVE_SOSNA_IMAGE,
-  `${TOUR_SPRING_13_ASSET_BASE}/summit-view.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/astafiev-bay.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip5.webm`,
-  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip6.webm`,
-  `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.webm`,
+  TOUR_SPRING_13_SUMMIT_VIEW_IMAGE,
+  TOUR_SPRING_13_ASTAFIEV_BAY_IMAGE,
 ] as const;
 
 export const TOUR_SPRING_13_GALLERY_GRID = [
   TOUR_SPRING_13_COVER_GRID,
   TOUR_SPRING_13_PREFACE_BACKGROUND,
-  TOUR_SPRING_13_CLIP2_GRID_WEBM,
-  `${TOUR_SPRING_13_ASSET_BASE}/vityaz-bay.webp`,
+  TOUR_SPRING_13_CLIP6_GRID_WEBM,
   TOUR_SPRING_13_CLIP1_GRID_WEBM,
   TOUR_SPRING_13_CLIP3_GRID_WEBM,
   TOUR_SPRING_13_VIEW7_IMAGE,
   TOUR_SPRING_13_ROCKS_IMAGE,
-  TOUR_SPRING_13_VIEW3_IMAGE,
+  TOUR_SPRING_13_CLIP5_GRID_WEBM,
   TOUR_SPRING_13_SOSNA2_IMAGE,
   TOUR_SPRING_13_DVE_SOSNA_IMAGE,
-  `${TOUR_SPRING_13_ASSET_BASE}/summit-view.webp`,
-  `${TOUR_SPRING_13_ASSET_BASE}/astafiev-bay.webp`,
-  TOUR_SPRING_13_CLIP5_GRID_WEBM,
-  TOUR_SPRING_13_CLIP6_GRID_WEBM,
-  TOUR_SPRING_13_CLIP4_GRID_WEBM,
+  TOUR_SPRING_13_SUMMIT_VIEW_IMAGE,
+  TOUR_SPRING_13_ASTAFIEV_BAY_IMAGE,
 ] as const;
 
 export const TOUR_SPRING_13_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SPRING_13_CLIP1_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip1.poster.webp`,
-  [TOUR_SPRING_13_CLIP2_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip2.poster.webp`,
   [TOUR_SPRING_13_CLIP3_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip3.poster.webp`,
-  [TOUR_SPRING_13_CLIP4_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip4.poster.webp`,
   [TOUR_SPRING_13_CLIP5_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip5.poster.webp`,
   [TOUR_SPRING_13_CLIP6_GRID_WEBM]: `${TOUR_SPRING_13_ASSET_BASE}/gam.clip6.poster.webp`,
+};
+
+/** «Заповедная Та-Чингоуза» (summer-1). Медиа: `scripts/encode-summer-1-tachingouza-media.ps1`. */
+export const TOUR_SUMMER_1_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-1` as const;
+
+/** Hero карточки и страницы тура — бухта с бирюзовой водой (`first.webp`). */
+export const TOUR_SUMMER_1_FIRST_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/first.webp` as const;
+export const TOUR_SUMMER_1_COVER_GRID = TOUR_SUMMER_1_FIRST_IMAGE;
+/** Бывшая обложка из `HERO/tachingouza.webp` — в сетке вместо дубля `first`. */
+export const TOUR_SUMMER_1_LEGACY_HERO_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/hero.webp` as const;
+
+export const TOUR_SUMMER_1_PREFACE_BACKGROUND =
+  `${TOUR_SUMMER_1_ASSET_BASE}/preface.webp` as const;
+
+export const TOUR_SUMMER_1_VODA_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/voda.webp` as const;
+export const TOUR_SUMMER_1_PESOCHEK_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/pesochek.webp` as const;
+export const TOUR_SUMMER_1_SKALA_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/skala.webp` as const;
+export const TOUR_SUMMER_1_CAVE_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/cave.webp` as const;
+export const TOUR_SUMMER_1_DLINNI_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/dlinni.webp` as const;
+export const TOUR_SUMMER_1_MOST_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/most.webp` as const;
+export const TOUR_SUMMER_1_SAPONI_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/saponi.webp` as const;
+export const TOUR_SUMMER_1_SHIROKI2_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/shiroki2.webp` as const;
+export const TOUR_SUMMER_1_STOIT_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/stoit.webp` as const;
+export const TOUR_SUMMER_1_STONE_IMAGE = `${TOUR_SUMMER_1_ASSET_BASE}/stone.webp` as const;
+
+export const TOUR_SUMMER_1_CLIP1_GRID_WEBM =
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip1.grid.webm` as const;
+export const TOUR_SUMMER_1_CLIP2_GRID_WEBM =
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip2.grid.webm` as const;
+export const TOUR_SUMMER_1_CLIP3_GRID_WEBM =
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip3.grid.webm` as const;
+export const TOUR_SUMMER_1_CLIP4_GRID_WEBM =
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip4.grid.webm` as const;
+export const TOUR_SUMMER_1_CLIP5_GRID_WEBM =
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip5.grid.webm` as const;
+export const TOUR_SUMMER_1_CLIP6_GRID_WEBM =
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip6.grid.webm` as const;
+export const TOUR_SUMMER_1_CLIP7_GRID_WEBM =
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip7.grid.webm` as const;
+
+/**
+ * Порядок: обложка → префейс → кадры для bento `tachingouza` в `TourDetailGallery`.
+ * После `slice(2)` (18 слотов): clip1–clip5, voda, pesochek, first, clip6–clip7, skala, cave,
+ * legacy hero, clip6–clip7, skala, cave, dlinni, most, saponi, shiroki2, stoit, stone.
+ */
+export const TOUR_SUMMER_1_GALLERY_VIEWER = [
+  TOUR_SUMMER_1_COVER_GRID,
+  TOUR_SUMMER_1_PREFACE_BACKGROUND,
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip1.webm`,
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip2.webm`,
+  TOUR_SUMMER_1_VODA_IMAGE,
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip3.webm`,
+  TOUR_SUMMER_1_PESOCHEK_IMAGE,
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip4.webm`,
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip5.webm`,
+  TOUR_SUMMER_1_LEGACY_HERO_IMAGE,
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip6.webm`,
+  TOUR_SUMMER_1_SKALA_IMAGE,
+  `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip7.webm`,
+  TOUR_SUMMER_1_CAVE_IMAGE,
+  TOUR_SUMMER_1_DLINNI_IMAGE,
+  TOUR_SUMMER_1_MOST_IMAGE,
+  TOUR_SUMMER_1_SAPONI_IMAGE,
+  TOUR_SUMMER_1_SHIROKI2_IMAGE,
+  TOUR_SUMMER_1_STOIT_IMAGE,
+  TOUR_SUMMER_1_STONE_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_1_GALLERY_GRID = [
+  TOUR_SUMMER_1_COVER_GRID,
+  TOUR_SUMMER_1_PREFACE_BACKGROUND,
+  TOUR_SUMMER_1_CLIP1_GRID_WEBM,
+  TOUR_SUMMER_1_CLIP2_GRID_WEBM,
+  TOUR_SUMMER_1_VODA_IMAGE,
+  TOUR_SUMMER_1_CLIP3_GRID_WEBM,
+  TOUR_SUMMER_1_PESOCHEK_IMAGE,
+  TOUR_SUMMER_1_CLIP4_GRID_WEBM,
+  TOUR_SUMMER_1_CLIP5_GRID_WEBM,
+  TOUR_SUMMER_1_LEGACY_HERO_IMAGE,
+  TOUR_SUMMER_1_CLIP6_GRID_WEBM,
+  TOUR_SUMMER_1_SKALA_IMAGE,
+  TOUR_SUMMER_1_CLIP7_GRID_WEBM,
+  TOUR_SUMMER_1_CAVE_IMAGE,
+  TOUR_SUMMER_1_DLINNI_IMAGE,
+  TOUR_SUMMER_1_MOST_IMAGE,
+  TOUR_SUMMER_1_SAPONI_IMAGE,
+  TOUR_SUMMER_1_SHIROKI2_IMAGE,
+  TOUR_SUMMER_1_STOIT_IMAGE,
+  TOUR_SUMMER_1_STONE_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_1_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [TOUR_SUMMER_1_CLIP1_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip1.poster.webp`,
+  [TOUR_SUMMER_1_CLIP2_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip2.poster.webp`,
+  [TOUR_SUMMER_1_CLIP3_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip3.poster.webp`,
+  [TOUR_SUMMER_1_CLIP4_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip4.poster.webp`,
+  [TOUR_SUMMER_1_CLIP5_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip5.poster.webp`,
+  [TOUR_SUMMER_1_CLIP6_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip6.poster.webp`,
+  [TOUR_SUMMER_1_CLIP7_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip7.poster.webp`,
 };
 
 /**

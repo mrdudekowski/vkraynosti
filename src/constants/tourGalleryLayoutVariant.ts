@@ -16,7 +16,8 @@ export type TourGalleryLayoutVariant =
   | 'dardanelles'
   | 'askold'
   | 'shkota'
-  | 'gamova';
+  | 'gamova'
+  | 'tachingouza';
 
 export function getTourGalleryLayoutVariant(tourId: string): TourGalleryLayoutVariant {
   if (tourId === 'winter-1') return 'izubrinaya';
@@ -29,8 +30,9 @@ export function getTourGalleryLayoutVariant(tourId: string): TourGalleryLayoutVa
   if (tourId === 'spring-7') return 'dardanelles';
   if (tourId === 'spring-8') return 'falaza';
   if (tourId === 'spring-9') return 'vorobey-winery';
-  if (tourId === 'spring-10') return 'askold';
-  if (tourId === 'spring-11') return 'shkota';
-  if (tourId === 'spring-13') return 'gamova';
+  if (tourId === 'spring-10' || tourId === 'summer-3') return 'askold';
+  if (tourId === 'spring-11' || tourId === 'summer-4') return 'shkota';
+  if (tourId === 'spring-13' || tourId === 'summer-5') return 'gamova';
+  if (tourId === 'summer-1') return 'tachingouza';
   return 'default';
 }

@@ -37,6 +37,7 @@ import {
   GALLERY_GRID_VIDEO_POSTER_REVEAL_MS,
 } from './src/constants/galleryGridVideoLoop'
 import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
+import { TOUR_CARD_SKELETON_SHIMMER_MS } from './src/constants/tourCardSkeletonShimmer'
 import {
   TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
   TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
@@ -83,6 +84,9 @@ const MODAL_CHUNK_LOADER_STAGGER = `${MODAL_CHUNK_LOADER_STAGGER_MS}ms` as const
 
 /** Плейсхолдер медиа-плитки до lazy-src (`mediaPlaceholderShimmer.ts`). */
 const MEDIA_PLACEHOLDER_SHIMMER_DURATION = `${MEDIA_PLACEHOLDER_SHIMMER_MS}ms` as const
+
+/** Горизонтальный sheen линий и обложки `TourCardSkeleton`; синхронно с `tourCardSkeletonShimmer.ts`. */
+const TOUR_CARD_SKELETON_SHIMMER_DURATION = `${TOUR_CARD_SKELETON_SHIMMER_MS}ms` as const
 
 /** CTA: зелёный sweep поверх апельсинового `cta.fill` (согласовано с `.btn-cta-tour`). */
 const CTA_SWEEP_DURATION = '400ms' as const
@@ -167,12 +171,12 @@ function buildSeasonChromeIconDropShadow(season: keyof typeof SEASON_ACCENT_HEX)
   ].join(', ')
 }
 
-/** Активные иконки «Что включено» — те же hex, что `colors.tourIncludedIcon.active.*`. */
+/** Активные иконки «Что включено»: зима/весна — насыщенные тона к фону; лето/осень — акцент сезона (`SEASON_ACCENT_HEX`). */
 const TOUR_INCLUDED_ICON_ACTIVE_HEX = {
   winter: '#B45309',
   spring: '#861C44',
-  summer: '#0E7490',
-  fall: '#14532D',
+  summer: SEASON_ACCENT_HEX.summer,
+  fall: SEASON_ACCENT_HEX.fall,
 } as const
 
 function buildTourIncludedActiveVolumeShadow(
@@ -356,6 +360,7 @@ const config: Config = {
     'animate-cta-letter-pop',
     'animate-tour-meta-stagger-in',
     'motion-safe:animate-media-placeholder-shimmer',
+    'motion-safe:animate-tour-card-skeleton-sheen',
     'delay-tour-meta-0',
     'delay-tour-meta-1',
     'delay-tour-meta-2',
@@ -409,11 +414,13 @@ const config: Config = {
           dark:  '#0D0D0D',
           light: '#F7F5F0',
         },
-        /** Скелеты загрузки: один shimmer-паттерн, разная плотность для медиа и текстовых линий. */
+        /** Скелеты загрузки: плотность линий/медиа + полоса sheen (без сырого #fff). */
         skeleton: {
           media:     'color-mix(in srgb, #F7F5F0 78%, #0D0D0D 22%)',
           line:      'color-mix(in srgb, #F7F5F0 86%, #0D0D0D 14%)',
           lineMuted: 'color-mix(in srgb, #F7F5F0 91%, #0D0D0D 9%)',
+          /** Центр градиента скользящего блика (`::after` на линиях и обложке скелетона карточки). */
+          sheen:     'color-mix(in srgb, #F7F5F0 97%, #0D0D0D 3%)',
         },
         /**
          * Базовый интенсивный тон для «неба» главной; фактический низ — смешение с пастелью (`HOME_PAGE_SKY_FINAL_INTENSE_RATIO`).
@@ -467,7 +474,8 @@ const config: Config = {
           maxGlow: '#6366F1',
         },
         /**
-         * Активная иконка в «Что включено» (`TourIncludedIconList`): насыщенный акцент в триаде к `seasonBg.*`.
+         * Активная иконка в «Что включено» (`TourIncludedIconList`): зима/весна — насыщенный акцент к `seasonBg.*`;
+         * лето и осень — тот же hex, что `colors.season.*` (`SEASON_ACCENT_HEX`).
          * Утилиты: `text-tourIncludedIcon-active-{winter|spring|summer|fall}`.
          */
         tourIncludedIcon: {
@@ -1224,6 +1232,14 @@ const config: Config = {
           '0%, 100%': { opacity: '0.52' },
           '50%': { opacity: '0.9' },
         },
+        /**
+         * Скользящий блик по оси X для `TourCardSkeleton` (псевдоэлемент + translate3d).
+         * Проценты относительно ширины полосы (`::after`), не карточки.
+         */
+        'tour-card-skeleton-sheen': {
+          '0%': { transform: 'translate3d(-130%, 0, 0)' },
+          '100%': { transform: 'translate3d(280%, 0, 0)' },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -1246,6 +1262,7 @@ const config: Config = {
         'home-gate-scroll-hint-bob': `home-gate-scroll-hint-bob ${HOME_GATE_SCROLL_HINT_BOB_DURATION} ease-in-out infinite`,
         'modal-chunk-loader-bubble': `modal-chunk-loader-bubble ${MODAL_CHUNK_LOADER_DURATION} linear infinite`,
         'media-placeholder-shimmer': `media-placeholder-shimmer ${MEDIA_PLACEHOLDER_SHIMMER_DURATION} ease-in-out infinite`,
+        'tour-card-skeleton-sheen': `tour-card-skeleton-sheen ${TOUR_CARD_SKELETON_SHIMMER_DURATION} linear infinite`,
       },
       transitionDelay: {
         'tour-meta-0': '0ms',

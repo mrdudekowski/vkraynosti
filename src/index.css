@@ -483,6 +483,15 @@
     align-items: center;
     gap: theme('spacing.2');
     color: theme('colors.text.inverse');
+    /** Не наследовать `letterSpacing.cta` с кнопки — слово читается как обычный текст CTA. */
+    letter-spacing: normal;
+  }
+
+  .btn-cta-tour__wordmark {
+    display: inline-flex;
+    align-items: center;
+    letter-spacing: normal;
+    font: inherit;
   }
 
   .btn-cta-tour__letter,
@@ -566,29 +575,59 @@
            transition-all duration-hover hover:-translate-y-1 hover:shadow-xl;
   }
 
+  /**
+   * Оболочка скелетона карточки: те же max-size / radius / shadow / фон, что у `TourCard` в покое,
+   * без hover-трансформа `card-base`.
+   */
+  .tour-card-skeleton-card {
+    @apply h-full w-full max-h-tour-card max-w-tour-card justify-self-center overflow-hidden rounded-card bg-white shadow-md;
+  }
+
   .tour-card-skeleton-line {
-    @apply rounded-full bg-skeleton-line;
+    @apply relative block overflow-hidden rounded-full bg-skeleton-line;
   }
 
   .tour-card-skeleton-line-muted {
-    @apply rounded-full bg-skeleton-lineMuted;
+    @apply relative block overflow-hidden rounded-full bg-skeleton-lineMuted;
   }
 
+  /** Плейсхолдер до `src` у `PlaceholderImage` и крупных блоков в `RouteFallback`: только мягкий пульс opacity. */
   .tour-card-skeleton-media {
     @apply bg-skeleton-media;
   }
 
+  /**
+   * Обложка в `TourCardSkeleton`: тот же слот высоты, что у обложки карточки, плюс горизонтальный sheen.
+   */
+  .tour-card-skeleton-card-cover {
+    @apply relative h-full w-full overflow-hidden rounded-t-card bg-skeleton-media;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    .tour-card-skeleton-line,
-    .tour-card-skeleton-line-muted,
     .tour-card-skeleton-media {
       animation: theme('animation.media-placeholder-shimmer');
+    }
+
+    .tour-card-skeleton-line::after,
+    .tour-card-skeleton-line-muted::after,
+    .tour-card-skeleton-card-cover::after {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      width: 45%;
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, theme('colors.skeleton.sheen') 0%, transparent),
+        theme('colors.skeleton.sheen'),
+        color-mix(in srgb, theme('colors.skeleton.sheen') 0%, transparent)
+      );
+      will-change: transform;
+      animation: theme('animation.tour-card-skeleton-sheen');
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tour-card-skeleton-line,
-    .tour-card-skeleton-line-muted,
     .tour-card-skeleton-media {
       opacity: 1;
     }

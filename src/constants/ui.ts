@@ -118,7 +118,7 @@ export const UI = {
   seasons: {
     winter: { label: 'Зима',  emoji: '❄️', description: 'Байкал подо льдом, Хибины, полярное сияние' },
     spring: { label: 'Весна', emoji: '🌿', description: 'Цветение Алтая, таяние Байкала, Камчатка' },
-    summer: { label: 'Лето',  emoji: '☀️', description: 'Вулканы, тропы, сплавы и белые ночи' },
+    summer: { label: 'Лето',  emoji: '☀️', description: 'Тачингоуза, Тобизина, Аскольд, Шкота, Гамова' },
     fall:   { label: 'Осень', emoji: '🍂', description: 'Золотой Алтай, карельский лес, горные сёла' },
   },
   footer: {

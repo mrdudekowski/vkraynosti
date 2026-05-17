@@ -1,0 +1,24 @@
+---
+description: Vkraynosti — Tailwind theme и компонентные слои (tailwind.config, index.css)
+globs: tailwind.config.ts,src/index.css
+alwaysApply: false
+---
+
+# Зона: дизайн-система (Tailwind + глобальные слои)
+
+Соблюдай инварианты **`vkraynosti.mdc`** (SSOT, No Hardcode).
+
+## Tailwind (`tailwind.config.ts`)
+
+- Новые **цвета, spacing, typography, z-index, breakpoints, keyframes, animation** — добавляй в **`theme.extend`**, не хардкодь произвольные значения в компонентах.
+- **Длительности анимаций**, которые должны совпадать с кодом, — по паттерну проекта: константа в **`src/constants/*.ts`**, затем **импорт в `tailwind.config.ts`** и использование в `keyframes` / `animation` — без дублирования «магических» миллисекунд в двух местах.
+
+## Глобальные стили (`src/index.css`)
+
+- Повторяемые визуальные блоки — **`@layer components`** или утилиты темы, а не копипаста длинных `className` везде.
+- Сохраняй **mobile-first**; брейкпоинты проекта: **sm 640, md 768, lg 1024, xl 1280** (как в конфиге).
+- Поверхности секций: **`bg-surface-light` / `bg-surface-dark`** — не подбирать произвольные фоны вне токенов.
+
+## Согласованность
+
+- Меняя токен, проверь визуальные потребители в **`src/components/`** и утилиты, которые ссылаются на `theme()`.

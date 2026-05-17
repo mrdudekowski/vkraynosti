@@ -1,0 +1,30 @@
+---
+description: Vkraynosti — туры, карточка, галерея, плейсхолдеры, медиа-пути и shimmer
+globs: src/components/tours/**/*.tsx,src/components/shared/TourCard.tsx,src/components/shared/PlaceholderImage.tsx,src/utils/tourGalleryUrls.ts,src/utils/getTourPrefaceBackgroundUrl.ts,src/utils/isVideoAssetUrl.ts,src/constants/tourDetailGalleryGridClasses.ts,src/constants/images.ts
+alwaysApply: false
+---
+
+# Зона: туры и медиа
+
+Соблюдай инварианты **`vkraynosti.mdc`** (SSOT, No Hardcode).
+
+## Медиа и пути
+
+- Любые пути к обложкам, галерее, видео для UI — через **`src/constants/images.ts`** и утилиты (**`tourGalleryUrls.ts`**, **`getTourPrefaceBackgroundUrl.ts`**, и т.д.). Не размножать строки вида `/tours/...` в компонентах.
+
+## Карточка и скелетон
+
+- Внешний вид и структура **скелетона** должны оставаться согласованными с **`TourCard`** и **`TourCardSkeleton`** (отступы, высоты медиа, сетка заголовка/чипа). Меняя одно, проверь второе.
+
+## Плейсхолдеры и анимация
+
+- Стили плейсхолдеров/скелетона: **`src/index.css`** (классы `.tour-card-skeleton-*`). Учитывай **`prefers-reduced-motion`** — не отключай статику для `reduce` без замены на допустимый паттерн.
+- Анимация **`media-placeholder-shimmer`** в **`tailwind.config.ts`** может быть общей для **`PlaceholderImage`** и скелетона карточки. Меняя keyframes/длительность, **оцени влияние** на все потребители или вынеси **отдельную** анимацию с новым именем и константой длительности в **`src/constants/`** (связка с Tailwind, как в проекте).
+
+## Производительность
+
+- Крупные ассеты — **`public/`**; при изменении набора медиа учитывай скрипты из **`package.json`** (`media:budget`, генераторы). Не ухудшай LCP без необходимости; сохраняй ленивую загрузку и приоритеты изображений там, где уже заданы.
+
+## Галерея и сетка
+
+- Классы сетки/варианты галереи — из принятых констант (**`tourDetailGalleryGridClasses.ts`** и связанные), не хардкодь произвольные grid-классы в обход канона без причины.

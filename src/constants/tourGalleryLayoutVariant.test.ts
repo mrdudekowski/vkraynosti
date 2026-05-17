@@ -8,6 +8,10 @@ describe('getTourGalleryLayoutVariant', () => {
     expect(getTourGalleryLayoutVariant('spring-10')).toBe('askold');
     expect(getTourGalleryLayoutVariant('spring-11')).toBe('shkota');
     expect(getTourGalleryLayoutVariant('spring-13')).toBe('gamova');
+    expect(getTourGalleryLayoutVariant('summer-3')).toBe('askold');
+    expect(getTourGalleryLayoutVariant('summer-4')).toBe('shkota');
+    expect(getTourGalleryLayoutVariant('summer-5')).toBe('gamova');
+    expect(getTourGalleryLayoutVariant('summer-1')).toBe('tachingouza');
   });
 
   it('неизвестный id — default', () => {

@@ -301,6 +301,7 @@ const GalleryGridVideo = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const unmountMotionVideoTimerRef = useRef<number | null>(null);
   const hasPoster = posterSrc != null && posterSrc.length > 0;
+  /** Пул слотов `useActiveMediaSlot` (см. `GALLERY_GRID_VIDEO_MAX_CONCURRENT_SLOTS`) ограничивает число одновременных `<video>`. */
   const shouldRequestMotionVideoSlot =
     shouldRenderMotionVideo && inView && isPageVisible && !prefersReducedMotion;
   const activeMediaSlotGranted = useActiveMediaSlot(shouldRequestMotionVideoSlot);

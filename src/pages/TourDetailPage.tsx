@@ -238,7 +238,7 @@ const TourDetailPage = () => {
                   ? 'lg:object-tour-detail-hero-desktop-spring-4'
                   : tour.id === 'spring-5'
                     ? 'lg:object-tour-detail-hero-desktop-spring-5'
-                    : tour.id === 'spring-13'
+                    : tour.id === 'spring-13' || tour.id === 'summer-5'
                       ? 'lg:object-tour-detail-hero-desktop-spring-13'
                       : undefined
         }

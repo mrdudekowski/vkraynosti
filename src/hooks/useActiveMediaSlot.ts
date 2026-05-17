@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { GALLERY_GRID_VIDEO_MAX_CONCURRENT_SLOTS } from '../constants/galleryGridVideoLoop';
 
 type ActiveMediaSlotId = symbol;
 type ActiveMediaSlotListener = () => void;
 
-let activeMediaSlotId: ActiveMediaSlotId | null = null;
+const activeMediaSlotHolders = new Set<ActiveMediaSlotId>();
 const activeMediaSlotListeners = new Set<ActiveMediaSlotListener>();
 
 const notifyActiveMediaSlotListeners = () => {
@@ -11,28 +12,29 @@ const notifyActiveMediaSlotListeners = () => {
 };
 
 export function requestActiveMediaSlot(slotId: ActiveMediaSlotId): boolean {
-  if (activeMediaSlotId === slotId) return true;
-  if (activeMediaSlotId != null) return false;
+  if (activeMediaSlotHolders.has(slotId)) return true;
+  if (activeMediaSlotHolders.size >= GALLERY_GRID_VIDEO_MAX_CONCURRENT_SLOTS) return false;
 
-  activeMediaSlotId = slotId;
+  activeMediaSlotHolders.add(slotId);
   notifyActiveMediaSlotListeners();
   return true;
 }
 
 export function releaseActiveMediaSlot(slotId: ActiveMediaSlotId): boolean {
-  if (activeMediaSlotId !== slotId) return false;
+  if (!activeMediaSlotHolders.has(slotId)) return false;
 
-  activeMediaSlotId = null;
+  activeMediaSlotHolders.delete(slotId);
   notifyActiveMediaSlotListeners();
   return true;
 }
 
-export function getActiveMediaSlotId(): ActiveMediaSlotId | null {
-  return activeMediaSlotId;
+/** Для тестов и отладки: число активных держателей слота. */
+export function getActiveMediaSlotHolderCount(): number {
+  return activeMediaSlotHolders.size;
 }
 
 export function resetActiveMediaSlotForTest(): void {
-  activeMediaSlotId = null;
+  activeMediaSlotHolders.clear();
   activeMediaSlotListeners.clear();
 }
 

@@ -4,6 +4,8 @@
 # Usage:
 #   .\scripts\encode-spring-13-gamova-media.ps1
 #   .\scripts\encode-spring-13-gamova-media.ps1 -SourceDir D:\path\to\source
+# Только обновить gam.clip5 + gam.clip6 (пути к двум файлам):
+#   .\scripts\encode-spring-13-gamova-two-clips.ps1 -Clip5Path '...' -Clip6Path '...'
 param(
   [string] $SourceDir = ''
 )

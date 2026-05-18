@@ -40,6 +40,8 @@ npm run generate:banner-loops
 
 Та-Чингоуза (summer-1): [`encode-summer-1-tachingouza-media.ps1`](../encode-summer-1-tachingouza-media.ps1) — MP4 из DaVinci `site/` → `tch.clip1..7`, webp из `content/…/Тачингоуза/`. Если `drive` / `pesochek` / `wai-wai` выше warn — перекодируйте только их из MP4 с CRF выше (не `batch-shrink-public-webm.ps1`).
 
+Северное Приморье (summer-7): [`encode-summer-7-sever-media.ps1`](../encode-summer-7-sever-media.ps1) — webp и MOV из `content/Лето/Север/` → `public/tours/summer-7/` (`sev.clip1..4`; clip1 — первые **6 с** для loop в сетке). Точечно из уже собранных webm: [`trim-summer-7-clip1-to-6sec.ps1`](../trim-summer-7-clip1-to-6sec.ps1).
+
 ## Оптимизация по бюджету (фаза 1)
 
 См. [docs/optimization-phase-1-public-tours.md](../../docs/optimization-phase-1-public-tours.md). Видео и фото на сайте не пережимать пачкой: только точечная замена из **исходника** без ухудшения качества; массовый shrink по `public/**/*.webm` в стандартный процесс не входит. Постер из одного `*.grid.webm`: [regenerate-poster-from-grid.ps1](../regenerate-poster-from-grid.ps1).

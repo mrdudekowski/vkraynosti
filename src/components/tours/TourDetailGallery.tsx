@@ -35,6 +35,12 @@ import {
   TOUR_SUMMER_1_CLIP3_GRID_WEBM,
   TOUR_SUMMER_1_CLIP4_GRID_WEBM,
   TOUR_SUMMER_1_CLIP7_GRID_WEBM,
+  TOUR_SUMMER_7_DUB_IMAGE,
+  TOUR_SUMMER_7_CLIP1_GRID_WEBM,
+  TOUR_SUMMER_7_CLIP2_GRID_WEBM,
+  TOUR_SUMMER_7_FIN_IMAGE,
+  TOUR_SUMMER_7_SKAL_34_IMAGE,
+  TOUR_SUMMER_7_SKAL_POINT3_IMAGE,
 } from '../../constants/images';
 import { TOUR_SUMMER_1_CLIP4_GRID_VIDEO_OBJECT_CLASS } from '../../constants/tourSummer1GalleryCrop';
 import { isVideoAssetUrl } from '../../utils/isVideoAssetUrl';
@@ -584,6 +590,54 @@ const TourDetailGalleryComponent = ({
         </div>
         <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
           {renderTileButton(images[14], 14, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Северное Приморье (summer-7): 11 кадров после hero/preface.
+   * Порядок `slice(2)`: clip1, dub, clip2, skal-point3, skal-34..46, clip3, clip4, fin (только `*.grid.webm`).
+   * Снизу `fin` — `GALLERY_GRID_FULL_WIDTH_TILE_2X2`; clip3 и clip4 — две вертикали в ряд.
+   */
+  if (
+    layoutVariant === 'severCoast' &&
+    images.length === 11 &&
+    images[0] === TOUR_SUMMER_7_CLIP1_GRID_WEBM &&
+    images[1] === TOUR_SUMMER_7_DUB_IMAGE &&
+    images[2] === TOUR_SUMMER_7_CLIP2_GRID_WEBM &&
+    images[3] === TOUR_SUMMER_7_SKAL_POINT3_IMAGE &&
+    images[4] === TOUR_SUMMER_7_SKAL_34_IMAGE &&
+    images[10] === TOUR_SUMMER_7_FIN_IMAGE
+  ) {
+    const severBentoRow = (left: number, rightTop: number, rightBottom: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[left], left, GALLERY_GRID_BENTO_TALL_LEFT)}
+        {renderTileButton(images[rightTop], rightTop, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+        {renderTileButton(images[rightBottom], rightBottom, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        {severBentoRow(0, 1, 2)}
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[3], 3, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[6], 6, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[7], 7, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[8], 8, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[9], 9, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[10], 10, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
         </div>
       </div>
     );

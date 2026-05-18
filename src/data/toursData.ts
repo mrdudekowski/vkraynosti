@@ -85,6 +85,10 @@ import {
   TOUR_SUMMER_1_GALLERY_GRID,
   TOUR_SUMMER_1_GALLERY_VIEWER,
   TOUR_SUMMER_1_PREFACE_BACKGROUND,
+  TOUR_SUMMER_7_COVER_GRID,
+  TOUR_SUMMER_7_GALLERY_GRID,
+  TOUR_SUMMER_7_GALLERY_VIEWER,
+  TOUR_SUMMER_7_PREFACE_BACKGROUND,
 } from '../constants/images';
 import { UI } from '../constants/ui';
 
@@ -1014,7 +1018,7 @@ export const TOURS: Tour[] = [
     galleryGridUrls: [...TOUR_SPRING_1_GALLERY_GRID],
   },
 
-  // SUMMER — 5 tours
+  // SUMMER — 7 tours
   {
     id: 'summer-1',
     season: 'summer',
@@ -1267,6 +1271,142 @@ export const TOURS: Tour[] = [
     prefaceBackgroundImageUrl: TOUR_SPRING_13_PREFACE_BACKGROUND,
     galleryImages: [...TOUR_SPRING_13_GALLERY_VIEWER],
     galleryGridUrls: [...TOUR_SPRING_13_GALLERY_GRID],
+  },
+  {
+    id: 'summer-6',
+    season: 'summer',
+    title: 'Путешествие в ущелье Дарданеллы',
+    subtitle: 'Каменные стражи и горная река в сердце Приморья',
+    heroPhrase: 'Исполинные скалы Щёк Дарданеллы',
+    duration: '14–16 часов',
+    difficulty: 'Easy',
+    price: 'от 4 500 ₽',
+    description:
+      'Ущелье Дарданеллы (Щёки) — природный памятник в долине реки Тигровой. Здесь нас ждут скальные останцы, тропа вдоль реки и видовые точки с высоты до 150 м. Маршрут мягкий по темпу и подходит тем, кто хочет красивый день в горах без перегруза.',
+    program: [
+      {
+        timeLabel: '08:00',
+        description: 'Выезд из Владивостока. В пути около 2,5 часов.',
+      },
+      {
+        timeLabel: '10:30',
+        description: 'Прибытие к старту маршрута, инструктаж и подготовка.',
+      },
+      {
+        timeLabel: '10:45–14:30',
+        description:
+          'Пеший маршрут 5-6 км: тропа вдоль Тигровой, "Замок Принцессы", "Каменный монастырь" и видовые площадки.',
+      },
+      {
+        timeLabel: '14:30–16:00',
+        description:
+          'Большой привал у реки: горячий обед, отдых, фото. В тёплое время можно искупаться.',
+      },
+      {
+        timeLabel: '16:00–17:30',
+        description: 'Спуск и возвращение к машине.',
+      },
+      {
+        timeLabel: '17:30–20:30',
+        description: 'Возвращение во Владивосток.',
+      },
+    ],
+    includedInPrice: [
+      inc(
+        'Трансфер Владивосток — ущелье Дарданеллы — Владивосток',
+        faShuttleVan
+      ),
+      inc('Горячий обед на берегу реки Тигровой', faUtensils),
+      inc('Горячие напитки (чай/кофе/глинтвейн по сезону)', faMugSaucer),
+      inc('Гид-проводник', faUserTie),
+      inc('Истории о местности и происхождении названия ущелья', faBookOpen),
+      inc('Забота команды на всём маршруте', faHeart),
+    ],
+    imageUrl: SPRING_TOUR_COVERS['spring-7'],
+    prefaceBackgroundImageUrl: TOUR_SPRING_7_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SPRING_7_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SPRING_7_GALLERY_GRID],
+  },
+  {
+    id: 'summer-7',
+    season: 'summer',
+    title: 'Северное Приморье: Тайны побережья',
+    subtitle: 'Бухта Дубовая, маяк Балюзек и космическая тайна Дальнегорска',
+    heroPhrase:
+      'Туда, где кончаются дороги, а океан встречается со звёздами. Два дня, чтобы влюбиться в настоящий север Приморья.',
+    duration: '2 дня / 1 ночь',
+    difficulty: 'Medium',
+    difficultyDisplayLabel: 'Средняя',
+    price: '19 500 ₽',
+    priceFootnote: 'на одного участника, группа от 5 человек',
+    description:
+      'Два дня на севере: Дубовая — кекуры, пляж и пикник у воды; вечером база «Мыс Балюзек», ужин и ночь с видом на залив.\n\nНаутро — маяк Балюзек, мыс Четырёх Скал, Рудная Пристань и Высота 611 в Дальнегорске. К ночи — Владивосток.',
+    descriptionAside:
+      'Между перевалами — тайга и бухты, где время течёт иначе. Дубовая дышит шумом волн; у Балюзека маяк почти век смотрит в море. Четырёх Скал держат кекуры-стражи — а Высота 611 в финале: небо, легенда 1986-го, история, от которой стынет кожа.',
+    program: [
+      {
+        timeLabel: 'День 1 · 04:00',
+        description: 'Выезд из Владивостока навстречу приключениям!',
+      },
+      {
+        timeLabel: 'День 1 · 11:30',
+        description:
+          'Бухта Дубовая: кекуры «Курица» и «Бутылка», прогулка по песчаному пляжу, обед-пикник',
+      },
+      {
+        timeLabel: 'День 1 · 16:00',
+        description: 'Переезд на базу отдыха «Мыс Балюзек», размещение в номерах',
+      },
+      {
+        timeLabel: 'День 1 · 16:30',
+        description: 'Посещение смотровой площадки к маяку Балюзек',
+      },
+      {
+        timeLabel: 'День 1 · 19:00',
+        description: 'Ужин, согревающий чай под шум волн',
+      },
+      { timeLabel: 'День 2 · 09:00', description: 'Завтрак на базе, сборы' },
+      {
+        timeLabel: 'День 2 · 12:00',
+        description: 'Мыс Четырёх Скал: визитная карточка Севера',
+      },
+      { timeLabel: 'День 2 · 14:30', description: 'Обед' },
+      {
+        timeLabel: 'День 2 · 15:30',
+        description:
+          'Прогулка к маяку Рудной Пристани: виды на бухту и скалы 2 Брата',
+      },
+      {
+        timeLabel: 'День 2 · 16:30',
+        description: 'Переезд в Дальнегорск. Экскурсия на Высоту 611',
+      },
+      { timeLabel: 'День 2 · 17:30', description: 'Выезд домой' },
+      { timeLabel: 'День 2 · 23:00', description: 'Прибытие во Владивосток' },
+    ],
+    programAdditionalNotes: [
+      'По желанию можно встретить рассвет на маяке Балюзек.',
+      'Время поездки и маршрут могут меняться из-за погодных и иных условий.',
+    ],
+    includedInPrice: [
+      inc(
+        'Комфортабельный трансфер Владивосток — север Приморья — Владивосток',
+        faShuttleVan
+      ),
+      inc('Проживание на базе отдыха «Мыс Балюзек» (1 ночь)', faBed),
+      inc(
+        'Питание: обед-пикник и горячий ужин первого дня, завтрак и обед-пикник второго дня',
+        faUtensils
+      ),
+      inc('Вход на все указанные природные объекты', faTicket),
+      inc('Экскурсия на маяк Балюзек и к мысу Четырёх Скал', faBinoculars),
+      inc('Услуги гида-проводника и трансфер по всему маршруту', faUserTie),
+      inc('Горячие напитки на маршруте', faMugHot),
+      inc('Наша забота и душа', faHeart),
+    ],
+    imageUrl: TOUR_SUMMER_7_COVER_GRID,
+    prefaceBackgroundImageUrl: TOUR_SUMMER_7_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SUMMER_7_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SUMMER_7_GALLERY_GRID],
   },
 
   // FALL — 4 tours

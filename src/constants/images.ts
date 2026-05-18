@@ -945,6 +945,76 @@ export const TOUR_SUMMER_1_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SUMMER_1_CLIP7_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip7.poster.webp`,
 };
 
+/** «Северное Приморье» (summer-7). Медиа: `scripts/encode-summer-7-sever-media.ps1`. */
+export const TOUR_SUMMER_7_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-7` as const;
+
+export const TOUR_SUMMER_7_COVER = `${TOUR_SUMMER_7_ASSET_BASE}/bazi.webp` as const;
+export const TOUR_SUMMER_7_COVER_GRID = TOUR_SUMMER_7_COVER;
+export const TOUR_SUMMER_7_PREFACE_BACKGROUND =
+  `${TOUR_SUMMER_7_ASSET_BASE}/preface.webp` as const;
+
+export const TOUR_SUMMER_7_DUB_IMAGE = `${TOUR_SUMMER_7_ASSET_BASE}/dub.webp` as const;
+export const TOUR_SUMMER_7_BAZI_IMAGE = TOUR_SUMMER_7_COVER;
+export const TOUR_SUMMER_7_SKAL_POINT3_IMAGE =
+  `${TOUR_SUMMER_7_ASSET_BASE}/skal-point3.webp` as const;
+export const TOUR_SUMMER_7_SKAL_34_IMAGE = `${TOUR_SUMMER_7_ASSET_BASE}/skal-34.webp` as const;
+export const TOUR_SUMMER_7_SKAL_44_IMAGE = `${TOUR_SUMMER_7_ASSET_BASE}/skal-44.webp` as const;
+export const TOUR_SUMMER_7_SKAL_45_IMAGE = `${TOUR_SUMMER_7_ASSET_BASE}/skal-45.webp` as const;
+export const TOUR_SUMMER_7_SKAL_46_IMAGE = `${TOUR_SUMMER_7_ASSET_BASE}/skal-46.webp` as const;
+export const TOUR_SUMMER_7_FIN_IMAGE = `${TOUR_SUMMER_7_ASSET_BASE}/fin.webp` as const;
+
+export const TOUR_SUMMER_7_CLIP1_GRID_WEBM =
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip1.grid.webm` as const;
+export const TOUR_SUMMER_7_CLIP2_GRID_WEBM =
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip2.grid.webm` as const;
+export const TOUR_SUMMER_7_CLIP3_GRID_WEBM =
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip3.grid.webm` as const;
+export const TOUR_SUMMER_7_CLIP4_GRID_WEBM =
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip4.grid.webm` as const;
+
+/**
+ * Порядок: cover → preface → bento `severCoast` после `slice(2)` (11 слотов):
+ * clip1, dub, clip2, skal-point3, skal-34..46, clip3, clip4, fin.
+ */
+export const TOUR_SUMMER_7_GALLERY_VIEWER = [
+  TOUR_SUMMER_7_COVER_GRID,
+  TOUR_SUMMER_7_PREFACE_BACKGROUND,
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip1.webm`,
+  TOUR_SUMMER_7_DUB_IMAGE,
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip2.webm`,
+  TOUR_SUMMER_7_SKAL_POINT3_IMAGE,
+  TOUR_SUMMER_7_SKAL_34_IMAGE,
+  TOUR_SUMMER_7_SKAL_44_IMAGE,
+  TOUR_SUMMER_7_SKAL_45_IMAGE,
+  TOUR_SUMMER_7_SKAL_46_IMAGE,
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip3.webm`,
+  `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip4.webm`,
+  TOUR_SUMMER_7_FIN_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_7_GALLERY_GRID = [
+  TOUR_SUMMER_7_COVER_GRID,
+  TOUR_SUMMER_7_PREFACE_BACKGROUND,
+  TOUR_SUMMER_7_CLIP1_GRID_WEBM,
+  TOUR_SUMMER_7_DUB_IMAGE,
+  TOUR_SUMMER_7_CLIP2_GRID_WEBM,
+  TOUR_SUMMER_7_SKAL_POINT3_IMAGE,
+  TOUR_SUMMER_7_SKAL_34_IMAGE,
+  TOUR_SUMMER_7_SKAL_44_IMAGE,
+  TOUR_SUMMER_7_SKAL_45_IMAGE,
+  TOUR_SUMMER_7_SKAL_46_IMAGE,
+  TOUR_SUMMER_7_CLIP3_GRID_WEBM,
+  TOUR_SUMMER_7_CLIP4_GRID_WEBM,
+  TOUR_SUMMER_7_FIN_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_7_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [TOUR_SUMMER_7_CLIP1_GRID_WEBM]: `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip1.poster.webp`,
+  [TOUR_SUMMER_7_CLIP2_GRID_WEBM]: `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip2.poster.webp`,
+  [TOUR_SUMMER_7_CLIP3_GRID_WEBM]: `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip3.poster.webp`,
+  [TOUR_SUMMER_7_CLIP4_GRID_WEBM]: `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip4.poster.webp`,
+};
+
 /**
  * Секунда входа 5-секундного сегмента в исходном `*.grid.webm` для баннера зимы (колонки 0…9).
  * Синхронно с `cuts[].startSec` в `scripts/generate-home-season-banner-loop-videos.cjs`.

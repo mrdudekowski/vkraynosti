@@ -53,6 +53,10 @@ import {
   TOUR_SUMMER_1_COVER_OBJECT_POSITION,
   TOUR_SUMMER_1_COVER_OBJECT_POSITION_LG,
 } from './src/constants/tourSummer1GalleryCrop'
+import {
+  TOUR_SUMMER_7_COVER_OBJECT_POSITION,
+  TOUR_SUMMER_7_COVER_OBJECT_POSITION_LG,
+} from './src/constants/tourSummer7CoverCrop'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -333,7 +337,7 @@ const config: Config = {
     'to-home-season-strip-btn-to',
     {
       pattern:
-        /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13|-summer-1-cover)?$/,
+        /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13|-summer-1-cover|-summer-7-cover)?$/,
       variants: ['lg'],
     },
     'object-tour-detail-hero-spring-3-tight',
@@ -363,6 +367,8 @@ const config: Config = {
     'object-gallery-summer-1-clip4-tall',
     'object-tour-detail-hero-summer-1-cover',
     'lg:object-tour-detail-hero-desktop-summer-1-cover',
+    'object-tour-detail-hero-summer-7-cover',
+    'lg:object-tour-detail-hero-desktop-summer-7-cover',
     'object-home-season-banner-spring-loop',
     'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
@@ -752,6 +758,11 @@ const config: Config = {
          */
         'tour-detail-hero-summer-1-cover': TOUR_SUMMER_1_COVER_OBJECT_POSITION,
         'tour-detail-hero-desktop-summer-1-cover': TOUR_SUMMER_1_COVER_OBJECT_POSITION_LG,
+        /**
+         * Северное Приморье (summer-7): hero `bazi.webp` — маяк Балюзек по центру кадра.
+         */
+        'tour-detail-hero-summer-7-cover': TOUR_SUMMER_7_COVER_OBJECT_POSITION,
+        'tour-detail-hero-desktop-summer-7-cover': TOUR_SUMMER_7_COVER_OBJECT_POSITION_LG,
         /**
          * Главная, баннер весны: только колонка буквы «н» — правый край кадра loop-видео/постера при `object-cover`.
          */

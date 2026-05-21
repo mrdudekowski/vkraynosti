@@ -1,7 +1,6 @@
 import { format, isSameMonth } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import type { Season } from '../../types';
-import { parseIsoDate } from '../../utils/tourSchedule/parseIsoDate';
 
 interface TourCalendarMiniWeekStripProps {
   weekDates: Date[];
@@ -63,17 +62,3 @@ const TourCalendarMiniWeekStrip = ({
 );
 
 export default TourCalendarMiniWeekStrip;
-
-export const buildWeekDates = (anchorIso: string): Date[] => {
-  const anchor = parseIsoDate(anchorIso);
-  const day = anchor.getDay();
-  const mondayOffset = day === 0 ? -6 : 1 - day;
-  const monday = new Date(anchor);
-  monday.setDate(anchor.getDate() + mondayOffset);
-
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(monday);
-    date.setDate(monday.getDate() + index);
-    return date;
-  });
-};

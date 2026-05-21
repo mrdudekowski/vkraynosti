@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 import { UI } from '../../constants/ui';
-import { useTourSchedule } from '../../hooks/useTourSchedule';
+import { useTourScheduleCalendarEvents } from '../../hooks/useTourScheduleCalendarEvents';
 import TourCalendarDayPanel from './TourCalendarDayPanel';
 import TourCalendarMonth from './TourCalendarMonth';
 
 const TourCalendar = () => {
-  const { status, events, eventsByDate, retry } = useTourSchedule();
+  const { status, events, eventsByDate, retry } = useTourScheduleCalendarEvents();
   const [displayMonth, setDisplayMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);

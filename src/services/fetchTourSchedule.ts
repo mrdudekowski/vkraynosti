@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { TourScheduleEvent } from '../types/tourSchedule';
 
-const tourScheduleStatusSchema = z.enum(['planned', 'open', 'full', 'cancelled']);
+const tourScheduleStatusSchema = z.enum(['planned', 'open', 'full', 'cancelled', 'completed']);
 
 const tourScheduleDurationTypeSchema = z.enum(['однодневный', 'многодневный']);
 

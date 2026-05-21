@@ -250,7 +250,7 @@ for (const ev of exported) {
 
 // Zod-like validation
 const isoRe = /^\d{4}-\d{2}-\d{2}$/;
-const statusCodes = new Set(['planned', 'open', 'full', 'cancelled']);
+const statusCodes = new Set(['planned', 'open', 'full', 'cancelled', 'completed']);
 for (const ev of exported) {
   if (!isoRe.test(ev.date)) issues.push(`ZOD_DATE:${ev.tourId}@${ev.date}`);
   if (!statusCodes.has(ev.status)) issues.push(`ZOD_STATUS:${ev.tourId}`);

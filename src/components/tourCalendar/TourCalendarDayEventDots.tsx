@@ -16,7 +16,10 @@ const TourCalendarDayEventDots = ({ events }: TourCalendarDayEventDotsProps) => 
         <span
           key={`${event.tourId}-${event.date}`}
           className="size-1.5 shrink-0 rounded-full"
-          style={{ backgroundColor: SEASON_ACCENT_HEX[event.season as Season] }}
+          style={{
+            backgroundColor: SEASON_ACCENT_HEX[event.season as Season],
+            opacity: event.status === 'completed' ? 0.45 : 1,
+          }}
         />
       ))}
       {overflow > 0 && (

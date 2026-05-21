@@ -29,6 +29,8 @@ const statusBadgeClass = (status: EnrichedScheduleEvent['status']): string => {
       return 'text-brand-secondary';
     case 'full':
       return 'text-text-muted';
+    case 'completed':
+      return 'text-text-muted line-through decoration-text-muted/60';
     default:
       return 'text-text-muted';
   }

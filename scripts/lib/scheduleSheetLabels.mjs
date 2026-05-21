@@ -38,7 +38,7 @@ export const SCHEDULE_HEADERS = [
 ];
 
 /** Значения выпадающего списка «Статус» (без запятых внутри). */
-export const STATUS_VALUES = ['запланирован', 'набор открыт', 'мест нет', 'отменён'];
+export const STATUS_VALUES = ['запланирован', 'набор открыт', 'мест нет', 'отменён', 'завершился'];
 
 export const STATUS_LIST = `"${STATUS_VALUES.join(',')}"`;
 
@@ -48,6 +48,7 @@ export const STATUS_TO_EXPORT_CODE = {
   'набор открыт': 'open',
   'мест нет': 'full',
   отменён: 'cancelled',
+  завершился: 'completed',
 };
 
 /**

@@ -1,4 +1,4 @@
-import { addMonths, format, subMonths } from 'date-fns';
+import { addMonths, format, isBefore, startOfMonth, subMonths } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UI } from '../../constants/ui';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
@@ -12,15 +12,11 @@ interface TourCalendarNavProps {
 }
 
 const TourCalendarNav = ({ displayMonth, events, onMonthChange }: TourCalendarNavProps) => {
-  const today = new Date();
-  const minMonth = subMonths(today, 12);
+  const currentMonthStart = startOfMonth(new Date());
   const prevMonth = subMonths(displayMonth, 1);
   const nextMonth = addMonths(displayMonth, 1);
 
-  const canGoPrev =
-    prevMonth.getFullYear() > minMonth.getFullYear() ||
-    (prevMonth.getFullYear() === minMonth.getFullYear() &&
-      prevMonth.getMonth() >= minMonth.getMonth());
+  const canGoPrev = !isBefore(prevMonth, currentMonthStart);
 
   const canGoNext = monthHasEvents(nextMonth.getFullYear(), nextMonth.getMonth(), events);
 

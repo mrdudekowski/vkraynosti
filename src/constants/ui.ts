@@ -265,6 +265,7 @@ export const UI = {
       open: 'Набор открыт',
       planned: 'Скоро',
       full: 'Мест нет',
+      completed: 'Завершился',
     },
     dayAriaLabel: (formattedDate: string, count: number) => {
       const mod10 = count % 10;

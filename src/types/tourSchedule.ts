@@ -1,6 +1,6 @@
 import type { Season, Tour } from './index';
 
-export type TourScheduleStatus = 'planned' | 'open' | 'full' | 'cancelled';
+export type TourScheduleStatus = 'planned' | 'open' | 'full' | 'cancelled' | 'completed';
 
 export type TourScheduleDurationType = 'однодневный' | 'многодневный';
 

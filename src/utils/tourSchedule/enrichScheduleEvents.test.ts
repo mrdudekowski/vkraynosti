@@ -38,6 +38,24 @@ describe('enrichScheduleEvents', () => {
     warn.mockRestore();
   });
 
+  it('enriches completed tour', () => {
+    const events: TourScheduleEvent[] = [
+      {
+        date: '2026-05-09',
+        tourId: 'spring-3',
+        durationType: 'однодневный',
+        priceRub: 6000,
+        seats: 8,
+        status: 'completed',
+        comment: null,
+      },
+    ];
+
+    const enriched = enrichScheduleEvents(events);
+    expect(enriched).toHaveLength(1);
+    expect(enriched[0]?.statusLabel).toBe('Завершился');
+  });
+
   it('enriches known tour', () => {
     const events: TourScheduleEvent[] = [
       {

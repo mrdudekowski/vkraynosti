@@ -207,7 +207,7 @@ function addScheduleSheet(wb, scheduleSheetName, catalogSheetName, catalogLastRo
     lastScheduleRow,
     [STATUS_LIST],
     'Статус',
-    'запланирован / набор открыт / мест нет / отменён'
+    'запланирован / набор открыт / мест нет / отменён / завершился'
   );
 
   return ws;

@@ -5,13 +5,14 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { buildHomeSectionPath } from '../../constants/routes';
 import { UI } from '../../constants/ui';
-import { useTourSchedule } from '../../hooks/useTourSchedule';
+import { useTourScheduleCalendarEvents } from '../../hooks/useTourScheduleCalendarEvents';
 import type { Season } from '../../types';
 import { getTourDepartureDates } from '../../utils/tourSchedule/getTourDepartureDates';
 import { parseIsoDate } from '../../utils/tourSchedule/parseIsoDate';
 import { toIsoDate } from '../../utils/tourSchedule/toIsoDate';
 import TourCalendarDayButton from './TourCalendarDayButton';
-import TourCalendarMiniWeekStrip, { buildWeekDates } from './TourCalendarMiniWeekStrip';
+import { buildWeekDates } from '../../utils/tourSchedule/buildWeekDates';
+import TourCalendarMiniWeekStrip from './TourCalendarMiniWeekStrip';
 import {
   tourCalendarMiniClassNames,
   tourCalendarModifierClassNames,
@@ -26,7 +27,7 @@ const farPast = new Date(1900, 0, 1);
 const farFuture = new Date(2100, 11, 31);
 
 const TourCalendarMini = ({ tourId, season }: TourCalendarMiniProps) => {
-  const { status, events, eventsByDate } = useTourSchedule();
+  const { status, events, eventsByDate } = useTourScheduleCalendarEvents();
 
   const tourEvents = useMemo(
     () => events.filter(event => event.tourId === tourId),

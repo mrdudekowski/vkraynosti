@@ -9,6 +9,8 @@ export const mapStatusLabel = (status: TourScheduleStatus): string => {
       return UI.tourCalendar.status.planned;
     case 'full':
       return UI.tourCalendar.status.full;
+    case 'completed':
+      return UI.tourCalendar.status.completed;
     case 'cancelled':
       return '';
   }

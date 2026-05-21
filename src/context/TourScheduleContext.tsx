@@ -35,9 +35,12 @@ const loadSchedule = async (): Promise<CachedSchedule> => {
   return inflightPromise;
 };
 
+const scheduleError = (err: unknown): Error =>
+  err instanceof Error ? err : new Error('Unknown schedule error');
+
 export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   const [status, setStatus] = useState<TourScheduleLoadStatus>(
-    cachedSchedule ? 'success' : 'idle'
+    cachedSchedule ? 'success' : 'loading'
   );
   const [events, setEvents] = useState<EnrichedScheduleEvent[]>(cachedSchedule?.events ?? []);
   const [eventsByDate, setEventsByDate] = useState<Map<string, EnrichedScheduleEvent[]>>(
@@ -46,34 +49,47 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<Error | null>(null);
   const retryNonce = useRef(0);
 
-  const load = useCallback(async (force = false) => {
-    if (force) {
-      cachedSchedule = null;
-    }
-
-    setStatus('loading');
+  const applySchedule = useCallback((result: CachedSchedule) => {
+    setEvents(result.events);
+    setEventsByDate(result.eventsByDate);
+    setStatus('success');
     setError(null);
-
-    try {
-      const result = await loadSchedule();
-      setEvents(result.events);
-      setEventsByDate(result.eventsByDate);
-      setStatus('success');
-    } catch (err) {
-      setStatus('error');
-      setError(err instanceof Error ? err : new Error('Unknown schedule error'));
-    }
   }, []);
 
   useEffect(() => {
     if (cachedSchedule) return;
-    void load();
-  }, [load]);
+
+    let cancelled = false;
+
+    void loadSchedule()
+      .then(result => {
+        if (!cancelled) applySchedule(result);
+      })
+      .catch(err => {
+        if (!cancelled) {
+          setStatus('error');
+          setError(scheduleError(err));
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [applySchedule]);
 
   const retry = useCallback(() => {
     retryNonce.current += 1;
-    void load(true);
-  }, [load]);
+    cachedSchedule = null;
+    setStatus('loading');
+    setError(null);
+
+    void loadSchedule()
+      .then(applySchedule)
+      .catch(err => {
+        setStatus('error');
+        setError(scheduleError(err));
+      });
+  }, [applySchedule]);
 
   const value = useMemo(
     () => ({ status, events, eventsByDate, error, retry }),

@@ -1,4 +1,4 @@
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+﻿import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faBed } from '@fortawesome/free-solid-svg-icons/faBed';
 import { faBinoculars } from '@fortawesome/free-solid-svg-icons/faBinoculars';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons/faBookOpen';
@@ -24,7 +24,6 @@ import { faPaw } from '@fortawesome/free-solid-svg-icons/faPaw';
 import { faUserTie } from '@fortawesome/free-solid-svg-icons/faUserTie';
 import type { Tour, TourIncludedItem } from '../types';
 import {
-  IMAGES,
   SPRING_TOUR_COVERS,
   TOUR_WINTER_1_COVER,
   TOUR_WINTER_1_GALLERY_GRID,
@@ -89,15 +88,23 @@ import {
   TOUR_SUMMER_7_GALLERY_GRID,
   TOUR_SUMMER_7_GALLERY_VIEWER,
   TOUR_SUMMER_7_PREFACE_BACKGROUND,
+  TOUR_SUMMER_8_COVER_GRID,
+  TOUR_SUMMER_8_GALLERY_GRID,
+  TOUR_SUMMER_8_GALLERY_VIEWER,
+  TOUR_SUMMER_8_PREFACE_BACKGROUND,
 } from '../constants/images';
+import { FALL_TOUR_MEDIA_BY_ID } from '../constants/generated/fallTourMedia.generated';
+import { SUMMER_PAIRED_TOUR_MEDIA_BY_ID } from '../constants/generated/summerPairedTourMedia.generated';
 import { UI } from '../constants/ui';
+import { buildFallToursFromSpring } from './createFallTourFromSpring';
+import { buildSummerToursFromSpring } from './createSummerTourFromSpring';
 
 const inc = (text: string, icon: IconDefinition = faCheck): TourIncludedItem => ({
   text,
   icon,
 });
 
-export const TOURS: Tour[] = [
+const TOURS_CORE: Tour[] = [
   // WINTER — 5 tours
   {
     id: 'winter-1',
@@ -1018,7 +1025,7 @@ export const TOURS: Tour[] = [
     galleryGridUrls: [...TOUR_SPRING_1_GALLERY_GRID],
   },
 
-  // SUMMER — 7 tours
+  // SUMMER — 8 tours (summer-1, summer-7, summer-8 — уникальные; summer-2…6 — фабрика)
   {
     id: 'summer-1',
     season: 'summer',
@@ -1063,269 +1070,6 @@ export const TOURS: Tour[] = [
     prefaceBackgroundImageUrl: TOUR_SUMMER_1_PREFACE_BACKGROUND,
     galleryImages: [...TOUR_SUMMER_1_GALLERY_VIEWER],
     galleryGridUrls: [...TOUR_SUMMER_1_GALLERY_GRID],
-  },
-  {
-    id: 'summer-2',
-    season: 'summer',
-    title: 'Путешествие на мыс Тобизина',
-    subtitle: 'Край земли с каменной «шахматной доской»',
-    heroPhrase: 'Скалы-исполины и бескрайнее море',
-    duration: '6–8 часов',
-    difficulty: 'Easy',
-    price: '5 000 ₽',
-    priceFootnote: 'Для группы от 4 до 10 человек.',
-    descriptionLeadBold: 'Мыс Тобизина',
-    description:
-      ' — самая южная точка острова Русский: лесная тропа, скалы до 30 м и каменное плато, похожее на шахматную доску. Дойдём до края моря, пройдём небольшой верёвочный участок, летом искупаемся в бухте Карпинского и устроим обед с морепродуктами на берегу.',
-    program: [
-      { timeLabel: '10:00', description: 'Выезд из Владивостока через Русский мост' },
-      {
-        timeLabel: '10:40',
-        description: 'Прибытие к бухте Карпинского, инструктаж и подготовка',
-      },
-      {
-        timeLabel: '11:00–13:00',
-        description:
-          'Пешая прогулка к мысу: лесная тропа, скалы, каменный перешеек и верёвочный участок',
-      },
-      {
-        timeLabel: '13:00–14:00',
-        description:
-          'Свободное время на мысе: фото на каменном плато, виды на море и отдых',
-      },
-      { timeLabel: '14:00–15:30', description: 'Обратный путь к бухте Карпинского' },
-      {
-        timeLabel: '15:30–16:30',
-        description: 'Купание в бухте Карпинского в тёплое время года',
-      },
-      {
-        timeLabel: '16:30–17:30',
-        description: 'Обед с морепродуктами на берегу, готовим на месте',
-      },
-      { timeLabel: '17:30–18:30', description: 'Возвращение во Владивосток' },
-    ],
-    includedInPrice: [
-      inc('Индивидуальный трансфер Владивосток — мыс Тобизина — Владивосток', faShuttleVan),
-      inc('Сопровождение гида-проводника', faUserTie),
-      inc('Обед с морепродуктами на берегу', faUtensils),
-      inc('Горячие напитки (чай/кофе)', faMugHot),
-      inc('Помощь на верёвочном участке маршрута', faHelmetSafety),
-      inc('Истории об острове Русский и мысе Тобизина', faBookOpen),
-      inc('Забота команды и индивидуальный формат', faHeart),
-    ],
-    imageUrl: SPRING_TOUR_COVERS['spring-12'],
-    prefaceBackgroundImageUrl: TOUR_SPRING_12_PREFACE_BACKGROUND,
-    galleryImages: [...TOUR_SPRING_12_GALLERY_VIEWER],
-    galleryGridUrls: [...TOUR_SPRING_12_GALLERY_GRID],
-  },
-  {
-    id: 'summer-3',
-    season: 'summer',
-    title: 'Путешествие на остров Аскольд',
-    subtitle:
-      'Остров-призрак с маяками, кекурами и морскими котиками',
-    heroPhrase: 'Катер, маяк, кекуры и лежбища ларг за один день',
-    duration: '12–14 часов',
-    difficulty: 'Medium',
-    difficultyDisplayLabel: 'Легкая/Сложная',
-    price: '7 000 ₽',
-    descriptionLeadBold: 'Остров Аскольд',
-    description:
-      ' — однодневная морская экспедиция на один из самых атмосферных островов Приморья. За поездку увидим кекуры "Пять пальцев", лежбища ларг и сивучей, старый маяк и военные объекты. Маршрут зависит от погоды и состояния моря.',
-    program: [
-      { timeLabel: '07:00', description: 'Выезд из Владивостока' },
-      {
-        timeLabel: '10:00',
-        description: 'Прибытие в посёлок Дунай, пересадка на катер',
-      },
-      {
-        timeLabel: '10:00–11:00',
-        description:
-          'Морская прогулка к кекурам "Пять пальцев", наблюдение за ларгами и сивучами',
-      },
-      {
-        timeLabel: '11:00–11:30',
-        description: 'Высадка на остров (бухта зависит от погоды)',
-      },
-      {
-        timeLabel: '11:30–15:30',
-        description:
-          'Пешая прогулка по острову: батарея №26, маяк на мысе Елагина и смотровые точки',
-      },
-      {
-        timeLabel: '15:30–16:30',
-        description: 'Обед на берегу. Готовим на месте',
-      },
-      { timeLabel: '16:30–17:00', description: 'Посадка на катер' },
-      { timeLabel: '17:00–18:00', description: 'Переход в посёлок Дунай' },
-      { timeLabel: '18:00–21:00', description: 'Возвращение во Владивосток' },
-    ],
-    includedInPrice: [
-      inc('Индивидуальный трансфер Владивосток — Дунай — Владивосток', faShuttleVan),
-      inc('Катер до острова Аскольд и обратно', faWater),
-      inc('Сопровождение гида-проводника', faUserTie),
-      inc('Обед на берегу', faUtensils),
-      inc('Горячие напитки (чай/кофе)', faMugHot),
-      inc('Истории об острове и его обитателях', faBookOpen),
-      inc('Забота команды на протяжении тура', faHeart),
-    ],
-    imageUrl: SPRING_TOUR_COVERS['spring-10'],
-    prefaceBackgroundImageUrl: TOUR_SPRING_10_PREFACE_BACKGROUND,
-    galleryImages: [...TOUR_SPRING_10_GALLERY_VIEWER],
-    galleryGridUrls: [...TOUR_SPRING_10_GALLERY_GRID],
-  },
-  {
-    id: 'summer-4',
-    season: 'summer',
-    title: 'Путешествие на остров Шкота',
-    subtitle: 'Необитаемый остров с маяком и морскими котиками',
-    heroPhrase: 'Лазурная бухта, старый маяк и ужин с морепродуктами',
-    duration: '8–10 часов',
-    difficulty: 'Easy',
-    price: '5 000 ₽',
-    priceFootnote: 'Для группы от 3 до 8 человек.',
-    descriptionLeadBold: 'Остров Шкота',
-    description:
-      ' — маленький необитаемый остров к югу от Русского, куда летом можно перейти вброд по каменистой косе. За один день пройдём к заброшенному маяку, увидим скалы, кекуры и, если повезёт, лежбище ларг. В финале — спуск в бухту по стационарной верёвке, купание в чистой воде и обед с морепродуктами для вашей компании.',
-    program: [
-      { timeLabel: '09:00', description: 'Выезд из Владивостока через Русский мост' },
-      {
-        timeLabel: '10:00',
-        description: 'Прибытие к косе и переход вброд на остров Шкота',
-      },
-      {
-        timeLabel: '10:15–12:30',
-        description:
-          'Пешая прогулка: заброшенный военный городок, батарея, старый маяк, скалы и море',
-      },
-      {
-        timeLabel: '12:30–13:30',
-        description:
-          'Спуск в бухту по верёвке для желающих, купание и отдых у воды',
-      },
-      {
-        timeLabel: '13:30–14:30',
-        description: 'Обед с морепродуктами на берегу, готовим на месте',
-      },
-      {
-        timeLabel: '14:30–15:30',
-        description: 'Отдых, фотосессия и купание',
-      },
-      { timeLabel: '15:30–16:30', description: 'Обратный путь до косы' },
-      { timeLabel: '16:30–17:30', description: 'Возвращение во Владивосток' },
-    ],
-    includedInPrice: [
-      inc('Индивидуальный трансфер Владивосток — остров Шкота — Владивосток', faShuttleVan),
-      inc('Сопровождение гида-проводника', faUserTie),
-      inc('Обед с морепродуктами на берегу', faUtensils),
-      inc('Горячие напитки (чай/кофе)', faMugHot),
-      inc('Истории об острове, маяке, батареях и морских котиках', faBookOpen),
-      inc('Забота команды и индивидуальный подход', faHeart),
-    ],
-    imageUrl: SPRING_TOUR_COVERS['spring-11'],
-    prefaceBackgroundImageUrl: TOUR_SPRING_11_PREFACE_BACKGROUND,
-    galleryImages: [...TOUR_SPRING_11_GALLERY_VIEWER],
-    galleryGridUrls: [...TOUR_SPRING_11_GALLERY_GRID],
-  },
-  {
-    id: 'summer-5',
-    season: 'summer',
-    title: 'Полуостров Гамова',
-    subtitle: 'Райский уголок на юге Приморья',
-    heroPhrase: 'Скалистые мысы, реликтовый лес и бескрайнее море!',
-    duration: '15 часов',
-    difficulty: 'Easy',
-    difficultyDisplayLabel: 'Лёгкий хайкинг',
-    price: '6 500 ₽',
-    priceFootnote: 'Июль-август: 7 200 ₽.',
-    descriptionLeadBold: 'Полуостров Гамова',
-    description:
-      ' — джип-тур по югу Приморья, где за один день собраны бухты Витязь, Теляковского и Астафьева, реликтовые сосны, скалистые мысы и видовые точки над морем. Маршрут для тех, кто хочет увидеть дикое Приморье без суеты: прозрачную воду, вековой маяк, легенды старого края и пикник на берегу.',
-    program: [
-      { timeLabel: '06:00', description: 'Выезд из Владивостока' },
-      {
-        timeLabel: '10:30',
-        description: 'Бухта Витязь и её главные достопримечательности',
-      },
-      {
-        timeLabel: '12:00',
-        description:
-          'Полуостров Гамова: остров Томящегося сердца, бухта Теляковского и реликтовые сосны',
-      },
-      {
-        timeLabel: '15:00',
-        description: 'Дзен в бухте Астафьева и пикник на берегу',
-      },
-      { timeLabel: '17:00', description: 'Выезд в город' },
-      { timeLabel: '21:00', description: 'Прибытие во Владивосток' },
-    ],
-    includedInPrice: [
-      inc('Индивидуальный трансфер из Владивостока', faShuttleVan),
-      inc('Сопровождение гида-проводника', faUserTie),
-      inc('Обед на берегу', faUtensils),
-      inc('Горячие напитки (чай/кофе)', faMugHot),
-      inc('Истории о крае, полуострове, бухтах и окрестностях', faBookOpen),
-      inc('Забота команды и индивидуальный подход', faHeart),
-    ],
-    imageUrl: SPRING_TOUR_COVERS['spring-13'],
-    prefaceBackgroundImageUrl: TOUR_SPRING_13_PREFACE_BACKGROUND,
-    galleryImages: [...TOUR_SPRING_13_GALLERY_VIEWER],
-    galleryGridUrls: [...TOUR_SPRING_13_GALLERY_GRID],
-  },
-  {
-    id: 'summer-6',
-    season: 'summer',
-    title: 'Путешествие в ущелье Дарданеллы',
-    subtitle: 'Каменные стражи и горная река в сердце Приморья',
-    heroPhrase: 'Исполинные скалы Щёк Дарданеллы',
-    duration: '14–16 часов',
-    difficulty: 'Easy',
-    price: 'от 4 500 ₽',
-    description:
-      'Ущелье Дарданеллы (Щёки) — природный памятник в долине реки Тигровой. Здесь нас ждут скальные останцы, тропа вдоль реки и видовые точки с высоты до 150 м. Маршрут мягкий по темпу и подходит тем, кто хочет красивый день в горах без перегруза.',
-    program: [
-      {
-        timeLabel: '08:00',
-        description: 'Выезд из Владивостока. В пути около 2,5 часов.',
-      },
-      {
-        timeLabel: '10:30',
-        description: 'Прибытие к старту маршрута, инструктаж и подготовка.',
-      },
-      {
-        timeLabel: '10:45–14:30',
-        description:
-          'Пеший маршрут 5-6 км: тропа вдоль Тигровой, "Замок Принцессы", "Каменный монастырь" и видовые площадки.',
-      },
-      {
-        timeLabel: '14:30–16:00',
-        description:
-          'Большой привал у реки: горячий обед, отдых, фото. В тёплое время можно искупаться.',
-      },
-      {
-        timeLabel: '16:00–17:30',
-        description: 'Спуск и возвращение к машине.',
-      },
-      {
-        timeLabel: '17:30–20:30',
-        description: 'Возвращение во Владивосток.',
-      },
-    ],
-    includedInPrice: [
-      inc(
-        'Трансфер Владивосток — ущелье Дарданеллы — Владивосток',
-        faShuttleVan
-      ),
-      inc('Горячий обед на берегу реки Тигровой', faUtensils),
-      inc('Горячие напитки (чай/кофе/глинтвейн по сезону)', faMugSaucer),
-      inc('Гид-проводник', faUserTie),
-      inc('Истории о местности и происхождении названия ущелья', faBookOpen),
-      inc('Забота команды на всём маршруте', faHeart),
-    ],
-    imageUrl: SPRING_TOUR_COVERS['spring-7'],
-    prefaceBackgroundImageUrl: TOUR_SPRING_7_PREFACE_BACKGROUND,
-    galleryImages: [...TOUR_SPRING_7_GALLERY_VIEWER],
-    galleryGridUrls: [...TOUR_SPRING_7_GALLERY_GRID],
   },
   {
     id: 'summer-7',
@@ -1408,113 +1152,73 @@ export const TOURS: Tour[] = [
     galleryImages: [...TOUR_SUMMER_7_GALLERY_VIEWER],
     galleryGridUrls: [...TOUR_SUMMER_7_GALLERY_GRID],
   },
-
-  // FALL — 4 tours
   {
-    id: 'fall-1',
-    season: 'fall',
-    title: 'Алтай: Золотая Осень',
-    subtitle: 'Золото лиственниц и синь озёр',
-    heroPhrase: 'Алтай осенью: лиственницы и синие озёра',
-    duration: '7 дней',
+    id: 'summer-8',
+    season: 'summer',
+    title: 'Полуостров Краббе',
+    subtitle: 'Один день среди морских скал, бухт и тех видов, в которые влюбляешься сразу',
+    heroPhrase:
+      'Туда, где зелёные сопки уходят в море, а каждый поворот тропы — как новая открытка Приморья',
+    duration: '1 день',
     difficulty: 'Medium',
-    price: 'от 40 000 ₽',
-    description: 'Осенний Алтай в золоте — зрелище фантастическое. Лиственницы горят золотом, озёра синеют, воздух прозрачен как хрусталь.',
+    difficultyDisplayLabel: 'Средняя',
+    price: 'по запросу',
+    description:
+      'Этот маршрут — для тех, кто любит живые путешествия: красивые дороги, морской воздух, душевную компанию и места, после которых ещё долго тепло внутри.\n\nПолуостров Краббе — одно из самых атмосферных мест юга Приморья. Он в Хасанском округе, считается необитаемым и входит в буферную зону особо охраняемых природных территорий. Здесь море с двух сторон, зелёные сопки, бухты, кекуры, пещеры и ощущение, будто вы приехали в совсем другое Приморье — более дикое, тихое и сильное.\n\nМы любим этот маршрут за красоту и характер: прогулку по берегу и смотровым точкам, каменную сказку Краббе, бухту Агатовую, простор и редкое чувство свободы. Это поездка, в которой не нужно спешить: идём, смотрим, дышим морем и просто проживаем очень красивый день.',
     program: [
-      { timeLabel: 'День 2 · 09:00', description: 'Мультинские озёра' },
-      { timeLabel: 'День 3 · 14:00', description: 'Золотые лиственницы' },
-      { timeLabel: 'День 5 · 11:00', description: 'Горные реки' },
-      { timeLabel: 'День 6 · 08:30', description: 'Панорамные виды' },
+      { timeLabel: '05:30', description: 'Выезд из Владивостока' },
+      { timeLabel: '10:00', description: 'Прибытие к началу маршрута, короткий инструктаж' },
+      {
+        timeLabel: '10:30–13:30',
+        description: 'Прогулка по полуострову, видовые точки, море, фото',
+      },
+      { timeLabel: '13:30–14:30', description: 'Пикник с красивым видом' },
+      {
+        timeLabel: '14:30–17:00',
+        description: 'Продолжаем маршрут, исследуем берег и бухты',
+      },
+      { timeLabel: '17:30', description: 'Выезд обратно' },
+      { timeLabel: '22:00–23:00', description: 'Возвращение во Владивосток' },
     ],
     includedInPrice: [
-      inc('Гид и маршрутные листы'),
-      inc('Питание на активных днях'),
-      inc('Трансферы к началу троп'),
-      inc('Групповая аптечка'),
-      inc('Прокат штативов для съёмки — по запросу и наличию'),
+      inc('Трансфер туда и обратно', faShuttleVan),
+      inc('Сопровождение команды Вкрайности', faUserTie),
+      inc('Организация маршрута', faBookOpen),
+      inc('Прогулка по полуострову Краббе', faPersonHiking),
+      inc('Время на отдых, фото и пикник', faMugHot),
+      inc('Наша забота и тёплая атмосфера в поездке', faHeart),
     ],
-    imageUrl: IMAGES.tours.placeholder,
-    galleryImages: [IMAGES.tours.gallery, IMAGES.tours.gallery, IMAGES.tours.gallery],
-  },
-  {
-    id: 'fall-2',
-    season: 'fall',
-    title: 'Карелия: Осенний Лес',
-    subtitle: 'Грибной поход среди берёз',
-    heroPhrase: 'Карелия осенью: лесная тишина и грибы',
-    duration: '4 дня',
-    difficulty: 'Easy',
-    price: 'от 18 000 ₽',
-    description: 'Осенняя Карелия — это краски, тишина и аромат леса. Грибной поход, рыбалка на озёрах, баня с берёзовым веником.',
-    program: [
-      { timeLabel: 'День 1 · 10:00', description: 'Грибной сезон' },
-      { timeLabel: 'День 2 · 18:00', description: 'Карельская баня' },
-      { timeLabel: 'День 3 · 07:00', description: 'Рыбалка' },
-      { timeLabel: 'День 3 · 15:00', description: 'Осенние краски' },
-    ],
-    includedInPrice: [
-      inc('Проводник по лесу и правилам сбора'),
-      inc('Банный инвентарь и веники'),
-      inc('Удочки и наживка — по программе рыбалки'),
-      inc('Питание в базовом лагере'),
-      inc('Трансфер от пункта сбора'),
-    ],
-    imageUrl: IMAGES.tours.placeholder,
-    galleryImages: [IMAGES.tours.gallery, IMAGES.tours.gallery, IMAGES.tours.gallery],
-  },
-  {
-    id: 'fall-3',
-    season: 'fall',
-    title: 'Кавказ: Горные Деревни',
-    subtitle: 'Средневековые сёла в осенних горах',
-    heroPhrase: 'Кавказ осенью: башни и горные сёла',
-    duration: '8 дней',
-    difficulty: 'Medium',
-    price: 'от 45 000 ₽',
-    description: 'Трекинг по горным сёлам Кавказа осенью — когда туристы расходятся, горы становятся дикими и величественными. Средневековые башни, древние традиции.',
-    program: [
-      { timeLabel: 'День 2 · 11:00', description: 'Средневековые башни' },
-      { timeLabel: 'День 4 · 16:00', description: 'Горские традиции' },
-      { timeLabel: 'День 5 · 09:00', description: 'Осенние виды' },
-      { timeLabel: 'День 7 · 19:00', description: 'Домашняя кухня' },
-    ],
-    includedInPrice: [
-      inc('Проживание в гостевых домах по маршруту'),
-      inc('Гид-культуролог по башенным комплексам'),
-      inc('Питание: завтраки и ужины там, где указано в программе'),
-      inc('Трансферы между сёлами'),
-      inc('Входные билеты в музеи — если входят в маршрут'),
-    ],
-    imageUrl: IMAGES.tours.placeholder,
-    galleryImages: [IMAGES.tours.gallery, IMAGES.tours.gallery, IMAGES.tours.gallery],
-  },
-  {
-    id: 'fall-4',
-    season: 'fall',
-    title: 'Байкал: Штормовой',
-    subtitle: 'Осенние шторма и пустые берега',
-    heroPhrase: 'Осенний Байкал: шторм, берег и сила',
-    duration: '6 дней',
-    difficulty: 'Hard',
-    price: 'от 48 000 ₽',
-    description: 'Осенний Байкал без туристов — суровый, штормовой, настоящий. Пешие маршруты вдоль пустых берегов, рыбалка, горячие источники.',
-    program: [
-      { timeLabel: 'День 1 · 14:00', description: 'Осенние шторма' },
-      { timeLabel: 'День 2 · 10:00', description: 'Пустые пляжи' },
-      { timeLabel: 'День 4 · 15:00', description: 'Горячие источники' },
-      { timeLabel: 'День 5 · 22:00', description: 'Ночные звёзды' },
-    ],
-    includedInPrice: [
-      inc('Гид по береговым маршрутам'),
-      inc('Питание и горячие напитки на ветреных выходах'),
-      inc('Посещение источников — по согласованной программе'),
-      inc('Снасти для рыбалки — групповой комплект'),
-      inc('Трансферы вдоль побережья'),
-    ],
-    imageUrl: IMAGES.tours.placeholder,
-    galleryImages: [IMAGES.tours.gallery, IMAGES.tours.gallery, IMAGES.tours.gallery],
+    imageUrl: TOUR_SUMMER_8_COVER_GRID,
+    prefaceBackgroundImageUrl: TOUR_SUMMER_8_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SUMMER_8_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SUMMER_8_GALLERY_GRID],
   },
 ];
+
+const springTours = TOURS_CORE.filter((tour) => tour.season === 'spring');
+
+const SUMMER_PAIRED_TOURS = buildSummerToursFromSpring(
+  springTours,
+  SUMMER_PAIRED_TOUR_MEDIA_BY_ID
+);
+
+function summerTourSortKey(tour: Tour): number {
+  return Number.parseInt(tour.id.replace('summer-', ''), 10);
+}
+
+const summerTours = [
+  ...TOURS_CORE.filter((tour) => tour.season === 'summer'),
+  ...SUMMER_PAIRED_TOURS,
+].sort((a, b) => summerTourSortKey(a) - summerTourSortKey(b));
+
+const TOURS_BEFORE_FALL: Tour[] = [
+  ...TOURS_CORE.filter((tour) => tour.season !== 'summer'),
+  ...summerTours,
+];
+
+const FALL_TOURS = buildFallToursFromSpring(springTours, FALL_TOUR_MEDIA_BY_ID);
+
+export const TOURS: Tour[] = [...TOURS_BEFORE_FALL, ...FALL_TOURS];
 
 export const getToursBySeason = (season: Tour['season']): Tour[] =>
   TOURS.filter(t => t.season === season);

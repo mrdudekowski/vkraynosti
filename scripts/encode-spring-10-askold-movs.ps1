@@ -1,4 +1,4 @@
-# Шесть MOV с Аскольда → `public/tours/spring-10/ask.clip1..6` (.webm, .grid.webm, .poster.webp).
+# Шесть MOV с Аскольда → `public/tours/spring-10/ask.clip1..6` (.grid.webm, .poster.webp).
 # Порядок по времени съёмки (хронология файлов). VP9: `media/WebmTourEncoding.ps1`.
 # Клип из MP4 (6 с) → `ask.intro`: после этого скрипта выполните `encode-spring-10-askold-trimmed-mp4.ps1`.
 # Копирует `content/Аскольд/webp/*.webp` в `public/tours/spring-10/`.
@@ -56,11 +56,9 @@ foreach ($name in $orderedMovNames) {
   $i++
   $in = Join-Path $SourceDir $name
   $base = "ask.clip$i"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
   Write-Host "[$i/6] $base <- $name"
-  Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($gridWebm))
   Invoke-Ffmpeg @('-y', '-i', $gridWebm, '-vframes', '1', '-q:v', '80', $poster)
 }

@@ -1,5 +1,5 @@
 # Encodes five spring-6 (Maral farm + Dragon park) MOV sources to public/tours/spring-6/mnd.clip1..5
-# (.webm, .grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1.
+# (.grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1.
 #
 # Canonical order (IMG number ascending):
 #   IMG_3775, IMG_3782, IMG_3788, IMG_4095, IMG_4135
@@ -56,11 +56,9 @@ foreach ($name in $orderedMovNames) {
   $i++
   $in = Join-Path $SourceDir $name
   $base = "mnd.clip$i"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
   Write-Host "[$i/5] $base <- $name"
-  Invoke-Ffmpeg (@("-y", "-i", $in, "-vf", (Get-WebmScaleFilter "full")) + (Get-WebmVp9CodecArgs "full") + @($viewer))
   Invoke-Ffmpeg (@("-y", "-i", $in, "-vf", (Get-WebmScaleFilter "grid")) + (Get-WebmVp9CodecArgs "grid") + @($gridWebm))
   Invoke-Ffmpeg @("-y", "-i", $gridWebm, "-vframes", "1", "-q:v", "80", $poster)
 }

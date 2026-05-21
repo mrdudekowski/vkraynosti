@@ -1,5 +1,5 @@
 # Перекодировать «Сестра» ss.clip1, ss.clip3 и ss.clip5 из исходных MOV (как `encode-sestra-tour-movs.ps1`).
-# - Full: полная длина (восстановить «оригинал» в public после экспериментов с обрезкой в плеере).
+# - Full: полная длина из MOV для grid + poster в public после экспериментов с обрезкой.
 # - Trim: обрезка вступления на диске (clip1 с 2 с, clip3 с 4 с, clip5 с 4.2 с), те же имена файлов — нативный loop без seek в React.
 #   clip1.grid — плитка в галерее «Пидан» (spring-3) и в туре «Сестра».
 #
@@ -52,7 +52,6 @@ function Encode-OneClip {
     [Nullable[double]]$SeekSeconds
   )
   $base = "ss.clip$ClipNumber"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $grid = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
 
@@ -62,7 +61,6 @@ function Encode-OneClip {
   }
 
   Write-Host "[$base] <- $(Split-Path $MovPath -Leaf) Mode=$Mode seek=$SeekSeconds"
-  Invoke-Ffmpeg (@('-y') + $seekArgs + @('-i', $MovPath, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-Ffmpeg (@('-y') + $seekArgs + @('-i', $MovPath, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($grid))
   Invoke-Ffmpeg @('-y', '-i', $grid, '-vframes', '1', '-q:v', '80', $poster)
 }
@@ -86,4 +84,4 @@ else {
   Encode-OneClip -ClipNumber 5 -MovPath $p5 -SeekSeconds 4.2
 }
 
-Write-Host "Done ($Mode): $($tourDir.Path) — ss.clip1, ss.clip3, ss.clip5 (viewer + grid + poster)"
+Write-Host "Done ($Mode): $($tourDir.Path) — ss.clip1, ss.clip3, ss.clip5 (grid + poster)"

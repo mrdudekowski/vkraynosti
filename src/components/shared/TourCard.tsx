@@ -4,8 +4,7 @@ import type { KeyboardEvent } from 'react';
 import type { Tour } from '../../types';
 import { TOUR_MOBILE_IMAGE_VARIANTS } from '../../constants/images';
 import { buildTourDetailPath } from '../../constants/routes';
-import { TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS } from '../../constants/tourSpring3CoverCrop';
-import { TOUR_SPRING_6_COVER_CARD_IMG_OBJECT_CLASS } from '../../constants/tourSpring6CoverCrop';
+import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import { UI } from '../../constants/ui';
 import PlaceholderImage from './PlaceholderImage';
 
@@ -51,13 +50,7 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
           src={tour.imageUrl}
           alt={tour.title}
           className="h-full w-full"
-          imgClassName={
-            tour.id === 'spring-3'
-              ? TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS
-              : tour.id === 'spring-6'
-                ? TOUR_SPRING_6_COVER_CARD_IMG_OBJECT_CLASS
-                : undefined
-          }
+          imgClassName={getTourCoverCardImgObjectClass(tour.id)}
           loading={priorityImage ? 'eager' : 'lazy'}
           fetchPriority={priorityImage ? 'high' : 'auto'}
           srcSet={coverSrcSet}

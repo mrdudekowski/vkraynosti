@@ -13,12 +13,11 @@
 | Файл               | Назначение                                                                               |
 | ------------------ | ---------------------------------------------------------------------------------------- |
 | `name.webp`        | Качественное фото для страницы тура                                                      |
-| `clip.webm`        | Полная VP9-версия из исходного `*.mov` / `*.mp4` (`WebmTourEncoding.ps1`, пресет `full`) |
 | `name.grid.webm`   | Сетка: VP9, пресет `grid`, без аудио                                                     |
 | `name.poster.webp` | Кадр из `*.grid.webm` для ленивого `<video>`                                             |
 
 
-Исходники `*.mov` / `*.mp4` держите как мастера для повторного прогона скриптов (ветки зимы — в папках туров; весна — положите `*.mp4` снова перед `npm run generate:spring-clips`, либо восстановите из истории VCS). Отдача на сайте — только `*.webm`.
+Исходники `*.mov` / `*.mp4` держите как мастера для повторного прогона скриптов (ветки зимы — в папках туров; весна — положите `*.mp4` снова перед `npm run generate:spring-clips`, либо восстановите из истории VCS). Отдача видео в сетке — `*.grid.webm` и постеры.
 
 ## FFmpeg
 
@@ -49,7 +48,7 @@ npm run generate:banner-loops
 ## Новый тур
 
 1. Положить исходники в `public/tours/{id}/`.
-2. В [`src/constants/images.ts`](../../src/constants/images.ts): пары `*_GALLERY_VIEWER` и `*_GALLERY_GRID` (одинаковый порядок). Для фото в `*_GALLERY_GRID` используйте элементы viewer-массива, для видео — `*.grid.webm`.
+2. В [`src/constants/images.ts`](../../src/constants/images.ts): пары `*_GALLERY_VIEWER` и `*_GALLERY_GRID` (одинаковый порядок). Для фото используйте те же URL в обоих массивах; для видео в сетке — `*.grid.webm`, слоты просмотра — постеры (`*_GRID_VIDEO_POSTERS` / `<video poster=…>`), не отдельный full `.webm`.
 3. В [`src/data/toursData.ts`](../../src/data/toursData.ts): `galleryImages: [...VIEWER]`, `galleryGridUrls: [...GRID]`, `imageUrl` — обложка (часто `GRID[0]` или отдельный кадр).
 4. Если в сетке есть видео: `TOUR_*_GRID_VIDEO_POSTERS` и в [`TourDetailPage`](../../src/pages/TourDetailPage.tsx) передача `getVideoPosterForGridSrc` для `tour.id`.
 5. Скопировать ближайший видео-скрипт, подставить список клипов и вызовы `Invoke-Ffmpeg` / `WebmTourEncoding.ps1`.

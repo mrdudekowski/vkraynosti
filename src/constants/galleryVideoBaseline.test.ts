@@ -6,9 +6,9 @@ import {
 import { isVideoAssetUrl } from '../utils/isVideoAssetUrl';
 
 describe('Эталон галереи winter-3 (Фалаза × Грибановка)', () => {
-  it('viewer: ровно пять видео-URL по тем же правилам, что и TourDetailGallery', () => {
+  it('still-галерея (GALLERY_VIEWER): без video URL — только webp/posters', () => {
     const videoUrls = TOUR_WINTER_3_GALLERY.filter(isVideoAssetUrl);
-    expect(videoUrls).toHaveLength(5);
+    expect(videoUrls).toHaveLength(0);
   });
 
   it('сетка страницы: только clip1–clip5 как видео (остальные кадры — webp)', () => {

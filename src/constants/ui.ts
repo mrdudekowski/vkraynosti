@@ -52,6 +52,7 @@ export const UI = {
     brand: 'Вкрайности',
     links: [
       { label: 'Туры',         hash: 'tours' },
+      { label: 'Календарь',    hash: 'kalendar' },
       { label: 'Безопасность', hash: 'safety' },
       { label: 'Команда',      hash: 'team' },
       { label: 'Контакты',     hash: 'contact' },
@@ -75,6 +76,11 @@ export const UI = {
   sections: {
     /** `id` секции туров на главной (якорь из навигации, hash «Туры»). */
     homeToursSectionElementId: 'tours' as const,
+    /** `id` секции календаря на главной (якорь «Календарь»). */
+    homeTourCalendarSectionElementId: 'kalendar' as const,
+    tourCalendarTitle: 'Календарь туров',
+    tourCalendarLead:
+      'Выберите дату — и посмотрите, какие выезды запланированы. Актуальное расписание по всем сезонам.',
     tours:        'Туры по сезонам',
     toursSub:     'Четыре сезона — четыре разных приключения',
     toursTitleBySeason: {
@@ -118,8 +124,12 @@ export const UI = {
   seasons: {
     winter: { label: 'Зима',  emoji: '❄️', description: 'Байкал подо льдом, Хибины, полярное сияние' },
     spring: { label: 'Весна', emoji: '🌿', description: 'Цветение Алтая, таяние Байкала, Камчатка' },
-    summer: { label: 'Лето',  emoji: '☀️', description: 'Тачингоуза, Тобизина, Аскольд, Шкота, Гамова' },
-    fall:   { label: 'Осень', emoji: '🍂', description: 'Золотой Алтай, карельский лес, горные сёла' },
+    summer: {
+      label: 'Лето',
+      emoji: '☀️',
+      description: 'Тачингоуза, Краббе, Аскольд, Шкота, Гамова и другие маршруты юга Приморья',
+    },
+    fall:   { label: 'Осень', emoji: '🍂', description: 'Те же маршруты Приморья, что весной — в осеннем сезоне' },
   },
   footer: {
     tagline:        'Открываем дикую природу России',
@@ -234,22 +244,57 @@ export const UI = {
     notFound:        'Тур не найден',
     notFoundWithId:  'Тур с ID «{id}» не существует.',
     homeLink:   'На главную',
-    /** Полноэкранный просмотр фото: клик по затемнению вне кадра закрывает просмотр. */
-    galleryPhoto: {
-      openHeroAria: 'Открыть первое фото тура',
-      /** Подставить `{n}` — номер фото по порядку на странице. */
-      openPhotoAria: 'Открыть фото {n}',
-      viewerDialogAria: 'Просмотр фотографии тура',
-      viewerPrevAria: 'Предыдущее фото',
-      viewerNextAria: 'Следующее фото',
-      /** Подставить `{current}` и `{total}`. */
-      viewerCounter: 'Фото {current} из {total}',
-    },
   },
   errorFallback: {
     title:       'Что-то пошло не так',
     message:     'Произошла ошибка. Попробуйте обновить страницу.',
     retryButton: 'Обновить страницу',
+  },
+  tourCalendar: {
+    selectDateHint: 'Выберите дату в календаре',
+    emptyDay: 'В этот день выездов нет',
+    emptyMonth: 'В этом месяце выездов пока нет',
+    emptyAll: 'Расписание скоро появится',
+    prevMonthAria: 'Предыдущий месяц',
+    nextMonthAria: 'Следующий месяц',
+    nextMonthDisabledTooltip: 'Расписание на этот месяц ещё не опубликовано',
+    retryLoad: 'Повторить',
+    loadingAria: 'Загрузка расписания',
+    dayPanelAriaLabel: 'Туры на выбранную дату',
+    status: {
+      open: 'Набор открыт',
+      planned: 'Скоро',
+      full: 'Мест нет',
+    },
+    dayAriaLabel: (formattedDate: string, count: number) => {
+      const mod10 = count % 10;
+      const mod100 = count % 100;
+      const word =
+        mod10 === 1 && mod100 !== 11
+          ? 'выезд'
+          : mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)
+            ? 'выезда'
+            : 'выездов';
+      return `${formattedDate}, ${count} ${word}`;
+    },
+  },
+  tourCalendarMini: {
+    title: 'Ближайшие выезды',
+    empty: 'Даты выездов уточняются. Смотрите общее расписание.',
+    allScheduleLink: 'Всё расписание',
+    archiveHint: 'Все даты в прошлом',
+    nearestLabel: (formatted: string, statusLabel: string) => `${formatted} · ${statusLabel}`,
+    moreDates: (count: number) => {
+      const mod10 = count % 10;
+      const mod100 = count % 100;
+      const word =
+        mod10 === 1 && mod100 !== 11
+          ? 'дата'
+          : mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)
+            ? 'даты'
+            : 'дат';
+      return `+ ещё ${count} ${word}`;
+    },
   },
   notFoundPage: {
     metaTitle:   'Страница не найдена | Вкрайности',

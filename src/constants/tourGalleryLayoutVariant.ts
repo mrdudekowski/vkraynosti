@@ -1,6 +1,7 @@
+import { resolveContentSourceTourId } from '../data/seasonTourRegistry';
+
 /**
- * Вариант bento-сетки `TourDetailGallery` — задаётся по `tour.id` (не из данных тура),
- * чтобы не дублировать ветвление в `TourDetailPage`.
+ * Вариант bento-сетки `TourDetailGallery` — по маршруту (`contentSourceTourId` или `tour.id`).
  */
 export type TourGalleryLayoutVariant =
   | 'default'
@@ -21,19 +22,20 @@ export type TourGalleryLayoutVariant =
   | 'severCoast';
 
 export function getTourGalleryLayoutVariant(tourId: string): TourGalleryLayoutVariant {
-  if (tourId === 'winter-1') return 'izubrinaya';
-  if (tourId === 'winter-5') return 'arsgora';
-  if (tourId === 'spring-1') return 'lysy-ded';
-  if (tourId === 'spring-2') return 'olkhovaya';
-  if (tourId === 'spring-3') return 'pidan';
-  if (tourId === 'spring-4') return 'sestra';
-  if (tourId === 'spring-5' || tourId === 'spring-6') return 'chitinza';
-  if (tourId === 'spring-7' || tourId === 'summer-6') return 'dardanelles';
-  if (tourId === 'spring-8') return 'falaza';
-  if (tourId === 'spring-9') return 'vorobey-winery';
-  if (tourId === 'spring-10' || tourId === 'summer-3') return 'askold';
-  if (tourId === 'spring-11' || tourId === 'summer-4') return 'shkota';
-  if (tourId === 'spring-13' || tourId === 'summer-5') return 'gamova';
+  const layoutKey = resolveContentSourceTourId(tourId) ?? tourId;
+  if (layoutKey === 'winter-1') return 'izubrinaya';
+  if (layoutKey === 'winter-5') return 'arsgora';
+  if (layoutKey === 'spring-1') return 'lysy-ded';
+  if (layoutKey === 'spring-2') return 'olkhovaya';
+  if (layoutKey === 'spring-3') return 'pidan';
+  if (layoutKey === 'spring-4') return 'sestra';
+  if (layoutKey === 'spring-5' || layoutKey === 'spring-6') return 'chitinza';
+  if (layoutKey === 'spring-7') return 'dardanelles';
+  if (layoutKey === 'spring-8') return 'falaza';
+  if (layoutKey === 'spring-9') return 'vorobey-winery';
+  if (layoutKey === 'spring-10') return 'askold';
+  if (layoutKey === 'spring-11') return 'shkota';
+  if (layoutKey === 'spring-13') return 'gamova';
   if (tourId === 'summer-1') return 'tachingouza';
   if (tourId === 'summer-7') return 'severCoast';
   return 'default';

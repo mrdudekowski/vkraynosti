@@ -1,4 +1,4 @@
-# Полноразмерные `*.webm` и `*.grid.webm` для клипов весенних туров (источники — `*.mp4` в папке тура).
+# `*.grid.webm` (+ постеры) для клипов весенних туров (источники — `*.mp4` в папке тура).
 # Постеры `*.poster.webp` — с первого кадра grid-webm. Требует `Invoke-Ffmpeg` (PATH или bundled на Windows).
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "media\Invoke-Ffmpeg.ps1")
@@ -14,9 +14,7 @@ function Encode-ClipPair {
     Write-Warning "Skip missing: $inMp4"
     return
   }
-  $viewer = Join-Path $TourDir "${BaseName}.webm"
   $grid = Join-Path $TourDir "${BaseName}.grid.webm"
-  Invoke-Ffmpeg (@('-y', '-i', $inMp4, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-Ffmpeg (@('-y', '-i', $inMp4, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($grid))
   $poster = Join-Path $TourDir "${BaseName}.poster.webp"
   Invoke-Ffmpeg @('-y', '-i', $grid, '-vframes', '1', '-q:v', '80', $poster)

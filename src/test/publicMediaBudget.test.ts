@@ -9,11 +9,12 @@ const importPublicMediaBudgetModule = async (): Promise<PublicMediaBudgetModule>
   import('../../scripts/public-media-budget-core.mjs') as Promise<PublicMediaBudgetModule>;
 
 describe('public media budget classifier', () => {
-  it('classifies grid WebM separately from viewer WebM', async () => {
+  it('classifies grid WebM, legacy plain WebM, and viewer MP4', async () => {
     const { classifyPublicTourMediaPath } = await importPublicMediaBudgetModule();
 
     expect(classifyPublicTourMediaPath('public/tours/spring/spring-3.grid.webm')).toBe('gridVideo');
-    expect(classifyPublicTourMediaPath('public/tours/spring/spring-11.webm')).toBe('viewerVideo');
+    expect(classifyPublicTourMediaPath('public/tours/spring/spring-11.webm')).toBe('other');
+    expect(classifyPublicTourMediaPath('public/tours/spring/spring-11/source.mp4')).toBe('viewerVideo');
   });
 
   it('classifies poster and hero or viewer images', async () => {

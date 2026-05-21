@@ -1,5 +1,5 @@
 # Encodes spring-13 Gamova media to public/tours/spring-13.
-# Photos -> webp; MOV / MP4 -> .webm, .grid.webm, .poster.webp.
+# Photos -> webp; MOV / MP4 -> .grid.webm, .poster.webp.
 #
 # Usage:
 #   .\scripts\encode-spring-13-gamova-media.ps1
@@ -134,11 +134,9 @@ foreach ($name in $orderedMovNames) {
   $i++
   $in = Join-Path $SourceDir $name
   $base = 'gam.clip{0}' -f $i
-  $viewer = Join-Path $tourDir.Path ('{0}.webm' -f $base)
   $gridWebm = Join-Path $tourDir.Path ('{0}.grid.webm' -f $base)
   $poster = Join-Path $tourDir.Path ('{0}.poster.webp' -f $base)
   Write-Host ('video [{0}/{1}] {2} from {3}' -f $i, $orderedMovCount, $base, $name)
-  Invoke-LocalFfmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-LocalFfmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($gridWebm))
   Invoke-LocalFfmpeg @('-y', '-ss', '1', '-i', $gridWebm, '-vframes', '1', '-q:v', '80', $poster)
 }

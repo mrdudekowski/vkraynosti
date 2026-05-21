@@ -19,9 +19,6 @@ interface TourDetailHeroProps {
    * `object-center` + `desktopHeroImgClassName` / дефолтного `lg:object-tour-detail-hero-desktop`.
    */
   heroImageObjectClassName?: string;
-  /** Опциональное открытие фото, если у страницы есть отдельный viewer. */
-  onOpenPhoto?: () => void;
-  openPhotoAriaLabel?: string;
 }
 
 const TourDetailHeroComponent = ({
@@ -33,8 +30,6 @@ const TourDetailHeroComponent = ({
   backLinkLabel,
   desktopHeroImgClassName,
   heroImageObjectClassName,
-  onOpenPhoto,
-  openPhotoAriaLabel = '',
 }: TourDetailHeroProps) => (
   <div className="relative h-tour-detail-hero overflow-hidden">
     <PlaceholderImage
@@ -48,14 +43,6 @@ const TourDetailHeroComponent = ({
       loading="eager"
       fetchPriority="high"
     />
-    {onOpenPhoto != null && (
-      <button
-        type="button"
-        className="absolute inset-0 z-20 cursor-pointer bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
-        aria-label={openPhotoAriaLabel}
-        onClick={onOpenPhoto}
-      />
-    )}
     <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
     <div className="absolute bottom-0 left-0 right-0 z-30 tour-detail-page-gutter py-tour-detail-hero-overlay-y">
       <div className="tour-detail-page-measure flex flex-col gap-4">

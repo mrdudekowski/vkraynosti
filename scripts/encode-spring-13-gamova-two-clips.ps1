@@ -1,4 +1,4 @@
-# Только gam.clip5 + gam.clip6 для «Полуостров Гамова» (spring-13): viewer + grid + poster.
+# Только gam.clip5 + gam.clip6 для «Полуостров Гамова» (spring-13): grid + poster.
 # Полный тур — `encode-spring-13-gamova-media.ps1` (все MOV/фото). Этот скрипт — если нужно обновить два клипа по путям к файлам.
 #
 # Пример:
@@ -41,11 +41,9 @@ function Encode-OneGamovaClip {
     [Parameter(Mandatory)][string] $BaseName,
     [Parameter(Mandatory)][string] $TourDir
   )
-  $viewer = Join-Path $TourDir ('{0}.webm' -f $BaseName)
   $gridWebm = Join-Path $TourDir ('{0}.grid.webm' -f $BaseName)
   $poster = Join-Path $TourDir ('{0}.poster.webp' -f $BaseName)
   Write-Host ('Encoding {0} from {1}' -f $BaseName, $InputPath)
-  Invoke-LocalFfmpeg (@('-y', '-i', $InputPath, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-LocalFfmpeg (@('-y', '-i', $InputPath, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($gridWebm))
   Invoke-LocalFfmpeg @('-y', '-ss', '1', '-i', $gridWebm, '-vframes', '1', '-q:v', '80', $poster)
 }

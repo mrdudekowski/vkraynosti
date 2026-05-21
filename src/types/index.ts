@@ -46,20 +46,25 @@ export interface Tour {
   includedInPrice: TourIncludedItem[];
   imageUrl: string;
   /**
-   * Канонический порядок медиа: качественные фото и полные видео.
+   * Канонический порядок still-медиа галереи (webp; на слотах видео — poster кадр, не `.webm`).
    * Длина совпадает с `galleryGridUrls`, если он задан.
    */
   galleryImages: string[];
   /**
-   * URL для сетки страницы тура: те же качественные фото, но VP9 `*.grid.webm` для видео.
+   * URL для сетки страницы тура: те же фото, на видео-слотах — VP9 `*.grid.webm`.
    * При отсутствии для сетки используется `galleryImages`.
    */
   galleryGridUrls?: string[];
   /**
    * Если задано — фон блока «О туре» (`tour-detail-preface-bg`) вместо `galleryImages[1]`.
-   * URL из `src/constants/images.ts` или того же массива, что и `galleryImages`.
+   * URL из `src/constants/images.ts` или того же массива, что и `galleryImages` (только webp).
    */
   prefaceBackgroundImageUrl?: string;
+  /**
+   * Весенний тур с тем же маршрутом (контент, bento-layout).
+   * Медиа всегда из папки `public/tours/{id}/` этого тура, не из source.
+   */
+  contentSourceTourId?: string;
 }
 
 export interface TeamMember {

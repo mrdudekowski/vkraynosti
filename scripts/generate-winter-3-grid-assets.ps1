@@ -1,5 +1,5 @@
 # `Invoke-Ffmpeg`: ffmpeg из PATH или bundled (`node_modules/@ffmpeg-installer/...` на Windows).
-# Создаёт полноразмерные `*.webm`, `*.grid.webm`, `*.poster.webp` в `public/tours/winter-3/`.
+# Создаёт `*.grid.webm` и `*.poster.webp` в `public/tours/winter-3/` (VP9 preset grid).
 $ErrorActionPreference = "Stop"
 $dir = Join-Path $PSScriptRoot "..\public\tours\winter-3" | Resolve-Path
 Set-Location $dir
@@ -16,9 +16,7 @@ $videos = @(
 
 foreach ($v in $videos) {
   if (-not (Test-Path $v.In)) { Write-Warning "Skip missing: $($v.In)"; continue }
-  $viewer = "$($v.Base).webm"
   $grid = "$($v.Base).grid.webm"
-  Invoke-Ffmpeg (@('-y', '-i', $v.In, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-Ffmpeg (@('-y', '-i', $v.In, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($grid))
 }
 

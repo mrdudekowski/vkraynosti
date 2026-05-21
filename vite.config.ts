@@ -25,7 +25,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.test.ts'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.test.ts', 'scripts/**/*.test.mjs'],
   },
   base: '/vkraynosti/',
   build: {

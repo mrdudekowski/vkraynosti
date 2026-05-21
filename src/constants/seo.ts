@@ -29,12 +29,12 @@ const SEASON_META_BY_KEY: Record<Season, Omit<SeoEntry, 'path'>> = {
   summer: {
     title: 'Летние туры Приморья — заповедное побережье | Вкрайности',
     description:
-      'Лето из Владивостока: Тачингоуза, Тобизина, Аскольд, Шкота и полуостров Гамова — те же маршруты, что в весеннем каталоге, в летнем сезоне.',
+      'Лето из Владивостока: Тачингоуза, полуостров Краббе, Аскольд, Шкота, Гамова и другие однодневные и многодневные маршруты юга Приморья.',
   },
   fall: {
-    title: 'Осенние туры — Алтай, Карелия, Кавказ | Вкрайности',
+    title: 'Осенние туры Приморья — те же маршруты, что весной | Вкрайности',
     description:
-      'Осень в России: золото лиственниц Алтая, леса Карелии и горные сёла Кавказа. Живописное время года для походов.',
+      'Осень из Владивостока: Лысый Дед, Пидан, Сестра, Аскольд, Шкота, Гамова и другие весенние маршруты — в осеннем каталоге с отдельными обложками.',
   },
 };
 
@@ -78,9 +78,11 @@ export const getTourSeoEntry = (tour: Tour): SeoEntry => {
     .map(step => step.description)
     .join(', ');
 
+  const seasonLabel = UI.seasons[tour.season].label;
+
   return {
-    title: `${tour.title} | ${SITE_NAME}`,
-    description: `${tour.subtitle}. ${tour.duration}, ${tour.price}. ${metaSnippet}.`,
+    title: `${tour.title} — ${seasonLabel} | ${SITE_NAME}`,
+    description: `${seasonLabel}: ${tour.subtitle}. ${tour.duration}, ${tour.price}. ${metaSnippet}.`,
     path: buildTourDetailPath(tour.season, tour.id),
   };
 };

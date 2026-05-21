@@ -1,0 +1,94 @@
+{
+  "events": [
+    {
+      "date": "2026-04-12",
+      "tourId": "spring-6",
+      "durationType": "однодневный",
+      "priceRub": 5500,
+      "seats": 12,
+      "status": "open",
+      "comment": null
+    },
+    {
+      "date": "2026-05-09",
+      "tourId": "spring-3",
+      "durationType": "однодневный",
+      "priceRub": 6000,
+      "seats": 8,
+      "status": "open",
+      "comment": null
+    },
+    {
+      "date": "2026-05-09",
+      "tourId": "summer-7",
+      "durationType": "многодневный",
+      "priceRub": 12000,
+      "seats": 6,
+      "status": "planned",
+      "comment": null
+    },
+    {
+      "date": "2026-05-09",
+      "tourId": "spring-1",
+      "durationType": "однодневный",
+      "priceRub": null,
+      "seats": null,
+      "status": "cancelled",
+      "comment": "Отменён — не показывать"
+    },
+    {
+      "date": "2026-05-10",
+      "tourId": "spring-3",
+      "durationType": "однодневный",
+      "priceRub": 6000,
+      "seats": 10,
+      "status": "open",
+      "comment": null
+    },
+    {
+      "date": "2026-05-17",
+      "tourId": "spring-6",
+      "durationType": "однодневный",
+      "priceRub": 5500,
+      "seats": 0,
+      "status": "full",
+      "comment": null
+    },
+    {
+      "date": "2026-05-24",
+      "tourId": "fall-4",
+      "durationType": "однодневный",
+      "priceRub": 6500,
+      "seats": 14,
+      "status": "planned",
+      "comment": null
+    },
+    {
+      "date": "2026-06-07",
+      "tourId": "summer-1",
+      "durationType": "многодневный",
+      "priceRub": 15000,
+      "seats": 8,
+      "status": "open",
+      "comment": null
+    },
+    {
+      "date": "2026-06-14",
+      "tourId": "winter-3",
+      "durationType": "многодневный",
+      "priceRub": 18000,
+      "seats": 6,
+      "status": "planned",
+      "comment": null
+    },
+    {
+      "date": "2026-05-20",
+      "tourId": "unknown-tour-id",
+      "durationType": "однодневный",
+      "priceRub": 1000,
+      "seats": null,
+      "status": "open",
+      "comment": "Тест: неизвестный tourId"
+    }
+  ]
+}

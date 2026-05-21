@@ -37,18 +37,28 @@ describe('resolveTourPrefaceBackgroundUrl', () => {
     const winterTour = { ...buildTour(TOUR_WINTER_3_PREFACE_BACKGROUND), id: 'winter-3', season: 'winter' as const };
     const value = resolveTourPrefaceBackgroundUrl({
       tour: winterTour,
-      viewerGalleryUrls: ['/a.webp', '/b.webp'],
+      galleryStillUrls: ['/a.webp', '/b.webp'],
       isLgOrAbove: false,
     });
     expect(value).toBe(TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE);
   });
 
-  it('keeps quality preface fallback on mobile when explicit preface matches viewer index 1', () => {
+  it('ignores video URL at gallery still index 1 on mobile', () => {
+    const tour = buildTour();
+    const value = resolveTourPrefaceBackgroundUrl({
+      tour,
+      galleryStillUrls: ['/cover.webp', '/tours/x/clip1.grid.webm'],
+      isLgOrAbove: false,
+    });
+    expect(value).toBeNull();
+  });
+
+  it('keeps quality preface fallback on mobile when explicit preface matches still index 1', () => {
     const viewer = ['/cover.webp', '/preface.webp'];
     const tour = buildTour('/preface.webp');
     const value = resolveTourPrefaceBackgroundUrl({
       tour,
-      viewerGalleryUrls: viewer,
+      galleryStillUrls: viewer,
       isLgOrAbove: false,
     });
     expect(value).toBe('/preface.webp');
@@ -58,7 +68,7 @@ describe('resolveTourPrefaceBackgroundUrl', () => {
     const tour = buildTour(TOUR_SPRING_10_PREFACE_BACKGROUND);
     const value = resolveTourPrefaceBackgroundUrl({
       tour,
-      viewerGalleryUrls: ['/cover.webp', TOUR_SPRING_10_PREFACE_BACKGROUND],
+      galleryStillUrls: ['/cover.webp', TOUR_SPRING_10_PREFACE_BACKGROUND],
       isLgOrAbove: false,
     });
     expect(value).toBe(TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE);

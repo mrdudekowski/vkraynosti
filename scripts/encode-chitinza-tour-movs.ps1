@@ -1,5 +1,5 @@
 # Encodes four Chitinza (spring-5) MOV sources to public/tours/spring-5/ctz.clip1..4
-# (.webm, .grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1 (same as spring-4 clips).
+# (.grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1 (same as spring-4 clips).
 #
 # Canonical order (chronological filenames):
 #   2023-10-07 15-45-00, 15-56-46, 16-34-03, 17-19-10
@@ -53,11 +53,9 @@ foreach ($name in $orderedMovNames) {
   $i++
   $in = Join-Path $SourceDir $name
   $base = "ctz.clip$i"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
   Write-Host "[$i/4] $base <- $name"
-  Invoke-Ffmpeg (@("-y", "-i", $in, "-vf", (Get-WebmScaleFilter "full")) + (Get-WebmVp9CodecArgs "full") + @($viewer))
   Invoke-Ffmpeg (@("-y", "-i", $in, "-vf", (Get-WebmScaleFilter "grid")) + (Get-WebmVp9CodecArgs "grid") + @($gridWebm))
   Invoke-Ffmpeg @("-y", "-i", $gridWebm, "-vframes", "1", "-q:v", "80", $poster)
 }

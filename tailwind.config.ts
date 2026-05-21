@@ -517,9 +517,6 @@ const config: Config = {
           fill:  '#F97316',
           sweep: '#1A3C2E',
         },
-        /** Кнопки «назад/вперёд» в полноэкранном просмотре фото (`TourPhotoViewer`). */
-        'photo-viewer-nav':       'rgba(13, 13, 13, 0.45)',
-        'photo-viewer-nav-hover': 'rgba(13, 13, 13, 0.62)',
       },
       fontFamily: {
         // Стеки — `src/constants/fonts.ts`. Hero: `font-hero-heading` / `font-hero-carousel-phrase`; лого navbar — `font-brand-wordmark` (Dela Gothic One).
@@ -771,8 +768,6 @@ const config: Config = {
       spacing: {
         /** Зазор между ячейками сетки фотогалереи на странице тура. */
         'gallery-gap': '0.75rem',
-        /** Между стрелками и областью кадра в `TourPhotoViewer` (десктоп). */
-        'photo-viewer-nav-gap': 'clamp(0.5rem, 2vw, 1.25rem)',
         /** «Воздух» между контентом и вертикальным разделителем до сайдбара (страница тура). */
         'tour-detail-col-divider-gap': '3rem',
         /** Высота вертикального акцента у заголовка секции галереи. */
@@ -908,8 +903,6 @@ const config: Config = {
       maxHeight: {
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
-        /** Полноэкранный просмотр фото тура (`TourPhotoViewer`, `object-contain`). */
-        'photo-viewer': 'min(90dvh, 90vh)',
         /** Тело модалок с прокруткой (`TourRequestModal`, `TeamMemberModal`). */
         'modal-body': 'min(90dvh, 90vh)',
         /** Максимальная высота карточки тура в сетке главной. */

@@ -9,6 +9,7 @@ import { RouterProvider } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ModalProvider } from './context/ModalContext';
 import { SeasonProvider } from './context/SeasonContext';
+import { TourScheduleProvider } from './context/TourScheduleContext';
 import ErrorBoundary from './components/errors/ErrorBoundary';
 import AppLenis from './components/layout/AppLenis';
 import { router } from './router';
@@ -21,9 +22,11 @@ createRoot(document.getElementById('root')!).render(
       <ErrorBoundary>
         <HelmetProvider>
           <SeasonProvider>
-            <ModalProvider>
-              <RouterProvider router={router} />
-            </ModalProvider>
+            <TourScheduleProvider>
+              <ModalProvider>
+                <RouterProvider router={router} />
+              </ModalProvider>
+            </TourScheduleProvider>
           </SeasonProvider>
         </HelmetProvider>
       </ErrorBoundary>

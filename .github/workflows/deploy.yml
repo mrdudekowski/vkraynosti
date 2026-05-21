@@ -50,6 +50,9 @@ jobs:
         run: npm run seo:check
 
       - name: Build
+        env:
+          VITE_TOUR_SCHEDULE_ENDPOINT_URL: ${{ vars.VITE_TOUR_SCHEDULE_ENDPOINT_URL }}
+          VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
         run: npm run build
 
       - name: Setup Pages

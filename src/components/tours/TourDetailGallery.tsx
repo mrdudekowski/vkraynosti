@@ -503,15 +503,56 @@ const TourDetailGalleryComponent = ({
   }
 
   /**
-   * Читинза (spring-5) и Маралы х Драконы (spring-6): ритм как у «Сестра» (`sestra`), 11 кадров после hero/preface.
-   * Первый блок: клип `images[6]` на всю ширину (`aspect-gallery-tile-2x2`), под ним — вертикали `images[5]` и `images[7]`.
-   * spring-5 `slice(2)`: woods, yar, clip1…clip4, peak, forest, top, peak5, hike (`peak2` — hero).
-   * spring-6 `slice(2)`: hills, deer, clip1, clip2, drag, clip3, clip4, hills5, deer2, clip5, deer3.
+   * Читинза (spring-5 / fall-5): 10 кадров после hero/preface.
+   * `slice(2)`: clip4 (2×2), woods, yar, clip1…clip3, forest, top, peak5, hike.
+   */
+  if (
+    layoutVariant === 'chitinza' &&
+    images.length === 10 &&
+    images[0] === TOUR_SPRING_5_GROUP_IMAGE
+  ) {
+    const chitinzaFullWidthSquare = (sliceIndex: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[sliceIndex], sliceIndex, GALLERY_GRID_FULL_WIDTH_SQUARE)}
+      </div>
+    );
+
+    const chitinzaBentoRow = (left: number, rightTop: number, rightBottom: number) => (
+      <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+        {renderTileButton(images[left], left, GALLERY_GRID_BENTO_TALL_LEFT)}
+        {renderTileButton(images[rightTop], rightTop, GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE)}
+        {renderTileButton(images[rightBottom], rightBottom, GALLERY_GRID_BENTO_RIGHT_BOTTOM_SQUARE)}
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col gap-gallery-gap">
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[0], 0, GALLERY_GRID_FULL_WIDTH_TILE_2X2)}
+        </div>
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[4], 4, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[5], 5, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        </div>
+        {chitinzaBentoRow(2, 3, 4)}
+        {chitinzaFullWidthSquare(6)}
+        {chitinzaFullWidthSquare(1)}
+        {chitinzaFullWidthSquare(7)}
+        <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">
+          {renderTileButton(images[8], 8, GALLERY_GRID_BENTO_TALL_LEFT)}
+          {renderTileButton(images[9], 9, GALLERY_GRID_BENTO_TALL_RIGHT)}
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Маралы х Драконы (spring-6): 11 кадров после hero/preface.
    */
   if (
     layoutVariant === 'chitinza' &&
     images.length === 11 &&
-    (images[0] === TOUR_SPRING_5_GROUP_IMAGE || images[0] === TOUR_SPRING_6_GROUP_IMAGE)
+    images[0] === TOUR_SPRING_6_GROUP_IMAGE
   ) {
     const chitinzaFullWidthSquare = (sliceIndex: number) => (
       <div className="grid min-w-0 grid-cols-2 gap-gallery-gap">

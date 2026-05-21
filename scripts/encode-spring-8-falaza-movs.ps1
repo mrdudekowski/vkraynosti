@@ -1,5 +1,5 @@
 # Encodes spring-8 (Falaza) MOV source to public/tours/spring-8/flz.clip1
-# (.webm, .grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1.
+# (.grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1.
 #
 # Usage:
 #   .\scripts\encode-spring-8-falaza-movs.ps1
@@ -38,12 +38,10 @@ New-Item -ItemType Directory -Path $tourDir -Force | Out-Null
 $tourDir = Resolve-Path $tourDir
 
 $base = 'flz.clip1'
-$viewer = Join-Path $tourDir.Path "$base.webm"
 $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
 $poster = Join-Path $tourDir.Path "$base.poster.webp"
 
 Write-Host "Encoding Falaza MOV from $SourceDir -> $($tourDir.Path)"
-Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
 Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($gridWebm))
 Invoke-Ffmpeg @('-y', '-i', $gridWebm, '-vframes', '1', '-q:v', '80', $poster)
 

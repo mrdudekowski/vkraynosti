@@ -13,21 +13,30 @@ const extractStaticRoutes = (routesSource) => {
     .filter(route => !route.path.includes(':'));
 };
 
-const extractTourUrls = (toursSource) => {
-  const matches = [...toursSource.matchAll(/id:\s*'([^']+)'.*?season:\s*'(winter|spring|summer|fall)'/gs)];
+const extractTourUrlsFromCore = (toursSource) => {
+  const matches = [...toursSource.matchAll(/id:\s*'([^']+)'.*?season:\s*'(winter|spring|summer)'/gs)];
   return matches.map(([, id, season]) => `/tours/${season}/${id}`);
+};
+
+const extractFallTourUrls = (fallImagesSource) => {
+  const ids = [...fallImagesSource.matchAll(/'fall-\d+'/g)].map((m) => m[0].slice(1, -1));
+  return [...new Set(ids)].map((id) => `/tours/fall/${id}`);
 };
 
 const createUrlNode = (path) => `  <url><loc>${SITE_URL}${path}</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>`;
 
 const run = async () => {
-  const [routesSource, toursSource] = await Promise.all([
+  const [routesSource, toursSource, fallImagesSource] = await Promise.all([
     read('src/constants/routes.ts'),
     read('src/data/toursData.ts'),
+    read('src/constants/fallTourImages.ts'),
   ]);
 
   const staticRoutes = extractStaticRoutes(routesSource).map(route => route.path);
-  const tourRoutes = extractTourUrls(toursSource);
+  const tourRoutes = [
+    ...extractTourUrlsFromCore(toursSource),
+    ...extractFallTourUrls(fallImagesSource),
+  ];
 
   const allRoutes = [...new Set([...(staticRoutes.includes('/') ? [] : ['/']), ...staticRoutes, ...tourRoutes])];
   const xmlLines = [

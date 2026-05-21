@@ -25,8 +25,8 @@ import {
   getHomeSeasonBannerWinterVideoPreloadLinks,
 } from '../constants/homeSeasonBannerVideoPreload';
 import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfadeVideoIntersection';
-import { TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS } from '../constants/tourSpring3CoverCrop';
-import { TOUR_SPRING_6_COVER_CARD_IMG_OBJECT_CLASS } from '../constants/tourSpring6CoverCrop';
+import { getTourCoverCardImgObjectClass } from '../constants/tourCoverCropByCanonicalId';
+import { resolveContentSourceTourId } from '../data/seasonTourRegistry';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
@@ -47,6 +47,7 @@ import {
 } from '../constants/homeToursGrid';
 
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
+const TourCalendarSectionLazy = lazy(() => import('../components/tourCalendar/TourCalendarSection'));
 const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
 const GRID_FADE_OUT_DURATION_MS = 260;
@@ -386,13 +387,10 @@ const Home = () => {
                                 src={activeSeasonLeadTour.imageUrl}
                                 alt={`${UI.tourCard.nextSeasonCloneImageAltPrefix}: ${UI.sections.toursTitleBySeason[activeSeason]}`}
                                 className="h-full w-full opacity-50"
-                                imgClassName={
-                                  activeSeasonLeadTour.id === 'spring-3'
-                                    ? TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS
-                                    : activeSeasonLeadTour.id === 'spring-6'
-                                      ? TOUR_SPRING_6_COVER_CARD_IMG_OBJECT_CLASS
-                                      : undefined
-                                }
+                                imgClassName={getTourCoverCardImgObjectClass(
+                                  resolveContentSourceTourId(activeSeasonLeadTour.id) ??
+                                    activeSeasonLeadTour.id
+                                )}
                                 loading="lazy"
                               />
                             )}
@@ -429,6 +427,10 @@ const Home = () => {
           </section>
 
           <Suspense fallback={<HomeBelowFoldSuspenseFallback />}>
+            <ScrollScrubFade className="relative w-full">
+              <TourCalendarSectionLazy />
+            </ScrollScrubFade>
+
             <ScrollScrubFade className="relative w-full">
               <SafetySectionLazy />
             </ScrollScrubFade>

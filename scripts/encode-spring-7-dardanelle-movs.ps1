@@ -1,5 +1,5 @@
 # Encodes two spring-7 (Dardanelles gorge) MOV sources to public/tours/spring-7/ddn.clip1..2
-# (.webm, .grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1.
+# (.grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1.
 #
 # Canonical order (chronological filenames):
 #   2023-10-15 15-48-35, 2025-06-08 08-39-01
@@ -53,11 +53,9 @@ foreach ($name in $orderedMovNames) {
   $i++
   $in = Join-Path $SourceDir $name
   $base = "ddn.clip$i"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
   Write-Host "[$i/2] $base <- $name"
-  Invoke-Ffmpeg (@("-y", "-i", $in, "-vf", (Get-WebmScaleFilter "full")) + (Get-WebmVp9CodecArgs "full") + @($viewer))
   Invoke-Ffmpeg (@("-y", "-i", $in, "-vf", (Get-WebmScaleFilter "grid")) + (Get-WebmVp9CodecArgs "grid") + @($gridWebm))
   Invoke-Ffmpeg @("-y", "-i", $gridWebm, "-vframes", "1", "-q:v", "80", $poster)
 }

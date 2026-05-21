@@ -8,20 +8,23 @@ import type { Tour } from '../types';
 
 interface ResolveTourPrefaceBackgroundUrlParams {
   tour: Tour;
-  viewerGalleryUrls: string[];
+  /** Still-галерея (`galleryImages`): fallback для preface — только webp, не video. */
+  galleryStillUrls: string[];
   isLgOrAbove: boolean;
 }
 
 export const resolveTourPrefaceBackgroundUrl = ({
   tour,
-  viewerGalleryUrls,
+  galleryStillUrls,
   isLgOrAbove,
 }: ResolveTourPrefaceBackgroundUrlParams): string | null => {
   const explicitPrefaceUrl = tour.prefaceBackgroundImageUrl ?? null;
-  const viewerFallback = viewerGalleryUrls.length > 1 ? viewerGalleryUrls[1] : null;
+  const stillFallbackRaw = galleryStillUrls.length > 1 ? galleryStillUrls[1] : null;
+  const stillFallback =
+    stillFallbackRaw != null && !isVideoAssetUrl(stillFallbackRaw) ? stillFallbackRaw : null;
 
   if (isLgOrAbove) {
-    return explicitPrefaceUrl ?? viewerFallback;
+    return explicitPrefaceUrl ?? stillFallback;
   }
 
   if (explicitPrefaceUrl === TOUR_WINTER_3_PREFACE_BACKGROUND) {
@@ -36,7 +39,7 @@ export const resolveTourPrefaceBackgroundUrl = ({
     return explicitPrefaceUrl;
   }
 
-  return viewerFallback;
+  return stillFallback;
 };
 
 interface ResolveTourHeroImageUrlParams {

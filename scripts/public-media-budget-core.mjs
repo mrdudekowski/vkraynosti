@@ -5,6 +5,7 @@ const BYTES_IN_KIB = 1024;
 
 export const MEDIA_BUDGET_LIMITS = {
   gridVideo: { warnBytes: 6 * BYTES_IN_MIB, failBytes: 10 * BYTES_IN_MIB },
+  // MP4 viewer assets only; plain *.webm is legacy / not produced by encode scripts.
   viewerVideo: { warnBytes: 15 * BYTES_IN_MIB, failBytes: 40 * BYTES_IN_MIB },
   posterImage: { warnBytes: 300 * BYTES_IN_KIB, failBytes: 500 * BYTES_IN_KIB },
   heroOrViewerImage: { warnBytes: 2 * BYTES_IN_MIB, failBytes: Number.POSITIVE_INFINITY },
@@ -18,7 +19,9 @@ export function classifyPublicTourMediaPath(filePath) {
   const fileName = path.posix.basename(normalizedPath).toLowerCase();
 
   if (fileName.endsWith('.grid.webm')) return 'gridVideo';
-  if (fileName.endsWith('.webm') || fileName.endsWith('.mp4')) return 'viewerVideo';
+  // Plain *.webm (non-grid) is legacy / unexpected in tours; budget as uncategorized.
+  if (fileName.endsWith('.webm')) return 'other';
+  if (fileName.endsWith('.mp4')) return 'viewerVideo';
   if (/\.poster(?:\.mobile)?\.webp$/.test(fileName)) return 'posterImage';
   if (/\.(webp|png|jpe?g)$/i.test(fileName)) return 'heroOrViewerImage';
   return 'other';

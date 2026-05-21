@@ -1,4 +1,4 @@
-# Первые 6 с `VID_20250928_173937_00_500.MP4` → `ask.intro` (.webm, .grid.webm, .poster.webp). Шесть MOV — `encode-spring-10-askold-movs.ps1` → `ask.clip1..6`.
+# Первые 6 с `VID_20250928_173937_00_500.MP4` → `ask.intro` (.grid.webm, .poster.webp). Шесть MOV — `encode-spring-10-askold-movs.ps1` → `ask.clip1..6`.
 # Исходник: `content/Аскольд/original/`. Оригинальный MP4 не изменяется.
 # Копирует `content/Аскольд/webp/*.webp` в `public/tours/spring-10/` (перезапись).
 #
@@ -32,16 +32,10 @@ New-Item -ItemType Directory -Path $tourDir -Force | Out-Null
 $tourDir = Resolve-Path $tourDir
 
 $base = 'ask.intro'
-$viewer = Join-Path $tourDir.Path "$base.webm"
 $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
 $poster = Join-Path $tourDir.Path "$base.poster.webp"
 
 Write-Host "Encoding first 6s of $SourceFile -> $($tourDir.Path)\$base.*"
-
-Invoke-Ffmpeg (@(
-    '-y', '-i', $SourceFile, '-t', '6',
-    '-vf', (Get-WebmScaleFilter 'full')
-  ) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
 
 Invoke-Ffmpeg (@(
     '-y', '-i', $SourceFile, '-t', '6',
@@ -58,4 +52,4 @@ if (Test-Path -LiteralPath $webpSrc) {
   Write-Host "Copied webp from $webpSrc"
 }
 
-Write-Host "Done: $viewer"
+Write-Host "Done: $gridWebm"

@@ -137,11 +137,9 @@ foreach ($name in $orderedMp4Names) {
   $i++
   $in = Join-Path $SourceDir $name
   $base = "tch.clip$i"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
   Write-Host "[$i/$clipCount] $base <- $name"
-  Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($gridWebm))
   Invoke-Ffmpeg @('-y', '-ss', '1', '-i', $gridWebm, '-vframes', '1', '-q:v', '80', $poster)
 }

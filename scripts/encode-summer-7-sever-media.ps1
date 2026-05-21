@@ -121,7 +121,6 @@ foreach ($name in $orderedMovs) {
   }
   $in = Join-Path $VidDir $name
   $base = "sev.clip$i"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $gridWebm = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
   $durationArgs = @()
@@ -129,7 +128,6 @@ foreach ($name in $orderedMovs) {
     $durationArgs = @('-t', ([string]$clip1GridDurationSec))
   }
   Write-Host "[$i/$clipCount] $base <- $name$(if ($durationArgs.Count) { " (${clip1GridDurationSec}s)" } else { '' })"
-  Invoke-Ffmpeg (@('-y', '-i', $in) + $durationArgs + @('-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-Ffmpeg (@('-y', '-i', $in) + $durationArgs + @('-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($gridWebm))
   Invoke-Ffmpeg @('-y', '-i', $gridWebm, '-vframes', '1', '-q:v', '80', $poster)
 }

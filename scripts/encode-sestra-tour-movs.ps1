@@ -1,5 +1,5 @@
 # Encodes the eight Sestra tour MOV sources to public/tours/spring-4/ss.clip1..ss.clip8
-# (.webm, .grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1 (same as spring-2/3 clips).
+# (.grid.webm, .poster.webp). VP9 = media/WebmTourEncoding.ps1 (same as spring-2/3 clips).
 #
 # Canonical order (chronological filenames from Pictures\Spring\Сестра):
 #   11-16-53, 11-17-28, 11-18-05, 11-34-59, 13-58-57, 14-50-45, 15-29-42, 20-41-21
@@ -56,11 +56,9 @@ foreach ($name in $orderedMovNames) {
   $i++
   $in = Join-Path $SourceDir $name
   $base = "ss.clip$i"
-  $viewer = Join-Path $tourDir.Path "$base.webm"
   $grid = Join-Path $tourDir.Path "$base.grid.webm"
   $poster = Join-Path $tourDir.Path "$base.poster.webp"
   Write-Host "[$i/8] $base <- $name"
-  Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'full')) + (Get-WebmVp9CodecArgs 'full') + @($viewer))
   Invoke-Ffmpeg (@('-y', '-i', $in, '-vf', (Get-WebmScaleFilter 'grid')) + (Get-WebmVp9CodecArgs 'grid') + @($grid))
   Invoke-Ffmpeg @('-y', '-i', $grid, '-vframes', '1', '-q:v', '80', $poster)
 }

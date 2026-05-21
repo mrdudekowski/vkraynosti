@@ -11,11 +11,9 @@ import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { buildTourDetailPath } from '../../constants/routes';
 import { BREAKPOINT_LG_PX } from '../../constants/reveal';
 import { TOUR_MOBILE_IMAGE_VARIANTS } from '../../constants/images';
-import {
-  resolveTourSpring3CoverBackgroundPosition,
-  TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX,
-} from '../../constants/tourSpring3CoverCrop';
-import { resolveTourSpring6CoverBackgroundPosition } from '../../constants/tourSpring6CoverCrop';
+import { resolveContentSourceTourId } from '../../data/seasonTourRegistry';
+import { resolveTourHeroCoverBackgroundPosition } from '../../constants/tourCoverCropByCanonicalId';
+import { TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX } from '../../constants/tourSpring3CoverCrop';
 import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { getToursBySeason } from '../../data/toursData';
@@ -75,16 +73,11 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             backgroundSizes="100vw"
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
-            backgroundPosition={
-              tour.id === 'spring-3'
-                ? resolveTourSpring3CoverBackgroundPosition(heroCoverGteLayoutMin620, spring3Lg)
-                : tour.id === 'spring-6'
-                  ? resolveTourSpring6CoverBackgroundPosition(
-                      heroCoverGteLayoutMin620,
-                      spring3Lg
-                    )
-                  : undefined
-            }
+            backgroundPosition={resolveTourHeroCoverBackgroundPosition(
+              resolveContentSourceTourId(tour.id) ?? tour.id,
+              heroCoverGteLayoutMin620,
+              spring3Lg
+            )}
             onAdvanceNext={next}
             onAdvancePrev={prev}
             swipeEnabled={!prefersReducedMotion}

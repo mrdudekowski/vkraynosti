@@ -13,6 +13,7 @@ describe('getTourGalleryLayoutVariant', () => {
     expect(getTourGalleryLayoutVariant('summer-5')).toBe('gamova');
     expect(getTourGalleryLayoutVariant('summer-1')).toBe('tachingouza');
     expect(getTourGalleryLayoutVariant('summer-7')).toBe('severCoast');
+    expect(getTourGalleryLayoutVariant('fall-4')).toBe('sestra');
   });
 
   it('неизвестный id — default', () => {

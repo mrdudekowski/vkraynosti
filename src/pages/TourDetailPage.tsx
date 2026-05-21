@@ -28,6 +28,7 @@ import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
 import TourDetailSectionHeading from "../components/tours/TourDetailSectionHeading";
 import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
 import TourDetailPriceHighlight from "../components/tours/TourDetailPriceHighlight";
+import TourCalendarMini from "../components/tourCalendar/TourCalendarMini";
 import TourIncludedIconList from "../components/tours/TourIncludedIconList";
 import RevealBox from "../components/shared/RevealBox";
 import ScrollScrubFade from "../components/shared/ScrollScrubFade";
@@ -87,16 +88,16 @@ const TourDetailPage = () => {
   const programTrackStyle = {
     '--tour-program-track-offset-y': `${trackOffsetY}px`,
   } as CSSProperties;
-  const viewerGalleryUrls = tour?.galleryImages ?? [];
+  const galleryStillUrls = tour?.galleryImages ?? [];
   const gridGalleryUrls = tour == null ? [] : getTourGalleryGridUrls(tour);
 
-  /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе второй кадр viewer-галереи. */
+  /** Фон блока «О туре»: `prefaceBackgroundImageUrl` или иначе второй still-кадр галереи. */
   const prefaceBackgroundUrl =
     tour == null
       ? null
       : resolveTourPrefaceBackgroundUrl({
       tour,
-      viewerGalleryUrls,
+      galleryStillUrls,
       isLgOrAbove,
       });
 
@@ -170,6 +171,8 @@ const TourDetailPage = () => {
   const seoEntry = getTourSeoEntry(tour);
   const tourStructuredData = getTourStructuredData(tour);
   const breadcrumbStructuredData = getTourBreadcrumbSchema(tour);
+  /** Bento/crop по маршруту; медиа — только `tour.id`. */
+  const heroLayoutTourId = tour.contentSourceTourId ?? tour.id;
 
   const includedRevealClassName =
     prefaceBackgroundUrl != null
@@ -223,9 +226,9 @@ const TourDetailPage = () => {
         backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
         backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
         heroImageObjectClassName={
-          tour.id === 'spring-3'
+          heroLayoutTourId === 'spring-3'
             ? TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS
-            : tour.id === 'spring-6'
+            : heroLayoutTourId === 'spring-6'
               ? TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS
               : tour.id === 'summer-1'
                 ? TOUR_SUMMER_1_COVER_HERO_IMG_OBJECT_CLASS
@@ -238,13 +241,13 @@ const TourDetailPage = () => {
             ? 'lg:object-tour-detail-hero-desktop-winter-3'
             : tour.id === 'winter-4'
               ? 'lg:object-tour-detail-hero-desktop-winter-4'
-              : tour.id === 'spring-1'
+              : heroLayoutTourId === 'spring-1'
                 ? 'lg:object-tour-detail-hero-desktop-spring-1'
-                : tour.id === 'spring-4'
+                : heroLayoutTourId === 'spring-4'
                   ? 'lg:object-tour-detail-hero-desktop-spring-4'
-                  : tour.id === 'spring-5'
+                  : heroLayoutTourId === 'spring-5'
                     ? 'lg:object-tour-detail-hero-desktop-spring-5'
-                    : tour.id === 'spring-13' || tour.id === 'summer-5'
+                    : heroLayoutTourId === 'spring-13' || tour.id === 'summer-5'
                       ? 'lg:object-tour-detail-hero-desktop-spring-13'
                       : undefined
         }
@@ -403,6 +406,9 @@ const TourDetailPage = () => {
                 </div>
               )}
               <div className="hidden lg:mt-10 lg:block">
+                <div className="mb-6">
+                  <TourCalendarMini tourId={tour.id} season={tour.season} />
+                </div>
                 <TourDetailPriceHighlight
                   price={tour.price}
                   pricePrevious={tour.pricePrevious}
@@ -483,6 +489,9 @@ const TourDetailPage = () => {
           </div>
 
           <div className="mt-10 lg:hidden">
+            <div className="mb-6">
+              <TourCalendarMini tourId={tour.id} season={tour.season} />
+            </div>
             <TourDetailPriceHighlight
               price={tour.price}
               pricePrevious={tour.pricePrevious}

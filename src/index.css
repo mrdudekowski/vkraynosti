@@ -851,6 +851,23 @@
   }
 }
 
+@layer components {
+  .tour-calendar {
+    --rdp-accent-color: theme('colors.season.spring');
+    --rdp-day-height: 2.75rem;
+    --rdp-day-width: 2.75rem;
+  }
+
+  .tour-calendar-mini {
+    --rdp-day-height: 2rem;
+    --rdp-day-width: 2rem;
+  }
+
+  .tour-calendar__day--departure {
+    background-color: color-mix(in srgb, theme('colors.season.spring') 12%, transparent);
+  }
+}
+
 @layer utilities {
   /** Галерея тура (лайтбокс): горизонтальный скролл без видимой полосы — навигация точками и свайпом. */
   .scrollbar-none {

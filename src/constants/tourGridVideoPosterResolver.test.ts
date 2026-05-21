@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { SUMMER_PAIRED_TOUR_MEDIA_BY_ID } from './generated/summerPairedTourMedia.generated';
 import {
-  TOUR_SPRING_10_GALLERY_GRID,
   TOUR_SUMMER_1_CLIP1_GRID_WEBM,
   TOUR_WINTER_3_CLIP1_VIDEO,
 } from './images';
@@ -29,11 +29,13 @@ describe('tourGridVideoPosterResolver', () => {
     expect(poster).toBe('/tours/summer-1/tch.clip1.poster.webp');
   });
 
-  it('летняя копия Аскольда (summer-3) — постеры сетки как у spring-10', () => {
-    const gridClip = TOUR_SPRING_10_GALLERY_GRID[2];
-    expect(resolveTourGridVideoPoster('summer-3', gridClip, true)).toEqual(
-      resolveTourGridVideoPoster('spring-10', gridClip, true)
-    );
+  it('summer-3 — постеры сетки в папке summer-3 (не spring-10)', () => {
+    const posters = SUMMER_PAIRED_TOUR_MEDIA_BY_ID['summer-3'].gridVideoPosters;
+    expect(posters).toBeDefined();
+    const gridClip = Object.keys(posters!)[0]!;
+    const posterUrl = posters![gridClip as keyof typeof posters];
+    expect(resolveTourGridVideoPoster('summer-3', gridClip, true)).toBe(posterUrl);
+    expect(gridClip).toContain('/tours/summer-3/');
   });
 
   it('getTourGridVideoPosterGetter: колбэк совпадает с resolveTourGridVideoPoster', () => {

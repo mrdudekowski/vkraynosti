@@ -5,6 +5,7 @@ export interface TourScheduleContextValue {
   status: TourScheduleLoadStatus;
   events: EnrichedScheduleEvent[];
   eventsByDate: Map<string, EnrichedScheduleEvent[]>;
+  prices: ReadonlyMap<string, number>;
   error: Error | null;
   retry: () => void;
 }

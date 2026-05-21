@@ -406,11 +406,7 @@ const TourDetailPage = () => {
               )}
               <div className="hidden lg:mt-10 lg:block">
                 <TourDetailPriceHighlight
-                  tourId={tour.id}
-                  price={tour.price}
-                  pricePrevious={tour.pricePrevious}
-                  footnote={tour.priceFootnote}
-                  season={tour.season}
+                  tour={tour}
                   ariaHidden={!isLgOrAbove}
                 />
               </div>
@@ -487,11 +483,7 @@ const TourDetailPage = () => {
 
           <div className="mt-10 lg:hidden">
             <TourDetailPriceHighlight
-              tourId={tour.id}
-              price={tour.price}
-              pricePrevious={tour.pricePrevious}
-              footnote={tour.priceFootnote}
-              season={tour.season}
+              tour={tour}
               ariaHidden={isLgOrAbove}
             />
           </div>

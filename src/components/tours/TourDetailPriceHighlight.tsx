@@ -1,13 +1,14 @@
 import { useMemo } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import type { Season } from "../../types";
+import type { Tour } from "../../types";
 import { UI } from "../../constants/ui";
+import { useTourDisplayPrice } from "../../hooks/useTourDisplayPrice";
 import { useTourSchedule } from "../../hooks/useTourSchedule";
 import { getTourDepartureDates } from "../../utils/tourSchedule/getTourDepartureDates";
 import { parseIsoDate } from "../../utils/tourSchedule/parseIsoDate";
 
-const ACCENT_BG: Record<Season, string> = {
+const ACCENT_BG: Record<Tour['season'], string> = {
   winter: "bg-season-accent-bar-winter",
   spring: "bg-season-accent-bar-spring",
   summer: "bg-season-accent-bar-summer",
@@ -15,12 +16,7 @@ const ACCENT_BG: Record<Season, string> = {
 };
 
 export interface TourDetailPriceHighlightProps {
-  tourId: string;
-  price: string;
-  pricePrevious?: string;
-  /** См. `Tour.priceFootnote`. */
-  footnote?: string;
-  season: Season;
+  tour: Pick<Tour, "id" | "price" | "pricePrevious" | "priceFootnote" | "season">;
   className?: string;
   /** Дублирующий экземпляр: скрыть от вспомогательных технологий, если блок показан в другом месте. */
   ariaHidden?: boolean;
@@ -33,32 +29,29 @@ const formatDepartureDate = (isoDate: string): string =>
  * Акцентный блок стоимости и дат выездов (не в ряду мета под hero).
  */
 const TourDetailPriceHighlight = ({
-  tourId,
-  price,
-  pricePrevious,
-  footnote,
-  season,
+  tour,
   className = "",
   ariaHidden,
 }: TourDetailPriceHighlightProps) => {
   const { status, events } = useTourSchedule();
+  const { displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
 
   const futureDepartureDates = useMemo(() => {
-    const tourEvents = events.filter(event => event.tourId === tourId);
-    return getTourDepartureDates(tourId, tourEvents).futureDates;
-  }, [events, tourId]);
+    const tourEvents = events.filter(event => event.tourId === tour.id);
+    return getTourDepartureDates(tour.id, tourEvents).futureDates;
+  }, [events, tour.id]);
 
   const ariaPrice =
-    pricePrevious != null && pricePrevious.length > 0
-      ? `${price}, ранее ${pricePrevious}`
-      : price;
+    displayPricePrevious != null && displayPricePrevious.length > 0
+      ? `${displayPrice}, ранее ${displayPricePrevious}`
+      : displayPrice;
 
   const departuresAriaLabel =
     futureDepartureDates.length > 0
       ? `${UI.tourDetail.departuresHeading}: ${futureDepartureDates.map(formatDepartureDate).join(", ")}`
       : `${UI.tourDetail.departuresHeading}: ${UI.tourDetail.departuresEmpty}`;
 
-  const note = footnote ?? UI.tourDetail.priceHighlightNote;
+  const note = tour.priceFootnote ?? UI.tourDetail.priceHighlightNote;
   const isDeparturesLoading = status === "loading" || status === "idle";
 
   return (
@@ -68,18 +61,18 @@ const TourDetailPriceHighlight = ({
       aria-hidden={ariaHidden === true ? true : undefined}
     >
       <div
-        className={`tour-detail-price-highlight__accent ${ACCENT_BG[season]}`}
+        className={`tour-detail-price-highlight__accent ${ACCENT_BG[tour.season]}`}
         aria-hidden
       />
       <p className="text-center font-heading text-tour-detail-prose font-normal text-text-muted sm:text-left">
         {UI.tourDetail.priceHighlightLead}
       </p>
       <p className="mt-3 text-center font-heading text-tour-detail-meta-price-prominent font-bold tabular-nums text-brand-primary sm:text-left">
-        {price}
+        {displayPrice}
       </p>
-      {pricePrevious != null && pricePrevious.length > 0 && (
+      {displayPricePrevious != null && displayPricePrevious.length > 0 && (
         <p className="mt-1 text-center font-heading text-tour-detail-prose tabular-nums text-text-muted line-through sm:text-left">
-          {pricePrevious}
+          {displayPricePrevious}
         </p>
       )}
       <p className="mt-2 text-center text-tooltip text-text-muted sm:text-left">

@@ -6,6 +6,7 @@ import { TOUR_MOBILE_IMAGE_VARIANTS } from '../../constants/images';
 import { buildTourDetailPath } from '../../constants/routes';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import { UI } from '../../constants/ui';
+import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import PlaceholderImage from './PlaceholderImage';
 
 interface TourCardProps {
@@ -27,8 +28,43 @@ const winterCardStruckPrice = (tour: Tour): string | null => {
   return p;
 };
 
-const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
+interface TourCardPriceProps {
+  tour: Tour;
+}
+
+const TourCardPrice = ({ tour }: TourCardPriceProps) => {
+  const { priceRub, displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
   const winterStruck = winterCardStruckPrice(tour);
+  const showWinterInquiry = tour.season === 'winter' && priceRub == null;
+
+  if (showWinterInquiry) {
+    return (
+      <>
+        <span className="font-semibold text-brand-primary block">
+          {UI.tourCard.winterPriceLead}
+        </span>
+        {winterStruck != null && (
+          <span className="text-tooltip text-text-muted line-through tabular-nums block">
+            {winterStruck}
+          </span>
+        )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <span className="font-semibold text-brand-primary block">{displayPrice}</span>
+      {displayPricePrevious != null && displayPricePrevious.length > 0 && (
+        <span className="text-tooltip text-text-muted line-through tabular-nums block">
+          {displayPricePrevious}
+        </span>
+      )}
+    </>
+  );
+};
+
+const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   const showAudienceLine =
     tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0;
   const showCustomDifficultyChip =
@@ -78,27 +114,7 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
         <div className="flex flex-col gap-2 text-sm">
           <span className="text-text-muted">{tour.duration}</span>
           <div className="w-full text-right">
-            {tour.season === 'winter' ? (
-              <>
-                <span className="font-semibold text-brand-primary block">
-                  {UI.tourCard.winterPriceLead}
-                </span>
-                {winterStruck != null && (
-                  <span className="text-tooltip text-text-muted line-through tabular-nums block">
-                    {winterStruck}
-                  </span>
-                )}
-              </>
-            ) : (
-              <>
-                <span className="font-semibold text-brand-primary block">{tour.price}</span>
-                {tour.pricePrevious != null && tour.pricePrevious.length > 0 && (
-                  <span className="text-tooltip text-text-muted line-through tabular-nums block">
-                    {tour.pricePrevious}
-                  </span>
-                )}
-              </>
-            )}
+            <TourCardPrice tour={tour} />
           </div>
         </div>
       </div>

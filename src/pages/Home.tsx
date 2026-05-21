@@ -6,6 +6,7 @@ import { HomeGateScrollToHeroLink } from '../components/home/HomeGateScrollToHer
 import HeroCarousel from '../components/home/HeroCarousel';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import HomeBelowFoldSuspenseFallback from '../components/home/HomeBelowFoldSuspenseFallback';
+import TourCalendarSection from '../components/tourCalendar/TourCalendarSection';
 import PageMeta from '../components/shared/PageMeta';
 import RevealBox from '../components/shared/RevealBox';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
@@ -47,7 +48,6 @@ import {
 } from '../constants/homeToursGrid';
 
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
-const TourCalendarSectionLazy = lazy(() => import('../components/tourCalendar/TourCalendarSection'));
 const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
 const GRID_FADE_OUT_DURATION_MS = 260;
@@ -426,11 +426,11 @@ const Home = () => {
             </ScrollScrubFade>
           </section>
 
-          <Suspense fallback={<HomeBelowFoldSuspenseFallback />}>
-            <ScrollScrubFade className="relative w-full">
-              <TourCalendarSectionLazy />
-            </ScrollScrubFade>
+          <ScrollScrubFade className="relative w-full">
+            <TourCalendarSection />
+          </ScrollScrubFade>
 
+          <Suspense fallback={<HomeBelowFoldSuspenseFallback />}>
             <ScrollScrubFade className="relative w-full">
               <SafetySectionLazy />
             </ScrollScrubFade>

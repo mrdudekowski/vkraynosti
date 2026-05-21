@@ -21,3 +21,9 @@ export interface EnrichedScheduleEvent extends TourScheduleEvent {
 }
 
 export type TourScheduleLoadStatus = 'idle' | 'loading' | 'success' | 'error';
+
+export interface TourSchedulePayload {
+  events: TourScheduleEvent[];
+  /** Каталог цен из листов Туры_* (tourId → ₽). */
+  catalogPrices: Record<string, number>;
+}

@@ -13,7 +13,7 @@ describe('fetchTourSchedule', () => {
     vi.restoreAllMocks();
   });
 
-  it('parses array response', async () => {
+  it('parses array response and builds prices from events', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       json: async () => [
@@ -29,12 +29,13 @@ describe('fetchTourSchedule', () => {
       ],
     } as Response);
 
-    const events = await fetchTourSchedule();
-    expect(events).toHaveLength(1);
-    expect(events[0]?.tourId).toBe('spring-3');
+    const payload = await fetchTourSchedule();
+    expect(payload.events).toHaveLength(1);
+    expect(payload.events[0]?.tourId).toBe('spring-3');
+    expect(payload.catalogPrices).toEqual({ 'spring-3': 6000 });
   });
 
-  it('parses wrapped events response', async () => {
+  it('parses wrapped response with catalog prices', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -49,11 +50,19 @@ describe('fetchTourSchedule', () => {
             comment: null,
           },
         ],
+        prices: {
+          'spring-3': 6500,
+          'spring-1': 6000,
+        },
       }),
     } as Response);
 
-    const events = await fetchTourSchedule();
-    expect(events).toHaveLength(1);
+    const payload = await fetchTourSchedule();
+    expect(payload.events).toHaveLength(1);
+    expect(payload.catalogPrices).toEqual({
+      'spring-3': 6500,
+      'spring-1': 6000,
+    });
   });
 
   it('throws parse error on invalid payload', async () => {

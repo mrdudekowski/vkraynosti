@@ -7,7 +7,8 @@ import { getTourById } from '../../data/toursData';
 import { UI } from '../../constants/ui';
 
 const spring3 = getTourById('spring-3');
-if (!spring3) throw new Error('spring-3 missing');
+const spring1 = getTourById('spring-1');
+if (!spring3 || !spring1) throw new Error('test tours missing');
 
 const enrichedEvents: EnrichedScheduleEvent[] = [
   {
@@ -36,29 +37,32 @@ const enrichedEvents: EnrichedScheduleEvent[] = [
   },
 ];
 
-const defaultProps = {
-  tourId: 'spring-3',
-  price: '6 000 ₽',
-  season: 'spring' as const,
-};
+const scheduleContextValue = (
+  overrides: Partial<{
+    status: 'success' | 'loading';
+    events: EnrichedScheduleEvent[];
+    prices: ReadonlyMap<string, number>;
+  }> = {}
+) => ({
+  status: 'success' as const,
+  events: enrichedEvents,
+  eventsByDate: new Map(),
+  prices: new Map([['spring-3', 6500]]),
+  error: null,
+  retry: vi.fn(),
+  ...overrides,
+});
 
 describe('TourDetailPriceHighlight', () => {
-  it('shows future departure dates in the same card as price', () => {
+  it('shows schedule price and future departure dates in one card', () => {
     render(
-      <TourScheduleContext.Provider
-        value={{
-          status: 'success',
-          events: enrichedEvents,
-          eventsByDate: new Map(),
-          error: null,
-          retry: vi.fn(),
-        }}
-      >
-        <TourDetailPriceHighlight {...defaultProps} />
+      <TourScheduleContext.Provider value={scheduleContextValue()}>
+        <TourDetailPriceHighlight tour={spring3} />
       </TourScheduleContext.Provider>
     );
 
     expect(screen.getByText(UI.tourDetail.priceHighlightLead)).toBeInTheDocument();
+    expect(screen.getByText('6 500 ₽')).toBeInTheDocument();
     expect(screen.getByText(UI.tourDetail.departuresHeading)).toBeInTheDocument();
     expect(screen.getByText('9 мая 2099')).toBeInTheDocument();
     expect(screen.getByText('10 мая 2099')).toBeInTheDocument();
@@ -67,15 +71,9 @@ describe('TourDetailPriceHighlight', () => {
   it('shows empty departures message when tour has no future dates', () => {
     render(
       <TourScheduleContext.Provider
-        value={{
-          status: 'success',
-          events: [],
-          eventsByDate: new Map(),
-          error: null,
-          retry: vi.fn(),
-        }}
+        value={scheduleContextValue({ events: [], prices: new Map() })}
       >
-        <TourDetailPriceHighlight {...defaultProps} tourId="spring-1" />
+        <TourDetailPriceHighlight tour={spring1} />
       </TourScheduleContext.Provider>
     );
 
@@ -85,15 +83,9 @@ describe('TourDetailPriceHighlight', () => {
   it('shows loading skeleton while schedule is loading', () => {
     render(
       <TourScheduleContext.Provider
-        value={{
-          status: 'loading',
-          events: [],
-          eventsByDate: new Map(),
-          error: null,
-          retry: vi.fn(),
-        }}
+        value={scheduleContextValue({ status: 'loading', events: [], prices: new Map() })}
       >
-        <TourDetailPriceHighlight {...defaultProps} />
+        <TourDetailPriceHighlight tour={spring3} />
       </TourScheduleContext.Provider>
     );
 

@@ -54,6 +54,10 @@ const renderCalendar = () =>
           status: 'success',
           events: enrichedEvents,
           eventsByDate,
+          prices: new Map([
+            ['spring-3', 6000],
+            ['spring-6', 5500],
+          ]),
           error: null,
           retry: vi.fn(),
         }}

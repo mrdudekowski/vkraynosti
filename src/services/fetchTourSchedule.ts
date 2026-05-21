@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import type { TourScheduleEvent } from '../types/tourSchedule';
+import type { TourSchedulePayload } from '../types/tourSchedule';
+import { buildTourPricesFromEvents } from '../utils/tourSchedule/buildTourPricesFromEvents';
 
 const tourScheduleStatusSchema = z.enum(['planned', 'open', 'full', 'cancelled', 'completed']);
 
@@ -15,9 +16,14 @@ export const tourScheduleEventSchema = z.object({
   comment: z.string().nullable(),
 });
 
+const tourSchedulePricesSchema = z.record(z.string(), z.number());
+
 export const tourScheduleResponseSchema = z.union([
   z.array(tourScheduleEventSchema),
-  z.object({ events: z.array(tourScheduleEventSchema) }),
+  z.object({
+    events: z.array(tourScheduleEventSchema),
+    prices: tourSchedulePricesSchema.optional(),
+  }),
 ]);
 
 export type TourScheduleFetchErrorCode = 'network' | 'parse' | 'not-configured';
@@ -36,10 +42,25 @@ const tourScheduleEndpointUrl = import.meta.env.VITE_TOUR_SCHEDULE_ENDPOINT_URL;
 
 const MOCK_SCHEDULE_URL = `${import.meta.env.BASE_URL}data/tour-schedule.json`;
 
-const normalizeResponse = (parsed: z.infer<typeof tourScheduleResponseSchema>): TourScheduleEvent[] =>
-  Array.isArray(parsed) ? parsed : parsed.events;
+const normalizeResponse = (
+  parsed: z.infer<typeof tourScheduleResponseSchema>
+): TourSchedulePayload => {
+  if (Array.isArray(parsed)) {
+    const events = parsed;
+    return {
+      events,
+      catalogPrices: buildTourPricesFromEvents(events),
+    };
+  }
 
-export const fetchTourSchedule = async (): Promise<TourScheduleEvent[]> => {
+  const events = parsed.events;
+  return {
+    events,
+    catalogPrices: parsed.prices ?? buildTourPricesFromEvents(events),
+  };
+};
+
+export const fetchTourSchedule = async (): Promise<TourSchedulePayload> => {
   const url = tourScheduleEndpointUrl?.trim() || MOCK_SCHEDULE_URL;
 
   let response: Response;

@@ -21,14 +21,6 @@ export const tourCalendarClassNames: Partial<ClassNames> = {
   hidden: 'invisible',
 };
 
-export const tourCalendarMiniClassNames: Partial<ClassNames> = {
-  ...tourCalendarClassNames,
-  root: 'tour-calendar tour-calendar-mini rdp-root w-full',
-  day_button:
-    'flex h-full w-full max-w-[2rem] flex-col items-center justify-center rounded-md aspect-square mx-auto font-body text-xs text-text-primary disabled:opacity-30',
-  weekday: 'flex-1 text-center text-[10px] font-body uppercase tracking-wide text-text-muted pb-1',
-};
-
 export const tourCalendarModifierClassNames = {
   hasEvents: 'tour-calendar__day--has-events font-medium',
   tourDeparture: 'tour-calendar__day--departure font-semibold',

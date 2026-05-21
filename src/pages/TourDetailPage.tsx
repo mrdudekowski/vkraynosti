@@ -28,7 +28,6 @@ import TourRequestCtaButton from "../components/tours/TourRequestCtaButton";
 import TourDetailSectionHeading from "../components/tours/TourDetailSectionHeading";
 import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
 import TourDetailPriceHighlight from "../components/tours/TourDetailPriceHighlight";
-import TourCalendarMini from "../components/tourCalendar/TourCalendarMini";
 import TourIncludedIconList from "../components/tours/TourIncludedIconList";
 import RevealBox from "../components/shared/RevealBox";
 import ScrollScrubFade from "../components/shared/ScrollScrubFade";
@@ -406,10 +405,8 @@ const TourDetailPage = () => {
                 </div>
               )}
               <div className="hidden lg:mt-10 lg:block">
-                <div className="mb-6">
-                  <TourCalendarMini tourId={tour.id} season={tour.season} />
-                </div>
                 <TourDetailPriceHighlight
+                  tourId={tour.id}
                   price={tour.price}
                   pricePrevious={tour.pricePrevious}
                   footnote={tour.priceFootnote}
@@ -489,10 +486,8 @@ const TourDetailPage = () => {
           </div>
 
           <div className="mt-10 lg:hidden">
-            <div className="mb-6">
-              <TourCalendarMini tourId={tour.id} season={tour.season} />
-            </div>
             <TourDetailPriceHighlight
+              tourId={tour.id}
               price={tour.price}
               pricePrevious={tour.pricePrevious}
               footnote={tour.priceFootnote}

@@ -5,6 +5,7 @@ import { toIsoDate } from './toIsoDate';
 
 export interface TourDepartureDatesResult {
   dates: string[];
+  futureDates: string[];
   nearestFuture: string | null;
   focusMonth: Date;
   isArchive: boolean;
@@ -17,10 +18,13 @@ export const getTourDepartureDates = (
 ): TourDepartureDatesResult => {
   const todayIso = toIsoDate(today);
 
-  const dates = events
-    .filter(e => e.tourId === tourId && e.status !== 'cancelled')
-    .map(e => e.date)
-    .sort();
+  const dates = [
+    ...new Set(
+      events
+        .filter(e => e.tourId === tourId && e.status !== 'cancelled')
+        .map(e => e.date)
+    ),
+  ].sort();
 
   const futureDates = dates.filter(iso => iso >= todayIso);
   const nearestFuture = futureDates[0] ?? null;
@@ -30,6 +34,7 @@ export const getTourDepartureDates = (
 
   return {
     dates,
+    futureDates,
     nearestFuture,
     focusMonth,
     isArchive: nearestFuture === null && dates.length > 0,

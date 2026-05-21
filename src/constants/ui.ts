@@ -232,6 +232,10 @@ export const UI = {
     priceHighlightLead: 'Стоимость участия',
     priceHighlightNote: 'Указана на одного участника, в рублях.',
     priceHighlightAriaLabel: 'Стоимость тура',
+    departuresHeading: 'Даты выездов',
+    departuresEmpty:
+      'Следите за обновлениями, чтобы не упустить анонс этого тура!',
+    departuresLoadingAria: 'Загрузка дат выездов',
     requestTourCta:  'Оставить заявку на тур',
     /** Подпись при наведении на CTA заявки (буквы + стрелка в `.btn-cta-tour--dual`). */
     requestTourCtaHoverWordmark: 'Вкрайности',
@@ -277,24 +281,6 @@ export const UI = {
             ? 'выезда'
             : 'выездов';
       return `${formattedDate}, ${count} ${word}`;
-    },
-  },
-  tourCalendarMini: {
-    title: 'Ближайшие выезды',
-    empty: 'Даты выездов уточняются. Смотрите общее расписание.',
-    allScheduleLink: 'Всё расписание',
-    archiveHint: 'Все даты в прошлом',
-    nearestLabel: (formatted: string, statusLabel: string) => `${formatted} · ${statusLabel}`,
-    moreDates: (count: number) => {
-      const mod10 = count % 10;
-      const mod100 = count % 100;
-      const word =
-        mod10 === 1 && mod100 !== 11
-          ? 'дата'
-          : mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)
-            ? 'даты'
-            : 'дат';
-      return `+ ещё ${count} ${word}`;
     },
   },
   notFoundPage: {

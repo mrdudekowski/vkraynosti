@@ -6,7 +6,6 @@ import { HomeGateScrollToHeroLink } from '../components/home/HomeGateScrollToHer
 import HeroCarousel from '../components/home/HeroCarousel';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import HomeBelowFoldSuspenseFallback from '../components/home/HomeBelowFoldSuspenseFallback';
-import TourCalendarSection from '../components/tourCalendar/TourCalendarSection';
 import PageMeta from '../components/shared/PageMeta';
 import RevealBox from '../components/shared/RevealBox';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
@@ -46,7 +45,11 @@ import {
   HOME_TOURS_PRIORITY_IMAGE_ABOVE_FOLD_COUNT,
   HOME_TOURS_PROMO_VIDEO_SWITCH_MS,
 } from '../constants/homeToursGrid';
+import { getHomeLcpPreloadImageUrl } from '../utils/getHomeLcpPreloadImageUrl';
 
+const TourCalendarSectionLazy = lazy(
+  () => import('../components/tourCalendar/TourCalendarSection')
+);
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
 const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
@@ -142,6 +145,16 @@ const Home = () => {
           ? getHomeSeasonBannerSpringVideoPreloadLinks()
           : undefined,
     [activeSeason]
+  );
+
+  const lcpPreloadImageUrl = useMemo(
+    () =>
+      getHomeLcpPreloadImageUrl(
+        isHomeGateDesktopLayout,
+        activeSeason,
+        tours[0]?.imageUrl
+      ),
+    [isHomeGateDesktopLayout, activeSeason, tours]
   );
 
   const collapsedVisibleCount = Math.min(HOME_TOURS_COLLAPSED_MAX_VISIBLE, tours.length);
@@ -293,7 +306,7 @@ const Home = () => {
         imageUrl={IMAGES.hero[activeSeason]}
         path={SEO_DEFAULTS.home.path}
         structuredData={[ORGANIZATION_SCHEMA, WEBSITE_SCHEMA]}
-        preloadHeroImageUrl={IMAGES.seasonSection[activeSeason]}
+        preloadHeroImageUrl={lcpPreloadImageUrl}
         priorityVideoPreloads={seasonBannerVideoPreloads}
       />
 
@@ -426,11 +439,11 @@ const Home = () => {
             </ScrollScrubFade>
           </section>
 
-          <ScrollScrubFade className="relative w-full">
-            <TourCalendarSection />
-          </ScrollScrubFade>
-
           <Suspense fallback={<HomeBelowFoldSuspenseFallback />}>
+            <ScrollScrubFade className="relative w-full">
+              <TourCalendarSectionLazy />
+            </ScrollScrubFade>
+
             <ScrollScrubFade className="relative w-full">
               <SafetySectionLazy />
             </ScrollScrubFade>

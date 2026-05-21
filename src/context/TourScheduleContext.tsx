@@ -41,6 +41,18 @@ const loadSchedule = async (): Promise<CachedSchedule> => {
 const scheduleError = (err: unknown): Error =>
   err instanceof Error ? err : new Error('Unknown schedule error');
 
+/** Не конкурировать с LCP: первый fetch после idle, не позже timeout (мс). */
+const SCHEDULE_LOAD_IDLE_TIMEOUT_MS = 2500;
+
+const scheduleDeferredLoad = (run: () => void): (() => void) => {
+  if (typeof requestIdleCallback === 'function') {
+    const id = requestIdleCallback(run, { timeout: SCHEDULE_LOAD_IDLE_TIMEOUT_MS });
+    return () => cancelIdleCallback(id);
+  }
+  const id = window.setTimeout(run, 1);
+  return () => window.clearTimeout(id);
+};
+
 export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   const [status, setStatus] = useState<TourScheduleLoadStatus>(
     cachedSchedule ? 'success' : 'loading'
@@ -68,19 +80,25 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
 
     let cancelled = false;
 
-    void loadSchedule()
-      .then(result => {
-        if (!cancelled) applySchedule(result);
-      })
-      .catch(err => {
-        if (!cancelled) {
-          setStatus('error');
-          setError(scheduleError(err));
-        }
-      });
+    const runLoad = () => {
+      if (cancelled) return;
+      void loadSchedule()
+        .then(result => {
+          if (!cancelled) applySchedule(result);
+        })
+        .catch(err => {
+          if (!cancelled) {
+            setStatus('error');
+            setError(scheduleError(err));
+          }
+        });
+    };
+
+    const cancelDeferred = scheduleDeferredLoad(runLoad);
 
     return () => {
       cancelled = true;
+      cancelDeferred();
     };
   }, [applySchedule]);
 

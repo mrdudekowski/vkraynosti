@@ -4,7 +4,6 @@ import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByC
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import type { Season } from '../../types';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
-import { formatPriceRub } from '../../utils/tourSchedule/formatPriceRub';
 import PlaceholderImage from '../shared/PlaceholderImage';
 
 const SEASON_STRIPE_CLASS: Record<Season, string> = {
@@ -17,16 +16,6 @@ const SEASON_STRIPE_CLASS: Record<Season, string> = {
 interface TourScheduleListItemProps {
   event: EnrichedScheduleEvent;
 }
-
-const formatSchedulePrice = (
-  eventPriceRub: number | null,
-  catalogPriceRub: number | null,
-  fallbackPrice: string
-): string => {
-  if (eventPriceRub != null) return formatPriceRub(eventPriceRub);
-  if (catalogPriceRub != null) return formatPriceRub(catalogPriceRub);
-  return fallbackPrice;
-};
 
 const statusBadgeClass = (status: EnrichedScheduleEvent['status']): string => {
   switch (status) {
@@ -43,7 +32,7 @@ const statusBadgeClass = (status: EnrichedScheduleEvent['status']): string => {
 
 const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
   const { tour, season } = event;
-  const { priceRub: catalogPriceRub } = useTourDisplayPrice(tour);
+  const { displayPrice } = useTourDisplayPrice(tour);
 
   return (
     <Link
@@ -75,7 +64,7 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
         </p>
       </div>
       <p className="shrink-0 text-right text-sm font-semibold tabular-nums text-brand-primary">
-        {formatSchedulePrice(event.priceRub, catalogPriceRub, tour.price)}
+        {displayPrice}
       </p>
     </Link>
   );

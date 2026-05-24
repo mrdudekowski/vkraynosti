@@ -89,7 +89,7 @@ function readFallIds() {
 }
 
 /**
- * Каталог 39 туров — SSOT из toursData + пары summer/fall.
+ * Каталог 43 туров — SSOT из toursData + пары summer/fall.
  * @returns {TourCatalogRow[]}
  */
 export function loadTourCatalog() {
@@ -136,8 +136,8 @@ export function loadTourCatalog() {
     return Number.parseInt(a.id.split('-')[1], 10) - Number.parseInt(b.id.split('-')[1], 10);
   });
 
-  if (sorted.length !== 39) {
-    throw new Error(`Expected 39 tours, got ${sorted.length}`);
+  if (sorted.length !== 43) {
+    throw new Error(`Expected 43 tours, got ${sorted.length}`);
   }
 
   return sorted;

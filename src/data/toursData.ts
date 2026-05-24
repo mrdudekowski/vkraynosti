@@ -92,6 +92,22 @@ import {
   TOUR_SUMMER_8_GALLERY_GRID,
   TOUR_SUMMER_8_GALLERY_VIEWER,
   TOUR_SUMMER_8_PREFACE_BACKGROUND,
+  TOUR_SUMMER_9_COVER_GRID,
+  TOUR_SUMMER_9_GALLERY_GRID,
+  TOUR_SUMMER_9_GALLERY_VIEWER,
+  TOUR_SUMMER_9_PREFACE_BACKGROUND,
+  TOUR_SUMMER_10_COVER_GRID,
+  TOUR_SUMMER_10_GALLERY_GRID,
+  TOUR_SUMMER_10_GALLERY_VIEWER,
+  TOUR_SUMMER_10_PREFACE_BACKGROUND,
+  TOUR_SUMMER_11_COVER_GRID,
+  TOUR_SUMMER_11_GALLERY_GRID,
+  TOUR_SUMMER_11_GALLERY_VIEWER,
+  TOUR_SUMMER_11_PREFACE_BACKGROUND,
+  TOUR_SUMMER_12_COVER_GRID,
+  TOUR_SUMMER_12_GALLERY_GRID,
+  TOUR_SUMMER_12_GALLERY_VIEWER,
+  TOUR_SUMMER_12_PREFACE_BACKGROUND,
 } from '../constants/images';
 import { FALL_TOUR_MEDIA_BY_ID } from '../constants/generated/fallTourMedia.generated';
 import { SUMMER_PAIRED_TOUR_MEDIA_BY_ID } from '../constants/generated/summerPairedTourMedia.generated';
@@ -103,6 +119,11 @@ const inc = (text: string, icon: IconDefinition = faCheck): TourIncludedItem => 
   text,
   icon,
 });
+
+/** Диапазон сложности из `UI.difficulty.labels` (склонение -ий: Лёгкий / Средний / Сложный). */
+const difficultyRangeLabel = (
+  ...levels: Array<keyof typeof UI.difficulty.labels>
+) => levels.join(UI.tourCard.metaAudienceDifficultyRangeSeparator);
 
 const TOURS_CORE: Tour[] = [
   // WINTER — 5 tours
@@ -318,7 +339,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Арсгора ждёт приморских райдеров',
     duration: '2 дня',
     difficulty: 'Medium',
-    difficultyDisplayLabel: 'Лёгкая/Сложная',
+    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Hard'),
     price: UI.tourCard.winterPricePlaceholderNoListing,
     pricePrevious: '13 000 ₽',
     priceFootnote: 'Актуальную стоимость сообщим по запросу.',
@@ -562,7 +583,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Катер, маяк, кекуры и лежбища ларг за один день',
     duration: '12–14 часов',
     difficulty: 'Medium',
-    difficultyDisplayLabel: 'Легкая/Сложная',
+    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Hard'),
     price: '7 000 ₽',
     descriptionLeadBold: 'Остров Аскольд',
     description:
@@ -1025,7 +1046,7 @@ const TOURS_CORE: Tour[] = [
     galleryGridUrls: [...TOUR_SPRING_1_GALLERY_GRID],
   },
 
-  // SUMMER — 8 tours (summer-1, summer-7, summer-8 — уникальные; summer-2…6 — фабрика)
+  // SUMMER — 12 tours (summer-1, summer-7…12 — уникальные; summer-2…6 — фабрика)
   {
     id: 'summer-1',
     season: 'summer',
@@ -1034,7 +1055,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Бирюзовое море, скалы и ферма маралов',
     duration: '2 дня / 1 ночь',
     difficulty: 'Easy',
-    difficultyDisplayLabel: 'легкая',
+    difficultyDisplayLabel: UI.difficulty.labels.Easy,
     price: 'от 15 000 ₽',
     priceFootnote: 'группа от 4 человек',
     description:
@@ -1080,7 +1101,7 @@ const TOURS_CORE: Tour[] = [
       'Туда, где кончаются дороги, а океан встречается со звёздами. Два дня, чтобы влюбиться в настоящий север Приморья.',
     duration: '2 дня / 1 ночь',
     difficulty: 'Medium',
-    difficultyDisplayLabel: 'Средняя',
+    difficultyDisplayLabel: UI.difficulty.labels.Medium,
     price: '19 500 ₽',
     priceFootnote: 'на одного участника, группа от 5 человек',
     description:
@@ -1155,43 +1176,344 @@ const TOURS_CORE: Tour[] = [
   {
     id: 'summer-8',
     season: 'summer',
-    title: 'Полуостров Краббе',
-    subtitle: 'Один день среди морских скал, бухт и тех видов, в которые влюбляешься сразу',
+    title: 'Полуостров Краббе с палатками',
+    subtitle:
+      'Два дня у моря, палаточный лагерь и один из самых красивых берегов Приморья',
     heroPhrase:
-      'Туда, где зелёные сопки уходят в море, а каждый поворот тропы — как новая открытка Приморья',
-    duration: '1 день',
+      'Уедем туда, где зелёные сопки уходят в море, а вечер в палатке хочется запомнить надолго',
+    duration: '2 дня / 1 ночь',
     difficulty: 'Medium',
-    difficultyDisplayLabel: 'Средняя',
+    difficultyDisplayLabel: UI.difficulty.labels.Medium,
     price: 'по запросу',
     description:
-      'Этот маршрут — для тех, кто любит живые путешествия: красивые дороги, морской воздух, душевную компанию и места, после которых ещё долго тепло внутри.\n\nПолуостров Краббе — одно из самых атмосферных мест юга Приморья. Он в Хасанском округе, считается необитаемым и входит в буферную зону особо охраняемых природных территорий. Здесь море с двух сторон, зелёные сопки, бухты, кекуры, пещеры и ощущение, будто вы приехали в совсем другое Приморье — более дикое, тихое и сильное.\n\nМы любим этот маршрут за красоту и характер: прогулку по берегу и смотровым точкам, каменную сказку Краббе, бухту Агатовую, простор и редкое чувство свободы. Это поездка, в которой не нужно спешить: идём, смотрим, дышим морем и просто проживаем очень красивый день.',
+      'Это путешествие для тех, кто любит не спешить: красивую дорогу, море с двух сторон, живые разговоры, ужин в лагере и такие места, после которых внутри становится тихо и хорошо.\n\nПолуостров Краббе — одно из самых атмосферных мест юга Приморья: он необитаем, входит в буферную зону охраняемых территорий и известен вулканическими берегами, гротами, арками, кекурами и бухтой Агатовой с разноцветной галькой.',
+    descriptionAside:
+      'На официальном туристическом портале Приморья среди ключевых точек полуострова отдельно выделены гора де-Гера, «Каменная сказка» и бухта Агатовая.',
     program: [
-      { timeLabel: '05:30', description: 'Выезд из Владивостока' },
-      { timeLabel: '10:00', description: 'Прибытие к началу маршрута, короткий инструктаж' },
+      { timeLabel: 'День 1 · 06:00', description: 'Выезд из Владивостока' },
       {
-        timeLabel: '10:30–13:30',
-        description: 'Прогулка по полуострову, видовые точки, море, фото',
+        timeLabel: 'День 1 · 09:00–09:20',
+        description: 'Санитарная остановка и кофе по пути',
       },
-      { timeLabel: '13:30–14:30', description: 'Пикник с красивым видом' },
       {
-        timeLabel: '14:30–17:00',
-        description: 'Продолжаем маршрут, исследуем берег и бухты',
+        timeLabel: 'День 1 · 12:00',
+        description:
+          'Прибытие в район Гвоздево, короткая остановка, подготовка к финальному участку дороги',
       },
-      { timeLabel: '17:30', description: 'Выезд обратно' },
-      { timeLabel: '22:00–23:00', description: 'Возвращение во Владивосток' },
+      { timeLabel: 'День 1 · 13:30', description: 'Прибытие в район бухты Агатовой' },
+      {
+        timeLabel: 'День 1 · 13:30–14:30',
+        description: 'Обед / перекус с видом на море',
+      },
+      {
+        timeLabel: 'День 1 · 14:30–16:00',
+        description: 'Установка палаточного лагеря, обустройство, отдых',
+      },
+      {
+        timeLabel: 'День 1 · 16:00–18:30',
+        description:
+          'Лёгкая прогулка по побережью: море, скалы, фото, закатные виды',
+      },
+      { timeLabel: 'День 1 · 19:00–20:30', description: 'Ужин в лагере' },
+      {
+        timeLabel: 'День 1 · 20:30–22:30',
+        description: 'Свободное время, вечер у моря, отдых',
+      },
+      { timeLabel: 'День 1 · 22:30', description: 'Отбой' },
+      { timeLabel: 'День 2 · 08:00', description: 'Подъём' },
+      { timeLabel: 'День 2 · 08:30–09:30', description: 'Завтрак в лагере' },
+      {
+        timeLabel: 'День 2 · 09:30–10:30',
+        description: 'Неспешное утро у моря, сборы на прогулку',
+      },
+      {
+        timeLabel: 'День 2 · 10:30–13:30',
+        description:
+          'Радиальный маршрут без спешки: бухта Агатовая, «Каменная сказка», видовые точки в сторону де-Гера',
+      },
+      { timeLabel: 'День 2 · 13:30–14:30', description: 'Обед / перекус и отдых' },
+      { timeLabel: 'День 2 · 14:30–15:30', description: 'Сбор лагеря' },
+      { timeLabel: 'День 2 · 15:30', description: 'Выезд с полуострова' },
+      {
+        timeLabel: 'День 2 · 17:30',
+        description: 'Выезд в сторону Владивостока после участка до Гвоздево',
+      },
+      {
+        timeLabel: 'День 2 · 21:30–22:00',
+        description: 'Возвращение во Владивосток',
+      },
+    ],
+    programAdditionalNotes: [
+      'Время поездки и маршрут могут меняться из-за погодных и дорожных условий.',
     ],
     includedInPrice: [
       inc('Трансфер туда и обратно', faShuttleVan),
+      inc('Организация маршрута и лагеря', faBookOpen),
       inc('Сопровождение команды Вкрайности', faUserTie),
-      inc('Организация маршрута', faBookOpen),
-      inc('Прогулка по полуострову Краббе', faPersonHiking),
-      inc('Время на отдых, фото и пикник', faMugHot),
+      inc('Двухдневная программа по полуострову Краббе', faPersonHiking),
+      inc('Ночёвка в палаточном лагере', faBed),
+      inc('Помощь с групповым лагерным снаряжением', faHelmetSafety),
+      inc('Горячее питание в лагере', faUtensils),
       inc('Наша забота и тёплая атмосфера в поездке', faHeart),
     ],
     imageUrl: TOUR_SUMMER_8_COVER_GRID,
     prefaceBackgroundImageUrl: TOUR_SUMMER_8_PREFACE_BACKGROUND,
     galleryImages: [...TOUR_SUMMER_8_GALLERY_VIEWER],
     galleryGridUrls: [...TOUR_SUMMER_8_GALLERY_GRID],
+  },
+  {
+    id: 'summer-9',
+    season: 'summer',
+    title: 'Водопад Неожиданный х Майхинское хозяйство',
+    subtitle: 'Один день среди леса, воды и вкусов Приморья',
+    heroPhrase: 'Пикник у водопада и посещение местной винодельни',
+    duration: '1 день',
+    difficulty: 'Easy',
+    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),
+    price: 'по запросу',
+    description:
+      'Это путешествие для тех, кто любит, когда в одном дне красиво сочетаются природа, отдых и вкусные впечатления. Сначала нас ждёт водопад Неожиданный: лес, шум воды, пикник, отдых у водопада и, по желанию, купание. А потом — переезд в Майхинское хозяйство, чтобы завершить день в атмосфере уюта, тишины и приморского виноделия.\n\nЭтот маршрут — про живое удовольствие от простых вещей: пройтись по лесу, посидеть у воды, выдохнуть, вкусно провести день и разделить всё это с хорошими людьми. Именно такие поездки мы любим больше всего — лёгкие, красивые и по-настоящему душевные.',
+    program: [
+      { timeLabel: '08:00', description: 'Выезд из Владивостока' },
+      { timeLabel: '10:30', description: 'Прибытие к началу маршрута' },
+      { timeLabel: '11:00', description: 'Прогулка к водопаду Неожиданный' },
+      {
+        timeLabel: '12:00–14:30',
+        description:
+          'Отдых у водопада, пикник, фото, купание по желанию',
+      },
+      { timeLabel: '15:00', description: 'Выезд в сторону Анисимовки' },
+      { timeLabel: '16:00', description: 'Посещение Майхинского хозяйства' },
+      { timeLabel: '18:00', description: 'Завершение программы, выезд в город' },
+      {
+        timeLabel: '20:00–20:30',
+        description: 'Возвращение во Владивосток',
+      },
+    ],
+    programAdditionalNotes: ['Программа дня ориентировочная.'],
+    includedInPrice: [
+      inc('Трансфер туда и обратно', faShuttleVan),
+      inc('Сопровождение команды Вкрайности', faUserTie),
+      inc('Посещение водопада Неожиданный', faWater),
+      inc('Пикник и купание у водопада', faUtensils),
+      inc('Входные билеты на посещение Майхинского хозяйства', faTicket),
+      inc('Организация маршрута и наша забота на всём пути', faHeart),
+    ],
+    imageUrl: TOUR_SUMMER_9_COVER_GRID,
+    prefaceBackgroundImageUrl: TOUR_SUMMER_9_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SUMMER_9_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SUMMER_9_GALLERY_GRID],
+  },
+  {
+    id: 'summer-10',
+    season: 'summer',
+    title: 'Бухта Ежовая + гора Сестра + бухта Спокойная / Окунёвая',
+    subtitle:
+      'Два дня у моря: видовая вершина, бирюзовая бухта и ещё один красивый день у воды',
+    heroPhrase:
+      'Сначала — Сестра и Ежовая. Потом — ночь у моря, сапы и ещё один день в одной из самых красивых бухт Приморья',
+    duration: '2 дня / 1 ночь',
+    difficulty: 'Easy',
+    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),
+    price: 'по запросу',
+    description:
+      'Это два дня среди тех красот Приморья, в которые мы сами искренне влюблены. Сначала — лёгкое восхождение на Сестру, потом — бухта Ежовая с прозрачной водой и белым песком, а на следующий день — ещё одна красивая морская локация: бухта Спокойная или Окунёвая. Всё, чтобы уехать домой с лёгкой головой, красивыми фотографиями и очень тёплым чувством внутри.',
+    program: [
+      { timeLabel: 'День 1 · 06:00', description: 'Выезд из Владивостока' },
+      {
+        timeLabel: 'День 1 · 09:30',
+        description: 'Прибытие к началу тропы на г. Сестра',
+      },
+      { timeLabel: 'День 1 · 09:45–10:30', description: 'Подъём на вершину' },
+      { timeLabel: 'День 1 · 10:30–11:00', description: 'Отдых, фото, виды' },
+      { timeLabel: 'День 1 · 11:00–11:40', description: 'Спуск' },
+      {
+        timeLabel: 'День 1 · 11:40–12:20',
+        description: 'Перекус / чай после восхождения',
+      },
+      { timeLabel: 'День 1 · 12:20', description: 'Выезд в сторону бухты Ежовой' },
+      { timeLabel: 'День 1 · 14:00', description: 'Прибытие в район бухты Ежовой' },
+      {
+        timeLabel: 'День 1 · 14:00–18:00',
+        description: 'Отдых у моря, прогулка по бухте, купание, фото',
+      },
+      { timeLabel: 'День 1 · 18:00', description: 'Выезд на ночёвку' },
+      { timeLabel: 'День 1 · 18:30–19:00', description: 'Размещение' },
+      {
+        timeLabel: 'День 1 · 19:30',
+        description: 'Ужин, свободный вечер, отдых',
+      },
+      { timeLabel: 'День 2 · 09:00', description: 'Завтрак' },
+      {
+        timeLabel: 'День 2 · 10:00',
+        description: 'Выезд в бухту Спокойную или Окунёвую',
+      },
+      {
+        timeLabel: 'День 2 · 10:30–14:00',
+        description:
+          'Отдых у моря, прогулки, купание, катание на сапах',
+      },
+      { timeLabel: 'День 2 · 14:00–15:00', description: 'Обед / пикник' },
+      {
+        timeLabel: 'День 2 · 15:00–16:30',
+        description: 'Свободное время у моря',
+      },
+      { timeLabel: 'День 2 · 16:30', description: 'Выезд во Владивосток' },
+      { timeLabel: 'День 2 · 21:00', description: 'Возвращение в город' },
+    ],
+    programAdditionalNotes: [
+      'Итоговая бухта на второй день определяется заранее по дорожным условиям, погоде и состоянию моря.',
+    ],
+    includedInPrice: [
+      inc('Трансфер туда и обратно', faShuttleVan),
+      inc('Сопровождение команды Вкрайности', faUserTie),
+      inc('Подъём на г. Сестра', faPersonHiking),
+      inc('Посещение бухты Ежовой', faWater),
+      inc('Ночёвка у моря', faBed),
+      inc('Второй день в бухте Спокойной или Окунёвой', faWater),
+      inc('Предоставление сапов', faWater),
+      inc('Организация маршрута и помощь по ходу поездки', faBookOpen),
+      inc('Наша забота и тёплая атмосфера в путешествии', faHeart),
+    ],
+    imageUrl: TOUR_SUMMER_10_COVER_GRID,
+    prefaceBackgroundImageUrl: TOUR_SUMMER_10_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SUMMER_10_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SUMMER_10_GALLERY_GRID],
+  },
+  {
+    id: 'summer-11',
+    season: 'summer',
+    title: 'Релакс-тур в бухту Ежовую / Спокойную',
+    subtitle: 'Один день у моря: отдых, сапы и красота Приморья без спешки',
+    heroPhrase:
+      'Бирюзовая вода, белый песок, сапы и день, после которого внутри становится легко',
+    duration: '1 день',
+    difficulty: 'Easy',
+    difficultyDisplayLabel: UI.difficulty.labels.Easy,
+    price: 'по запросу',
+    description:
+      'Это день для тех, кто хочет просто выдохнуть и красиво провести время у моря. В зависимости от дорожных условий мы отправимся в бухту Ежовую или бухту Спокойную — в те места, где Приморье особенно нежное: светлая вода, белый песок, тёплые камни, спокойный отдых и никакой гонки.\n\nБерём с собой сапы, чтобы ещё сильнее почувствовать море, проплыть вдоль берега, полюбоваться бухтой с воды и просто побыть в моменте. Такой выезд мы любим за лёгкость, душевную компанию и то самое маленькое счастье, которое дарят красивые дороги, море и живые путешествия.',
+    program: [
+      { timeLabel: '07:00', description: 'Выезд из Владивостока' },
+      { timeLabel: '11:00', description: 'Прибытие на побережье' },
+      {
+        timeLabel: '11:00–14:30',
+        description:
+          'Отдых у моря, свободное время, катание на сапах, купание',
+      },
+      { timeLabel: '14:30–15:30', description: 'Пикник на берегу' },
+      {
+        timeLabel: '15:30–17:30',
+        description: 'Продолжаем отдыхать, гулять и наслаждаться морем',
+      },
+      { timeLabel: '17:30', description: 'Выезд в город' },
+      {
+        timeLabel: '21:00–22:00',
+        description: 'Возвращение во Владивосток',
+      },
+    ],
+    programAdditionalNotes: [
+      'Примерная программа дня.',
+      'Бухта (Ежовая или Спокойная) выбирается заранее по дорожным условиям и погоде.',
+    ],
+    includedInPrice: [
+      inc('Трансфер туда и обратно', faShuttleVan),
+      inc('Сопровождение команды Вкрайности', faUserTie),
+      inc('Пикник на берегу моря', faUtensils),
+      inc('Предоставление сапов', faWater),
+      inc('Наша забота и тёплая атмосфера в поездке', faHeart),
+    ],
+    imageUrl: TOUR_SUMMER_11_COVER_GRID,
+    prefaceBackgroundImageUrl: TOUR_SUMMER_11_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SUMMER_11_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SUMMER_11_GALLERY_GRID],
+  },
+  {
+    id: 'summer-12',
+    season: 'summer',
+    title: 'Пляж Трёх границ',
+    subtitle:
+      'Два дня на самом юге Приморья: бесконечный песок, палаточный лагерь и редкое чувство настоящего края света',
+    heroPhrase:
+      'Туда, где море, ветер и песок тянутся до самой границы, а закат в лагере хочется запомнить надолго',
+    duration: '2 дня / 1 ночь',
+    difficulty: 'Easy',
+    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),
+    price: 'по запросу',
+    description:
+      'Это маршрут для тех, кто любит живые путешествия и места с характером. Пляж Трёх границ — одна из самых необычных точек Приморья: огромная песчаная полоса у самой южной части края, рядом с рекой Туманной и местом, где сходятся границы России, Китая и КНДР.',
+    program: [
+      { timeLabel: 'День 1 · 06:00', description: 'Выезд из Владивостока' },
+      {
+        timeLabel: 'День 1 · 10:00–10:20',
+        description: 'Санитарная остановка и кофе по пути',
+      },
+      { timeLabel: 'День 1 · 13:30', description: 'Прибытие в район посёлка Хасан' },
+      {
+        timeLabel: 'День 1 · 13:30–14:00',
+        description:
+          'Короткая остановка, знакомство с локацией, виды в сторону реки Туманной и триграничья',
+      },
+      {
+        timeLabel: 'День 1 · 14:00–15:00',
+        description: 'Переезд на Пляж Трёх границ',
+      },
+      {
+        timeLabel: 'День 1 · 15:00–16:00',
+        description: 'Установка палаточного лагеря',
+      },
+      {
+        timeLabel: 'День 1 · 16:00–17:30',
+        description: 'Отдых на пляже, прогулка по берегу, фото',
+      },
+      {
+        timeLabel: 'День 1 · 17:30–19:00',
+        description:
+          'Подъём на Голубиный Утёс в спокойном темпе, закатные виды',
+      },
+      { timeLabel: 'День 1 · 19:30–21:00', description: 'Ужин в лагере' },
+      {
+        timeLabel: 'День 1 · 21:00–23:00',
+        description: 'Свободное время у моря, тёплый вечер, ночёвка',
+      },
+      { timeLabel: 'День 2 · 08:00', description: 'Подъём' },
+      { timeLabel: 'День 2 · 08:30–09:30', description: 'Завтрак в лагере' },
+      {
+        timeLabel: 'День 2 · 09:30–11:30',
+        description: 'Неспешное утро на пляже: море, прогулки, отдых',
+      },
+      { timeLabel: 'День 2 · 11:30–12:30', description: 'Сбор лагеря' },
+      { timeLabel: 'День 2 · 12:30', description: 'Выезд в сторону Посьета' },
+      {
+        timeLabel: 'День 2 · 13:30–15:00',
+        description:
+          'Коса Назимова, прогулка, виды на бухту Экспедиции и маяк',
+      },
+      { timeLabel: 'День 2 · 15:00–16:00', description: 'Обед / перекус' },
+      { timeLabel: 'День 2 · 16:00', description: 'Выезд во Владивосток' },
+      { timeLabel: 'День 2 · 21:00–21:30', description: 'Возвращение в город' },
+    ],
+    programAdditionalNotes: [
+      'Тайминг ориентировочный и может меняться из-за дорожных условий, режима погранзоны и погоды.',
+      'Для россиян в пограничной зоне действует пропускной режим: пропуск оформляется заранее по документам участников.',
+    ],
+    includedInPrice: [
+      inc('Трансфер туда и обратно', faShuttleVan),
+      inc('Сопровождение команды Вкрайности', faUserTie),
+      inc('Двухдневная программа по югу Хасанского округа', faBookOpen),
+      inc('Ночёвка в палаточном лагере', faBed),
+      inc('Помощь с групповым лагерным снаряжением', faHelmetSafety),
+      inc('Горячий ужин в лагере', faUtensils),
+      inc('Завтрак во второй день', faMugHot),
+      inc('Прогулка по Пляжу Трёх границ', faPersonHiking),
+      inc('Подъём на Голубиный Утёс', faPersonHiking),
+      inc('Заезд на косу Назимова во второй день', faWater),
+      inc('Наша забота и тёплая атмосфера в поездке', faHeart),
+    ],
+    imageUrl: TOUR_SUMMER_12_COVER_GRID,
+    prefaceBackgroundImageUrl: TOUR_SUMMER_12_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SUMMER_12_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SUMMER_12_GALLERY_GRID],
   },
 ];
 

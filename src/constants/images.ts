@@ -1006,7 +1006,7 @@ export const TOUR_SUMMER_7_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SUMMER_7_CLIP4_GRID_WEBM]: `${TOUR_SUMMER_7_ASSET_BASE}/sev.clip4.poster.webp`,
 };
 
-/** «Полуостров Краббе» (summer-8). Медиа: `public/tours/summer-8/` (временные кадры до съёмки тура). */
+/** «Полуостров Краббе с палатками» (summer-8). Медиа: `public/tours/summer-8/`. */
 export const TOUR_SUMMER_8_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-8` as const;
 
 export const TOUR_SUMMER_8_COVER = `${TOUR_SUMMER_8_ASSET_BASE}/cover.webp` as const;
@@ -1035,6 +1035,112 @@ export const TOUR_SUMMER_8_GALLERY_VIEWER = [
 ] as const;
 
 export const TOUR_SUMMER_8_GALLERY_GRID = TOUR_SUMMER_8_GALLERY_VIEWER;
+
+/** «Водопад Неожиданный х Майхинское хозяйство» (summer-9). Медиа: `public/tours/summer-9/`. */
+export const TOUR_SUMMER_9_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-9` as const;
+
+export const TOUR_SUMMER_9_COVER = `${TOUR_SUMMER_9_ASSET_BASE}/cover.webp` as const;
+export const TOUR_SUMMER_9_COVER_GRID = TOUR_SUMMER_9_COVER;
+export const TOUR_SUMMER_9_PREFACE_BACKGROUND =
+  `${TOUR_SUMMER_9_ASSET_BASE}/preface.webp` as const;
+export const TOUR_SUMMER_9_WATERFALL_IMAGE =
+  `${TOUR_SUMMER_9_ASSET_BASE}/waterfall.webp` as const;
+export const TOUR_SUMMER_9_PICNIC_IMAGE = `${TOUR_SUMMER_9_ASSET_BASE}/picnic.webp` as const;
+export const TOUR_SUMMER_9_FOREST_IMAGE = `${TOUR_SUMMER_9_ASSET_BASE}/forest.webp` as const;
+export const TOUR_SUMMER_9_WINERY_IMAGE = `${TOUR_SUMMER_9_ASSET_BASE}/winery.webp` as const;
+export const TOUR_SUMMER_9_TRAIL_IMAGE = `${TOUR_SUMMER_9_ASSET_BASE}/trail.webp` as const;
+
+export const TOUR_SUMMER_9_GALLERY_VIEWER = [
+  TOUR_SUMMER_9_COVER_GRID,
+  TOUR_SUMMER_9_PREFACE_BACKGROUND,
+  TOUR_SUMMER_9_WATERFALL_IMAGE,
+  TOUR_SUMMER_9_PICNIC_IMAGE,
+  TOUR_SUMMER_9_FOREST_IMAGE,
+  TOUR_SUMMER_9_TRAIL_IMAGE,
+  TOUR_SUMMER_9_WINERY_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_9_GALLERY_GRID = TOUR_SUMMER_9_GALLERY_VIEWER;
+
+/**
+ * «Бухта Ежовая, гора Сестра и бухта Спокойная / Окунёвая» (summer-10).
+ * Медиа: `public/tours/summer-10/`.
+ */
+export const TOUR_SUMMER_10_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-10` as const;
+
+export const TOUR_SUMMER_10_COVER = `${TOUR_SUMMER_10_ASSET_BASE}/cover.webp` as const;
+export const TOUR_SUMMER_10_COVER_GRID = TOUR_SUMMER_10_COVER;
+export const TOUR_SUMMER_10_PREFACE_BACKGROUND =
+  `${TOUR_SUMMER_10_ASSET_BASE}/preface.webp` as const;
+export const TOUR_SUMMER_10_SESTRA_IMAGE = `${TOUR_SUMMER_10_ASSET_BASE}/sestra.webp` as const;
+export const TOUR_SUMMER_10_EZHOVAYA_IMAGE =
+  `${TOUR_SUMMER_10_ASSET_BASE}/ezhovaya.webp` as const;
+export const TOUR_SUMMER_10_COAST_IMAGE = `${TOUR_SUMMER_10_ASSET_BASE}/coast.webp` as const;
+export const TOUR_SUMMER_10_BAY_DAY2_IMAGE =
+  `${TOUR_SUMMER_10_ASSET_BASE}/bay-day2.webp` as const;
+export const TOUR_SUMMER_10_SUP_IMAGE = `${TOUR_SUMMER_10_ASSET_BASE}/sup.webp` as const;
+
+export const TOUR_SUMMER_10_GALLERY_VIEWER = [
+  TOUR_SUMMER_10_COVER_GRID,
+  TOUR_SUMMER_10_PREFACE_BACKGROUND,
+  TOUR_SUMMER_10_SESTRA_IMAGE,
+  TOUR_SUMMER_10_EZHOVAYA_IMAGE,
+  TOUR_SUMMER_10_COAST_IMAGE,
+  TOUR_SUMMER_10_BAY_DAY2_IMAGE,
+  TOUR_SUMMER_10_SUP_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_10_GALLERY_GRID = TOUR_SUMMER_10_GALLERY_VIEWER;
+
+/** «Релакс-тур в бухту Ежовую / Спокойную» (summer-11). Медиа: `public/tours/summer-11/`. */
+export const TOUR_SUMMER_11_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-11` as const;
+
+export const TOUR_SUMMER_11_COVER = `${TOUR_SUMMER_11_ASSET_BASE}/cover.webp` as const;
+export const TOUR_SUMMER_11_COVER_GRID = TOUR_SUMMER_11_COVER;
+export const TOUR_SUMMER_11_PREFACE_BACKGROUND =
+  `${TOUR_SUMMER_11_ASSET_BASE}/preface.webp` as const;
+export const TOUR_SUMMER_11_COAST_IMAGE = `${TOUR_SUMMER_11_ASSET_BASE}/coast.webp` as const;
+export const TOUR_SUMMER_11_BEACH_IMAGE = `${TOUR_SUMMER_11_ASSET_BASE}/beach.webp` as const;
+export const TOUR_SUMMER_11_SUP_IMAGE = `${TOUR_SUMMER_11_ASSET_BASE}/sup.webp` as const;
+export const TOUR_SUMMER_11_PICNIC_IMAGE = `${TOUR_SUMMER_11_ASSET_BASE}/picnic.webp` as const;
+
+export const TOUR_SUMMER_11_GALLERY_VIEWER = [
+  TOUR_SUMMER_11_COVER_GRID,
+  TOUR_SUMMER_11_PREFACE_BACKGROUND,
+  TOUR_SUMMER_11_COAST_IMAGE,
+  TOUR_SUMMER_11_BEACH_IMAGE,
+  TOUR_SUMMER_11_SUP_IMAGE,
+  TOUR_SUMMER_11_PICNIC_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_11_GALLERY_GRID = TOUR_SUMMER_11_GALLERY_VIEWER;
+
+/** «Пляж Трёх границ» (summer-12). Медиа: `public/tours/summer-12/`. */
+export const TOUR_SUMMER_12_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-12` as const;
+
+export const TOUR_SUMMER_12_COVER = `${TOUR_SUMMER_12_ASSET_BASE}/cover.webp` as const;
+export const TOUR_SUMMER_12_COVER_GRID = TOUR_SUMMER_12_COVER;
+export const TOUR_SUMMER_12_PREFACE_BACKGROUND =
+  `${TOUR_SUMMER_12_ASSET_BASE}/preface.webp` as const;
+export const TOUR_SUMMER_12_BEACH_IMAGE = `${TOUR_SUMMER_12_ASSET_BASE}/beach.webp` as const;
+export const TOUR_SUMMER_12_CAMP_IMAGE = `${TOUR_SUMMER_12_ASSET_BASE}/camp.webp` as const;
+export const TOUR_SUMMER_12_CLIFF_IMAGE = `${TOUR_SUMMER_12_ASSET_BASE}/cliff.webp` as const;
+export const TOUR_SUMMER_12_NAZIMOVA_IMAGE =
+  `${TOUR_SUMMER_12_ASSET_BASE}/nazimova.webp` as const;
+export const TOUR_SUMMER_12_SUNSET_IMAGE =
+  `${TOUR_SUMMER_12_ASSET_BASE}/sunset.webp` as const;
+
+export const TOUR_SUMMER_12_GALLERY_VIEWER = [
+  TOUR_SUMMER_12_COVER_GRID,
+  TOUR_SUMMER_12_PREFACE_BACKGROUND,
+  TOUR_SUMMER_12_BEACH_IMAGE,
+  TOUR_SUMMER_12_CAMP_IMAGE,
+  TOUR_SUMMER_12_CLIFF_IMAGE,
+  TOUR_SUMMER_12_SUNSET_IMAGE,
+  TOUR_SUMMER_12_NAZIMOVA_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_12_GALLERY_GRID = TOUR_SUMMER_12_GALLERY_VIEWER;
 
 /**
  * Секунда входа 5-секундного сегмента в исходном `*.grid.webm` для баннера зимы (колонки 0…9).

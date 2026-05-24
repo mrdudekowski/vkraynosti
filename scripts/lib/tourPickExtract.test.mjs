@@ -5,7 +5,7 @@ import { buildTourPickLabel, extractTourIdFromPick } from './tourPickFormula.mjs
 describe('tourPickExtract', () => {
   const tours = loadTourCatalog();
 
-  it('extracts tour_id for all 39 catalog tours (incl. titles with parentheses)', () => {
+  it('extracts tour_id for all 43 catalog tours (incl. titles with parentheses)', () => {
     for (const tour of tours) {
       const pick = buildTourPickLabel(tour.title, tour.id);
       expect(extractTourIdFromPick(pick), pick).toBe(tour.id);

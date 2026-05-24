@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// Не восстанавливать позицию скролла при F5 — иначе страница открывается внизу (у подвала).
+// Браузерный restore отключён — позиция управляется sessionStorage + Lenis (`useScrollRestoration`).
 if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }

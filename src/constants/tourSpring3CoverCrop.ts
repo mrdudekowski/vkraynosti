@@ -16,7 +16,7 @@ export const TOUR_SPRING_3_COVER_CARD_IMG_OBJECT_CLASS =
 
 /** `< 620px` и базовый слой без min-width. */
 export const TOUR_SPRING_3_COVER_OBJECT_POSITION_LT620 = 'center 44%' as const;
-/** `≥ 620px` до `lg` (1024px). */
+/** `≥ 620px` до `lg` (992px). */
 export const TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620 = 'center 62%' as const;
 /** `lg` и шире. */
 export const TOUR_SPRING_3_COVER_OBJECT_POSITION_LG = 'center 58%' as const;

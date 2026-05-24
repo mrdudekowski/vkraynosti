@@ -8,13 +8,19 @@ import {
   scrollWindowToTopImmediate,
   scrollWindowToTopSmooth,
 } from '../../constants/smoothScroll';
+import {
+  getScrollStorageKey,
+  hasSavedScrollY,
+  isReloadNavigation,
+} from '../../utils/scrollRestoration';
 
 const routeSignature = (pathname: string, search: string, hash: string) =>
   `${pathname}${search}${hash}`;
 
 /**
- * Первый монтинг (в т.ч. F5): всегда мгновенно вверх — без якорного скролла по URL.
- * Дальше: смена маршрута — плавно вверх; переход на главную с `#hash` или смена только hash — к секции.
+ * Первый mount: reload с сохранённым Y — не сбрасывать (восстановит `ScrollRestoration`);
+ * иначе — вверх или якорь по hash (прямая ссылка `/#section`).
+ * Смена маршрута: плавно вверх; главная с `#hash` — к секции.
  */
 const ScrollToTopOnNavigate = () => {
   const location = useLocation();
@@ -27,6 +33,23 @@ const ScrollToTopOnNavigate = () => {
 
     if (prevSignatureRef.current === null) {
       prevSignatureRef.current = signature;
+      const storageKey = getScrollStorageKey(location.pathname, location.search);
+      const reloadWithSavedScroll =
+        isReloadNavigation() && hasSavedScrollY(storageKey);
+
+      if (reloadWithSavedScroll) {
+        return;
+      }
+
+      if (isHomeWithSectionHash && !isReloadNavigation()) {
+        const id = location.hash.slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
+          return;
+        }
+      }
+
       scrollWindowToTopImmediate(lenis);
       return;
     }

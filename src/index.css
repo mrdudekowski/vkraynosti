@@ -141,9 +141,10 @@
     @apply w-full max-w-tourDetail mx-auto xl:mx-0 xl:mr-auto;
   }
 
-  /** Тело страницы тура под hero: measure + вертикальные отступы секции. */
+  /** Тело страницы тура под hero: compact — без боковых pl/pr; с `lg` — асимметричные отступы. */
   .tour-detail-page-inner {
-    @apply w-full max-w-tourDetail mx-auto pt-tour-detail-page-inner-pt pb-tour-detail-page-inner-pb xl:mx-0 xl:mr-auto;
+    @apply w-full pt-tour-detail-page-inner-pt pb-tour-detail-page-inner-pb
+      lg:pl-tour-detail-page-inner-pl lg:pr-tour-detail-page-inner-pr;
   }
 
   /**
@@ -154,16 +155,17 @@
     @apply min-w-0 max-w-full;
   }
 
-  /** Основная колонка страницы тура: разделитель до сайдбара с программой (только lg+). */
+  /** Основная колонка: правый отступ и разделитель до сайдбара только с `lg` (≥992px). */
   .tour-detail-main-column {
-    @apply lg:border-r lg:border-divider lg:pr-tour-detail-col-divider-gap;
+    @apply lg:pr-tour-detail-col-divider-gap lg:border-r lg:border-divider;
   }
 
   /**
-   * Секция «О туре» внутри основной колонки: сверху блок (1 или 2 колонки), снизу полоса «Что включено» на всю ширину.
+   * Секция «О туре»: compact — без pl; с `lg` — ступенчатый pl как на desktop.
    */
   .tour-detail-about-section {
-    @apply grid grid-cols-1 gap-y-tour-detail-about-section-row-gap mb-tour-detail-about-section-mb min-w-0;
+    @apply grid grid-cols-1 gap-y-tour-detail-about-section-row-gap mb-tour-detail-about-section-mb min-w-0
+      lg:pl-4 lg:sm:pl-8 lg:lg:pl-12;
   }
 
   /** Верхняя часть: основной текст/CTA и при необходимости aside в двух колонках (от `md`). */
@@ -180,7 +182,7 @@
 
   /** Правая колонка верхнего ряда (`descriptionAside`). */
   .tour-detail-about-aside-column {
-    @apply min-w-0 pl-4 sm:pl-8 lg:pl-12;
+    @apply min-w-0 pl-4 lg:sm:pl-8 lg:lg:pl-12;
   }
 
   /** Ячейка полосы «Что включено» под верхним блоком. */
@@ -189,11 +191,11 @@
   }
 
   /**
-   * Первый кадр галереи (после обложки) — фон блока до секции «Наши Подвиги»; контент на скриме.
-   * Горизонтальное раскрытие на ширину gutter (`tour-detail-page-gutter` даёт px).
+   * Фон блока «О туре» — внутри `.tour-detail-main-column` (без отрицательных margin).
+   * Слои `__image` / `__scrim` — absolute внутри relative-обёртки; контент в `__content`.
    */
   .tour-detail-preface-bg {
-    @apply relative isolate -mx-4 mb-10 overflow-hidden rounded-card px-4 pb-10 pt-tour-detail-preface-pt sm:-mx-6 sm:px-6 sm:pb-12 sm:pt-tour-detail-preface-pt-sm lg:-mx-8 lg:px-8;
+    @apply relative isolate mb-10 w-full min-w-0 max-w-full overflow-hidden rounded-card pb-10 pt-tour-detail-preface-pt sm:pb-12 sm:pt-tour-detail-preface-pt-sm;
   }
 
   .tour-detail-preface-bg__image {
@@ -201,15 +203,15 @@
   }
 
   .tour-detail-preface-bg__scrim {
-    @apply absolute inset-0 z-stack-base bg-surface-dark/40;
+    @apply absolute inset-0 z-stack-base bg-surface-dark/70;
   }
 
   .tour-detail-preface-bg__content {
-    @apply relative z-10 min-w-0;
+    @apply relative z-10 min-w-0 px-4 lg:sm:px-6 lg:lg:px-8;
   }
 
   .tour-detail-preface-bg .tour-detail-about-section {
-    @apply mb-0;
+    @apply mb-0 pl-0;
   }
 
   .tour-detail-preface-bg .tour-detail-about-top--with-aside {
@@ -256,9 +258,9 @@
     @apply text-text-inverse/90;
   }
 
-  /** Колонка «О туре»: отступ к вертикали; на узких экранах компактнее. */
+  /** Колонка «О туре»: compact — pr-4; с `lg` — ступенчатый pr к разделителю. */
   .tour-detail-about-column {
-    @apply pr-4 sm:pr-8 lg:pr-12 min-w-0;
+    @apply min-w-0 pr-4 lg:sm:pr-8 lg:lg:pr-12;
   }
 
   /** Обёртка `RevealBox` для «Что включено» (полоса на всю ширину секции «О туре»). */

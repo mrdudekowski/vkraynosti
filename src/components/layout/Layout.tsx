@@ -11,6 +11,7 @@ import SeasonNavDock from './SeasonNavDock';
 import Footer from './Footer';
 import SeasonRouteSync from './SeasonRouteSync';
 import ScrollToTopOnNavigate from './ScrollToTopOnNavigate';
+import ScrollRestoration from './ScrollRestoration';
 import { useModal } from '../../context/useModal';
 import RouteFallback from '../shared/RouteFallback';
 import ModalLazyChunkFallback from '../shared/ModalLazyChunkFallback';
@@ -72,6 +73,7 @@ const Layout = () => {
     <div className="min-h-screen flex flex-col">
       <SeasonRouteSync />
       <ScrollToTopOnNavigate />
+      <ScrollRestoration />
       <SeasonNavMenuProvider>
         <HomeNavbarChromeProvider>
           <LayoutChrome />

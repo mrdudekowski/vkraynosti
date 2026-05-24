@@ -36,6 +36,13 @@ import {
   GALLERY_GRID_VIDEO_LOOP_CROSSFADE_MS,
   GALLERY_GRID_VIDEO_POSTER_REVEAL_MS,
 } from './src/constants/galleryGridVideoLoop'
+import {
+  BREAKPOINT_2XL_PX,
+  BREAKPOINT_LG_PX,
+  BREAKPOINT_MD_PX,
+  BREAKPOINT_SM_PX,
+  BREAKPOINT_XL_PX,
+} from './src/constants/breakpoints'
 import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
 import { TOUR_CARD_SKELETON_SHIMMER_MS } from './src/constants/tourCardSkeletonShimmer'
 import {
@@ -428,7 +435,7 @@ const config: Config = {
          * База — `surface.dark` (#0D0D0D).
          */
         tourIncludedIconStripPreface:
-          'color-mix(in srgb, #0D0D0D 55%, transparent)',
+          'color-mix(in srgb, #0D0D0D, transparent)',
         surface: {
           dark:  '#0D0D0D',
           light: '#F7F5F0',
@@ -779,6 +786,9 @@ const config: Config = {
         /** Верхний отступ `tour-detail-page-inner` под hero (нижний — `tour-detail-page-inner-pb`). */
         'tour-detail-page-inner-pt': '2rem',
         'tour-detail-page-inner-pb': '3rem',
+        /** Горизонтальные отступы `tour-detail-page-inner` (без max-width). */
+        'tour-detail-page-inner-pl': '3rem',
+        'tour-detail-page-inner-pr': '2rem',
         /** Между мета-блоком и `tour-detail-preface-bg`. */
         'tour-detail-meta-to-preface': '1.5rem',
         /** Вертикальный зазор между верхним блоком и полосой «Что включено» в секции «О туре». */
@@ -1300,6 +1310,15 @@ const config: Config = {
         'modal-chunk-stagger': MODAL_CHUNK_LOADER_STAGGER,
       },
       screens: {
+        /**
+         * Стандартные tiers (SSOT: `src/constants/breakpoints.ts`).
+         * X-Small <576 | sm ≥576 | md ≥768 | lg ≥992 | xl ≥1200 | 2xl ≥1400.
+         */
+        sm: `${BREAKPOINT_SM_PX}px`,
+        md: `${BREAKPOINT_MD_PX}px`,
+        lg: `${BREAKPOINT_LG_PX}px`,
+        xl: `${BREAKPOINT_XL_PX}px`,
+        '2xl': `${BREAKPOINT_2XL_PX}px`,
         /**
          * Ряд «Срок / Сложность» (`TourDetailMetaFacts`): ниже 320px — столбец, от 320px — две колонки.
          */

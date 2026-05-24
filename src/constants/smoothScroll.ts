@@ -1,13 +1,10 @@
 import type { default as Lenis, LenisOptions } from 'lenis';
+import { BREAKPOINT_MD_PX } from './breakpoints';
 import { HOME_HERO_SECTION_ELEMENT_ID } from './homeHeroSnap';
 
 // Скролл: Lenis в `SmoothScrollProvider`; chrome главной — `useHomeNavbarChromeScroll` + контекст.
 
-/**
- * Совпадает с Tailwind `md` по умолчанию (48rem).
- * Не дублировать порог в других местах — использовать этот импорт или `useMatchMinWidth`.
- */
-export const BREAKPOINT_MD_PX = 768;
+export { BREAKPOINT_MD_PX };
 
 /**
  * Смещение для якоря под фиксированный navbar (`h-16` = `spacing.navbar`).

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { TOUR_GALLERY_TILE_IMAGE_ROOT_MARGIN } from '../../constants/reveal';
 
@@ -82,25 +82,15 @@ const ImageWithLoadPlaceholder = ({
 
 }: ImageWithLoadPlaceholderProps) => {
 
-  const imgRef = useRef<HTMLImageElement>(null);
-
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [hasError, setHasError] = useState(false);
 
-
-
-  useLayoutEffect(() => {
-
-    const img = imgRef.current;
-
-    if (img?.complete && img.naturalWidth > 0) {
-
+  const handleImageRef = useCallback((node: HTMLImageElement | null) => {
+    if (node?.complete && node.naturalWidth > 0) {
       setIsLoaded(true);
-
     }
-
-  }, [src, srcSet]);
+  }, []);
 
 
 
@@ -146,7 +136,7 @@ const ImageWithLoadPlaceholder = ({
 
         <img
 
-          ref={imgRef}
+          ref={handleImageRef}
 
           src={src}
 
@@ -193,7 +183,7 @@ const ImageWithLoadPlaceholder = ({
 
       <img
 
-        ref={imgRef}
+        ref={handleImageRef}
 
         src={src}
 

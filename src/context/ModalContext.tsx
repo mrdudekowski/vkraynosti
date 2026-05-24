@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
-import type { ModalState, TeamMember, TourRequestModalPayload } from '../types';
+import type { ModalState, TourRequestModalPayload } from '../types';
 import { ModalContext } from './modal-context-definition';
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
@@ -17,13 +17,6 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     lastFocusRef.current = active instanceof HTMLElement ? active : null;
     setModal(next);
   }, []);
-
-  const openTeamModal = useCallback(
-    (member: TeamMember) => {
-      captureFocusAndOpen({ type: 'teamMember', payload: member });
-    },
-    [captureFocusAndOpen]
-  );
 
   const openTourRequestModal = useCallback(
     (payload: TourRequestModalPayload) => {
@@ -44,8 +37,8 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const modalContextValue = useMemo(
-    () => ({ modal, openTeamModal, openTourRequestModal, closeModal }),
-    [modal, openTeamModal, openTourRequestModal, closeModal]
+    () => ({ modal, openTourRequestModal, closeModal }),
+    [modal, openTourRequestModal, closeModal]
   );
 
   return (

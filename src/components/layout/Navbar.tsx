@@ -14,6 +14,7 @@ import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
 import SeasonSwitcher from '../shared/SeasonSwitcher';
 import AnimatedHamburgerIcon from '../shared/AnimatedHamburgerIcon';
+import BrandWordmark from '../shared/BrandWordmark';
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   /** Портал и выходная анимация: держим в DOM, пока transform не доедет до translateX(100%). */
@@ -42,13 +43,6 @@ const Navbar = () => {
     useSeasonNavMenu();
   const { snap: homeChrome } = useHomeNavbarChrome();
   const activeSeasonStyle = SEASON_STYLE[activeSeason];
-  const brandWordmark = UI.nav.brand;
-  const brandFirstLetter = brandWordmark.slice(0, 1);
-  const brandRestRaw = brandWordmark.slice(1);
-  const brandRest =
-    brandRestRaw.length === 0
-      ? ''
-      : brandRestRaw[0].toLocaleUpperCase('ru-RU') + brandRestRaw.slice(1);
 
   const openMenu = () => {
     setMenuOpen(true);
@@ -118,13 +112,7 @@ const Navbar = () => {
     }
   };
 
-  const navSurfaceOpacityTransition = homeChrome.disableTopChromeTransition
-    ? 'duration-0'
-    : 'transition-opacity duration-home-navbar-chrome ease-out';
   const navShellTransition = homeChrome.disableTopChromeTransition
-    ? 'duration-0'
-    : 'transition-opacity duration-home-navbar-chrome ease-out';
-  const gateStartBackingTransition = homeChrome.disableTopChromeTransition
     ? 'duration-0'
     : 'transition-opacity duration-home-navbar-chrome ease-out';
   const mobileOverlayTop = homeChrome.mainUsesNavbarTopPadding ? 'top-16' : 'top-0';
@@ -133,33 +121,18 @@ const Navbar = () => {
   const navShellOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
   const navShellPointerEvents =
     isHomePath && navShellOpacity < 0.001 ? 'pointer-events-none' : '';
-  const homeNavChromeSolid =
-    isHomePath &&
-    (homeChrome.gateStageFullBleedMinHeight || homeChrome.topChromeSurfaceOpacity < 1);
-  const navChromeSurfaceClass = homeNavChromeSolid
-    ? 'bg-surface-dark'
-    : 'bg-surface-dark/95 backdrop-blur-sm';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-navbar">
+    <nav data-layout-navbar className="fixed top-0 left-0 right-0 z-navbar">
       <div
-        className={`${navShellTransition} ${navShellPointerEvents}`.trim()}
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-navbar-chrome bg-home-gate-start-screen"
+      />
+      <div
+        className={`relative z-10 ${navShellTransition} ${navShellPointerEvents}`.trim()}
         style={{ opacity: navShellOpacity }}
       >
-      <div className="relative z-10">
-        {isHomePath ? (
-          <div
-            className={`pointer-events-none absolute inset-0 z-0 bg-home-gate-start-screen ${gateStartBackingTransition}`.trim()}
-            style={{ opacity: homeChrome.gateStageFullBleedMinHeight ? 1 : 0 }}
-            aria-hidden
-          />
-        ) : null}
-        <div
-          aria-hidden
-          className={`pointer-events-none absolute inset-0 z-stack-base ${navChromeSurfaceClass} ${navSurfaceOpacityTransition}`}
-          style={{ opacity: homeChrome.topChromeSurfaceOpacity }}
-        />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Left: Logo + подпись сезона (текст только здесь; в SeasonNavDock — только иконки) */}
@@ -167,17 +140,10 @@ const Navbar = () => {
             <Link
               to={ROUTES.HOME}
               onClick={handleBrandLogoClick}
-              className="shrink-0 font-brand-wordmark text-brand-wordmark-nav group transition-colors duration-hover"
+              className="shrink-0 group transition-colors duration-hover"
               prefetch="none"
             >
-              <span
-                className={`transition-all duration-season-change ${SEASON_TEXT_CLASS[activeSeason]} group-hover:!bg-none group-hover:!text-brand-secondary`}
-              >
-                {brandFirstLetter}
-              </span>
-              <span className="text-text-inverse transition-colors duration-hover group-hover:text-brand-secondary">
-                {brandRest}
-              </span>
+              <BrandWordmark season={activeSeason} size="nav" interactive />
             </Link>
             <span
               data-testid="season-indicator"
@@ -332,7 +298,6 @@ const Navbar = () => {
             document.body
           )}
         </div>
-      </div>
       </div>
     </nav>
   );

@@ -14,8 +14,11 @@
    * получает такой же кастомный бегунок и визуально «двойной» скролл.
    */
   html {
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --navbar-chrome-height: calc(theme('spacing.navbar') + var(--safe-area-top));
     --scrollbar-thumb: theme('colors.season.spring');
     --scrollbar-track: color-mix(in srgb, theme('colors.surface.light') 94%, theme('colors.divider'));
+    background-color: theme('colors.surface.light');
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
@@ -95,6 +98,18 @@
     }
   }
 
+  @supports not (height: 100svh) {
+    .h-hero-viewport,
+    .min-h-home-gate-viewport,
+    .min-h-app-viewport {
+      min-height: 100vh;
+    }
+
+    .h-hero-viewport {
+      height: 100vh;
+    }
+  }
+
   body {
     @apply font-body text-text-primary bg-surface-light;
     -webkit-font-smoothing: antialiased;
@@ -126,6 +141,11 @@
 
   .tour-detail-section-heading-accent {
     @apply hidden sm:block shrink-0 self-stretch rounded-full w-tour-detail-heading-accent;
+  }
+
+  /** Каскадный fade-in текста team-hero при смене слайда (`teamHeroAnimation.ts`). */
+  .team-hero-text-stagger {
+    @apply motion-safe:animate-team-hero-text-stagger-in motion-reduce:animate-none opacity-0;
   }
 
   /**

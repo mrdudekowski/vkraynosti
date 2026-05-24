@@ -28,10 +28,9 @@ export const UI = {
   },
   team: {
     experienceSuffix: 'опыта',
-  },
-  teamModal: {
-    specialtiesHeading: 'Специализации',
-    experienceLabel:  'Опыт',
+    carouselPrevious: 'Предыдущий слайд команды',
+    carouselNext: 'Следующий слайд команды',
+    carouselPaginationGoToSlide: 'Перейти к слайду команды {n}',
   },
   privacyPage: {
     metaTitle:   'Политика конфиденциальности | Вкрайности',
@@ -102,8 +101,8 @@ export const UI = {
      * (`Link` + `hash`, скролл через `ScrollToTopOnNavigate` и `NAVBAR_SCROLL_OFFSET_PX`).
      */
     homeGateScrollToHeroAriaLabel: 'Перейти к обзору туров' as const,
-    team:         'Команда Вкрайности',
-    teamSub:      'Опытные гиды и эксперты',
+    teamHeadingPrefix: 'Команда ',
+    teamSub:      'У кого в крови текут приключения',
     safety:       'Безопасность в наших походах',
     safetySub:    'Ваша безопасность — наш приоритет',
     /** Текст на герое секции (поверх фото), короткий смысловой акцент. */
@@ -291,3 +290,7 @@ export const UI = {
     homeLink:    'На главную',
   },
 } as const;
+
+/** Полный заголовок секции команды для aria и скринридеров. */
+export const getTeamSectionHeading = () =>
+  `${UI.sections.teamHeadingPrefix}${UI.nav.brand}`;

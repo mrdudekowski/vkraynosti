@@ -1,9 +1,8 @@
 import { createContext } from 'react';
-import type { ModalState, TeamMember, TourRequestModalPayload } from '../types';
+import type { ModalState, TourRequestModalPayload } from '../types';
 
 export interface ModalContextValue {
   modal: ModalState;
-  openTeamModal: (member: TeamMember) => void;
   openTourRequestModal: (payload: TourRequestModalPayload) => void;
   closeModal: () => void;
 }

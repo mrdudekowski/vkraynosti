@@ -54,3 +54,9 @@ docs/
 /pred-plan.md
 /public/vite.svg
 /public/spring tours/
+
+# Local recovery / transcript dumps (not source of truth)
+/recovered-final/
+/recovered-team/
+/extracted-from-transcript/
+/extracted-writes/

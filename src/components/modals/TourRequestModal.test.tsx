@@ -11,7 +11,6 @@ const mockClose = vi.fn();
 vi.mock('../../context/useModal', () => ({
   useModal: () => ({
     closeModal: mockClose,
-    openTeamModal: vi.fn(),
     openTourRequestModal: vi.fn(),
     modal: { type: null },
   }),

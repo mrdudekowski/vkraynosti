@@ -28,13 +28,34 @@
 
 
 
-## Отступы контента
+## iOS safe area и viewport
 
 
 
-- `main`: только **`pt-16`** (фиксированный навбар `h-16`). Высота под dock **не резервируется**.
+- Meta viewport: `viewport-fit=cover` в [`index.html`](../index.html).
 
-- Hero: **`h-hero-viewport`** — `calc(100vh - navbar)` на всех ширинах.
+- SSOT chrome: [`src/constants/layoutChrome.ts`](../src/constants/layoutChrome.ts) — CSS-переменные `--safe-area-top`, `--navbar-chrome-height` в [`src/index.css`](../src/index.css).
+
+- Navbar: строка контента `h-16` от `top-0` (оверлей, «потолок» hero = 64px). Backing-слои с `-top-safe-top` закрывают safe area на iOS без сдвига navbar.
+- `main`: **`pt-navbar-chrome`** на страницах с отступом под navbar (мобильная главная, внутренние). Десктопные ворота — `pt-0`, gate под оверлеем.
+
+- Hero / gate: **`h-hero-viewport`**, **`min-h-home-gate-viewport`** — `100svh` (fallback `100vh` в `index.css` для старых браузеров).
+
+- Якорный скролл и «потолок» hero: `getNavbarScrollOffsetPx()` = `-64` (`h-16`); safe area — только в padding `main` и backing navbar.
+
+
+
+### Ручная проверка (iPhone Safari)
+
+
+
+- Загрузка главной: нет полоски hero над navbar.
+
+- Navbar/dock: фон доходит до физического верха экрана (notch / Dynamic Island).
+
+- Landscape и portrait: отступ `main` совпадает с высотой chrome.
+
+- Hash-якоря на главной: секция не перекрывается navbar.
 
 
 
@@ -51,4 +72,3 @@ npm run test:e2e
 
 
 Требуется: `npx playwright install chromium`.
-

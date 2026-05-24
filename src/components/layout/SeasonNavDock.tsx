@@ -89,20 +89,14 @@ const SeasonNavDock = () => {
   const slideTransition = reducedMotion
     ? 'duration-0'
     : 'transition-[max-height,transform] duration-season-dock-slide ease-out';
-  const dockSurfaceOpacityTransition = homeChrome.disableTopChromeTransition
-    ? 'duration-0'
-    : 'transition-opacity duration-home-navbar-chrome ease-out';
   const dockShellTransition = homeChrome.disableTopChromeTransition
     ? 'duration-0'
     : 'transition-opacity duration-home-navbar-chrome ease-out';
-  const dockBackgroundOpacity = open ? 1 : homeChrome.topChromeSurfaceOpacity;
   const isHomePath = pathname === ROUTES.HOME;
-  const dockGateBackingTransition = homeChrome.disableTopChromeTransition
-    ? 'duration-0'
-    : 'transition-opacity duration-home-navbar-chrome ease-out';
   const dockShellOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
   const dockShellPointerEvents =
     isHomePath && dockShellOpacity < 0.001 && !open ? 'pointer-events-none' : '';
+  const dockVisibleOpacity = open ? 1 : dockShellOpacity;
 
   return (
     <div
@@ -119,21 +113,12 @@ const SeasonNavDock = () => {
           ? 'max-h-season-dock-panel translate-y-0'
           : 'max-h-0 -translate-y-full pointer-events-none',
       ].join(' ')}
-      style={{ opacity: dockShellOpacity }}
     >
-      <div className="relative">
-        {isHomePath ? (
-          <div
-            className={`pointer-events-none absolute inset-0 z-0 bg-home-gate-start-screen ${dockGateBackingTransition}`.trim()}
-            style={{ opacity: homeChrome.gateStageFullBleedMinHeight ? 1 : 0 }}
-            aria-hidden
-          />
-        ) : null}
-        <div
-          aria-hidden
-          className={`pointer-events-none absolute inset-0 ${homeChrome.gateStageFullBleedMinHeight ? 'z-stack-base' : 'z-0'} bg-surface-dark/95 backdrop-blur-sm ${dockSurfaceOpacityTransition}`}
-          style={{ opacity: dockBackgroundOpacity }}
-        />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-stack-base bg-home-gate-start-screen"
+      />
+      <div className="relative" style={{ opacity: dockVisibleOpacity }}>
         <div
           className={[
             'relative z-10 border-b',

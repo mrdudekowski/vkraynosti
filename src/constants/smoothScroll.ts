@@ -1,6 +1,7 @@
 import type { default as Lenis, LenisOptions } from 'lenis';
 import { BREAKPOINT_MD_PX } from './breakpoints';
 import { HOME_HERO_SECTION_ELEMENT_ID } from './homeHeroSnap';
+import { NAVBAR_CONTENT_HEIGHT_PX } from './layoutChrome';
 
 // Скролл: Lenis в `SmoothScrollProvider`; chrome главной — `useHomeNavbarChromeScroll` + контекст.
 
@@ -8,9 +9,15 @@ export { BREAKPOINT_MD_PX };
 
 /**
  * Смещение для якоря под фиксированный navbar (`h-16` = `spacing.navbar`).
- * Верх контента (например секции `#home-hero`) совмещается с нижней кромкой навбара — «второй потолок» вьюпорта.
+ * Верх контента (например секции `#home-hero`) совмещается с нижней кромкой навбара — «второй потолок».
+ * Fallback без DOM (= только контентная строка, без safe area).
  */
-export const NAVBAR_SCROLL_OFFSET_PX = -64;
+export const NAVBAR_SCROLL_OFFSET_PX = -NAVBAR_CONTENT_HEIGHT_PX;
+
+/** Смещение якоря и «потолка» hero: только `h-16`, без safe area (navbar — оверлей от `top-0`). */
+export function getNavbarScrollOffsetPx(): number {
+  return NAVBAR_SCROLL_OFFSET_PX;
+}
 
 /** `false` — без Lenis, нативный скролл (локальная отладка). В проде держать `true`. */
 export const SMOOTH_SCROLL_ENABLED = true as const;
@@ -80,14 +87,14 @@ export function computeHomeHeroMinScrollY(
 ): number | null {
   if (!heroSection) return null;
   const rect = heroSection.getBoundingClientRect();
-  return lenisScroll + rect.top + NAVBAR_SCROLL_OFFSET_PX;
+  return lenisScroll + rect.top + getNavbarScrollOffsetPx();
 }
 
 /** Главная: к секции hero, верх под навбаром. */
 export function scrollHomeHeroTopSmooth(lenis: Lenis | undefined): void {
   const section = document.getElementById(HOME_HERO_SECTION_ELEMENT_ID);
   if (lenis && section) {
-    lenis.scrollTo(section, { offset: NAVBAR_SCROLL_OFFSET_PX });
+    lenis.scrollTo(section, { offset: getNavbarScrollOffsetPx() });
   } else if (section) {
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -96,7 +103,7 @@ export function scrollHomeHeroTopSmooth(lenis: Lenis | undefined): void {
 export function scrollHomeHeroTopImmediate(lenis: Lenis | undefined): void {
   const section = document.getElementById(HOME_HERO_SECTION_ELEMENT_ID);
   if (lenis && section) {
-    lenis.scrollTo(section, { offset: NAVBAR_SCROLL_OFFSET_PX, immediate: true });
+    lenis.scrollTo(section, { offset: getNavbarScrollOffsetPx(), immediate: true });
   } else if (section) {
     section.scrollIntoView({ block: 'start' });
   }

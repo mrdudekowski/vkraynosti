@@ -3,6 +3,18 @@ import type { Season } from '../types';
 
 const BASE = 'https://placehold.co';
 
+/** Портреты команды: `public/team/team-{n}.webp`. */
+const TEAM_ASSET_BASE = `${PUBLIC_ASSET_BASE}team`;
+
+/** Портрет члена команды по `teamData` id; fallback — placeholder. */
+export const getTeamPortraitUrl = (id: string): string => {
+  const portraits = IMAGES.team.portraits;
+  if (Object.prototype.hasOwnProperty.call(portraits, id)) {
+    return portraits[id as keyof typeof portraits];
+  }
+  return IMAGES.team.placeholder;
+};
+
 /** Папки туров: `public/tours/{tourId}/` — обложка и галерея одного маршрута. */
 const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours`;
 
@@ -1267,6 +1279,10 @@ export const IMAGES = {
   },
   team: {
     placeholder: `${BASE}/400x500/1A3C2E/C8A96E?text=Эксперт`,
+    portraits: {
+      'team-1': `${TEAM_ASSET_BASE}/team-1.webp`,
+      'team-2': `${TEAM_ASSET_BASE}/team-2.webp`,
+    },
   },
   tours: {
     placeholder: `${BASE}/600x400/1A3C2E/C8A96E?text=Тур`,

@@ -72,8 +72,9 @@ export interface TeamMember {
   name: string;
   role: string;
   bio: string;
-  specialties: string[];
-  experience: string;
+  experience?: string;
+  /** По умолчанию true; `false` скрывает строку опыта на слайде. */
+  showExperienceLine?: boolean;
   imageUrl: string;
 }
 
@@ -97,5 +98,4 @@ export interface TourRequestModalPayload {
 
 export type ModalState =
   | { type: null }
-  | { type: 'teamMember'; payload: TeamMember }
   | { type: 'tourRequest'; payload: TourRequestModalPayload };

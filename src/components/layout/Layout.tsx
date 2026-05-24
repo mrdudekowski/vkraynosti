@@ -16,7 +16,6 @@ import { useModal } from '../../context/useModal';
 import RouteFallback from '../shared/RouteFallback';
 import ModalLazyChunkFallback from '../shared/ModalLazyChunkFallback';
 
-const TeamMemberModal = lazy(() => import('../modals/TeamMemberModal'));
 const TourRequestModal = lazy(() => import('../modals/TourRequestModal'));
 
 function LayoutChrome() {
@@ -48,10 +47,10 @@ function LayoutMain() {
       ? snap.homeFlushWithViewportTop
         ? 'pt-0'
         : snap.mainUsesNavbarTopPadding
-          ? 'pt-16'
+          ? 'pt-navbar-chrome'
           : 'pt-0'
       : snap.mainUsesNavbarTopPadding
-        ? 'pt-16'
+        ? 'pt-navbar-chrome'
         : 'pt-0';
   /** Чёрный фон старта только при десктопных воротах; на мобильной главной — без полосы «gate» под навбаром. */
   const mainHomeStartBg =
@@ -70,7 +69,7 @@ const Layout = () => {
   const { modal } = useModal();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-app-viewport flex flex-col">
       <SeasonRouteSync />
       <ScrollToTopOnNavigate />
       <ScrollRestoration />
@@ -79,11 +78,6 @@ const Layout = () => {
           <LayoutChrome />
         </HomeNavbarChromeProvider>
       </SeasonNavMenuProvider>
-      {modal.type === 'teamMember' && (
-        <Suspense fallback={<ModalLazyChunkFallback />}>
-          <TeamMemberModal member={modal.payload} />
-        </Suspense>
-      )}
       {modal.type === 'tourRequest' && (
         <Suspense fallback={<ModalLazyChunkFallback />}>
           <TourRequestModal key={modal.payload.tourId} payload={modal.payload} />

@@ -64,6 +64,16 @@ import {
   TOUR_SUMMER_7_COVER_OBJECT_POSITION,
   TOUR_SUMMER_7_COVER_OBJECT_POSITION_LG,
 } from './src/constants/tourSummer7CoverCrop'
+import {
+  TEAM_HERO_DESKTOP_COLUMN_GAP,
+  TEAM_HERO_PORTRAIT_DESKTOP_MAX_HEIGHT,
+  TEAM_HERO_PORTRAIT_MOBILE_MAX_HEIGHT,
+  TEAM_HERO_SLIDE_MAX_WIDTH,
+} from './src/constants/teamHeroPortraitLayout'
+import {
+  TEAM_HERO_TEXT_STAGGER_DURATION_MS,
+  TEAM_HERO_TEXT_STAGGER_TRANSLATE_Y_REM,
+} from './src/constants/teamHeroAnimation'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -81,6 +91,9 @@ const MOBILE_NAV_DURATION = '320ms' as const
 const KEYFRAME_FADE_UP_Y = '1.5rem' as const
 /** Согласовано с `spacing.keyframe-slide-in-x` и keyframes `slide-in`. */
 const KEYFRAME_SLIDE_IN_X = '-1.25rem' as const
+
+/** Синхронно с `TEAM_HERO_TEXT_STAGGER_DURATION_MS` и `animation.team-hero-text-stagger-in`. */
+const TEAM_HERO_TEXT_STAGGER_DURATION = `${TEAM_HERO_TEXT_STAGGER_DURATION_MS}ms` as const
 
 const FADE_UP_DURATION = '720ms' as const
 const SLIDE_IN_DURATION = '480ms' as const
@@ -319,7 +332,27 @@ const config: Config = {
     'bg-home-gate-letterbox',
     'bg-home-gate-start-screen',
     'min-h-home-gate-viewport',
+    'min-h-app-viewport',
+    'pt-navbar-chrome',
+    'pt-safe-top',
+    'top-navbar-chrome',
+    'top-safe-top',
+    '-top-safe-top',
     'z-home-hero',
+    'z-home-team-backdrop',
+    'max-h-team-hero-portrait-mobile',
+    'max-h-team-hero-portrait-desktop',
+    'sm:max-h-team-hero-portrait-desktop',
+    'sm:grid-cols-[auto_minmax(0,1fr)]',
+    'sm:gap-x-team-hero-desktop',
+    'sm:mx-auto',
+    'sm:max-w-team-hero-slide',
+    'sm:w-full',
+    'gap-x-team-hero-desktop',
+    'w-fit',
+    'w-full',
+    'justify-self-center',
+    'motion-safe:animate-team-hero-text-stagger-in',
     'duration-home-navbar-chrome',
     'bg-home-gate-return-veil',
     'top-navbar',
@@ -805,6 +838,10 @@ const config: Config = {
         'tour-detail-preface-pt-sm': '2rem',
         /** Совпадает с `h-16` у фиксированного Navbar. */
         'navbar': '4rem',
+        /** Safe area inset top (iOS notch / Dynamic Island). */
+        'safe-top': 'env(safe-area-inset-top, 0px)',
+        /** Navbar + safe area: отступ `main`, `top` dock/overlay. */
+        'navbar-chrome': 'calc(4rem + env(safe-area-inset-top, 0px))',
         /** `absolute` top у h1 в `HeroCarousel`: высота navbar + бывший зазор `top-6`. */
         'home-hero-title-top': '5.5rem',
         /**
@@ -881,7 +918,9 @@ const config: Config = {
       },
       height: {
         /** Полный вьюпорт: navbar fixed оверлеем поверх hero (`main` на главной без `pt-16`). */
-        'hero-viewport': '100dvh',
+        'hero-viewport': '100svh',
+        /** Navbar + safe area (внешняя высота fixed chrome). */
+        'navbar-chrome': 'calc(4rem + env(safe-area-inset-top, 0px))',
         /** Круги сезона в навбаре (фикс с `season-md`, 36px). */
         'nav-season-circle-fixed': '2.25rem',
         /** Плавный масштаб 320–500px (совпадает с max у границы). */
@@ -913,10 +952,18 @@ const config: Config = {
       maxHeight: {
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
-        /** Тело модалок с прокруткой (`TourRequestModal`, `TeamMemberModal`). */
+        /** Тело модалок с прокруткой (`TourRequestModal`). */
         'modal-body': 'min(90dvh, 90vh)',
         /** Максимальная высота карточки тура в сетке главной. */
         'tour-card': '30rem',
+        /** Портрет team-hero на mobile (`TeamMemberHeroSlide`, intrinsic layout). */
+        'team-hero-portrait-mobile': TEAM_HERO_PORTRAIT_MOBILE_MAX_HEIGHT,
+        /** Портрет team-hero на desktop (полный кадр, без crop). */
+        'team-hero-portrait-desktop': TEAM_HERO_PORTRAIT_DESKTOP_MAX_HEIGHT,
+      },
+      gap: {
+        /** Горизонтальный gap между фото и bio на desktop (`TeamMemberHeroSlide`). */
+        'team-hero-desktop': TEAM_HERO_DESKTOP_COLUMN_GAP,
       },
       minWidth: {
         /** Минимальная сторона круглой кнопки «к hero» на воротах (~44px hit area). */
@@ -927,7 +974,7 @@ const config: Config = {
         tourDetail: '80rem',
         /** Контейнер баннера ворот: центрирование и ограничение ширины на широких экранах. */
         'home-gate-banner-shell': 'min(100%, 80rem)',
-        /** Горизонтальный разделитель над блоком «Команда» (`TeamCarousel`). */
+        /** Горизонтальный разделитель над блоком «Команда» (`TeamHeroSection`). */
         'team-section-divider': '28rem',
         /** Декоративный графический знак за контентом секции контактов (`ContactSection`); кап ×2 к прежнему 22rem. */
         'contact-section-mark': 'min(96vw, 44rem)',
@@ -935,6 +982,8 @@ const config: Config = {
         'tour-card': '22rem',
         /** Блок подписи/CTA карусели в hero: не шире контента и вьюпорта. */
         'home-hero-phrase': 'min(100%, min(42rem, 92vw))',
+        /** Слайд team-hero на sm+: центрирование, колонка bio получает `1fr` внутри заданной ширины. */
+        'team-hero-slide': TEAM_HERO_SLIDE_MAX_WIDTH,
       },
       minHeight: {
         /** Герой секции «Безопасность» на главной (фото + градиент и текст). */
@@ -953,7 +1002,9 @@ const config: Config = {
          */
         'home-below-fold-suspense': 'clamp(28rem, 65vh, 52rem)',
         /** Полный вьюпорт ворот; navbar — оверлей (`Home`). */
-        'home-gate-viewport': '100dvh',
+        'home-gate-viewport': '100svh',
+        /** Корневой layout: стабильная высота экрана (iOS Safari). */
+        'app-viewport': '100svh',
         /**
          * Внутренний слой параллакса неба на главной: выше родителя на 15%,
          * чтобы при `translateY` не проступали края (`overflow-hidden` снаружи).
@@ -1052,6 +1103,8 @@ const config: Config = {
         'home-gate-return-veil': '84',
         /** Кнопка «к hero» на стартовом экране — над баннером (`z-home-season-banner` ниже). */
         'home-gate-scroll-hint': '25',
+        /** Штора зоны «Команда» на главной: между небом (z-0) и контентом (z-10). */
+        'home-team-backdrop': '5',
         /** Стек двух `<video>` в `GalleryGridVideo` (seamless loop): нижний кадр под верхним. */
         'gallery-grid-video-loop-under': '1',
         'gallery-grid-video-loop-over': '2',
@@ -1278,6 +1331,14 @@ const config: Config = {
           '0%': { transform: 'translate3d(-130%, 0, 0)' },
           '100%': { transform: 'translate3d(280%, 0, 0)' },
         },
+        /** Каскад текста team-hero при смене слайда (`teamHeroAnimation.ts`). */
+        'team-hero-text-stagger-in': {
+          '0%': {
+            opacity: '0',
+            transform: `translateY(${TEAM_HERO_TEXT_STAGGER_TRANSLATE_Y_REM}rem)`,
+          },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
@@ -1294,6 +1355,7 @@ const config: Config = {
         'tour-included-text-enter': `tour-included-text-enter ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         'tour-included-text-exit': `tour-included-text-exit ${TOUR_INCLUDED_MOTOR_DURATION} cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         'tour-meta-stagger-in': `tour-meta-stagger-in ${SLIDE_IN_DURATION} ease forwards`,
+        'team-hero-text-stagger-in': `team-hero-text-stagger-in ${TEAM_HERO_TEXT_STAGGER_DURATION} ease-out forwards`,
         'home-season-banner-letter-wave-exit': `home-season-banner-letter-wave-exit ${HOME_SEASON_BANNER_LETTER_EXIT_MS}ms ease-in-out forwards`,
         'home-season-banner-wordmark-shimmer': `home-season-banner-wordmark-shimmer ${HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS}ms ease-in-out infinite alternate`,
         'home-hero-ceiling-bounce': `home-hero-ceiling-bounce ${HOME_HERO_CEILING_BOUNCE_DURATION} cubic-bezier(0.45, 0, 0.25, 1) forwards`,

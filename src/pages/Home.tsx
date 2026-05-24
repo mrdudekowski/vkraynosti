@@ -36,7 +36,7 @@ import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seaso
 import { useHomeGateDesktopLayout } from '../hooks/useHomeGateDesktopLayout';
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
 import { useHomeSkyParallax } from '../hooks/useHomeSkyParallax';
-import { BREAKPOINT_MD_PX, NAVBAR_SCROLL_OFFSET_PX } from '../constants/smoothScroll';
+import { BREAKPOINT_MD_PX, getNavbarScrollOffsetPx } from '../constants/smoothScroll';
 import type { Season } from '../types';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
 import { useDocumentVisibility } from '../hooks/useDocumentVisibility';
@@ -45,13 +45,14 @@ import {
   HOME_TOURS_PRIORITY_IMAGE_ABOVE_FOLD_COUNT,
   HOME_TOURS_PROMO_VIDEO_SWITCH_MS,
 } from '../constants/homeToursGrid';
+import TeamViewportBackdrop from '../components/home/TeamViewportBackdrop';
 import { getHomeLcpPreloadImageUrl } from '../utils/getHomeLcpPreloadImageUrl';
 
 const TourCalendarSectionLazy = lazy(
   () => import('../components/tourCalendar/TourCalendarSection')
 );
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
-const TeamCarouselLazy = lazy(() => import('../components/home/TeamCarousel'));
+const TeamHeroSectionLazy = lazy(() => import('../components/home/TeamHeroSection'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
 const GRID_FADE_OUT_DURATION_MS = 260;
 const GRID_REVEAL_DURATION_MS = 500;
@@ -199,12 +200,12 @@ const Home = () => {
     if (scrollTarget == null) return;
 
     if (lenis) {
-      lenis.scrollTo(scrollTarget, { offset: NAVBAR_SCROLL_OFFSET_PX, immediate: true });
+      lenis.scrollTo(scrollTarget, { offset: getNavbarScrollOffsetPx(), immediate: true });
       return;
     }
 
     const viewportTop = window.scrollY + scrollTarget.getBoundingClientRect().top;
-    window.scrollTo({ top: viewportTop + NAVBAR_SCROLL_OFFSET_PX, behavior: 'auto' });
+    window.scrollTo({ top: viewportTop + getNavbarScrollOffsetPx(), behavior: 'auto' });
   }, [lenis]);
 
   useEffect(() => {
@@ -317,6 +318,8 @@ const Home = () => {
             className={`absolute left-0 right-0 top-home-sky-parallax-inner min-h-home-sky-parallax-inner w-full will-change-transform ${HOME_PAGE_SKY_BG_CLASS[activeSeason]}`}
           />
         </div>
+
+        <TeamViewportBackdrop />
 
         <div className="relative z-10 flex w-full flex-col">
           {isHomeGateDesktopLayout ? (
@@ -448,9 +451,7 @@ const Home = () => {
               <SafetySectionLazy />
             </ScrollScrubFade>
 
-            <ScrollScrubFade className="relative w-full">
-              <TeamCarouselLazy />
-            </ScrollScrubFade>
+            <TeamHeroSectionLazy />
 
             <ScrollScrubFade className="relative w-full">
               <ContactSectionLazy />

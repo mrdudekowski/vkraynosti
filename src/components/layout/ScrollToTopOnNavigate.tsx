@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { ROUTES } from '../../constants/routes';
 import {
-  NAVBAR_SCROLL_OFFSET_PX,
+  getNavbarScrollOffsetPx,
   scrollElementIntoViewAnchored,
   scrollWindowToTopImmediate,
   scrollWindowToTopSmooth,
@@ -45,7 +45,7 @@ const ScrollToTopOnNavigate = () => {
         const id = location.hash.slice(1);
         const el = document.getElementById(id);
         if (el) {
-          scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
+          scrollElementIntoViewAnchored(lenis, el, getNavbarScrollOffsetPx());
           return;
         }
       }
@@ -65,7 +65,7 @@ const ScrollToTopOnNavigate = () => {
       const id = location.hash.slice(1);
       const el = document.getElementById(id);
       if (el) {
-        scrollElementIntoViewAnchored(lenis, el, NAVBAR_SCROLL_OFFSET_PX);
+        scrollElementIntoViewAnchored(lenis, el, getNavbarScrollOffsetPx());
       }
       return;
     }

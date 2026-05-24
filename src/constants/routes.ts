@@ -1,5 +1,8 @@
 import type { Season } from '../types';
 
+/** Должен совпадать с `id` секции «Команда» на главной (`TeamHeroSection`). */
+export const HOME_SECTION_TEAM = 'team' as const;
+
 /** Должен совпадать с `id` секции контактов на главной (`ContactSection`). */
 export const HOME_SECTION_CONTACT = 'contact' as const;
 

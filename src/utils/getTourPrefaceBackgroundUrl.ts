@@ -1,9 +1,10 @@
 import {
-  TOUR_MOBILE_IMAGE_VARIANTS,
+  TOUR_COVER_MOBILE_OVERRIDES,
   TOUR_WINTER_3_PREFACE_BACKGROUND,
   TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE,
 } from '../constants/images';
 import { isVideoAssetUrl } from './isVideoAssetUrl';
+import { resolveTourCoverMobileUrl } from './tourCoverMobileVariant';
 import type { Tour } from '../types';
 
 interface ResolveTourPrefaceBackgroundUrlParams {
@@ -32,11 +33,7 @@ export const resolveTourPrefaceBackgroundUrl = ({
   }
 
   if (explicitPrefaceUrl != null) {
-    const explicitMobileVariant = TOUR_MOBILE_IMAGE_VARIANTS[explicitPrefaceUrl];
-    if (explicitMobileVariant != null) {
-      return explicitMobileVariant;
-    }
-    return explicitPrefaceUrl;
+    return resolveTourCoverMobileUrl(explicitPrefaceUrl, TOUR_COVER_MOBILE_OVERRIDES);
   }
 
   return stillFallback;
@@ -56,20 +53,14 @@ export const resolveTourHeroImageUrl = ({
   if (isLgOrAbove) {
     return tour.imageUrl;
   }
-  const explicitMobileVariant = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
-  if (explicitMobileVariant != null) {
-    return explicitMobileVariant;
-  }
-  /**
-   * Каноническая обложка (`tour.imageUrl`) может не совпадать с `gridGalleryUrls[0]` (например «Пидан»:
-   * hero — `pd.preface.grid`, первый кадр сетки — `pd.hero.grid`). На мобильных нельзя подменять её на [0].
-   */
+
   if (!isVideoAssetUrl(tour.imageUrl)) {
-    return tour.imageUrl;
+    return resolveTourCoverMobileUrl(tour.imageUrl, TOUR_COVER_MOBILE_OVERRIDES);
   }
+
   const gridHeroCandidate = gridGalleryUrls[0];
   if (gridHeroCandidate != null && !isVideoAssetUrl(gridHeroCandidate)) {
-    return TOUR_MOBILE_IMAGE_VARIANTS[gridHeroCandidate] ?? gridHeroCandidate;
+    return resolveTourCoverMobileUrl(gridHeroCandidate, TOUR_COVER_MOBILE_OVERRIDES);
   }
   return tour.imageUrl;
 };

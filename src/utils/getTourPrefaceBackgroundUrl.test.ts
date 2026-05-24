@@ -3,12 +3,12 @@ import {
   TOUR_SPRING_3_COVER,
   TOUR_SPRING_3_GALLERY_GRID,
   TOUR_SPRING_10_COVER_GRID,
-  TOUR_SPRING_10_COVER_MOBILE,
   TOUR_SPRING_10_PREFACE_BACKGROUND,
   TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE,
   TOUR_WINTER_3_PREFACE_BACKGROUND,
   TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE,
 } from '../constants/images';
+import { tourCoverMobileVariantUrl } from './tourCoverMobileVariant';
 import type { Tour } from '../types';
 import {
   resolveTourHeroImageUrl,
@@ -61,7 +61,7 @@ describe('resolveTourPrefaceBackgroundUrl', () => {
       galleryStillUrls: viewer,
       isLgOrAbove: false,
     });
-    expect(value).toBe('/preface.webp');
+    expect(value).toBe('/preface.mobile.webp');
   });
 
   it('uses mapped mobile preface variant on mobile when available', () => {
@@ -86,7 +86,7 @@ describe('resolveTourHeroImageUrl', () => {
       gridGalleryUrls: [TOUR_SPRING_10_COVER_GRID],
       isLgOrAbove: false,
     });
-    expect(value).toBe(TOUR_SPRING_10_COVER_MOBILE);
+    expect(value).toBe(tourCoverMobileVariantUrl(TOUR_SPRING_10_COVER_GRID));
   });
 
   it('keeps tour.imageUrl on mobile when it differs from gridGalleryUrls[0] (spring-3 hero)', () => {
@@ -100,7 +100,7 @@ describe('resolveTourHeroImageUrl', () => {
       gridGalleryUrls: [...TOUR_SPRING_3_GALLERY_GRID],
       isLgOrAbove: false,
     });
-    expect(value).toBe(TOUR_SPRING_3_COVER);
+    expect(value).toBe(tourCoverMobileVariantUrl(TOUR_SPRING_3_COVER));
     expect(value).not.toBe(TOUR_SPRING_3_GALLERY_GRID[0]);
   });
 });

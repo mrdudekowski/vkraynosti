@@ -2,9 +2,12 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { KeyboardEvent } from 'react';
 import type { Tour } from '../../types';
-import { TOUR_MOBILE_IMAGE_VARIANTS } from '../../constants/images';
+import { TOUR_COVER_MOBILE_OVERRIDES } from '../../constants/images';
+import { resolveTourCoverMobileUrl } from '../../utils/tourCoverMobileVariant';
 import { buildTourDetailPath } from '../../constants/routes';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
+import { BREAKPOINT_MD_PX } from '../../constants/smoothScroll';
+import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
 import { UI } from '../../constants/ui';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import PlaceholderImage from './PlaceholderImage';
@@ -64,18 +67,19 @@ const TourCardPrice = ({ tour }: TourCardPriceProps) => {
   );
 };
 
-const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
+const cardInner = (
+  tour: Tour,
+  compact: boolean,
+  priorityImage: boolean,
+  coverSrc: string,
+  coverSrcSet: string | undefined
+) => {
   const showAudienceLine =
     tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0;
   const showCustomDifficultyChip =
     !showAudienceLine &&
     tour.difficultyDisplayLabel != null &&
     tour.difficultyDisplayLabel.length > 0;
-  const mobileCoverSrc = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
-  const coverSrcSet =
-    mobileCoverSrc != null && mobileCoverSrc !== tour.imageUrl
-      ? `${mobileCoverSrc} 640w, ${tour.imageUrl} 1200w`
-      : undefined;
 
   return (
     <>
@@ -83,14 +87,14 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
         className={`overflow-hidden rounded-t-card ${compact ? 'h-32' : 'h-48'}`}
       >
         <PlaceholderImage
-          src={tour.imageUrl}
+          src={coverSrc}
           alt={tour.title}
           className="h-full w-full"
           imgClassName={getTourCoverCardImgObjectClass(tour.id)}
           loading={priorityImage ? 'eager' : 'lazy'}
           fetchPriority={priorityImage ? 'high' : 'auto'}
           srcSet={coverSrcSet}
-          sizes="(max-width: 639px) 100vw, (max-width: 1023px) calc(50vw - 1.5rem), calc(25vw - 2rem)"
+          sizes="(max-width: 639px) 640px, (max-width: 1023px) calc(50vw - 1.5rem), calc(25vw - 2rem)"
         />
       </div>
       <div className="p-card-p">
@@ -123,6 +127,16 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
 };
 
 const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = false }: TourCardProps) => {
+  const isDesktopLayout = useMatchMinWidth(BREAKPOINT_MD_PX);
+  const mobileCoverSrc = resolveTourCoverMobileUrl(tour.imageUrl, TOUR_COVER_MOBILE_OVERRIDES);
+  const hasMobileVariant = mobileCoverSrc !== tour.imageUrl;
+  const coverSrc = isDesktopLayout || !hasMobileVariant ? tour.imageUrl : mobileCoverSrc;
+  const coverSrcSet =
+    isDesktopLayout && hasMobileVariant
+      ? `${mobileCoverSrc} 640w, ${tour.imageUrl} 1200w`
+      : undefined;
+  const inner = cardInner(tour, compact, priorityImage, coverSrc, coverSrcSet);
+
   if (!onClick) {
     return (
       <Link
@@ -130,7 +144,7 @@ const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = fal
         className="card-base block h-full w-full max-h-tour-card max-w-tour-card justify-self-center cursor-pointer no-underline text-inherit"
         prefetch="intent"
       >
-        {cardInner(tour, compact, priorityImage)}
+        {inner}
       </Link>
     );
   }
@@ -150,7 +164,7 @@ const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = fal
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
-      {cardInner(tour, compact, priorityImage)}
+      {inner}
     </div>
   );
 };

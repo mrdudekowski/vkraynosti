@@ -523,7 +523,6 @@ export const TOUR_SPRING_6_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
 };
 
 export const TOUR_SPRING_6_COVER_GRID = `${TOUR_SPRING_6}/hero.webp` as const;
-export const TOUR_SPRING_6_COVER_MOBILE = TOUR_SPRING_6_COVER_GRID;
 
 const TOUR_SPRING_7 = `${TOURS_ASSET_BASE}/spring-7`;
 const TOUR_SPRING_8 = `${TOURS_ASSET_BASE}/spring-8`;
@@ -599,8 +598,6 @@ export const TOUR_SPRING_8_GRID_VIDEO_POSTERS: Record<string, string> = {
 
 /** Карточка/hero spring-8: отдельный hero-баннер. */
 export const TOUR_SPRING_8_COVER_GRID = `${TOUR_SPRING_8}/hero.webp` as const;
-/** Отдельного `*.mobile.webp` пока нет; мобильный кандидат совпадает с облегчённым cover. */
-export const TOUR_SPRING_8_COVER_MOBILE = TOUR_SPRING_8_COVER_GRID;
 export const TOUR_SPRING_8_PREFACE_BACKGROUND = `${TOUR_SPRING_8}/view.webp` as const;
 
 /**
@@ -647,7 +644,6 @@ export const TOUR_SPRING_9_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = {
 };
 
 export const TOUR_SPRING_9_COVER_GRID = `${TOUR_SPRING_9}/hero.webp` as const;
-export const TOUR_SPRING_9_COVER_MOBILE = TOUR_SPRING_9_COVER_GRID;
 export const TOUR_SPRING_9_PREFACE_BACKGROUND = `${TOUR_SPRING_9}/wine.webp` as const;
 
 /**
@@ -698,7 +694,6 @@ export const TOUR_SPRING_10_GRID_VIDEO_POSTERS_MOBILE: Record<string, string> = 
 };
 
 export const TOUR_SPRING_10_COVER_GRID = `${TOUR_SPRING_10}/hero.webp` as const;
-export const TOUR_SPRING_10_COVER_MOBILE = TOUR_SPRING_10_COVER_GRID;
 export const TOUR_SPRING_10_PREFACE_BACKGROUND = `${TOUR_SPRING_10}/beach.webp` as const;
 export const TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE = `${TOUR_SPRING_10}/beach.mobile.webp` as const;
 
@@ -1140,15 +1135,14 @@ export const SPRING_TOUR_COVERS = {
   'spring-13': TOUR_SPRING_13_COVER_GRID,
 } as const;
 
-/** Мобильные webp-варианты тяжёлых tour-изображений (hero/preface). */
-export const TOUR_MOBILE_IMAGE_VARIANTS: Record<string, string> = {
+/** Исключения: mobile URL не следует правилу `{name}.mobile.webp` от desktop. */
+export const TOUR_COVER_MOBILE_OVERRIDES: Record<string, string> = {
   [TOUR_WINTER_3_PREFACE_BACKGROUND]: TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE,
-  [TOUR_SPRING_6_COVER_GRID]: TOUR_SPRING_6_COVER_MOBILE,
-  [TOUR_SPRING_8_COVER_GRID]: TOUR_SPRING_8_COVER_MOBILE,
-  [TOUR_SPRING_9_COVER_GRID]: TOUR_SPRING_9_COVER_MOBILE,
-  [TOUR_SPRING_10_COVER_GRID]: TOUR_SPRING_10_COVER_MOBILE,
   [TOUR_SPRING_10_PREFACE_BACKGROUND]: TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE,
 };
+
+/** @deprecated Use resolveTourCoverMobileUrl + TOUR_COVER_MOBILE_OVERRIDES */
+export const TOUR_MOBILE_IMAGE_VARIANTS = TOUR_COVER_MOBILE_OVERRIDES;
 
 export const IMAGES = {
   hero: {

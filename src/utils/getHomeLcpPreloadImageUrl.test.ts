@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { IMAGES } from '../constants/images';
+import { tourCoverMobileVariantUrl } from './tourCoverMobileVariant';
 import { getHomeLcpPreloadImageUrl } from './getHomeLcpPreloadImageUrl';
 
 describe('getHomeLcpPreloadImageUrl', () => {
@@ -9,9 +10,11 @@ describe('getHomeLcpPreloadImageUrl', () => {
     ).toBe(IMAGES.seasonSection.spring);
   });
 
-  it('uses first tour cover on mobile layout', () => {
+  it('uses mobile tour cover on mobile layout', () => {
     const cover = '/vkraynosti/tours/spring-3/hero.webp';
-    expect(getHomeLcpPreloadImageUrl(false, 'spring', cover)).toBe(cover);
+    expect(getHomeLcpPreloadImageUrl(false, 'spring', cover)).toBe(
+      tourCoverMobileVariantUrl(cover)
+    );
   });
 
   it('falls back to season section when mobile has no tour cover', () => {

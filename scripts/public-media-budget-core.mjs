@@ -8,6 +8,8 @@ export const MEDIA_BUDGET_LIMITS = {
   // MP4 viewer assets only; plain *.webm is legacy / not produced by encode scripts.
   viewerVideo: { warnBytes: 15 * BYTES_IN_MIB, failBytes: 40 * BYTES_IN_MIB },
   posterImage: { warnBytes: 300 * BYTES_IN_KIB, failBytes: 500 * BYTES_IN_KIB },
+  /** Tour card / hero mobile covers: `{name}.mobile.webp` (not poster slots). */
+  coverMobile: { warnBytes: 200 * BYTES_IN_KIB, failBytes: 350 * BYTES_IN_KIB },
   heroOrViewerImage: { warnBytes: 2 * BYTES_IN_MIB, failBytes: Number.POSITIVE_INFINITY },
   other: { warnBytes: Number.POSITIVE_INFINITY, failBytes: Number.POSITIVE_INFINITY },
 };
@@ -23,6 +25,7 @@ export function classifyPublicTourMediaPath(filePath) {
   if (fileName.endsWith('.webm')) return 'other';
   if (fileName.endsWith('.mp4')) return 'viewerVideo';
   if (/\.poster(?:\.mobile)?\.webp$/.test(fileName)) return 'posterImage';
+  if (/\.mobile\.webp$/.test(fileName)) return 'coverMobile';
   if (/\.(webp|png|jpe?g)$/i.test(fileName)) return 'heroOrViewerImage';
   return 'other';
 }

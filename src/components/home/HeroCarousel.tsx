@@ -10,7 +10,9 @@ import { UI } from '../../constants/ui';
 import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { buildTourDetailPath } from '../../constants/routes';
 import { BREAKPOINT_LG_PX } from '../../constants/reveal';
-import { TOUR_MOBILE_IMAGE_VARIANTS } from '../../constants/images';
+import { BREAKPOINT_MD_PX } from '../../constants/smoothScroll';
+import { TOUR_COVER_MOBILE_OVERRIDES } from '../../constants/images';
+import { resolveTourCoverMobileUrl } from '../../utils/tourCoverMobileVariant';
 import { resolveContentSourceTourId } from '../../data/seasonTourRegistry';
 import { resolveTourHeroCoverBackgroundPosition } from '../../constants/tourCoverCropByCanonicalId';
 import { TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX } from '../../constants/tourSpring3CoverCrop';
@@ -53,6 +55,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
   const heroCoverGteLayoutMin620 = useMatchMinWidth(TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX);
   const spring3Lg = useMatchMinWidth(BREAKPOINT_LG_PX);
   const showDesktopArrows = useMatchMinWidth(BREAKPOINT_LG_PX);
+  const isDesktopLayout = useMatchMinWidth(BREAKPOINT_MD_PX);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
@@ -60,17 +63,23 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
       {tours.map((tour, idx) => {
         const isActive = idx === current;
         const shouldLoadBackground = visitedSlideIndices.has(idx);
-        const mobileCoverSrc = TOUR_MOBILE_IMAGE_VARIANTS[tour.imageUrl];
+        const mobileCoverSrc = resolveTourCoverMobileUrl(
+          tour.imageUrl,
+          TOUR_COVER_MOBILE_OVERRIDES
+        );
+        const hasMobileVariant = mobileCoverSrc !== tour.imageUrl;
+        const backgroundUrl =
+          isDesktopLayout || !hasMobileVariant ? tour.imageUrl : mobileCoverSrc;
         const backgroundSrcSet =
-          mobileCoverSrc != null && mobileCoverSrc !== tour.imageUrl
+          isDesktopLayout && hasMobileVariant
             ? `${mobileCoverSrc} 768w, ${tour.imageUrl} 1920w`
             : undefined;
         return (
           <CarouselSlide
             key={tour.id}
-            backgroundUrl={tour.imageUrl}
+            backgroundUrl={backgroundUrl}
             backgroundSrcSet={backgroundSrcSet}
-            backgroundSizes="100vw"
+            backgroundSizes="(max-width: 767px) 640px, 100vw"
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
             backgroundPosition={resolveTourHeroCoverBackgroundPosition(

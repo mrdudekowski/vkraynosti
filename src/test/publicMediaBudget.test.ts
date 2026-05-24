@@ -21,6 +21,7 @@ describe('public media budget classifier', () => {
     const { classifyPublicTourMediaPath } = await importPublicMediaBudgetModule();
 
     expect(classifyPublicTourMediaPath('public/tours/spring/spring-3.poster.mobile.webp')).toBe('posterImage');
+    expect(classifyPublicTourMediaPath('public/tours/spring-3/hero.mobile.webp')).toBe('coverMobile');
     expect(classifyPublicTourMediaPath('public/tours/spring/spring-11.webp')).toBe('heroOrViewerImage');
   });
 });

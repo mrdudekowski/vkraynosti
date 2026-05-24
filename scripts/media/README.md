@@ -47,8 +47,15 @@ npm run generate:banner-loops
 
 ## Новый тур
 
-1. Положить исходники в `public/tours/{id}/`.
+1. Положить исходники в `public/tours/{id}/` (`hero.webp` или `cover.webp` для `imageUrl`).
 2. В [`src/constants/images.ts`](../../src/constants/images.ts): пары `*_GALLERY_VIEWER` и `*_GALLERY_GRID` (одинаковый порядок). Для фото используйте те же URL в обоих массивах; для видео в сетке — `*.grid.webm`, слоты просмотра — постеры (`*_GRID_VIDEO_POSTERS` / `<video poster=…>`), не отдельный full `.webm`.
 3. В [`src/data/toursData.ts`](../../src/data/toursData.ts): `galleryImages: [...VIEWER]`, `galleryGridUrls: [...GRID]`, `imageUrl` — обложка (часто `GRID[0]` или отдельный кадр).
-4. Если в сетке есть видео: `TOUR_*_GRID_VIDEO_POSTERS` и в [`TourDetailPage`](../../src/pages/TourDetailPage.tsx) передача `getVideoPosterForGridSrc` для `tour.id`.
-5. Скопировать ближайший видео-скрипт, подставить список клипов и вызовы `Invoke-Ffmpeg` / `WebmTourEncoding.ps1`.
+4. **`npm run media:covers-mobile -- --tour-id {id}`** — создать `{name}.mobile.webp` (640px; бюджет `coverMobile` в `media:budget`). Правило: `hero.webp` → `hero.mobile.webp`; исключения — [`TOUR_COVER_MOBILE_OVERRIDES`](../../src/constants/images.ts).
+5. **`npm run media:verify-covers`** — desktop и mobile обложки для всех туров в `TOURS`.
+6. Если в сетке есть видео: `TOUR_*_GRID_VIDEO_POSTERS` и в [`TourDetailPage`](../../src/pages/TourDetailPage.tsx) передача `getVideoPosterForGridSrc` для `tour.id`.
+7. Скопировать ближайший видео-скрипт, подставить список клипов и вызовы `Invoke-Ffmpeg` / `WebmTourEncoding.ps1`.
+8. **`npm run media:budget`** + **`npm test`** (в т.ч. `scripts/tourCoverMedia.test.mjs`, gallery parity).
+
+После `npm run media:bootstrap-season`: **`npm run media:covers-mobile -- --season fall`** (или `--all-missing`).
+
+См. [docs/optimization-phase-2-tour-covers.md](../../docs/optimization-phase-2-tour-covers.md).

@@ -23,6 +23,8 @@
     "generate:winter-4-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-4-grid-assets.ps1",
     "generate:winter-5-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-5-grid-assets.ps1",
     "media:budget": "node scripts/check-public-media-budget.mjs",
+    "media:covers-mobile": "node scripts/generate-tour-cover-mobile-variants.mjs",
+    "media:verify-covers": "node scripts/verify-tour-cover-media.mjs",
     "generate:tour-schedule-template": "node scripts/generate-tour-schedule-template.mjs",
     "media:bootstrap-season": "node scripts/generate-isolated-season-media.mjs"
   },

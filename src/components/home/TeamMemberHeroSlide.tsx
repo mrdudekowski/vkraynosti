@@ -1,56 +1,98 @@
-import { forwardRef } from 'react';
 import type { TeamMember } from '../../types';
 import { getTeamHeroTextStaggerPresentation } from '../../constants/teamHeroAnimation';
 import { UI } from '../../constants/ui';
+import { useRevealOnScroll } from '../../hooks/useRevealOnScroll';
 import PlaceholderImage from '../shared/PlaceholderImage';
 import { splitTeamBioParagraphs } from '../../utils/team/splitTeamBioParagraphs';
+
+export type TeamMemberHeroLayoutVariant = 'photo-start' | 'photo-end';
 
 interface TeamMemberHeroSlideProps {
   member: TeamMember;
   prefersReducedMotion: boolean;
+  layoutVariant?: TeamMemberHeroLayoutVariant;
+  articleClassName?: string;
 }
 
-const TeamMemberHeroSlide = forwardRef<HTMLDivElement, TeamMemberHeroSlideProps>(
-  function TeamMemberHeroSlide({ member, prefersReducedMotion }, ref) {
-    const bioParagraphs = splitTeamBioParagraphs(member.bio);
-    const showExperienceLine = member.showExperienceLine !== false && member.experience != null;
+const portraitFrameClassName =
+  'relative mx-auto w-fit max-w-full overflow-hidden rounded-card';
 
-    let cascadeIndex = 0;
-    const nextStagger = () =>
-      getTeamHeroTextStaggerPresentation(cascadeIndex++, prefersReducedMotion);
+const portraitImageClassName =
+  'mx-auto block h-auto w-auto max-w-full max-h-team-hero-portrait-mobile sm:max-h-team-hero-portrait-desktop';
 
-    const nameStagger = nextStagger();
-    const roleStagger = nextStagger();
-    const experienceStagger = showExperienceLine ? nextStagger() : null;
-    const bioStaggers = bioParagraphs.map(() => nextStagger());
+const TeamMemberHeroSlide = ({
+  member,
+  prefersReducedMotion,
+  layoutVariant = 'photo-start',
+  articleClassName,
+}: TeamMemberHeroSlideProps) => {
+  const { ref: textRevealRef, isRevealed } = useRevealOnScroll({
+    once: true,
+    disabled: prefersReducedMotion,
+  });
 
-    return (
+  const bioParagraphs = splitTeamBioParagraphs(member.bio);
+  const showExperienceLine = member.showExperienceLine !== false && member.experience != null;
+  const isPhotoEnd = layoutVariant === 'photo-end';
+  const isTextRevealed = prefersReducedMotion || isRevealed;
+
+  let cascadeIndex = 0;
+  const nextStagger = () =>
+    getTeamHeroTextStaggerPresentation(cascadeIndex++, prefersReducedMotion, isTextRevealed);
+
+  const nameStagger = nextStagger();
+  const roleStagger = nextStagger();
+  const experienceStagger = showExperienceLine ? nextStagger() : null;
+  const bioStaggers = bioParagraphs.map(() => nextStagger());
+
+  const photoColumnClassName = [
+    'flex min-h-0 min-w-0 w-full max-w-full justify-center',
+    isPhotoEnd
+      ? [
+          'sm:col-start-2 sm:row-start-1 sm:relative sm:z-10',
+          'sm:-mt-team-hero-staircase-offset-sm md:-mt-team-hero-staircase-offset-md lg:-mt-team-hero-staircase-offset-lg',
+        ].join(' ')
+      : 'sm:col-start-1 sm:row-start-1',
+  ].join(' ');
+
+  return (
+    <article
+      aria-labelledby={`${member.id}-name`}
+      className={[isPhotoEnd ? 'sm:relative' : '', articleClassName].filter(Boolean).join(' ')}
+    >
       <div
-        ref={ref}
         className={[
-          'grid min-h-0 w-full grid-cols-1 gap-y-4',
+          'grid min-h-0 w-full grid-cols-1 gap-y-team-hero-slide-mobile-row-gap',
           'sm:mx-auto sm:w-full sm:max-w-team-hero-slide',
-          'sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start sm:gap-x-team-hero-desktop sm:gap-y-0',
+          isPhotoEnd
+            ? 'sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-x-team-hero-desktop sm:gap-y-0 sm:overflow-visible'
+            : 'sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start sm:gap-x-team-hero-desktop sm:gap-y-0',
         ].join(' ')}
-        aria-live="polite"
       >
-        <div className="flex min-h-0 min-w-0 w-full max-w-full justify-center sm:col-start-1 sm:row-start-1">
-          <div className="relative mx-auto w-fit max-w-full overflow-hidden rounded-card">
+        <div className={photoColumnClassName}>
+          <div className={portraitFrameClassName}>
             <PlaceholderImage
               src={member.imageUrl}
               alt={member.name}
               layout="intrinsic"
               className="max-w-full"
-              imgClassName="mx-auto block h-auto w-auto max-w-full max-h-team-hero-portrait-mobile sm:max-h-team-hero-portrait-desktop"
+              imgClassName={portraitImageClassName}
               loading="eager"
               fetchPriority="high"
             />
           </div>
         </div>
 
-        <div className="min-h-0 min-w-0 w-full px-1 sm:col-start-2 sm:row-start-1 sm:px-0 sm:pb-8 sm:pt-0">
+        <div
+          ref={textRevealRef}
+          className={[
+            'min-h-0 min-w-0 w-full px-1 sm:px-0 sm:pb-8 sm:pt-0',
+            isPhotoEnd ? 'sm:col-start-1 sm:row-start-1' : 'sm:col-start-2 sm:row-start-1',
+          ].join(' ')}
+        >
           <div className="max-w-prose space-y-4">
             <h3
+              id={`${member.id}-name`}
               className={`font-heading text-lg font-normal text-text-inverse sm:text-xl lg:text-2xl ${nameStagger.className}`.trim()}
               style={nameStagger.style}
             >
@@ -82,8 +124,8 @@ const TeamMemberHeroSlide = forwardRef<HTMLDivElement, TeamMemberHeroSlideProps>
           </div>
         </div>
       </div>
-    );
-  }
-);
+    </article>
+  );
+};
 
 export default TeamMemberHeroSlide;

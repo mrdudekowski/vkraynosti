@@ -43,4 +43,10 @@ describe('getTeamHeroTextStaggerPresentation', () => {
       className: '',
     });
   });
+
+  it('hides text until scroll reveal when motion is allowed', () => {
+    expect(getTeamHeroTextStaggerPresentation(1, false, false)).toEqual({
+      className: 'opacity-0',
+    });
+  });
 });

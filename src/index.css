@@ -143,7 +143,7 @@
     @apply hidden sm:block shrink-0 self-stretch rounded-full w-tour-detail-heading-accent;
   }
 
-  /** Каскадный fade-in текста team-hero при смене слайда (`teamHeroAnimation.ts`). */
+  /** Каскадный fade-in текста team-hero при scroll reveal (`teamHeroAnimation.ts`). */
   .team-hero-text-stagger {
     @apply motion-safe:animate-team-hero-text-stagger-in motion-reduce:animate-none opacity-0;
   }

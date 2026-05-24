@@ -31,14 +31,20 @@ export function getTeamHeroTextStaggerStyle(cascadeIndex: number): CSSProperties
 }
 
 /**
- * className + style для одного элемента каскада; при reduced motion — без анимации и delay.
+ * className + style для одного элемента каскада.
+ * При reduced motion или до scroll reveal — без анимации (контент скрыт до reveal или сразу видим).
  */
 export function getTeamHeroTextStaggerPresentation(
   cascadeIndex: number,
-  prefersReducedMotion: boolean
+  prefersReducedMotion: boolean,
+  isTextRevealed = true
 ): TeamHeroTextStaggerPresentation {
   if (prefersReducedMotion) {
     return { className: '' };
+  }
+
+  if (!isTextRevealed) {
+    return { className: 'opacity-0' };
   }
 
   return {

@@ -28,9 +28,6 @@ export const UI = {
   },
   team: {
     experienceSuffix: 'опыта',
-    carouselPrevious: 'Предыдущий слайд команды',
-    carouselNext: 'Следующий слайд команды',
-    carouselPaginationGoToSlide: 'Перейти к слайду команды {n}',
   },
   privacyPage: {
     metaTitle:   'Политика конфиденциальности | Вкрайности',

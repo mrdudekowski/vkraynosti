@@ -1,11 +1,52 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, afterEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import TeamMemberHeroSlide from './TeamMemberHeroSlide';
 import { TEAM } from '../../data/teamData';
 import { TEAM_HERO_TEXT_STAGGER_CLASS } from '../../constants/teamHeroAnimation';
 import { splitTeamBioParagraphs } from '../../utils/team/splitTeamBioParagraphs';
 
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin = '';
+  readonly thresholds: readonly number[] = [];
+  private callback: IntersectionObserverCallback;
+
+  constructor(callback: IntersectionObserverCallback) {
+    this.callback = callback;
+  }
+
+  observe(element: Element) {
+    this.callback(
+      [{ isIntersecting: true, target: element } as IntersectionObserverEntry],
+      this
+    );
+  }
+
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+
+class NoIntersectObserver implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin = '';
+  readonly thresholds: readonly number[] = [];
+
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+
 describe('TeamMemberHeroSlide', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('shows portrait after image load', () => {
     render(<TeamMemberHeroSlide member={TEAM[0]} prefersReducedMotion />);
 
@@ -33,7 +74,7 @@ describe('TeamMemberHeroSlide', () => {
     expect(portraitFrame).not.toHaveClass('w-full');
     expect(portraitFrame).not.toHaveClass('h-team-hero-portrait-mobile');
 
-    const slideRoot = container.firstElementChild;
+    const slideRoot = container.querySelector('article > div');
     expect(slideRoot?.className).toContain('sm:grid-cols-[auto_minmax(0,1fr)]');
     expect(slideRoot?.className).toContain('sm:mx-auto');
     expect(slideRoot?.className).toContain('sm:w-full');
@@ -41,7 +82,19 @@ describe('TeamMemberHeroSlide', () => {
     expect(slideRoot?.className).not.toContain('sm:w-fit');
   });
 
-  it('applies cascade stagger delays for Yaroslav', () => {
+  it('hides text with opacity-0 before scroll reveal', () => {
+    vi.stubGlobal('IntersectionObserver', NoIntersectObserver);
+
+    render(<TeamMemberHeroSlide member={TEAM[0]} prefersReducedMotion={false} />);
+
+    const name = screen.getByRole('heading', { level: 3, name: TEAM[0].name });
+    expect(name).toHaveClass('opacity-0');
+    expect(name).not.toHaveClass(TEAM_HERO_TEXT_STAGGER_CLASS);
+  });
+
+  it('applies cascade stagger delays after scroll reveal', () => {
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+
     render(<TeamMemberHeroSlide member={TEAM[0]} prefersReducedMotion={false} />);
 
     const name = screen.getByRole('heading', { level: 3, name: TEAM[0].name });
@@ -57,6 +110,8 @@ describe('TeamMemberHeroSlide', () => {
   });
 
   it('skips experience in cascade index for Elina', () => {
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+
     render(<TeamMemberHeroSlide member={TEAM[1]} prefersReducedMotion={false} />);
 
     const name = screen.getByRole('heading', { level: 3, name: TEAM[1].name });
@@ -107,5 +162,47 @@ describe('TeamMemberHeroSlide', () => {
 
     const [firstParagraph] = splitTeamBioParagraphs(TEAM[0].bio);
     expect(screen.getByText(firstParagraph)).toBeInTheDocument();
+  });
+
+  it('mirrors photo to the right column on sm for photo-end', () => {
+    const { container } = render(
+      <TeamMemberHeroSlide member={TEAM[0]} prefersReducedMotion layoutVariant="photo-end" />
+    );
+
+    const slideRoot = container.querySelector('article > div');
+    expect(slideRoot?.className).toContain('sm:grid-cols-[minmax(0,1fr)_auto]');
+    expect(slideRoot?.className).toContain('sm:overflow-visible');
+
+    const portraitFrame = container.querySelector('.rounded-card');
+    const photoColumn = portraitFrame?.parentElement;
+    expect(photoColumn?.className).toContain('sm:col-start-2');
+    expect(photoColumn?.className).toContain('sm:-mt-team-hero-staircase-offset-sm');
+    expect(photoColumn?.className).toContain('sm:z-10');
+    expect(photoColumn?.className).not.toContain('sm:absolute');
+
+    const textColumn = container.querySelector('[id="team-1-name"]')?.parentElement?.parentElement;
+    expect(textColumn?.className).toContain('sm:col-start-1');
+  });
+
+  it('does not apply mirror or staircase classes to photo-start', () => {
+    const { container } = render(
+      <TeamMemberHeroSlide member={TEAM[1]} prefersReducedMotion layoutVariant="photo-start" />
+    );
+
+    const slideRoot = container.querySelector('article > div');
+    expect(slideRoot?.className).not.toContain('sm:grid-cols-[minmax(0,1fr)_auto]');
+
+    const portraitFrame = container.querySelector('.rounded-card');
+    const photoColumn = portraitFrame?.parentElement;
+    expect(photoColumn?.className).not.toContain('sm:absolute');
+    expect(photoColumn?.className).not.toContain('sm:-mt-team-hero-staircase-offset-sm');
+  });
+
+  it('keeps Yaroslav portrait in document flow on photo-end', () => {
+    render(<TeamMemberHeroSlide member={TEAM[0]} prefersReducedMotion layoutVariant="photo-end" />);
+
+    const img = screen.getByRole('img', { name: TEAM[0].name });
+    expect(img).toHaveAttribute('src', TEAM[0].imageUrl);
+    expect(img.closest('.rounded-card')).toBeInTheDocument();
   });
 });

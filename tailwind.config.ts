@@ -66,9 +66,17 @@ import {
 } from './src/constants/tourSummer7CoverCrop'
 import {
   TEAM_HERO_DESKTOP_COLUMN_GAP,
+  TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
+  TEAM_HERO_MEMBERS_STACK_GAP,
+  TEAM_HERO_MEMBERS_STACK_GAP_MOBILE,
+  TEAM_HERO_MEMBERS_STACK_GAP_LG,
   TEAM_HERO_PORTRAIT_DESKTOP_MAX_HEIGHT,
   TEAM_HERO_PORTRAIT_MOBILE_MAX_HEIGHT,
   TEAM_HERO_SLIDE_MAX_WIDTH,
+  TEAM_HERO_SLIDE_MOBILE_ROW_GAP,
+  TEAM_HERO_STAIRCASE_OFFSET_LG,
+  TEAM_HERO_STAIRCASE_OFFSET_MD,
+  TEAM_HERO_STAIRCASE_OFFSET_SM,
 } from './src/constants/teamHeroPortraitLayout'
 import {
   TEAM_HERO_TEXT_STAGGER_DURATION_MS,
@@ -348,6 +356,21 @@ const config: Config = {
     'sm:mx-auto',
     'sm:max-w-team-hero-slide',
     'sm:w-full',
+    'gap-y-team-hero-slide-mobile-row-gap',
+    'flex',
+    'flex-col',
+    'max-sm:gap-team-hero-members-stack-mobile',
+    'sm:gap-team-hero-members',
+    'lg:gap-team-hero-members-lg',
+    'sm:pb-team-hero-first-member-bottom-sm',
+    'sm:grid-cols-[minmax(0,1fr)_auto]',
+    'sm:col-start-1',
+    'sm:col-start-2',
+    'sm:-mt-team-hero-staircase-offset-sm',
+    'md:-mt-team-hero-staircase-offset-md',
+    'lg:-mt-team-hero-staircase-offset-lg',
+    'sm:overflow-visible',
+    'sm:z-10',
     'gap-x-team-hero-desktop',
     'w-fit',
     'w-full',
@@ -872,6 +895,22 @@ const config: Config = {
         'home-gate-scroll-hint-bob-y': '0.35rem',
         /** Между капсулой-разделителем и заголовком секции «Команда» на главной. */
         'team-section-divider-to-heading': '2rem',
+        /** Вертикальный gap между блоками членов команды (`TeamHeroSection`). */
+        'team-hero-members-stack': TEAM_HERO_MEMBERS_STACK_GAP,
+        /** Gap между блоками команды на mobile. */
+        'team-hero-members-stack-mobile': TEAM_HERO_MEMBERS_STACK_GAP_MOBILE,
+        /** Gap между блоками команды на lg+. */
+        'team-hero-members-stack-lg': TEAM_HERO_MEMBERS_STACK_GAP_LG,
+        /** Нижний padding первого блока на sm+ (компенсация «лесенки»). */
+        'team-hero-first-member-bottom-sm': TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
+        /** Подъём фото второго блока («лесенка») на sm. */
+        'team-hero-staircase-offset-sm': TEAM_HERO_STAIRCASE_OFFSET_SM,
+        /** Между фото и текстом в карточке члена команды на mobile. */
+        'team-hero-slide-mobile-row-gap': TEAM_HERO_SLIDE_MOBILE_ROW_GAP,
+        /** Подъём фото второго блока на md. */
+        'team-hero-staircase-offset-md': TEAM_HERO_STAIRCASE_OFFSET_MD,
+        /** Подъём фото второго блока на lg+. */
+        'team-hero-staircase-offset-lg': TEAM_HERO_STAIRCASE_OFFSET_LG,
         'section-y': '6rem',
         'card-p':    '1.75rem',
         'tooltip-gap': '0.375rem',

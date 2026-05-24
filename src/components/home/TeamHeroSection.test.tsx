@@ -1,86 +1,145 @@
-import { describe, expect, it } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TeamHeroSection from './TeamHeroSection';
 import { TEAM } from '../../data/teamData';
 import { TEAM_HERO_TEXT_STAGGER_CLASS } from '../../constants/teamHeroAnimation';
-import { getTeamSectionHeading, UI } from '../../constants/ui';
+import { UI } from '../../constants/ui';
 import { splitTeamBioParagraphs } from '../../utils/team/splitTeamBioParagraphs';
 import { SeasonProvider } from '../../context/SeasonContext';
 
-describe('TeamHeroSection', () => {
-  it('renders founder names and carousel region', () => {
-    render(
-      <MemoryRouter>
-        <SeasonProvider>
-          <TeamHeroSection />
-        </SeasonProvider>
-      </MemoryRouter>
-    );
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin = '';
+  readonly thresholds: readonly number[] = [];
+  private callback: IntersectionObserverCallback;
 
-    expect(screen.getByRole('region', { name: getTeamSectionHeading() })).toHaveAttribute(
-      'aria-roledescription',
-      'carousel'
+  constructor(callback: IntersectionObserverCallback) {
+    this.callback = callback;
+  }
+
+  observe(element: Element) {
+    this.callback(
+      [{ isIntersecting: true, target: element } as IntersectionObserverEntry],
+      this
     );
+  }
+
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+
+function renderTeamHeroSection() {
+  return render(
+    <MemoryRouter>
+      <SeasonProvider>
+        <TeamHeroSection />
+      </SeasonProvider>
+    </MemoryRouter>
+  );
+}
+
+describe('TeamHeroSection', () => {
+  beforeEach(() => {
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('renders both founders and section heading with aria-labelledby', () => {
+    renderTeamHeroSection();
+
+    const section = document.getElementById('team');
+    expect(section).toHaveAttribute('aria-labelledby', 'team-heading');
+
     const heading = screen.getByRole('heading', { level: 2 });
+    expect(heading).toHaveAttribute('id', 'team-heading');
     expect(heading).toHaveTextContent(/Команда/);
     expect(heading).toHaveTextContent('В');
     expect(heading).toHaveTextContent('Крайности');
-    expect(screen.getByText('Ярослав')).toBeInTheDocument();
+
+    expect(screen.getByRole('heading', { level: 3, name: TEAM[0].name })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: TEAM[1].name })).toBeInTheDocument();
     expect(screen.getByText(UI.sections.teamSub)).toBeInTheDocument();
   });
 
-  it('renders all bio paragraphs for the active slide', () => {
-    render(
-      <MemoryRouter>
-        <SeasonProvider>
-          <TeamHeroSection />
-        </SeasonProvider>
-      </MemoryRouter>
-    );
+  it('renders all bio paragraphs for both team members', () => {
+    renderTeamHeroSection();
 
-    for (const paragraph of splitTeamBioParagraphs(TEAM[0].bio)) {
-      expect(screen.getByText(paragraph)).toBeInTheDocument();
+    for (const member of TEAM) {
+      for (const paragraph of splitTeamBioParagraphs(member.bio)) {
+        expect(screen.getByText(paragraph)).toBeInTheDocument();
+      }
     }
   });
 
-  it('renders pagination dots without a details button', () => {
-    render(
-      <MemoryRouter>
-        <SeasonProvider>
-          <TeamHeroSection />
-        </SeasonProvider>
-      </MemoryRouter>
-    );
+  it('does not render carousel controls or details button', () => {
+    renderTeamHeroSection();
 
-    const dots = screen.getAllByRole('button', {
-      name: /Перейти к слайду команды/i,
-    });
-    expect(dots).toHaveLength(TEAM.length);
+    expect(screen.queryByRole('button', { name: /слайд команды/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Предыдущий слайд команды/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Следующий слайд команды/i })).not.toBeInTheDocument();
+    expect(document.querySelector('[aria-roledescription="carousel"]')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Подробнее/i })).not.toBeInTheDocument();
   });
 
-  it('remounts slide with cascade stagger when switching team members', () => {
-    render(
-      <MemoryRouter>
-        <SeasonProvider>
-          <TeamHeroSection />
-        </SeasonProvider>
-      </MemoryRouter>
-    );
+  it('renders members in display order: Elina first, Yaroslav second', () => {
+    renderTeamHeroSection();
+
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Элина');
+    expect(headings[1]).toHaveTextContent('Ярослав');
+  });
+
+  it('uses overflow-visible stack wrapper with tokenized member gap', () => {
+    renderTeamHeroSection();
+
+    const stack = screen.getByRole('heading', { level: 3, name: 'Элина' }).closest('section')
+      ?.querySelector('.max-sm\\:gap-team-hero-members-stack-mobile');
+
+    expect(stack).toHaveClass('relative');
+    expect(stack).toHaveClass('overflow-visible');
+    expect(stack).toHaveClass('flex');
+    expect(stack).toHaveClass('flex-col');
+    expect(stack).toHaveClass('sm:gap-team-hero-members');
+    expect(stack).toHaveClass('lg:gap-team-hero-members-lg');
+  });
+
+  it('applies bottom padding on first member article from sm for staircase gap', () => {
+    renderTeamHeroSection();
+
+    const elinaArticle = screen.getByRole('heading', { level: 3, name: 'Элина' }).closest('article');
+    const yaroslavArticle = screen.getByRole('heading', { level: 3, name: 'Ярослав' }).closest('article');
+
+    expect(elinaArticle).toHaveClass('sm:pb-team-hero-first-member-bottom-sm');
+    expect(yaroslavArticle).not.toHaveClass('sm:pb-team-hero-first-member-bottom-sm');
+  });
+
+  it('applies text stagger after scroll reveal', () => {
+    renderTeamHeroSection();
 
     const yaroslavName = screen.getByRole('heading', { level: 3, name: TEAM[0].name });
+    const elinaName = screen.getByRole('heading', { level: 3, name: TEAM[1].name });
+
     expect(yaroslavName).toHaveClass(TEAM_HERO_TEXT_STAGGER_CLASS);
     expect(yaroslavName.style.animationDelay).toBe('0ms');
-
-    const secondDot = screen.getByRole('button', {
-      name: UI.team.carouselPaginationGoToSlide.replace('{n}', '2'),
-    });
-    fireEvent.click(secondDot);
-
-    const elinaName = screen.getByRole('heading', { level: 3, name: TEAM[1].name });
     expect(elinaName).toHaveClass(TEAM_HERO_TEXT_STAGGER_CLASS);
     expect(elinaName.style.animationDelay).toBe('0ms');
-    expect(screen.queryByRole('heading', { level: 3, name: TEAM[0].name })).not.toBeInTheDocument();
+  });
+
+  it('renders each member in an article with aria-labelledby on name', () => {
+    renderTeamHeroSection();
+
+    for (const member of TEAM) {
+      const nameHeading = screen.getByRole('heading', { level: 3, name: member.name });
+      const article = nameHeading.closest('article');
+      expect(article).toHaveAttribute('aria-labelledby', `${member.id}-name`);
+      expect(nameHeading).toHaveAttribute('id', `${member.id}-name`);
+    }
   });
 });

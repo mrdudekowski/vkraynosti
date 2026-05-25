@@ -883,6 +883,74 @@
     }
   }
 
+  /**
+   * Декоративный чекбокс в плашке #safety (`SafetyStatusPlaqueCheckbox`): stroke-dash как у формы, пульс scale.
+   */
+  .safety-status-plaque-checkbox {
+    @apply relative inline-flex h-safety-status-checkbox w-safety-status-checkbox items-center justify-center;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .safety-status-plaque-checkbox-svg {
+    @apply pointer-events-none transition-[height,width] duration-safety-checkbox-grow ease-reveal-out motion-reduce:transition-none;
+    position: relative;
+    z-index: 1;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke: currentColor;
+    stroke-width: theme('formCheckbox.strokeWidth');
+    transform: translate3d(0, 0, 0);
+  }
+
+  .safety-status-plaque-checkbox-svg path {
+    stroke-dasharray: theme('formCheckbox.pathDashArray');
+    stroke-dashoffset: 0;
+    transition: all 300ms linear;
+  }
+
+  .safety-status-plaque-checkbox-svg polyline {
+    stroke-dasharray: theme('formCheckbox.polylineDashArray');
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetIdle');
+    transition: all 200ms linear;
+    transition-delay: 0ms;
+  }
+
+  .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg path {
+    stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+    transition-delay: 0ms;
+  }
+
+  .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg polyline {
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetChecked');
+    transition-delay: 150ms;
+  }
+
+  .safety-status-plaque-checkbox--small .safety-status-plaque-checkbox-svg {
+    @apply h-safety-status-checkbox-sm w-safety-status-checkbox-sm;
+  }
+
+  .safety-status-plaque-checkbox--full .safety-status-plaque-checkbox-svg {
+    @apply h-safety-status-checkbox w-safety-status-checkbox;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .safety-status-plaque-checkbox--small .safety-status-plaque-checkbox-svg {
+      @apply h-safety-status-checkbox w-safety-status-checkbox;
+    }
+
+    .safety-status-plaque-checkbox-svg path,
+    .safety-status-plaque-checkbox-svg polyline {
+      transition: none !important;
+    }
+
+    .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg path,
+    .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg polyline {
+      stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+      transition-delay: 0ms;
+    }
+  }
+
   /** Мобильное меню навбара: без анимации, но смена transform/opacity мгновенная (закрытие работает). */
   @media (prefers-reduced-motion: reduce) {
     .mobile-nav-panel,

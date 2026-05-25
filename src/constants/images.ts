@@ -138,6 +138,9 @@ export const TOUR_WINTER_3_LIFT_IMAGE = TOUR_WINTER_3_GALLERY_GRID[2];
 
 /** Главная: секция «Безопасность» — герой (инструктаж в кадре, `gr.instr` сетки). */
 export const HOME_SAFETY_SECTION_HERO_IMAGE = TOUR_WINTER_3_GALLERY_GRID[8];
+
+/** Главная: левая колонка teaser #safety — `public/safety/safety.webp`. */
+export const HOME_SAFETY_TEASER_HERO_IMAGE = `${PUBLIC_ASSET_BASE}safety/safety.webp`;
 export const TOUR_WINTER_3_CLIP1_VIDEO = TOUR_WINTER_3_GALLERY_GRID[3];
 export const TOUR_WINTER_3_CLIP2_VIDEO = TOUR_WINTER_3_GALLERY_GRID[6];
 export const TOUR_WINTER_3_CLIP3_VIDEO = TOUR_WINTER_3_GALLERY_GRID[9];
@@ -1227,6 +1230,16 @@ export const HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS: Record<string, string
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[8]]: TOUR_SPRING_4_GRID_VIDEO_POSTERS[TOUR_SPRING_4_CLIP3_GRID_WEBM],
   [HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS[9]]: TOUR_SPRING_4_GRID_VIDEO_POSTERS[TOUR_SPRING_4_CLIP5_GRID_WEBM],
 };
+
+/** Иконки статусов подготовки на главной (#safety): `public/safety/icons/1.svg` … `6.svg`. */
+export const HOME_SAFETY_STATUS_ICONS = [
+  `${PUBLIC_ASSET_BASE}safety/icons/1.svg`,
+  `${PUBLIC_ASSET_BASE}safety/icons/2.svg`,
+  `${PUBLIC_ASSET_BASE}safety/icons/3.svg`,
+  `${PUBLIC_ASSET_BASE}safety/icons/4.svg`,
+  `${PUBLIC_ASSET_BASE}safety/icons/5.svg`,
+  `${PUBLIC_ASSET_BASE}safety/icons/6.svg`,
+] as const;
 
 /** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */
 export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-logo.svg` as const;

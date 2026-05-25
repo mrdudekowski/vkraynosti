@@ -50,6 +50,16 @@ import {
 } from './src/constants/breakpoints'
 import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
 import { TOUR_CARD_SKELETON_SHIMMER_MS } from './src/constants/tourCardSkeletonShimmer'
+import { SAFETY_STATUS_CHECKBOX_GROW_MS, SAFETY_STATUS_STACK_EXPAND_MS } from './src/constants/safetyStatusRotation'
+import {
+  getSafetyStatusStackHeightRem,
+  SAFETY_STATUS_STACK_LINE_COUNT_MAX,
+} from './src/constants/safetyStatusStackHeight'
+import {
+  SAFETY_STATUS_PLAQUE_TEXT_MAX_MOBILE_REM,
+  SAFETY_STATUS_PLAQUE_TEXT_MIN_MOBILE_REM,
+  SAFETY_STATUS_PLAQUE_TEXT_VW_MOBILE,
+} from './src/constants/safetyStatusPlaqueMetrics'
 import {
   TOUR_SPRING_3_COVER_OBJECT_POSITION_GTE620,
   TOUR_SPRING_3_COVER_OBJECT_POSITION_LG,
@@ -107,6 +117,26 @@ const MOBILE_NAV_DURATION = '320ms' as const
 const KEYFRAME_FADE_UP_Y = '1.5rem' as const
 /** Согласовано с `spacing.keyframe-slide-in-x` и keyframes `slide-in`. */
 const KEYFRAME_SLIDE_IN_X = '-1.25rem' as const
+/** Въезд плашки #safety справа налево; синхронно с `SAFETY_STATUS_FADE_MS` (360ms). */
+const KEYFRAME_SAFETY_PLAQUE_ENTER_X = '1.25rem' as const
+const SAFETY_STATUS_PLAQUE_ENTER_DURATION = '360ms' as const
+/** 6×`height.safety-status-plaque` + 5×`gap.safety-status-stack` — фикс. высота колонок #safety. */
+const SAFETY_STATUS_STACK_HEIGHT = getSafetyStatusStackHeightRem(
+  SAFETY_STATUS_STACK_LINE_COUNT_MAX
+) as `${number}rem`
+
+const SAFETY_STATUS_STACK_MAX_HEIGHT_BY_COUNT = Object.fromEntries(
+  Array.from({ length: SAFETY_STATUS_STACK_LINE_COUNT_MAX }, (_, index) => {
+    const count = index + 1
+    return [`safety-status-stack-${count}`, getSafetyStatusStackHeightRem(count)] as const
+  })
+) as Record<string, string>
+
+/** Размер декоративного чекбокса в плашке #safety (больше FormCheckbox 16px). */
+const SAFETY_STATUS_CHECKBOX_SIZE = '2.5rem' as const
+/** Стартовый размер активной плашки (`pulsing`); слот обёртки остаётся `SAFETY_STATUS_CHECKBOX_SIZE`. */
+const SAFETY_STATUS_CHECKBOX_SIZE_SM = '1.375rem' as const
+const SAFETY_STATUS_CHECKBOX_PULSE_DURATION = '1.1s' as const
 
 /** Синхронно с `TEAM_HERO_TEXT_STAGGER_DURATION_MS` и `animation.team-hero-text-stagger-in`. */
 const TEAM_HERO_TEXT_STAGGER_DURATION = `${TEAM_HERO_TEXT_STAGGER_DURATION_MS}ms` as const
@@ -330,6 +360,9 @@ const config: Config = {
     'text-tour-detail-meta-price-prominent',
     'text-tour-detail-included-icon-idle-horizontal',
     'text-tour-detail-included-icon-active-horizontal',
+    'text-safety-status-plaque',
+    'text-safety-status-plaque-mobile',
+    'line-clamp-2',
     'text-home-season-strip-label',
     'font-home-season-banner',
     'text-home-season-banner-letter',
@@ -427,7 +460,6 @@ const config: Config = {
     'bg-home-season-banner-wordmark-grid',
     'aspect-home-season-banner-inner',
     'min-h-home-season-banner-inner',
-    'min-h-home-safety-hero',
     'bg-home-season-banner-stage',
     'from-home-season-strip-btn-from',
     'to-home-season-strip-btn-to',
@@ -476,6 +508,39 @@ const config: Config = {
     'animate-tour-meta-stagger-in',
     'motion-safe:animate-media-placeholder-shimmer',
     'motion-safe:animate-tour-card-skeleton-sheen',
+    'h-safety-status-plaque',
+    'h-safety-status-plaque-mobile',
+    'h-safety-status-checkbox-mobile',
+    'w-safety-status-checkbox-mobile',
+    'h-safety-status-checkbox-sm-mobile',
+    'w-safety-status-checkbox-sm-mobile',
+    'h-safety-status-stack',
+    'min-h-safety-status-stack',
+    'max-h-safety-status-stack-1',
+    'max-h-safety-status-stack-2',
+    'max-h-safety-status-stack-3',
+    'max-h-safety-status-stack-4',
+    'max-h-safety-status-stack-5',
+    'max-h-safety-status-stack-6',
+    'duration-safety-stack-expand',
+    'duration-safety-plaque-enter',
+    'transition-[max-height]',
+    'ease-reveal-out',
+    'translate-x-safety-plaque-enter-x',
+    'motion-safe:animate-safety-plaque-enter',
+    'h-safety-status-checkbox',
+    'w-safety-status-checkbox',
+    'h-safety-status-checkbox-sm',
+    'w-safety-status-checkbox-sm',
+    'duration-safety-checkbox-grow',
+    'sm:order-1',
+    'sm:order-2',
+    'team-hero-text-stagger',
+    'motion-safe:animate-safety-status-checkbox-pulse',
+    'safety-status-plaque-checkbox',
+    'safety-status-plaque-checkbox--small',
+    'safety-status-plaque-checkbox--full',
+    'safety-status-plaque-checkbox--checked',
     'delay-tour-meta-0',
     'delay-tour-meta-1',
     'delay-tour-meta-2',
@@ -650,6 +715,16 @@ const config: Config = {
         'hero':    ['clamp(2.5rem, 6vw, 5rem)', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
         'section': ['clamp(1.75rem, 3vw, 2.75rem)', { lineHeight: '1.15' }],
         'card':    ['1.125rem', { lineHeight: '1.4' }],
+        /** Текст плашки стека #safety: сжимается на узких колонках, до 2 строк. */
+        'safety-status-plaque': [
+          'clamp(0.6875rem, 2.5vw, 1.125rem)',
+          { lineHeight: '1.2' },
+        ],
+        /** Текст плашки #safety на mobile (+10%, см. `SAFETY_STATUS_PLAQUE_MOBILE_SCALE`). */
+        'safety-status-plaque-mobile': [
+          `clamp(${SAFETY_STATUS_PLAQUE_TEXT_MIN_MOBILE_REM}rem, ${SAFETY_STATUS_PLAQUE_TEXT_VW_MOBILE}vw, ${SAFETY_STATUS_PLAQUE_TEXT_MAX_MOBILE_REM}rem)`,
+          { lineHeight: '1.2' },
+        ],
         'tooltip': ['0.875rem', { lineHeight: '1.25' }],
         /** Словесное лого navbar: `text-xl` (1.25rem) +15%. */
         'brand-wordmark-nav': ['1.4375rem', { lineHeight: '2.0125rem' }],
@@ -1015,6 +1090,8 @@ const config: Config = {
         'keyframe-fade-up-y': KEYFRAME_FADE_UP_Y,
         /** Keyframe `slide-in`: см. `KEYFRAME_SLIDE_IN_X` в `tailwind.config.ts`. */
         'keyframe-slide-in-x': KEYFRAME_SLIDE_IN_X,
+        /** Keyframe `safety-plaque-enter`: въезд плашки #safety справа. */
+        'safety-plaque-enter-x': KEYFRAME_SAFETY_PLAQUE_ENTER_X,
       },
       height: {
         /** Полный вьюпорт: navbar fixed оверлеем поверх hero (`main` на главной без `pt-16`). */
@@ -1033,8 +1110,17 @@ const config: Config = {
         'home-gate-scroll-hint-icon': '2.75rem',
         /** Hero страницы тура (карусель фото + градиент под заголовок). */
         'tour-detail-hero': 'clamp(28rem, 58vh, 48rem)',
+        /** Одна плашка стека #safety (6 шт. + gap в max-h-tour-card). */
+        'safety-status-plaque': '4.5rem',
+        /** Полный стек из 6 плашек (`SAFETY_STATUS_STACK_HEIGHT`). */
+        'safety-status-stack': SAFETY_STATUS_STACK_HEIGHT,
+        /** Декоративный чекбокс в плашке #safety. */
+        'safety-status-checkbox': SAFETY_STATUS_CHECKBOX_SIZE,
+        'safety-status-checkbox-sm': SAFETY_STATUS_CHECKBOX_SIZE_SM,
       },
       width: {
+        'safety-status-checkbox': SAFETY_STATUS_CHECKBOX_SIZE,
+        'safety-status-checkbox-sm': SAFETY_STATUS_CHECKBOX_SIZE_SM,
         /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`), увеличена в 2 раза. */
         'home-gate-scroll-hint-icon': '2.75rem',
         'nav-season-circle-fixed': '2.25rem',
@@ -1050,6 +1136,7 @@ const config: Config = {
         'mobile-nav-drawer': 'min(100vw, 24rem)',
       },
       maxHeight: {
+        ...SAFETY_STATUS_STACK_MAX_HEIGHT_BY_COUNT,
         /** Панель трёх сезонов под navbar (&lt;500px); запас под wrap. */
         'season-dock-panel': '12rem',
         /** Тело модалок с прокруткой (`TourRequestModal`). */
@@ -1064,6 +1151,8 @@ const config: Config = {
       gap: {
         /** Горизонтальный gap между фото и bio на desktop (`TeamMemberHeroSlide`). */
         'team-hero-desktop': TEAM_HERO_DESKTOP_COLUMN_GAP,
+        /** Вертикальный gap между плашками стека #safety на главной. */
+        'safety-status-stack': '0.375rem',
       },
       minWidth: {
         /** Минимальная сторона круглой кнопки «к hero» на воротах (~44px hit area). */
@@ -1086,8 +1175,6 @@ const config: Config = {
         'team-hero-slide': TEAM_HERO_SLIDE_MAX_WIDTH,
       },
       minHeight: {
-        /** Герой секции «Безопасность» на главной (фото + градиент и текст). */
-        'home-safety-hero': 'clamp(17rem, 52vw, 26rem)',
         /** Минимальная высота круглой кнопки «к hero» на воротах (`min-w-home-gate-scroll-hint-target`). */
         'home-gate-scroll-hint-target': '2.75rem',
         /** Минимальная высота прямоугольника баннера внутри ворот (адаптивно для mobile/tablet/desktop). */
@@ -1101,6 +1188,8 @@ const config: Config = {
          * Оценка суммарной высоты трёх блоков — смягчить CLS без бесконечной полосы.
          */
         'home-below-fold-suspense': 'clamp(28rem, 65vh, 52rem)',
+        /** Правая колонка #safety: резерв под 6 плашек с первого кадра (без CLS). */
+        'safety-status-stack': SAFETY_STATUS_STACK_HEIGHT,
         /** Полный вьюпорт ворот; navbar — оверлей (`Home`). */
         'home-gate-viewport': '100svh',
         /** Корневой layout: стабильная высота экрана (iOS Safari). */
@@ -1247,6 +1336,12 @@ const config: Config = {
         'home-season-banner-letter-in': `${HOME_SEASON_BANNER_LETTER_FADE_IN_MS}ms`,
         /** Navbar + SeasonNavDock: токен класса `duration-home-navbar-chrome` (на главной opacity transition отключён). */
         'home-navbar-chrome': `${HOME_NAVBAR_CHROME_TRANSITION_MS}ms`,
+        /** Рост чекбокса #safety; синхронно с `SAFETY_STATUS_CHECKBOX_GROW_MS`. */
+        'safety-checkbox-grow': `${SAFETY_STATUS_CHECKBOX_GROW_MS}ms`,
+        /** Рост стека плашек на mobile; синхронно с `SAFETY_STATUS_STACK_EXPAND_MS`. */
+        'safety-stack-expand': `${SAFETY_STATUS_STACK_EXPAND_MS}ms`,
+        /** Въезд плашки #safety; синхронно с `SAFETY_STATUS_FADE_MS`. */
+        'safety-plaque-enter': `${SAFETY_STATUS_STACK_EXPAND_MS}ms`,
       },
       transitionTimingFunction: {
         'reveal-out': 'ease-out',
@@ -1271,6 +1366,17 @@ const config: Config = {
         'slide-in': {
           '0%':   { opacity: '0', transform: `translateX(${KEYFRAME_SLIDE_IN_X})` },
           '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'safety-plaque-enter': {
+          '0%': {
+            opacity: '0',
+            transform: `translateX(${KEYFRAME_SAFETY_PLAQUE_ENTER_X})`,
+          },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'safety-status-checkbox-pulse': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.12)' },
         },
         'scale-in': {
           '0%':   { opacity: '0', transform: 'scale(0.95)' },
@@ -1443,6 +1549,8 @@ const config: Config = {
       animation: {
         'fade-up':  `fade-up ${FADE_UP_DURATION} ease forwards`,
         'slide-in': `slide-in ${SLIDE_IN_DURATION} ease forwards`,
+        'safety-plaque-enter': `safety-plaque-enter ${SAFETY_STATUS_PLAQUE_ENTER_DURATION} ease-out forwards`,
+        'safety-status-checkbox-pulse': `safety-status-checkbox-pulse ${SAFETY_STATUS_CHECKBOX_PULSE_DURATION} ease-in-out infinite`,
         'scale-in': `scale-in ${SCALE_IN_DURATION} ease forwards`,
         'bg-fade':       'bg-fade 600ms ease forwards',
         'season-flash':  `season-flash ${SEASON_FLASH_DURATION} ease-out forwards`,

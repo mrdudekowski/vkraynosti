@@ -6,6 +6,16 @@ import {
 } from '../constants/safetyStatusRotation';
 import { useSafetyStatusStack } from './useSafetyStatusStack';
 
+/** Два кадра rAF — как в хуке перед `fade_visible` (под fake timers). */
+const flushEnterFadeFrames = () => {
+  act(() => {
+    vi.advanceTimersToNextTimer();
+  });
+  act(() => {
+    vi.advanceTimersToNextTimer();
+  });
+};
+
 describe('useSafetyStatusStack', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -60,7 +70,7 @@ describe('useSafetyStatusStack', () => {
     expect(result.current.activeCheckboxPhase).toBe('committing');
   });
 
-  it('reveals the sixth plaque after fade when stack completes', async () => {
+  it('reveals the sixth plaque after fade when stack completes', () => {
     const { result } = renderHook(() =>
       useSafetyStatusStack({ lineCount: 6, enabled: true, paused: false })
     );
@@ -72,10 +82,7 @@ describe('useSafetyStatusStack', () => {
     expect(result.current.visibleCount).toBe(6);
     expect(result.current.enteringFadePhase).toBe('hidden');
 
-    await act(async () => {
-      await Promise.resolve();
-      await Promise.resolve();
-    });
+    flushEnterFadeFrames();
 
     expect(result.current.enteringFadePhase).toBe('visible');
   });

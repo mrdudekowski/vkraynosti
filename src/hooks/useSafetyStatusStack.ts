@@ -123,18 +123,32 @@ export function useSafetyStatusStack({
   const prevPausedRef = useRef(paused);
   const enterVisibleGenerationRef = useRef(0);
 
-  const scheduleEnterVisible = () => {
+  /** После commit `hidden`: два rAF — `visible`, чтобы CSS-transition успел стартовать. */
+  useLayoutEffect(() => {
+    if (!enabled || state.enteringFadePhase !== 'hidden') {
+      return;
+    }
+
     const generation = enterVisibleGenerationRef.current + 1;
     enterVisibleGenerationRef.current = generation;
-    queueMicrotask(() => {
-      queueMicrotask(() => {
+
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
         if (enterVisibleGenerationRef.current !== generation) {
           return;
         }
         dispatch({ type: 'fade_visible' });
       });
     });
-  };
+
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) {
+        cancelAnimationFrame(raf2);
+      }
+    };
+  }, [enabled, state.enteringFadePhase]);
 
   useLayoutEffect(() => {
     if (!enabled) {
@@ -171,7 +185,6 @@ export function useSafetyStatusStack({
         maxCount: safeLineCount,
         now: Date.now(),
       });
-      scheduleEnterVisible();
     }, SAFETY_STATUS_ROTATION_MS);
 
     return () => {

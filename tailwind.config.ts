@@ -24,6 +24,10 @@ import {
   fontFamilyMonoStack,
 } from './src/constants/fontFamilyStacks'
 import { SEASON_ACCENT_HEX } from './src/constants/seasonAccentHex'
+import {
+  SEASON_PRIMARY_BTN_FILL_HEX,
+  SEASON_PRIMARY_BTN_FG_HEX,
+} from './src/constants/seasonPrimaryButton'
 import { HOME_HERO_CEILING_BOUNCE_DURATION_MS } from './src/constants/homeHeroCeiling'
 import { HOME_NAVBAR_CHROME_TRANSITION_MS } from './src/constants/homeNavbarChrome'
 import { HOME_GATE_SCROLL_HINT_FADE_MS } from './src/constants/homeGateScroll'
@@ -41,6 +45,7 @@ import {
   BREAKPOINT_LG_PX,
   BREAKPOINT_MD_PX,
   BREAKPOINT_SM_PX,
+  BREAKPOINT_TEAM_HERO_DESKTOP_PX,
   BREAKPOINT_XL_PX,
 } from './src/constants/breakpoints'
 import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
@@ -67,6 +72,8 @@ import {
 import {
   TEAM_HERO_DESKTOP_COLUMN_GAP,
   TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
+  TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_MD,
+  TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_LG,
   TEAM_HERO_MEMBERS_STACK_GAP,
   TEAM_HERO_MEMBERS_STACK_GAP_MOBILE,
   TEAM_HERO_MEMBERS_STACK_GAP_LG,
@@ -77,6 +84,7 @@ import {
   TEAM_HERO_STAIRCASE_OFFSET_LG,
   TEAM_HERO_STAIRCASE_OFFSET_MD,
   TEAM_HERO_STAIRCASE_OFFSET_SM,
+  TEAM_HERO_BIO_LINE_HEIGHT,
 } from './src/constants/teamHeroPortraitLayout'
 import {
   TEAM_HERO_TEXT_STAGGER_DURATION_MS,
@@ -309,6 +317,13 @@ const config: Config = {
     'text-tour-detail-prose',
     'text-tour-detail-hero-subtitle',
     'text-tour-detail-program-heading',
+    'lg:text-tour-detail-section',
+    'sm:text-tour-detail-hero-subtitle',
+    'sm:text-tour-detail-prose',
+    'sm:text-tour-detail-program-heading',
+    'team-hero-desktop:text-tour-detail-hero-subtitle',
+    'team-hero-desktop:text-tour-detail-prose',
+    'team-hero-desktop:text-tour-detail-program-heading',
     'text-tour-detail-program-body',
     'text-tour-detail-meta',
     'text-tour-detail-meta-prominent',
@@ -350,27 +365,45 @@ const config: Config = {
     'z-home-team-backdrop',
     'max-h-team-hero-portrait-mobile',
     'max-h-team-hero-portrait-desktop',
-    'sm:max-h-team-hero-portrait-desktop',
-    'sm:grid-cols-[auto_minmax(0,1fr)]',
-    'sm:gap-x-team-hero-desktop',
-    'sm:mx-auto',
-    'sm:max-w-team-hero-slide',
-    'sm:w-full',
+    'team-hero-desktop:max-h-team-hero-portrait-desktop',
+    'team-hero-desktop:grid-cols-[auto_minmax(0,1fr)]',
+    'team-hero-desktop:gap-x-team-hero-desktop',
+    'team-hero-desktop:mx-auto',
+    'team-hero-desktop:max-w-team-hero-slide',
+    'team-hero-desktop:w-full',
     'gap-y-team-hero-slide-mobile-row-gap',
     'flex',
     'flex-col',
-    'max-sm:gap-team-hero-members-stack-mobile',
-    'sm:gap-team-hero-members',
+    'gap-team-hero-members-stack-mobile',
+    'team-hero-desktop:gap-team-hero-members',
     'lg:gap-team-hero-members-lg',
-    'sm:pb-team-hero-first-member-bottom-sm',
-    'sm:grid-cols-[minmax(0,1fr)_auto]',
-    'sm:col-start-1',
-    'sm:col-start-2',
-    'sm:-mt-team-hero-staircase-offset-sm',
+    'team-hero-desktop:pb-team-hero-first-member-bottom-sm',
+    'md:pb-team-hero-first-member-bottom-md',
+    'lg:pb-team-hero-first-member-bottom-lg',
+    'leading-team-hero-bio',
+    'team-hero-desktop:leading-team-hero-bio',
+    'md:leading-team-hero-bio',
+    'lg:leading-team-hero-bio',
+    'team-hero-desktop:grid-cols-[minmax(0,1fr)_auto]',
+    'team-hero-desktop:col-start-1',
+    'team-hero-desktop:col-start-2',
+    'team-hero-desktop:-mt-team-hero-staircase-offset-sm',
     'md:-mt-team-hero-staircase-offset-md',
     'lg:-mt-team-hero-staircase-offset-lg',
-    'sm:overflow-visible',
-    'sm:z-10',
+    'team-hero-desktop:overflow-visible',
+    'team-hero-desktop:z-10',
+    'team-hero-desktop:relative',
+    'team-hero-desktop:px-0',
+    'team-hero-desktop:pb-8',
+    'team-hero-desktop:pb-0',
+    'team-hero-desktop:items-end',
+    'team-hero-desktop:items-start',
+    'team-hero-desktop:pt-0',
+    'team-hero-desktop:space-y-3',
+    'team-hero-desktop:text-tour-detail-program-heading',
+    'team-hero-desktop:text-tour-detail-hero-subtitle',
+    'team-hero-desktop:text-tour-detail-prose',
+    'team-hero-desktop:block',
     'gap-x-team-hero-desktop',
     'w-fit',
     'w-full',
@@ -546,6 +579,28 @@ const config: Config = {
           summer: SEASON_ACCENT_HEX.summer,
           fall:   SEASON_ACCENT_HEX.fall,
         },
+        /**
+         * `.btn-primary`: смягчённый fill (78% accent + 22% surface.light) и текст по сезону.
+         * SSOT: `seasonPrimaryButton.ts`. Акцент иконок — `colors.season.*`.
+         */
+        btnPrimary: {
+          winter: {
+            bg: SEASON_PRIMARY_BTN_FILL_HEX.winter,
+            fg: SEASON_PRIMARY_BTN_FG_HEX.winter,
+          },
+          spring: {
+            bg: SEASON_PRIMARY_BTN_FILL_HEX.spring,
+            fg: SEASON_PRIMARY_BTN_FG_HEX.spring,
+          },
+          summer: {
+            bg: SEASON_PRIMARY_BTN_FILL_HEX.summer,
+            fg: SEASON_PRIMARY_BTN_FG_HEX.summer,
+          },
+          fall: {
+            bg: SEASON_PRIMARY_BTN_FILL_HEX.fall,
+            fg: SEASON_PRIMARY_BTN_FG_HEX.fall,
+          },
+        },
         divider: '#E5E7EB',
         /** Иконки выбора мессенджера в модалке заявки (hover / выбранное состояние). */
         messenger: {
@@ -652,6 +707,10 @@ const config: Config = {
         'tour-detail-included-icon-idle-horizontal': ['2.16rem', { lineHeight: '1' }],
         /** 2.16rem × 0.85 — согласовано с активным размером вертикального режима. */
         'tour-detail-included-icon-active-horizontal': ['1.836rem', { lineHeight: '1' }],
+      },
+      lineHeight: {
+        /** Межстрочный интервал bio в секции «Команда» (`teamHeroPortraitLayout.ts`). */
+        'team-hero-bio': TEAM_HERO_BIO_LINE_HEIGHT,
       },
       letterSpacing: {
         /** CTA: чуть уже, чем 0.3em в референсе — читаемость длинных русских подписей. */
@@ -903,6 +962,8 @@ const config: Config = {
         'team-hero-members-stack-lg': TEAM_HERO_MEMBERS_STACK_GAP_LG,
         /** Нижний padding первого блока на sm+ (компенсация «лесенки»). */
         'team-hero-first-member-bottom-sm': TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
+        'team-hero-first-member-bottom-md': TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_MD,
+        'team-hero-first-member-bottom-lg': TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_LG,
         /** Подъём фото второго блока («лесенка») на sm. */
         'team-hero-staircase-offset-sm': TEAM_HERO_STAIRCASE_OFFSET_SM,
         /** Между фото и текстом в карточке члена команды на mobile. */
@@ -1437,6 +1498,9 @@ const config: Config = {
         'season-md': '500px',
         /** Ссылки Туры…Контакты, CTA в строке и бургер: ниже этого порога — мобильный режим навбара. */
         'nav-desktop': '950px',
+        /** Секция «Команда»: mobile ≤649px, desktop grid с 650px (`breakpoints.ts`). */
+        'team-hero-below-desktop': { max: `${BREAKPOINT_TEAM_HERO_DESKTOP_PX - 1}px` },
+        'team-hero-desktop': `${BREAKPOINT_TEAM_HERO_DESKTOP_PX}px`,
       },
     },
   },

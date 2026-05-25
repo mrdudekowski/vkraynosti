@@ -18,21 +18,32 @@
     --navbar-chrome-height: calc(theme('spacing.navbar') + var(--safe-area-top));
     --scrollbar-thumb: theme('colors.season.spring');
     --scrollbar-track: color-mix(in srgb, theme('colors.surface.light') 94%, theme('colors.divider'));
+    /** `.btn-primary` fill до/без `data-season` — осень (`btnPrimary.fall`, 78% accent + 22% surface.light). */
+    --btn-primary-bg: theme('colors.btnPrimary.fall.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.fall.fg');
     background-color: theme('colors.surface.light');
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
   html[data-season='winter'] {
     --scrollbar-thumb: theme('colors.season.winter');
+    --btn-primary-bg: theme('colors.btnPrimary.winter.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.winter.fg');
   }
   html[data-season='spring'] {
     --scrollbar-thumb: theme('colors.season.spring');
+    --btn-primary-bg: theme('colors.btnPrimary.spring.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.spring.fg');
   }
   html[data-season='summer'] {
     --scrollbar-thumb: theme('colors.season.summer');
+    --btn-primary-bg: theme('colors.btnPrimary.summer.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.summer.fg');
   }
   html[data-season='fall'] {
     --scrollbar-thumb: theme('colors.season.fall');
+    --btn-primary-bg: theme('colors.btnPrimary.fall.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.fall.fg');
   }
 
   html::-webkit-scrollbar {
@@ -406,8 +417,16 @@
   }
 
   .btn-primary {
-    @apply bg-brand-secondary text-surface-dark font-semibold px-6 py-3 rounded-full
-           transition-all duration-hover hover:brightness-110 hover:scale-105 active:scale-95;
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-fg);
+    transition:
+      background-color theme('transitionDuration.season-change') theme('transitionTimingFunction.standard'),
+      color theme('transitionDuration.season-change') theme('transitionTimingFunction.standard'),
+      transform theme('transitionDuration.hover') theme('transitionTimingFunction.standard'),
+      filter theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+    @apply inline-flex w-fit max-w-full items-center justify-center whitespace-nowrap
+           font-semibold px-6 py-3 rounded-full
+           hover:brightness-110 hover:scale-105 active:scale-95;
   }
 
   /**

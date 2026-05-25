@@ -1,10 +1,12 @@
 import { forwardRef } from 'react';
 import { TEAM } from '../../data/teamData';
+import { TEAM_HERO_MEMBER_ID_DESKTOP_TEXT_ALIGN_END } from '../../constants/teamHeroPortraitLayout';
 import { HOME_SECTION_TEAM } from '../../constants/routes';
 import { TEAM_SECTION_DIVIDER_CLASS } from '../../constants/seasonTheme';
 import { UI } from '../../constants/ui';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useSeason } from '../../context/useSeason';
+import { isTeamSectionDebugOpaqueBg } from '../../utils/teamBackdropDebug';
 import RevealBox from '../shared/RevealBox';
 import BrandWordmark from '../shared/BrandWordmark';
 import TeamMemberHeroSlide from './TeamMemberHeroSlide';
@@ -23,7 +25,10 @@ const TeamHeroSection = forwardRef<HTMLElement>(function TeamHeroSection(_, ref)
       ref={ref}
       id={HOME_SECTION_TEAM}
       aria-labelledby="team-heading"
-      className="pt-home-section-top pb-section-y text-text-inverse"
+      className={[
+        'pt-home-section-top pb-section-y text-text-inverse',
+        isTeamSectionDebugOpaqueBg() ? 'bg-home-gate-start-screen' : '',
+      ].join(' ')}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex w-full justify-center">
@@ -46,7 +51,7 @@ const TeamHeroSection = forwardRef<HTMLElement>(function TeamHeroSection(_, ref)
           </div>
         </RevealBox>
 
-        <div className="relative overflow-visible flex flex-col max-sm:gap-team-hero-members-stack-mobile sm:gap-team-hero-members lg:gap-team-hero-members-lg">
+        <div className="relative overflow-visible flex flex-col gap-team-hero-members-stack-mobile team-hero-desktop:gap-team-hero-members lg:gap-team-hero-members-lg">
           {TEAM_SECTION_DISPLAY_ORDER.map((member, index) => (
             <TeamMemberHeroSlide
               key={member.id}
@@ -54,7 +59,12 @@ const TeamHeroSection = forwardRef<HTMLElement>(function TeamHeroSection(_, ref)
               layoutVariant={TEAM_MEMBER_LAYOUT_VARIANTS[index] ?? 'photo-start'}
               prefersReducedMotion={prefersReducedMotion}
               articleClassName={
-                index === 0 ? 'sm:pb-team-hero-first-member-bottom-sm' : undefined
+                index === 0
+                  ? 'team-hero-desktop:pb-team-hero-first-member-bottom-sm md:pb-team-hero-first-member-bottom-md lg:pb-team-hero-first-member-bottom-lg'
+                  : undefined
+              }
+              desktopTextAlign={
+                member.id === TEAM_HERO_MEMBER_ID_DESKTOP_TEXT_ALIGN_END ? 'end' : undefined
               }
             />
           ))}

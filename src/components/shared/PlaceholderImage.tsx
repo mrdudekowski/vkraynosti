@@ -104,7 +104,7 @@ const ImageWithLoadPlaceholder = ({
 
     const wrapperClassName = [
 
-      'relative inline-block w-fit max-w-full overflow-hidden',
+      'relative block w-fit max-w-full',
 
       showPlaceholder ? intrinsicLoadingClassName : '',
 

@@ -5,6 +5,7 @@ import {
   HOME_SKY_PARALLAX_SCROLL_FACTOR,
 } from '../constants/homeParallax';
 import { getViewportScrollY } from '../constants/smoothScroll';
+import { isTeamParallaxDebugOff } from '../utils/teamBackdropDebug';
 import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 /**
@@ -26,7 +27,7 @@ export function useHomeSkyParallax(): { ref: RefCallback<HTMLElement> } {
     const el = elementRef.current;
     if (!el || typeof window === 'undefined') return;
 
-    if (reducedMotion) {
+    if (reducedMotion || isTeamParallaxDebugOff()) {
       el.style.transform = 'none';
       return;
     }

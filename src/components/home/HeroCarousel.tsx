@@ -91,7 +91,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
                 >
                   {tour.heroPhrase}
                 </p>
-                <span className="btn-primary inline-block text-base shrink-0">{UI.hero.viewTour}</span>
+                <span className="btn-primary text-base">{UI.hero.viewTour}</span>
               </Link>
             </div>
           </CarouselSlide>

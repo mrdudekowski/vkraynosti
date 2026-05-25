@@ -83,4 +83,19 @@ describe('computeTeamZoneBackdropProgress', () => {
     const contact = mockElement(new DOMRect(0, vh * TEAM_ZONE_FADE_OUT_END_SHARE - 20, 0, 600));
     expect(computeTeamZoneBackdropProgress(team, contact, vh)).toBe(0);
   });
+
+  it.each([
+    { vh: 667, label: 'iPhone SE class' },
+    { vh: 844, label: 'iPhone 12/13 class' },
+    { vh: 932, label: 'iPhone 14 Pro Max class' },
+  ])('fade-in spans ~53% viewport on mobile ($label, vh=$vh)', ({ vh }) => {
+    const startY = vh * TEAM_ZONE_FADE_IN_START_SHARE;
+    const endY = vh * TEAM_ZONE_FADE_IN_END_SHARE;
+    const fadeSpanPx = startY - endY;
+    expect(fadeSpanPx / vh).toBeCloseTo(0.53, 2);
+    expect(computeTeamZoneBackdropProgress(mockElement(new DOMRect(0, startY + 8, 0, 800)), null, vh)).toBe(0);
+    const midTop = Math.round((startY + endY) / 2);
+    expect(computeTeamZoneFadeInProgress(midTop, vh)).toBeCloseTo(0.5, 2);
+    expect(computeTeamZoneFadeInProgress(endY - 16, vh)).toBe(1);
+  });
 });

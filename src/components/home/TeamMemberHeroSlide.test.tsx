@@ -63,7 +63,7 @@ describe('TeamMemberHeroSlide', () => {
     expect(img).toHaveClass('opacity-100');
   });
 
-  it('uses intrinsic portrait layout with sm grid and centered block', () => {
+  it('uses intrinsic portrait layout with team-hero-desktop grid and centered block', () => {
     const { container } = render(
       <TeamMemberHeroSlide member={TEAM[1]} prefersReducedMotion />
     );
@@ -75,11 +75,11 @@ describe('TeamMemberHeroSlide', () => {
     expect(portraitFrame).not.toHaveClass('h-team-hero-portrait-mobile');
 
     const slideRoot = container.querySelector('article > div');
-    expect(slideRoot?.className).toContain('sm:grid-cols-[auto_minmax(0,1fr)]');
-    expect(slideRoot?.className).toContain('sm:mx-auto');
-    expect(slideRoot?.className).toContain('sm:w-full');
-    expect(slideRoot?.className).toContain('sm:max-w-team-hero-slide');
-    expect(slideRoot?.className).not.toContain('sm:w-fit');
+    expect(slideRoot?.className).toContain('team-hero-desktop:grid-cols-[auto_minmax(0,1fr)]');
+    expect(slideRoot?.className).toContain('team-hero-desktop:mx-auto');
+    expect(slideRoot?.className).toContain('team-hero-desktop:w-full');
+    expect(slideRoot?.className).toContain('team-hero-desktop:max-w-team-hero-slide');
+    expect(slideRoot?.className).not.toContain('team-hero-desktop:w-fit');
   });
 
   it('hides text with opacity-0 before scroll reveal', () => {
@@ -138,6 +138,33 @@ describe('TeamMemberHeroSlide', () => {
     expect(bio.style.animationDelay).toBe('');
   });
 
+  it('uses standard Tailwind spacing and typography on mobile text block', () => {
+    const { container } = render(
+      <TeamMemberHeroSlide member={TEAM[1]} prefersReducedMotion />
+    );
+
+    const textColumn = container.querySelector('[id="team-2-name"]')?.parentElement?.parentElement;
+    expect(textColumn?.className).toContain('px-4');
+    expect(textColumn?.className).toContain('py-4');
+    expect(textColumn?.className).not.toContain('max-team-hero-below-desktop:px-4');
+    expect(textColumn?.className).toContain('team-hero-desktop:pb-8');
+
+    const textStack = container.querySelector('.space-y-4');
+    expect(textStack).toBeInTheDocument();
+    expect(textStack?.className).toContain('team-hero-desktop:space-y-3');
+
+    const [bioParagraph] = splitTeamBioParagraphs(TEAM[1].bio);
+    const bio = screen.getByText(bioParagraph);
+    expect(bio.className).toContain('leading-team-hero-bio');
+    expect(bio.className).toContain('team-hero-desktop:leading-team-hero-bio');
+    expect(bio.className).toContain('md:leading-team-hero-bio');
+    expect(bio.className).toContain('lg:leading-team-hero-bio');
+
+    const name = screen.getByRole('heading', { level: 3, name: TEAM[1].name });
+    expect(name.className).toContain('text-tour-detail-program-heading');
+    expect(name.className).toContain('lg:text-tour-detail-section');
+  });
+
   it('places name and role in the text column, not on the portrait', () => {
     const { container } = render(
       <TeamMemberHeroSlide member={TEAM[1]} prefersReducedMotion />
@@ -164,24 +191,24 @@ describe('TeamMemberHeroSlide', () => {
     expect(screen.getByText(firstParagraph)).toBeInTheDocument();
   });
 
-  it('mirrors photo to the right column on sm for photo-end', () => {
+  it('mirrors photo to the right column on team-hero-desktop for photo-end', () => {
     const { container } = render(
       <TeamMemberHeroSlide member={TEAM[0]} prefersReducedMotion layoutVariant="photo-end" />
     );
 
     const slideRoot = container.querySelector('article > div');
-    expect(slideRoot?.className).toContain('sm:grid-cols-[minmax(0,1fr)_auto]');
-    expect(slideRoot?.className).toContain('sm:overflow-visible');
+    expect(slideRoot?.className).toContain('team-hero-desktop:grid-cols-[minmax(0,1fr)_auto]');
+    expect(slideRoot?.className).toContain('team-hero-desktop:overflow-visible');
 
     const portraitFrame = container.querySelector('.rounded-card');
     const photoColumn = portraitFrame?.parentElement;
-    expect(photoColumn?.className).toContain('sm:col-start-2');
-    expect(photoColumn?.className).toContain('sm:-mt-team-hero-staircase-offset-sm');
-    expect(photoColumn?.className).toContain('sm:z-10');
-    expect(photoColumn?.className).not.toContain('sm:absolute');
+    expect(photoColumn?.className).toContain('team-hero-desktop:col-start-2');
+    expect(photoColumn?.className).toContain('team-hero-desktop:-mt-team-hero-staircase-offset-sm');
+    expect(photoColumn?.className).toContain('team-hero-desktop:z-10');
+    expect(photoColumn?.className).not.toContain('team-hero-desktop:absolute');
 
     const textColumn = container.querySelector('[id="team-1-name"]')?.parentElement?.parentElement;
-    expect(textColumn?.className).toContain('sm:col-start-1');
+    expect(textColumn?.className).toContain('team-hero-desktop:col-start-1');
   });
 
   it('does not apply mirror or staircase classes to photo-start', () => {
@@ -190,12 +217,12 @@ describe('TeamMemberHeroSlide', () => {
     );
 
     const slideRoot = container.querySelector('article > div');
-    expect(slideRoot?.className).not.toContain('sm:grid-cols-[minmax(0,1fr)_auto]');
+    expect(slideRoot?.className).not.toContain('team-hero-desktop:grid-cols-[minmax(0,1fr)_auto]');
 
     const portraitFrame = container.querySelector('.rounded-card');
     const photoColumn = portraitFrame?.parentElement;
-    expect(photoColumn?.className).not.toContain('sm:absolute');
-    expect(photoColumn?.className).not.toContain('sm:-mt-team-hero-staircase-offset-sm');
+    expect(photoColumn?.className).not.toContain('team-hero-desktop:absolute');
+    expect(photoColumn?.className).not.toContain('team-hero-desktop:-mt-team-hero-staircase-offset-sm');
   });
 
   it('keeps Yaroslav portrait in document flow on photo-end', () => {
@@ -204,5 +231,51 @@ describe('TeamMemberHeroSlide', () => {
     const img = screen.getByRole('img', { name: TEAM[0].name });
     expect(img).toHaveAttribute('src', TEAM[0].imageUrl);
     expect(img.closest('.rounded-card')).toBeInTheDocument();
+  });
+
+  it('aligns photo-start grid and text column to row end on desktop for Yaroslav', () => {
+    const { container } = render(
+      <TeamMemberHeroSlide
+        member={TEAM[0]}
+        prefersReducedMotion
+        layoutVariant="photo-start"
+        desktopTextAlign="end"
+      />
+    );
+
+    const slideRoot = container.querySelector('article > div');
+    expect(slideRoot?.className).toContain('team-hero-desktop:items-end');
+    expect(slideRoot?.className).not.toContain('team-hero-desktop:items-start');
+
+    const textColumn = container.querySelector('[id="team-1-name"]')?.parentElement?.parentElement;
+    expect(textColumn?.className).toContain('team-hero-desktop:pb-0');
+    expect(textColumn?.className).not.toContain('team-hero-desktop:pb-8');
+    expect(textColumn?.className).toContain('px-4');
+    expect(textColumn?.className).toContain('py-4');
+  });
+
+  it('does not apply row-end alignment to photo-start without desktopTextAlign end', () => {
+    const { container } = render(
+      <TeamMemberHeroSlide member={TEAM[1]} prefersReducedMotion layoutVariant="photo-start" />
+    );
+
+    const slideRoot = container.querySelector('article > div');
+    expect(slideRoot?.className).toContain('team-hero-desktop:items-start');
+    expect(slideRoot?.className).not.toContain('team-hero-desktop:items-end');
+  });
+
+  it('aligns photo-end grid to row end when desktopTextAlign is end', () => {
+    const { container } = render(
+      <TeamMemberHeroSlide
+        member={TEAM[0]}
+        prefersReducedMotion
+        layoutVariant="photo-end"
+        desktopTextAlign="end"
+      />
+    );
+
+    const slideRoot = container.querySelector('article > div');
+    expect(slideRoot?.className).toContain('team-hero-desktop:items-end');
+    expect(slideRoot?.className).not.toContain('team-hero-desktop:items-start');
   });
 });

@@ -13,6 +13,8 @@ import SeasonSwitcher from '../components/shared/SeasonSwitcher';
 import TourCard from '../components/shared/TourCard';
 import PlaceholderImage from '../components/shared/PlaceholderImage';
 import CrossfadeVideo from '../components/shared/CrossfadeVideo';
+import { getTourCoverCardImgObjectClass } from '../constants/tourCoverCropByCanonicalId';
+import { resolveContentSourceTourId } from '../data/seasonTourRegistry';
 import { HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS, IMAGES } from '../constants/images';
 import {
   HOME_GATE_STAGE_INTERSECT_ENTER,
@@ -25,8 +27,6 @@ import {
   getHomeSeasonBannerWinterVideoPreloadLinks,
 } from '../constants/homeSeasonBannerVideoPreload';
 import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfadeVideoIntersection';
-import { getTourCoverCardImgObjectClass } from '../constants/tourCoverCropByCanonicalId';
-import { resolveContentSourceTourId } from '../data/seasonTourRegistry';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
@@ -387,29 +387,52 @@ const Home = () => {
                         ref={expandControlButtonRef}
                         type="button"
                         onClick={toggleToursVisibility}
-                        className="card-base relative flex h-full w-full max-h-tour-card max-w-tour-card justify-self-center flex-col items-center justify-center overflow-hidden text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
+                        className="card-base relative flex w-full max-h-tour-card max-w-tour-card justify-self-center flex-col overflow-hidden text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
                       >
+                        <div className="invisible pointer-events-none flex flex-col" aria-hidden>
+                          <div className="h-48 shrink-0 overflow-hidden rounded-t-card" />
+                          <div className="p-card-p">
+                            <div className="mb-1 flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1 space-y-2">
+                                <div className="min-h-6 w-11/12 max-w-full" />
+                                <div className="h-3.5 w-3/5" />
+                              </div>
+                              <div className="h-6 w-16 shrink-0 rounded-full" />
+                            </div>
+                            <div className="mb-3 space-y-2">
+                              <div className="h-3.5 w-full" />
+                              <div className="h-3.5 w-2/3" />
+                            </div>
+                            <div className="flex flex-col gap-2 text-sm">
+                              <div className="h-4 w-28" />
+                              <div className="flex w-full flex-col items-end gap-1.5">
+                                <div className="h-6 w-32" />
+                                <div className="h-3 w-24" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         {activeSeasonLeadTour != null ? (
                           <div className="absolute inset-0" aria-hidden>
                             <div ref={expandCardMediaViewportRef} className="h-full w-full">
-                            {activeSeasonPromoVideoUrl != null && expandCardVideoInView && isPageVisible ? (
-                              <CrossfadeVideo
-                                src={activeSeasonPromoVideoUrl}
-                                poster={activeSeasonLeadTour.imageUrl}
-                                className="h-full w-full object-cover opacity-60"
-                              />
-                            ) : (
-                              <PlaceholderImage
-                                src={activeSeasonLeadTour.imageUrl}
-                                alt={`${UI.tourCard.nextSeasonCloneImageAltPrefix}: ${UI.sections.toursTitleBySeason[activeSeason]}`}
-                                className="h-full w-full opacity-50"
-                                imgClassName={getTourCoverCardImgObjectClass(
-                                  resolveContentSourceTourId(activeSeasonLeadTour.id) ??
-                                    activeSeasonLeadTour.id
-                                )}
-                                loading="lazy"
-                              />
-                            )}
+                              {activeSeasonPromoVideoUrl != null && expandCardVideoInView && isPageVisible ? (
+                                <CrossfadeVideo
+                                  src={activeSeasonPromoVideoUrl}
+                                  poster={activeSeasonLeadTour.imageUrl}
+                                  className="h-full w-full object-cover opacity-60"
+                                />
+                              ) : (
+                                <PlaceholderImage
+                                  src={activeSeasonLeadTour.imageUrl}
+                                  alt={`${UI.tourCard.nextSeasonCloneImageAltPrefix}: ${UI.sections.toursTitleBySeason[activeSeason]}`}
+                                  className="h-full w-full opacity-50"
+                                  imgClassName={getTourCoverCardImgObjectClass(
+                                    resolveContentSourceTourId(activeSeasonLeadTour.id) ??
+                                      activeSeasonLeadTour.id
+                                  )}
+                                  loading="lazy"
+                                />
+                              )}
                             </div>
                             <div
                               ref={expandOverlayRevealRef}
@@ -417,13 +440,15 @@ const Home = () => {
                             />
                           </div>
                         ) : null}
-                        <div className="relative z-10 flex flex-col items-center gap-3 p-card-p">
-                          <span className="font-heading text-card text-text-inverse">
-                            {isAllToursExpanded ? UI.tourCard.showLessCta : UI.tourCard.showMoreCta}
-                          </span>
-                          <span className="font-body text-sm text-text-inverse/90">
-                            {UI.sections.toursTitleBySeason[activeSeason]}
-                          </span>
+                        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center">
+                          <div className="flex flex-col items-center gap-3 p-card-p">
+                            <span className="font-heading text-card text-text-inverse">
+                              {isAllToursExpanded ? UI.tourCard.showLessCta : UI.tourCard.showMoreCta}
+                            </span>
+                            <span className="font-body text-sm text-text-inverse/90">
+                              {UI.sections.toursTitleBySeason[activeSeason]}
+                            </span>
+                          </div>
                         </div>
                       </button>
                     </div>

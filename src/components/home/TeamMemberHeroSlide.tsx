@@ -1,5 +1,6 @@
 import type { TeamMember } from '../../types';
 import { getTeamHeroTextStaggerPresentation } from '../../constants/teamHeroAnimation';
+import type { TeamHeroDesktopTextAlign } from '../../constants/teamHeroPortraitLayout';
 import { UI } from '../../constants/ui';
 import { useRevealOnScroll } from '../../hooks/useRevealOnScroll';
 import PlaceholderImage from '../shared/PlaceholderImage';
@@ -12,19 +13,22 @@ interface TeamMemberHeroSlideProps {
   prefersReducedMotion: boolean;
   layoutVariant?: TeamMemberHeroLayoutVariant;
   articleClassName?: string;
+  /** Нижняя граница текстовой колонки на team-hero-desktop (передаётся только для team-1 из секции). */
+  desktopTextAlign?: TeamHeroDesktopTextAlign;
 }
 
 const portraitFrameClassName =
   'relative mx-auto w-fit max-w-full overflow-hidden rounded-card';
 
 const portraitImageClassName =
-  'mx-auto block h-auto w-auto max-w-full max-h-team-hero-portrait-mobile sm:max-h-team-hero-portrait-desktop';
+  'mx-auto block h-auto w-auto max-w-full max-h-team-hero-portrait-mobile team-hero-desktop:max-h-team-hero-portrait-desktop';
 
 const TeamMemberHeroSlide = ({
   member,
   prefersReducedMotion,
   layoutVariant = 'photo-start',
   articleClassName,
+  desktopTextAlign,
 }: TeamMemberHeroSlideProps) => {
   const { ref: textRevealRef, isRevealed } = useRevealOnScroll({
     once: true,
@@ -34,6 +38,7 @@ const TeamMemberHeroSlide = ({
   const bioParagraphs = splitTeamBioParagraphs(member.bio);
   const showExperienceLine = member.showExperienceLine !== false && member.experience != null;
   const isPhotoEnd = layoutVariant === 'photo-end';
+  const isDesktopTextAlignEnd = desktopTextAlign === 'end';
   const isTextRevealed = prefersReducedMotion || isRevealed;
 
   let cascadeIndex = 0;
@@ -49,24 +54,36 @@ const TeamMemberHeroSlide = ({
     'flex min-h-0 min-w-0 w-full max-w-full justify-center',
     isPhotoEnd
       ? [
-          'sm:col-start-2 sm:row-start-1 sm:relative sm:z-10',
-          'sm:-mt-team-hero-staircase-offset-sm md:-mt-team-hero-staircase-offset-md lg:-mt-team-hero-staircase-offset-lg',
+          'team-hero-desktop:col-start-2 team-hero-desktop:row-start-1 team-hero-desktop:relative team-hero-desktop:z-10',
+          'team-hero-desktop:-mt-team-hero-staircase-offset-sm md:-mt-team-hero-staircase-offset-md lg:-mt-team-hero-staircase-offset-lg',
         ].join(' ')
-      : 'sm:col-start-1 sm:row-start-1',
+      : 'team-hero-desktop:col-start-1 team-hero-desktop:row-start-1',
   ].join(' ');
 
   return (
     <article
       aria-labelledby={`${member.id}-name`}
-      className={[isPhotoEnd ? 'sm:relative' : '', articleClassName].filter(Boolean).join(' ')}
+      className={[isPhotoEnd ? 'team-hero-desktop:relative' : '', articleClassName]
+        .filter(Boolean)
+        .join(' ')}
     >
       <div
         className={[
           'grid min-h-0 w-full grid-cols-1 gap-y-team-hero-slide-mobile-row-gap',
-          'sm:mx-auto sm:w-full sm:max-w-team-hero-slide',
+          'team-hero-desktop:mx-auto team-hero-desktop:w-full team-hero-desktop:max-w-team-hero-slide',
           isPhotoEnd
-            ? 'sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-x-team-hero-desktop sm:gap-y-0 sm:overflow-visible'
-            : 'sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start sm:gap-x-team-hero-desktop sm:gap-y-0',
+            ? [
+                'team-hero-desktop:grid-cols-[minmax(0,1fr)_auto] team-hero-desktop:gap-x-team-hero-desktop team-hero-desktop:gap-y-0 team-hero-desktop:overflow-visible',
+                isDesktopTextAlignEnd
+                  ? 'team-hero-desktop:items-end'
+                  : 'team-hero-desktop:items-start',
+              ].join(' ')
+            : [
+                'team-hero-desktop:grid-cols-[auto_minmax(0,1fr)] team-hero-desktop:gap-x-team-hero-desktop team-hero-desktop:gap-y-0',
+                isDesktopTextAlignEnd
+                  ? 'team-hero-desktop:items-end'
+                  : 'team-hero-desktop:items-start',
+              ].join(' '),
         ].join(' ')}
       >
         <div className={photoColumnClassName}>
@@ -86,27 +103,30 @@ const TeamMemberHeroSlide = ({
         <div
           ref={textRevealRef}
           className={[
-            'min-h-0 min-w-0 w-full px-1 sm:px-0 sm:pb-8 sm:pt-0',
-            isPhotoEnd ? 'sm:col-start-1 sm:row-start-1' : 'sm:col-start-2 sm:row-start-1',
+            'min-h-0 min-w-0 w-full px-4 py-4 team-hero-desktop:px-0 team-hero-desktop:pt-0',
+            isDesktopTextAlignEnd ? 'team-hero-desktop:pb-0' : 'team-hero-desktop:pb-8',
+            isPhotoEnd
+              ? 'team-hero-desktop:col-start-1 team-hero-desktop:row-start-1'
+              : 'team-hero-desktop:col-start-2 team-hero-desktop:row-start-1',
           ].join(' ')}
         >
-          <div className="max-w-prose space-y-4">
+          <div className="max-w-prose space-y-4 team-hero-desktop:space-y-3">
             <h3
               id={`${member.id}-name`}
-              className={`font-heading text-lg font-normal text-text-inverse sm:text-xl lg:text-2xl ${nameStagger.className}`.trim()}
+              className={`font-heading text-tour-detail-program-heading font-normal text-text-inverse team-hero-desktop:text-tour-detail-program-heading lg:text-tour-detail-section ${nameStagger.className}`.trim()}
               style={nameStagger.style}
             >
               {member.name}
             </h3>
             <p
-              className={`break-words text-xs text-text-inverse/80 sm:text-sm ${roleStagger.className}`.trim()}
+              className={`break-words text-tour-detail-meta text-text-inverse/80 team-hero-desktop:text-tour-detail-hero-subtitle ${roleStagger.className}`.trim()}
               style={roleStagger.style}
             >
               {member.role}
             </p>
             {showExperienceLine && experienceStagger ? (
               <p
-                className={`hidden text-sm text-text-inverse/80 sm:block ${experienceStagger.className}`.trim()}
+                className={`hidden text-tour-detail-meta text-text-inverse/80 team-hero-desktop:block team-hero-desktop:text-tour-detail-hero-subtitle ${experienceStagger.className}`.trim()}
                 style={experienceStagger.style}
               >
                 {member.experience} {UI.team.experienceSuffix}
@@ -115,7 +135,7 @@ const TeamMemberHeroSlide = ({
             {bioParagraphs.map((paragraph, index) => (
               <p
                 key={`${member.id}-bio-${index}`}
-                className={`text-sm leading-relaxed text-text-inverse sm:text-base ${bioStaggers[index].className}`.trim()}
+                className={`text-tour-detail-hero-subtitle leading-team-hero-bio text-text-inverse team-hero-desktop:text-tour-detail-prose team-hero-desktop:leading-team-hero-bio md:leading-team-hero-bio lg:leading-team-hero-bio ${bioStaggers[index].className}`.trim()}
                 style={bioStaggers[index].style}
               >
                 {paragraph}

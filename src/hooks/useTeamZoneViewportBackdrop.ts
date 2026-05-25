@@ -2,10 +2,20 @@ import { useCallback, useEffect, useLayoutEffect, useRef, type RefCallback } fro
 import { useLenis } from 'lenis/react';
 import {
   computeTeamZoneBackdropProgress,
+  computeTeamZoneFadeInProgress,
+  computeTeamZoneFadeOutProgress,
   getHomeContactSectionElement,
   getHomeTeamSectionElement,
+  quantizeTeamZoneScrollPx,
   TEAM_ZONE_REDUCED_MOTION_THRESHOLD,
 } from '../constants/teamZoneScroll';
+import {
+  emitTeamBackdropDebugLog,
+  getActiveTeamBackdropExperiments,
+  isTeamBackdropDebugBinaryOpacity,
+  probeViewportBottomElement,
+  shouldEmitTeamBackdropDebugLog,
+} from '../utils/teamBackdropDebug';
 import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 export interface UseTeamZoneViewportBackdropOptions {
@@ -42,14 +52,50 @@ export function useTeamZoneViewportBackdrop({
     const contactEl = getHomeContactSectionElement();
     const progress = computeTeamZoneBackdropProgress(teamEl, contactEl, vh);
 
-    const opacity = reducedMotion
+    let opacity = reducedMotion
       ? progress >= TEAM_ZONE_REDUCED_MOTION_THRESHOLD
         ? 1
         : 0
       : progress;
 
+    if (isTeamBackdropDebugBinaryOpacity()) {
+      opacity = progress >= 1 ? 1 : 0;
+    }
+
     el.style.opacity = String(opacity);
     el.style.pointerEvents = 'none';
+
+    if (shouldEmitTeamBackdropDebugLog(progress) && teamEl) {
+      const teamTop = quantizeTeamZoneScrollPx(teamEl.getBoundingClientRect().top);
+      const contactTop = contactEl
+        ? quantizeTeamZoneScrollPx(contactEl.getBoundingClientRect().top)
+        : null;
+      const fadeIn = computeTeamZoneFadeInProgress(teamTop, vh);
+      const fadeOut =
+        contactEl != null && contactTop != null
+          ? computeTeamZoneFadeOutProgress(contactTop, vh)
+          : null;
+      const skyEl = document.querySelector('.top-home-sky-parallax-inner');
+      emitTeamBackdropDebugLog(
+        'useTeamZoneViewportBackdrop.ts:applyStyles',
+        'team backdrop sample',
+        {
+          teamTop,
+          contactTop,
+          progress,
+          opacity,
+          innerHeight: vh,
+          visualViewportHeight: window.visualViewport?.height ?? null,
+          fadeIn,
+          fadeOut,
+          experiment: getActiveTeamBackdropExperiments().join(',') || 'baseline',
+          bottomHit: probeViewportBottomElement(),
+          backdropOpacity: opacity,
+          skyTransform: skyEl ? getComputedStyle(skyEl).transform : null,
+        },
+        progress > 0 && progress < 1 ? 'H9' : 'H5'
+      );
+    }
   }, [enabled, reducedMotion]);
 
   const schedule = useCallback(() => {

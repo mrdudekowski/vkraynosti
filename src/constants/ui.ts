@@ -6,7 +6,7 @@ export const UI = {
   homeSeasonBannerWordmark: 'Вкрайности' as const,
   hero: {
     /** Основной h1 главной страницы (SEO и скринридеры). */
-    documentTitle: 'Туры по дикой природе Приморского края',
+    documentTitle: '',
     viewTour:      'Забронировать тур',
     /** Интервал автосмены слайдов героя (мс). */
     autoplayIntervalMs: 7000,
@@ -236,7 +236,7 @@ export const UI = {
     requestTourCta:  'Оставить заявку на тур',
     /** Подпись при наведении на CTA заявки (буквы + стрелка в `.btn-cta-tour--dual`). */
     requestTourCtaHoverWordmark: 'Вкрайности',
-    /** Нижний CTA страницы тура: стиль `btn-primary`, модальное окно заявки на тур. */
+    /** Нижний CTA страницы тура: `.btn-tour-detail-footer-cta`, модальное окно заявки на тур. */
     askQuestionCta: 'Уточнить про тур',
     /** Текст перед нижним CTA «Уточнить про тур». */
     askQuestionFooterLead:

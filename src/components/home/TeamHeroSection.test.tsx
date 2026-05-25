@@ -100,24 +100,40 @@ describe('TeamHeroSection', () => {
     renderTeamHeroSection();
 
     const stack = screen.getByRole('heading', { level: 3, name: 'Элина' }).closest('section')
-      ?.querySelector('.max-sm\\:gap-team-hero-members-stack-mobile');
+      ?.querySelector('.gap-team-hero-members-stack-mobile');
 
     expect(stack).toHaveClass('relative');
     expect(stack).toHaveClass('overflow-visible');
     expect(stack).toHaveClass('flex');
     expect(stack).toHaveClass('flex-col');
-    expect(stack).toHaveClass('sm:gap-team-hero-members');
+    expect(stack).toHaveClass('team-hero-desktop:gap-team-hero-members');
     expect(stack).toHaveClass('lg:gap-team-hero-members-lg');
   });
 
-  it('applies bottom padding on first member article from sm for staircase gap', () => {
+  it('aligns Yaroslav text row to end on team-hero-desktop without affecting Elina', () => {
+    renderTeamHeroSection();
+
+    const yaroslavSlide = document.getElementById('team-1-name')?.closest('article')?.firstElementChild;
+    const elinaSlide = document.getElementById('team-2-name')?.closest('article')?.firstElementChild;
+
+    expect(yaroslavSlide?.className).toContain('team-hero-desktop:grid-cols-[minmax(0,1fr)_auto]');
+    expect(yaroslavSlide?.className).toContain('team-hero-desktop:items-end');
+    expect(yaroslavSlide?.className).not.toContain('team-hero-desktop:items-start');
+    expect(elinaSlide?.className).toContain('team-hero-desktop:grid-cols-[auto_minmax(0,1fr)]');
+    expect(elinaSlide?.className).toContain('team-hero-desktop:items-start');
+    expect(elinaSlide?.className).not.toContain('team-hero-desktop:items-end');
+  });
+
+  it('applies bottom padding on first member article from team-hero-desktop for staircase gap', () => {
     renderTeamHeroSection();
 
     const elinaArticle = screen.getByRole('heading', { level: 3, name: 'Элина' }).closest('article');
     const yaroslavArticle = screen.getByRole('heading', { level: 3, name: 'Ярослав' }).closest('article');
 
-    expect(elinaArticle).toHaveClass('sm:pb-team-hero-first-member-bottom-sm');
-    expect(yaroslavArticle).not.toHaveClass('sm:pb-team-hero-first-member-bottom-sm');
+    expect(elinaArticle).toHaveClass('team-hero-desktop:pb-team-hero-first-member-bottom-sm');
+    expect(elinaArticle).toHaveClass('md:pb-team-hero-first-member-bottom-md');
+    expect(elinaArticle).toHaveClass('lg:pb-team-hero-first-member-bottom-lg');
+    expect(yaroslavArticle).not.toHaveClass('team-hero-desktop:pb-team-hero-first-member-bottom-sm');
   });
 
   it('applies text stagger after scroll reveal', () => {

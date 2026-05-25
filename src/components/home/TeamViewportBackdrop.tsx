@@ -1,6 +1,8 @@
 import { useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import { useTeamZoneViewportBackdrop } from '../../hooks/useTeamZoneViewportBackdrop';
+import TeamBackdropDebugOverlay from './TeamBackdropDebugOverlay';
+import { isTeamBackdropDebugHide } from '../../utils/teamBackdropDebug';
 
 /**
  * Фиксированная чёрная штора viewport в зоне `#team` на главной.
@@ -15,11 +17,18 @@ export default function TeamViewportBackdrop() {
     return null;
   }
 
+  if (isTeamBackdropDebugHide()) {
+    return <TeamBackdropDebugOverlay />;
+  }
+
   return (
-    <div
-      ref={backdropRef}
-      className="pointer-events-none fixed inset-0 z-home-team-backdrop bg-home-gate-start-screen"
-      aria-hidden
-    />
+    <>
+      <div
+        ref={backdropRef}
+        className="pointer-events-none fixed inset-0 z-home-team-backdrop bg-home-gate-start-screen"
+        aria-hidden
+      />
+      <TeamBackdropDebugOverlay />
+    </>
   );
 }

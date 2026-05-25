@@ -15,3 +15,6 @@ export const BREAKPOINT_MD_PX = 768 as const;
 export const BREAKPOINT_LG_PX = 992 as const;
 export const BREAKPOINT_XL_PX = 1200 as const;
 export const BREAKPOINT_2XL_PX = 1400 as const;
+
+/** Секция «Команда»: desktop layout (grid + лесенка) с этой ширины (≤649px — mobile). */
+export const BREAKPOINT_TEAM_HERO_DESKTOP_PX = 650 as const;

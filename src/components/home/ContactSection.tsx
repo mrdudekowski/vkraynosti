@@ -44,7 +44,7 @@ const ContactSection = forwardRef<HTMLElement>(function ContactSection(_, ref) {
       <RevealBox as="div" className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
         <a
           href={toSafePhoneHref(CONTACTS.PHONE_HREF)}
-          className="btn-primary flex items-center justify-center gap-3"
+          className="btn-primary gap-3"
         >
           <FontAwesomeIcon icon={faPhone} />
           {UI.contact.phone}

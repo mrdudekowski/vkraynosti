@@ -36,7 +36,7 @@ export function useSafetyStatusStack({
     useState<SafetyStatusCheckboxPhase>('pulsing');
   const prevPausedRef = useRef(paused);
   const enterVisibleGenerationRef = useRef(0);
-  const activeCycleStartRef = useRef(Date.now());
+  const activeCycleStartRef = useRef(0);
 
   /**
    * После commit `hidden`: следующий тик — `visible`, чтобы CSS-transition
@@ -83,6 +83,7 @@ export function useSafetyStatusStack({
     }
 
     if (wasPaused && !paused && visibleCount === safeLineCount) {
+      activeCycleStartRef.current = Date.now();
       setVisibleCount(1);
       setEnteringFadePhase('visible');
       setActiveCheckboxPhase('pulsing');

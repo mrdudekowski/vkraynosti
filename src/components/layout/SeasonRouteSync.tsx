@@ -14,7 +14,7 @@ const SeasonRouteSync = () => {
   useLayoutEffect(() => {
     const detailMatch = matchPath(ROUTES.TOUR_DETAIL, pathname);
     const listMatch = matchPath(
-      { path: '/tours/:season', end: true },
+      { path: ROUTES.SEASON_LIST, end: true },
       pathname
     );
     const raw = detailMatch?.params.season ?? listMatch?.params.season;

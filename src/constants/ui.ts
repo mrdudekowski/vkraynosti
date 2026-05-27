@@ -21,6 +21,8 @@ export const UI = {
     carouselAdvanceImageArea: 'Следующий слайд. Сейчас: {title}',
     /** Точка пагинации: `{n}` — номер слайда (1-based). */
     carouselPaginationGoToSlide: 'Перейти к слайду {n}',
+    /** Icon-only кнопка телефона в `HomeHeroContactRail`. */
+    homeHeroContactPhoneAria: 'Позвонить',
   },
   breadcrumbs: {
     navLabel: 'Хлебные крошки',

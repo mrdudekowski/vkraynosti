@@ -54,7 +54,7 @@ const SeasonPageLayout = ({
           className="mb-8"
           items={[
             { label: UI.breadcrumbs.home, to: ROUTES.HOME },
-            { label: `${season.emoji} ${season.label}` },
+            { season: seasonKey },
           ]}
         />
         <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">

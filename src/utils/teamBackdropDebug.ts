@@ -48,6 +48,7 @@ export interface ViewportBottomHit {
 
 export interface TeamBackdropDebugSample {
   teamTop: number;
+  bridgeTop?: number | null;
   contactTop: number | null;
   progress: number;
   opacity: number;

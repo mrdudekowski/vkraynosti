@@ -41,6 +41,21 @@ export const HOME_GATE_SCROLL_HINT_VISIBLE_MAX_SCROLL_PX = 14 as const;
 /** Длительность opacity перехода стрелки ворот; синхронно с `duration-home-gate-scroll-hint-fade` в теме. */
 export const HOME_GATE_SCROLL_HINT_FADE_MS = 260 as const;
 
+/**
+ * Корень ворот на главной: в DOM с первого кадра на `md+` (Tailwind `hidden md:block`),
+ * без ожидания JS `useHomeGateDesktopLayout` — иначе Lenis/restore могут «перепрыгнуть» hero.
+ */
+export const HOME_GATE_DESKTOP_ROOT_CLASS = 'hidden md:block shrink-0' as const;
+
+/** Главная: при F5 не восстанавливать sessionStorage scroll — старт у ворот (scroll 0). */
+export const HOME_SCROLL_RESTORATION_PIN_TO_GATE_ON_RELOAD = true as const;
+
+/**
+ * После mount: если скролл уже у якоря hero, сбросить на 0 (гонка Lenis resize / restore).
+ * Синхронно с `useHomeNavbarChromeScroll` initial gate lock.
+ */
+export const HOME_GATE_INITIAL_SCROLL_LOCK_MS = 800 as const;
+
 /** Видна ли подсказка скролла при заданном `scrollY` и пороге (для тестов и хука). */
 export function computeHomeGateScrollHintVisible(scrollY: number, maxScrollPx: number): boolean {
   return scrollY <= maxScrollPx;

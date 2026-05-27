@@ -24,10 +24,16 @@ function buildHighlightGradientDefs(gradientId: string, season: Season): string 
 /**
  * Подготавливает SVG статуса: тёмные контуры фиксированные, светлые детали — сезонный акцент.
  */
+const SAFE_GRADIENT_ID_RE = /^[a-zA-Z][\w-]*$/;
+
 export function transformSafetyStatusIconSvg(
   svgMarkup: string,
   { gradientId, season, solidHighlight }: TransformSafetyStatusIconSvgOptions
 ): string {
+  if (!SAFE_GRADIENT_ID_RE.test(gradientId)) {
+    throw new Error('Invalid safety status icon gradient id');
+  }
+
   const highlightFill = solidHighlight
     ? SEASON_ACCENT_HEX[season]
     : `url(#${gradientId})`;

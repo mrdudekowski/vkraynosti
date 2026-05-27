@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "audit": "npm audit",
+    "audit:tailwind-safelist": "node scripts/audit-tailwind-safelist.mjs",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
@@ -26,6 +27,7 @@
     "media:covers-mobile": "node scripts/generate-tour-cover-mobile-variants.mjs",
     "media:verify-covers": "node scripts/verify-tour-cover-media.mjs",
     "generate:tour-schedule-template": "node scripts/generate-tour-schedule-template.mjs",
+    "generate:tour-schedule-gas-ids": "node scripts/generate-tour-schedule-gas-ids.mjs",
     "media:bootstrap-season": "node scripts/generate-isolated-season-media.mjs"
   },
   "dependencies": {
@@ -66,5 +68,8 @@
     "typescript-eslint": "^8.48.0",
     "vite": "^7.3.1",
     "vitest": "^4.1.1"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

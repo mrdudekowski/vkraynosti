@@ -59,6 +59,7 @@ const TourDetailPage = () => {
     tourId: string;
   }>();
   const tour = getTourById(tourId);
+
   const { openTourRequestModal } = useModal();
   useBrowserBackToHomeTours({ enabled: tour != null });
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
@@ -153,7 +154,6 @@ const TourDetailPage = () => {
     return <Navigate replace to={buildTourDetailPath(tour.season, tour.id)} />;
   }
 
-  const seasonInfo = UI.seasons[tour.season];
   const seasonVisualStyle = SEASON_STYLE[tour.season];
   const seasonButtonGradientClass = {
     winter: 'bg-gradient-to-r from-season-winter/30 to-season-winter/15',
@@ -223,7 +223,7 @@ const TourDetailPage = () => {
         title={tour.title}
         subtitle={tour.subtitle}
         backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
-        backLinkLabel={`${seasonInfo.emoji} ${seasonInfo.label}`}
+        backLinkSeason={tour.season}
         heroImageObjectClassName={
           heroLayoutTourId === 'spring-3'
             ? TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS

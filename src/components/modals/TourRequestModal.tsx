@@ -2,8 +2,6 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTelegram } from '@fortawesome/free-brands-svg-icons/faTelegram';
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons/faWhatsapp';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner';
 import { faTimes } from '@fortawesome/free-solid-svg-icons/faTimes';
 import type { TourRequestModalPayload } from '../../types';
@@ -16,7 +14,16 @@ import FormField from '../form/FormField';
 import FormCheckbox from '../form/FormCheckbox';
 import TextInput from '../form/TextInput';
 import TextArea from '../form/TextArea';
-import MaxMessengerIcon from '../icons/MaxMessengerIcon';
+import ContactMessengerLogo from '../icons/ContactMessengerLogo';
+import {
+  TOUR_REQUEST_MESSENGER_ICON_CLASS,
+  TOUR_REQUEST_MESSENGER_ICON_WELL_CLASS,
+  TOUR_REQUEST_MESSENGER_LABEL_MAX,
+  TOUR_REQUEST_MESSENGER_LABEL_TELEGRAM,
+  TOUR_REQUEST_MESSENGER_LABEL_WHATSAPP,
+  TOUR_REQUEST_MESSENGER_RADIO_CLASS,
+  TOUR_REQUEST_MESSENGER_ROW_CLASS,
+} from '../../constants/tourRequestMessenger';
 import { sendTourRequestLead } from '../../services/sendTourRequestLead';
 import {
   tourRequestFormSchema,
@@ -269,10 +276,10 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                     *
                   </span>
                 </legend>
-                <div className="flex flex-wrap gap-4">
+                <div className={TOUR_REQUEST_MESSENGER_ROW_CLASS}>
                   <label
                     htmlFor="tour-request-messenger-whatsapp"
-                    className="group inline-flex cursor-pointer items-center justify-center p-1"
+                    className={TOUR_REQUEST_MESSENGER_LABEL_WHATSAPP}
                   >
                     <input
                       id="tour-request-messenger-whatsapp"
@@ -281,19 +288,20 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                       value="whatsapp"
                       checked={values.preferredMessenger === 'whatsapp'}
                       onChange={() => updateField('preferredMessenger', 'whatsapp')}
-                      className="peer sr-only"
+                      className={TOUR_REQUEST_MESSENGER_RADIO_CLASS}
                       aria-label={UI.tourRequestModal.messengerWhatsappAria}
                       aria-invalid={!!fieldErrors.preferredMessenger}
                     />
-                    <FontAwesomeIcon
-                      icon={faWhatsapp}
-                      className="h-6 w-6 text-text-muted transition-[filter,colors] duration-hover drop-shadow-none peer-checked:drop-shadow-messenger-whatsapp-selected peer-checked:text-messenger-whatsapp group-hover:text-messenger-whatsapp"
-                      aria-hidden
-                    />
+                    <span className={TOUR_REQUEST_MESSENGER_ICON_WELL_CLASS}>
+                      <ContactMessengerLogo
+                        variant="whatsapp"
+                        className={TOUR_REQUEST_MESSENGER_ICON_CLASS}
+                      />
+                    </span>
                   </label>
                   <label
                     htmlFor="tour-request-messenger-telegram"
-                    className="group inline-flex cursor-pointer items-center justify-center p-1"
+                    className={TOUR_REQUEST_MESSENGER_LABEL_TELEGRAM}
                   >
                     <input
                       id="tour-request-messenger-telegram"
@@ -302,19 +310,20 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                       value="telegram"
                       checked={values.preferredMessenger === 'telegram'}
                       onChange={() => updateField('preferredMessenger', 'telegram')}
-                      className="peer sr-only"
+                      className={TOUR_REQUEST_MESSENGER_RADIO_CLASS}
                       aria-label={UI.tourRequestModal.messengerTelegramAria}
                       aria-invalid={!!fieldErrors.preferredMessenger}
                     />
-                    <FontAwesomeIcon
-                      icon={faTelegram}
-                      className="h-6 w-6 text-text-muted transition-[filter,colors] duration-hover drop-shadow-none peer-checked:drop-shadow-messenger-telegram-selected peer-checked:text-messenger-telegram group-hover:text-messenger-telegram"
-                      aria-hidden
-                    />
+                    <span className={TOUR_REQUEST_MESSENGER_ICON_WELL_CLASS}>
+                      <ContactMessengerLogo
+                        variant="telegram"
+                        className={TOUR_REQUEST_MESSENGER_ICON_CLASS}
+                      />
+                    </span>
                   </label>
                   <label
                     htmlFor="tour-request-messenger-max"
-                    className="group inline-flex cursor-pointer items-center justify-center p-1"
+                    className={TOUR_REQUEST_MESSENGER_LABEL_MAX}
                   >
                     <input
                       id="tour-request-messenger-max"
@@ -323,11 +332,16 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                       value="max"
                       checked={values.preferredMessenger === 'max'}
                       onChange={() => updateField('preferredMessenger', 'max')}
-                      className="peer sr-only"
+                      className={TOUR_REQUEST_MESSENGER_RADIO_CLASS}
                       aria-label={UI.tourRequestModal.messengerMaxAria}
                       aria-invalid={!!fieldErrors.preferredMessenger}
                     />
-                    <MaxMessengerIcon className="h-6 w-6 object-contain opacity-60 transition-[filter,opacity] duration-hover drop-shadow-none peer-checked:opacity-100 peer-checked:drop-shadow-messenger-max-selected group-hover:opacity-100" />
+                    <span className={TOUR_REQUEST_MESSENGER_ICON_WELL_CLASS}>
+                      <ContactMessengerLogo
+                        variant="max"
+                        className={TOUR_REQUEST_MESSENGER_ICON_CLASS}
+                      />
+                    </span>
                   </label>
                 </div>
                 {fieldErrors.preferredMessenger ? (

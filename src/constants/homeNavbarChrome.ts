@@ -27,10 +27,23 @@ export interface HomeNavbarChromeSnap {
   homeFlushWithViewportTop: boolean;
   /** Без transition opacity у фона (`prefers-reduced-motion`). */
   disableTopChromeTransition: boolean;
+  /** 0..1: скрытие navbar по центру `#team` (1 = полностью скрыт). Поле — `bridgeHideProgress`. */
+  bridgeHideProgress: number;
 }
 
-/** Длительность opacity transition фона навбара/дока (ms); синхронно с `duration-home-navbar-chrome`. */
+/**
+ * Длительность (ms) для токена `duration-home-navbar-chrome` в теме.
+ * Navbar/SeasonNavDock не анимируют scroll-linked opacity через CSS transition (см. `homeNavbarChromeOpacityShellClass`).
+ */
 export const HOME_NAVBAR_CHROME_TRANSITION_MS = 320;
+
+/**
+ * Класс оболочки с `style.opacity` от скролла (navbar, season dock).
+ * Без `transition-opacity` — иначе отставание от Lenis на каждом кадре.
+ */
+export function homeNavbarChromeOpacityShellClass(disableTopChromeTransition: boolean): string {
+  return disableTopChromeTransition ? 'duration-0' : '';
+}
 
 /** Полоса скролла (px): интерполяция `topChromeSurfaceOpacity` 0 → 1 перед `heroMinScrollY`. */
 export const HOME_NAVBAR_CHROME_SURFACE_FADE_SCROLL_PX = 140;
@@ -64,6 +77,7 @@ export const HOME_NAVBAR_CHROME_LAYOUT_DEFAULT: HomeNavbarChromeSnap = {
   gateStageFullBleedMinHeight: false,
   homeFlushWithViewportTop: false,
   disableTopChromeTransition: false,
+  bridgeHideProgress: 0,
 };
 
 /**
@@ -98,6 +112,7 @@ export function readInitialHomeNavbarChromeSnap(): HomeNavbarChromeSnap {
         topChromeSurfaceOpacity: 0,
         gateStageFullBleedMinHeight: true,
         homeFlushWithViewportTop: true,
+        bridgeHideProgress: 0,
       };
     }
     return {
@@ -182,5 +197,6 @@ export function computeHomeNavbarChromeSnap(p: ComputeHomeNavbarChromeParams): H
     gateStageFullBleedMinHeight,
     homeFlushWithViewportTop: true,
     disableTopChromeTransition: p.reducedMotion,
+    bridgeHideProgress: 0,
   };
 }

@@ -2,7 +2,7 @@
 export type SafetyStatusFadePhase = 'visible' | 'hidden';
 
 /** Интервал появления следующей плашки в стеке #safety, мс (было 4000). */
-export const SAFETY_STATUS_ROTATION_MS = 3000 as const;
+export const SAFETY_STATUS_ROTATION_MS = 1000 as const;
 
 /** Длительность fade out / fade in при смене статуса, мс. */
 export const SAFETY_STATUS_FADE_MS = 360 as const;

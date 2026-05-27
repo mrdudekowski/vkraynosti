@@ -9,12 +9,86 @@ import { ROUTES } from '../../constants/routes';
 import { scrollHomeHeroTopImmediate, scrollHomeHeroTopSmooth } from '../../constants/smoothScroll';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { SEASON_ICON, SEASON_STYLE, SEASON_TEXT_CLASS } from '../../constants/seasonNavbarAppearance';
+import { computeHomeNavbarEffectiveTopChromeOpacity } from '../../constants/homeNavbarBridgeChrome';
+import { homeNavbarChromeOpacityShellClass } from '../../constants/homeNavbarChrome';
 import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
+import { useMobileNavMenu } from '../../context/useMobileNavMenu';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
 import SeasonSwitcher from '../shared/SeasonSwitcher';
 import AnimatedHamburgerIcon from '../shared/AnimatedHamburgerIcon';
 import BrandWordmark from '../shared/BrandWordmark';
+
+type NavbarMobileMenuPortalProps = {
+  panelMounted: boolean;
+  panelEnter: boolean;
+  mobileOverlayTop: string;
+  closeMenu: () => void;
+  handleCtaClick: () => void;
+  handleMobilePanelTransitionEnd: (event: React.TransitionEvent<HTMLDivElement>) => void;
+  navLinkClassMobile: string;
+};
+
+function NavbarMobileMenuPortal({
+  panelMounted,
+  panelEnter,
+  mobileOverlayTop,
+  closeMenu,
+  handleCtaClick,
+  handleMobilePanelTransitionEnd,
+  navLinkClassMobile,
+}: NavbarMobileMenuPortalProps) {
+  if (!panelMounted) {
+    return null;
+  }
+
+  return createPortal(
+    <div className="nav-desktop:hidden contents">
+      <button
+        type="button"
+        className={[
+          `fixed left-0 right-0 bottom-0 z-mobileNav bg-black/50 ${mobileOverlayTop}`,
+          'transition-opacity duration-mobile-nav ease-out mobile-nav-backdrop',
+          panelEnter ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        ].join(' ')}
+        aria-label={UI.nav.mobileMenuCloseOverlay}
+        onClick={closeMenu}
+      />
+      <div
+        className={[
+          `fixed right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10 ${mobileOverlayTop}`,
+          'bg-surface-dark/95 py-4 pl-5 pr-4 shadow-xl backdrop-blur-sm mobile-nav-panel',
+          'w-mobile-nav-drawer mobile-nav-drawer-compact:w-mobile-nav-drawer-compact transform transition-transform duration-mobile-nav ease-out',
+          panelEnter ? 'translate-x-0' : 'translate-x-full',
+        ].join(' ')}
+        role="dialog"
+        aria-modal="true"
+        aria-label={UI.nav.mobileMenuDialog}
+        onTransitionEnd={handleMobilePanelTransitionEnd}
+      >
+        <ul className="flex flex-col gap-3 mb-3">
+          {UI.nav.links.map(link => (
+            <li key={link.hash}>
+              <Link
+                to={{ pathname: ROUTES.HOME, hash: link.hash }}
+                onClick={closeMenu}
+                className={navLinkClassMobile}
+                prefetch="none"
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <button type="button" onClick={handleCtaClick} className="btn-primary w-full text-center">
+          {UI.nav.cta}
+        </button>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   /** Портал и выходная анимация: держим в DOM, пока transform не доедет до translateX(100%). */
@@ -39,10 +113,15 @@ const Navbar = () => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { activeSeason } = useSeason();
   const activeSeasonUi = UI.seasons[activeSeason];
+  const { setBurgerMenuActive } = useMobileNavMenu();
   const { open: seasonMenuOpen, setOpen: setSeasonMenuOpen, toggle: toggleSeasonMenu } =
     useSeasonNavMenu();
   const { snap: homeChrome } = useHomeNavbarChrome();
   const activeSeasonStyle = SEASON_STYLE[activeSeason];
+
+  useEffect(() => {
+    setBurgerMenuActive(menuOpen || panelMounted);
+  }, [menuOpen, panelMounted, setBurgerMenuActive]);
 
   const openMenu = () => {
     setMenuOpen(true);
@@ -112,28 +191,34 @@ const Navbar = () => {
     }
   };
 
-  const navShellTransition = homeChrome.disableTopChromeTransition
-    ? 'duration-0'
-    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const navShellTransition = homeNavbarChromeOpacityShellClass(
+    homeChrome.disableTopChromeTransition
+  );
   const mobileOverlayTop = homeChrome.mainUsesNavbarTopPadding ? 'top-16' : 'top-0';
 
   const isHomePath = location.pathname === ROUTES.HOME;
-  const navShellOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
+  const navShellOpacity = isHomePath
+    ? computeHomeNavbarEffectiveTopChromeOpacity(
+        homeChrome.topChromeOpacity,
+        homeChrome.bridgeHideProgress
+      )
+    : 1;
   const navShellPointerEvents =
     isHomePath && navShellOpacity < 0.001 ? 'pointer-events-none' : '';
 
   return (
     <nav data-layout-navbar className="fixed top-0 left-0 right-0 z-navbar">
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-navbar-chrome bg-home-gate-start-screen"
-      />
-      <div
-        className={`relative z-10 ${navShellTransition} ${navShellPointerEvents}`.trim()}
+        className={`relative ${navShellTransition} ${navShellPointerEvents}`.trim()}
         style={{ opacity: navShellOpacity }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-navbar-chrome bg-home-gate-start-screen"
+        />
+        <div className="relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
 
           {/* Left: Logo + подпись сезона (текст только здесь; в SeasonNavDock — только иконки) */}
           <div className="flex min-w-0 flex-1 items-center gap-2 xs:gap-3">
@@ -248,56 +333,20 @@ const Navbar = () => {
               </span>
             </button>
           </div>
+            </div>
+          </div>
         </div>
 
-        {/* Mobile menu в portal: иначе backdrop-blur у <nav> ломает containing block для fixed */}
-        {panelMounted &&
-          createPortal(
-            <>
-              <button
-                type="button"
-                className={[
-                  `nav-desktop:hidden fixed left-0 right-0 bottom-0 z-mobileNav bg-black/50 ${mobileOverlayTop}`,
-                  'transition-opacity duration-mobile-nav ease-out mobile-nav-backdrop',
-                  panelEnter ? 'opacity-100' : 'opacity-0 pointer-events-none',
-                ].join(' ')}
-                aria-label={UI.nav.mobileMenuCloseOverlay}
-                onClick={closeMenu}
-              />
-              <div
-                className={[
-                  `nav-desktop:hidden fixed right-0 z-mobileNav flex flex-col rounded-b-lg border border-white/10 ${mobileOverlayTop}`,
-                  'bg-surface-dark/95 py-4 pl-5 pr-4 shadow-xl backdrop-blur-sm mobile-nav-panel',
-                  'w-mobile-nav-drawer transform transition-transform duration-mobile-nav ease-out',
-                  panelEnter ? 'translate-x-0' : 'translate-x-full',
-                ].join(' ')}
-                role="dialog"
-                aria-modal="true"
-                aria-label={UI.nav.mobileMenuDialog}
-                onTransitionEnd={handleMobilePanelTransitionEnd}
-              >
-                <ul className="flex flex-col gap-3 mb-3">
-                  {UI.nav.links.map(link => (
-                    <li key={link.hash}>
-                      <Link
-                        to={{ pathname: ROUTES.HOME, hash: link.hash }}
-                        onClick={closeMenu}
-                        className={navLinkClassMobile}
-                        prefetch="none"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <button type="button" onClick={handleCtaClick} className="btn-primary w-full text-center">
-                  {UI.nav.cta}
-                </button>
-              </div>
-            </>,
-            document.body
-          )}
-        </div>
+        {/* Portal вне blur-оболочки: backdrop-blur у <nav> ломает containing block для fixed */}
+        <NavbarMobileMenuPortal
+          panelMounted={panelMounted}
+          panelEnter={panelEnter}
+          mobileOverlayTop={mobileOverlayTop}
+          closeMenu={closeMenu}
+          handleCtaClick={handleCtaClick}
+          handleMobilePanelTransitionEnd={handleMobilePanelTransitionEnd}
+          navLinkClassMobile={navLinkClassMobile}
+        />
       </div>
     </nav>
   );

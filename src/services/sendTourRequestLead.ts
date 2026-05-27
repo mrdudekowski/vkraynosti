@@ -11,7 +11,21 @@ interface TourRequestLeadPayload extends TourRequestFormValues {
   userAgent: string;
 }
 
+export type TourRequestLeadErrorCode = 'not-configured' | 'network' | 'rejected';
+
+export class TourRequestLeadError extends Error {
+  readonly code: TourRequestLeadErrorCode;
+
+  constructor(code: TourRequestLeadErrorCode, message: string) {
+    super(message);
+    this.name = 'TourRequestLeadError';
+    this.code = code;
+  }
+}
+
 const tourRequestEndpointUrl = import.meta.env.VITE_TOUR_REQUEST_ENDPOINT_URL;
+
+const LEAD_CONTENT_TYPE = 'text/plain;charset=utf-8' as const;
 
 const createIdempotencyKey = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -43,25 +57,31 @@ export const sendTourRequestLead = async (
   tour: TourRequestModalPayload,
   values: TourRequestFormValues
 ) => {
-  if (!tourRequestEndpointUrl) {
-    throw new Error('Tour request endpoint is not configured');
+  const endpoint = tourRequestEndpointUrl?.trim();
+  if (!endpoint) {
+    throw new TourRequestLeadError('not-configured', 'Tour request endpoint is not configured');
   }
 
   const body = JSON.stringify(buildLeadPayload(tour, values));
 
-  if (navigator.sendBeacon) {
-    const queued = navigator.sendBeacon(tourRequestEndpointUrl, new Blob([body], { type: 'text/plain;charset=utf-8' }));
-    if (queued) return;
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': LEAD_CONTENT_TYPE,
+      },
+      body,
+      keepalive: true,
+    });
+  } catch {
+    throw new TourRequestLeadError('network', 'Failed to send tour request');
   }
 
-  await fetch(tourRequestEndpointUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    redirect: 'manual',
-    headers: {
-      'Content-Type': 'text/plain;charset=utf-8',
-    },
-    body,
-    keepalive: true,
-  });
+  if (!response.ok) {
+    throw new TourRequestLeadError(
+      'rejected',
+      `Tour request rejected: ${response.status}`
+    );
+  }
 };

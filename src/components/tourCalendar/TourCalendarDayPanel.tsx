@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS } from '../../constants/tourCalendarLayout';
 import { UI } from '../../constants/ui';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 import { toIsoDate } from '../../utils/tourSchedule/toIsoDate';
@@ -56,10 +57,7 @@ const TourCalendarDayPanel = ({
 
   if (!selectedDate) {
     return (
-      <div
-        className="flex min-h-[12rem] items-center justify-center rounded-card border border-dashed border-divider bg-surface-light/80 p-6 text-center"
-        aria-live="polite"
-      >
+      <div className={TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS} aria-live="polite">
         <p className="max-w-xs text-text-muted">{UI.tourCalendar.selectDateHint}</p>
       </div>
     );

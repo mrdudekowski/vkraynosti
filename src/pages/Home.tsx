@@ -4,6 +4,7 @@ import { useLenis } from 'lenis/react';
 import { HomeGateBannerShell } from '../components/home/HomeGateBannerShell';
 import { HomeGateScrollToHeroLink } from '../components/home/HomeGateScrollToHeroLink';
 import HeroCarousel from '../components/home/HeroCarousel';
+import HomeHeroContactRail from '../components/home/HomeHeroContactRail';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import HomeBelowFoldSuspenseFallback from '../components/home/HomeBelowFoldSuspenseFallback';
 import PageMeta from '../components/shared/PageMeta';
@@ -17,6 +18,7 @@ import { getTourCoverCardImgObjectClass } from '../constants/tourCoverCropByCano
 import { resolveContentSourceTourId } from '../data/seasonTourRegistry';
 import { HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS, IMAGES } from '../constants/images';
 import {
+  HOME_GATE_DESKTOP_ROOT_CLASS,
   HOME_GATE_STAGE_INTERSECT_ENTER,
   HOME_GATE_STAGE_INTERSECT_LEAVE,
   homeGateStageIntersectThresholds,
@@ -36,7 +38,11 @@ import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seaso
 import { useHomeGateDesktopLayout } from '../hooks/useHomeGateDesktopLayout';
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
 import { useHomeSkyParallax } from '../hooks/useHomeSkyParallax';
-import { BREAKPOINT_MD_PX, getNavbarScrollOffsetPx } from '../constants/smoothScroll';
+import {
+  BREAKPOINT_MD_PX,
+  getNavbarScrollOffsetPx,
+  scrollWindowToTopImmediate,
+} from '../constants/smoothScroll';
 import type { Season } from '../types';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
 import { useDocumentVisibility } from '../hooks/useDocumentVisibility';
@@ -45,6 +51,7 @@ import {
   HOME_TOURS_PRIORITY_IMAGE_ABOVE_FOLD_COUNT,
   HOME_TOURS_PROMO_VIDEO_SWITCH_MS,
 } from '../constants/homeToursGrid';
+import HomeTeamContactBrandBridge from '../components/home/HomeTeamContactBrandBridge';
 import TeamViewportBackdrop from '../components/home/TeamViewportBackdrop';
 import TourCardHeightGhost from '../components/shared/TourCardHeightGhost';
 import { getHomeLcpPreloadImageUrl } from '../utils/getHomeLcpPreloadImageUrl';
@@ -76,6 +83,7 @@ const Home = () => {
   const shouldScrollAfterCollapseRef = useRef(false);
   const expandCardMediaViewportRef = useRef<HTMLDivElement | null>(null);
   const gateIntersectRef = useRef<HTMLDivElement | null>(null);
+  const homeGateEntryScrollPinnedRef = useRef(false);
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const expandControlButtonRef = useRef<HTMLButtonElement | null>(null);
   const toursHeadingWrapRef = useRef<HTMLDivElement | null>(null);
@@ -104,6 +112,12 @@ const Home = () => {
     heroSectionRef,
     enabled: homeGateChromeScrollActive,
   });
+
+  useLayoutEffect(() => {
+    if (!homeGateChromeScrollActive || homeGateEntryScrollPinnedRef.current) return;
+    homeGateEntryScrollPinnedRef.current = true;
+    scrollWindowToTopImmediate(lenis);
+  }, [homeGateChromeScrollActive, lenis]);
 
   useLayoutEffect(() => {
     if (!homeGateChromeScrollActive) return;
@@ -323,34 +337,33 @@ const Home = () => {
         <TeamViewportBackdrop />
 
         <div className="relative z-10 flex w-full flex-col">
-          {isHomeGateDesktopLayout ? (
-            <div
-              ref={gateIntersectRef}
-              data-home-gate-intersect-root
-              className="shrink-0"
-            >
-              <div className="transition-none w-full shrink-0">
-                <div className="relative flex w-full shrink-0 flex-col items-center justify-center overflow-x-hidden bg-home-gate-start-screen min-h-home-gate-viewport">
-                  <div
-                    data-home-gate-banner-wrap
-                    className={`flex w-full shrink-0 justify-center px-4 sm:px-6 lg:px-8 ${
-                      gateStageFocused || homeGateBannerColumnHover ? '' : 'pointer-events-none'
-                    }`}
-                  >
-                    <HomeGateBannerShell>
-                      <HomeSeasonBanner
-                        season={activeSeason}
-                        staticPresentation={UI.sections.homeGateSeasonBannerStaticPresentation}
-                      />
-                    </HomeGateBannerShell>
-                  </div>
-                  <HomeGateScrollToHeroLink />
+          <div
+            ref={gateIntersectRef}
+            data-home-gate-intersect-root
+            className={HOME_GATE_DESKTOP_ROOT_CLASS}
+          >
+            <div className="transition-none w-full shrink-0">
+              <div className="relative flex w-full shrink-0 flex-col items-center justify-center overflow-x-hidden bg-home-gate-start-screen min-h-home-gate-viewport">
+                <div
+                  data-home-gate-banner-wrap
+                  className={`flex w-full shrink-0 justify-center px-4 sm:px-6 lg:px-8 ${
+                    gateStageFocused || homeGateBannerColumnHover ? '' : 'pointer-events-none'
+                  }`}
+                >
+                  <HomeGateBannerShell>
+                    <HomeSeasonBanner
+                      season={activeSeason}
+                      staticPresentation={UI.sections.homeGateSeasonBannerStaticPresentation}
+                    />
+                  </HomeGateBannerShell>
                 </div>
+                <HomeGateScrollToHeroLink />
               </div>
             </div>
-          ) : null}
+          </div>
 
           <HeroCarousel ref={heroSectionRef} />
+          <HomeHeroContactRail />
 
           <section
             id={UI.sections.homeToursSectionElementId}
@@ -456,7 +469,11 @@ const Home = () => {
             </ScrollScrubFade>
 
             <TeamHeroSectionLazy />
+          </Suspense>
 
+          <HomeTeamContactBrandBridge />
+
+          <Suspense fallback={<HomeBelowFoldSuspenseFallback />}>
             <ScrollScrubFade className="relative w-full">
               <ContactSectionLazy />
             </ScrollScrubFade>

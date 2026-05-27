@@ -19,7 +19,8 @@ export function HomeNavbarChromeProvider({ children }: { children: ReactNode }) 
         prev.mainUsesNavbarTopPadding === next.mainUsesNavbarTopPadding &&
         prev.gateStageFullBleedMinHeight === next.gateStageFullBleedMinHeight &&
         prev.homeFlushWithViewportTop === next.homeFlushWithViewportTop &&
-        prev.disableTopChromeTransition === next.disableTopChromeTransition
+        prev.disableTopChromeTransition === next.disableTopChromeTransition &&
+        prev.bridgeHideProgress === next.bridgeHideProgress
       ) {
         return prev;
       }

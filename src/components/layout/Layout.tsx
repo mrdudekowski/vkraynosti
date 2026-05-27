@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import { MobileNavMenuProvider } from '../../context/MobileNavMenuProvider';
 import { SeasonNavMenuProvider } from '../../context/SeasonNavMenuProvider';
 import {
   HomeNavbarChromeProvider,
@@ -74,9 +75,11 @@ const Layout = () => {
       <ScrollToTopOnNavigate />
       <ScrollRestoration />
       <SeasonNavMenuProvider>
-        <HomeNavbarChromeProvider>
-          <LayoutChrome />
-        </HomeNavbarChromeProvider>
+        <MobileNavMenuProvider>
+          <HomeNavbarChromeProvider>
+            <LayoutChrome />
+          </HomeNavbarChromeProvider>
+        </MobileNavMenuProvider>
       </SeasonNavMenuProvider>
       {modal.type === 'tourRequest' && (
         <Suspense fallback={<ModalLazyChunkFallback />}>

@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
+import { HOME_SCROLL_RESTORATION_PIN_TO_GATE_ON_RELOAD } from '../constants/homeGateScroll';
+import { ROUTES } from '../constants/routes';
 import { SCROLL_RESTORATION_SAVE_DEBOUNCE_MS } from '../constants/scrollRestoration';
 import { getViewportScrollY } from '../constants/smoothScroll';
 import { useModal } from '../context/useModal';
@@ -74,6 +76,10 @@ export function useScrollRestoration(): void {
     if (savedY == null || savedY <= 0) return;
 
     restoredRef.current = true;
-    restoreViewportScrollY(lenis, savedY);
+    const restoreY =
+      HOME_SCROLL_RESTORATION_PIN_TO_GATE_ON_RELOAD && location.pathname === ROUTES.HOME
+        ? 0
+        : savedY;
+    restoreViewportScrollY(lenis, restoreY);
   }, [lenis, location.pathname, storageKey]);
 }

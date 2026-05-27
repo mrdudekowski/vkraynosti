@@ -12,6 +12,8 @@ export const ROUTES = {
   SPRING:      '/tours/spring',
   SUMMER:      '/tours/summer',
   FALL:        '/tours/fall',
+  /** Паттерн списка туров сезона (`ROUTES.WINTER` … `ROUTES.FALL`). */
+  SEASON_LIST: '/tours/:season',
   TOUR_DETAIL: '/tours/:season/:tourId',
   SAFETY:      '/safety',
   PRIVACY:     '/privacy',

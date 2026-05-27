@@ -5,6 +5,8 @@ import {
   computeTeamZoneFadeOutProgress,
   TEAM_ZONE_FADE_IN_END_SHARE,
   TEAM_ZONE_FADE_IN_START_SHARE,
+  TEAM_ZONE_FADE_OUT_BRIDGE_END_SHARE,
+  TEAM_ZONE_FADE_OUT_BRIDGE_START_SHARE,
   TEAM_ZONE_FADE_OUT_END_SHARE,
   TEAM_ZONE_FADE_OUT_START_SHARE,
 } from './teamZoneScroll';
@@ -65,6 +67,24 @@ describe('computeTeamZoneBackdropProgress', () => {
     const team = mockElement(new DOMRect(0, vh * TEAM_ZONE_FADE_IN_END_SHARE - 20, 0, 1200));
     const contact = mockElement(new DOMRect(0, vh * TEAM_ZONE_FADE_OUT_START_SHARE + 40, 0, 600));
     expect(computeTeamZoneBackdropProgress(team, contact, vh)).toBe(1);
+  });
+
+  it('fades out when bridge rises before contact reaches fade-out zone', () => {
+    const team = mockElement(new DOMRect(0, -200, 0, 1200));
+    const bridge = mockElement(
+      new DOMRect(
+        0,
+        (vh * TEAM_ZONE_FADE_OUT_BRIDGE_START_SHARE + vh * TEAM_ZONE_FADE_OUT_BRIDGE_END_SHARE) /
+          2,
+        0,
+        280
+      )
+    );
+    const contact = mockElement(new DOMRect(0, vh * TEAM_ZONE_FADE_OUT_START_SHARE + 200, 0, 600));
+    const progress = computeTeamZoneBackdropProgress(team, contact, vh, bridge);
+    expect(progress).toBeGreaterThan(0);
+    expect(progress).toBeLessThan(1);
+    expect(progress).toBeCloseTo(0.5, 5);
   });
 
   it('fades out as contact rises into viewport', () => {

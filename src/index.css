@@ -66,6 +66,23 @@
     filter: brightness(0.9);
   }
 
+  /**
+   * Mobile/tablet (`screens.below-nav-desktop`, <950px): полоса документа скрыта, прокрутка сохраняется.
+   * Иначе при `body { overflow: hidden }` (бургер) исчезает gutter и контент сдвигается.
+   */
+  @screen below-nav-desktop {
+    html {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+
   .overflow-y-auto,
   .overflow-y-scroll,
   .overflow-auto {
@@ -157,6 +174,130 @@
   /** Каскадный fade-in текста team-hero при scroll reveal (`teamHeroAnimation.ts`). */
   .team-hero-text-stagger {
     @apply motion-safe:animate-team-hero-text-stagger-in motion-reduce:animate-none opacity-0;
+  }
+
+  /**
+   * Icon-only контакты (`HomeHeroContactRail`): radial-свечение под иконкой на hover/focus.
+   * Градиенты — `backgroundImage.home-contact-messenger-glow-*`; модификаторы `--phone` / `--telegram` / `--max`.
+   */
+  .home-contact-messenger-btn {
+    @apply relative isolate overflow-visible;
+  }
+
+  .home-contact-messenger-btn::before {
+    content: '';
+    @apply pointer-events-none absolute -z-10 rounded-full opacity-0 transition-opacity duration-hover;
+    inset: -7.5%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+  }
+
+  .home-contact-messenger-btn:hover::before,
+  .home-contact-messenger-btn:focus-visible::before {
+    @apply opacity-100;
+  }
+
+  .home-contact-messenger-btn--phone::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-phone');
+  }
+
+  .home-contact-messenger-btn--telegram::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-telegram');
+  }
+
+  .home-contact-messenger-btn--max::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-max');
+  }
+
+  .home-contact-messenger-btn--whatsapp::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-whatsapp');
+  }
+
+  .home-contact-messenger-icon-well {
+    @apply relative isolate overflow-hidden bg-transparent transition-colors duration-hover;
+  }
+
+  .home-contact-messenger-btn:hover .home-contact-messenger-icon-well,
+  .home-contact-messenger-btn:focus-visible .home-contact-messenger-icon-well {
+    @apply bg-surface-dark;
+  }
+
+  .home-contact-messenger-icon-well::after {
+    content: '';
+    @apply pointer-events-none absolute rounded-full opacity-0 transition-opacity duration-hover;
+    inset: 20%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+  }
+
+  .home-contact-messenger-btn:hover .home-contact-messenger-icon-well::after,
+  .home-contact-messenger-btn:focus-visible .home-contact-messenger-icon-well::after {
+    @apply opacity-100;
+  }
+
+  .home-contact-messenger-btn--phone .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-phone');
+  }
+
+  .home-contact-messenger-btn--telegram .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-telegram');
+  }
+
+  .home-contact-messenger-btn--max .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-max');
+  }
+
+  .home-contact-messenger-btn--whatsapp .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-whatsapp');
+  }
+
+  /**
+   * Модалка заявки: без hover/focus; glow и заливка иконки только при :checked.
+   * Без focus-within outline при клике; кольцо — только `:focus-visible` (клавиатура).
+   */
+  .home-contact-messenger-btn--selectable {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .home-contact-messenger-btn--selectable:focus-within {
+    outline: none;
+  }
+
+  .home-contact-messenger-btn--selectable:has(:focus-visible) {
+    @apply outline outline-2 outline-offset-2 outline-brand-primary;
+  }
+
+  .home-contact-messenger-btn--selectable:hover::before,
+  .home-contact-messenger-btn--selectable:focus-visible::before {
+    @apply opacity-0;
+  }
+
+  .home-contact-messenger-btn--selectable:hover .home-contact-messenger-icon-well,
+  .home-contact-messenger-btn--selectable:focus-visible .home-contact-messenger-icon-well {
+    @apply bg-transparent;
+  }
+
+  .home-contact-messenger-btn--selectable:hover .home-contact-messenger-icon-well::after,
+  .home-contact-messenger-btn--selectable:focus-visible .home-contact-messenger-icon-well::after {
+    @apply opacity-0;
+  }
+
+  .home-contact-messenger-btn--selectable:has(:checked)::before {
+    @apply opacity-100;
+  }
+
+  .home-contact-messenger-btn--selectable:has(:checked) .home-contact-messenger-icon-well::after {
+    @apply opacity-100;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-contact-messenger-btn::before,
+    .home-contact-messenger-icon-well,
+    .home-contact-messenger-icon-well::after {
+      transition: none;
+    }
   }
 
   /**

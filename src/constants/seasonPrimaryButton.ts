@@ -86,9 +86,6 @@ export function pickBtnPrimaryTextOnFill(fillHex: string): string {
  */
 export const SEASON_PRIMARY_BTN_FILL_HEX = buildSeasonPrimaryBtnFillHex();
 
-/** @deprecated Используйте `SEASON_PRIMARY_BTN_FILL_HEX`. */
-export const SEASON_PRIMARY_BTN_BG_HEX = SEASON_PRIMARY_BTN_FILL_HEX;
-
 /** Текст `.btn-primary` на fill сезона (см. `seasonPrimaryButton.test.ts`). */
 export const SEASON_PRIMARY_BTN_FG_HEX = Object.fromEntries(
   SEASONS.map(season => [

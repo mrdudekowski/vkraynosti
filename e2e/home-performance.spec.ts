@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { UI } from '../src/constants/ui';
 
 const VIDEO_URL_IN_RESPONSE_RE = /\.(mov|mp4|webm|ogg)(\?|#|$)/i;
 const MEDIA_URL_IN_RESPONSE_RE = /\.(mov|mp4|webm|ogg|webp|png|jpe?g)(\?|#|$)/i;
@@ -75,8 +76,11 @@ test.describe('Home: ранние media-запросы', () => {
       if (MEDIA_URL_IN_RESPONSE_RE.test(url)) mediaResponseUrls.push(url);
     });
 
-    await page.goto(HOME_RELATIVE_URL, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await page.goto(HOME_RELATIVE_URL, { waitUntil: 'load' });
+    /** Главная — lazy route; в dev нет отдельного `Home-*.js`, ждём контент по DOM. */
+    await expect(
+      page.getByRole('region', { name: UI.sections.homeSeasonBannerRegion })
+    ).toBeVisible({ timeout: 30_000 });
     await page.waitForTimeout(HOME_MEDIA_SNAPSHOT_MS);
 
     const stats = await collectHomeMediaStats(page);

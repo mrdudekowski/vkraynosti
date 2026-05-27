@@ -37,6 +37,40 @@ export const SCHEDULE_HEADERS = [
   'Комментарий',
 ];
 
+/** Строк данных каталога (2…N) с запасом под ручные добавления менеджером. */
+export const CATALOG_MAX_DATA_ROW = 80;
+
+/** Строк расписания на сезон (sync: GAS MAX_SCHEDULE_DATA_ROWS). */
+export const SCHEDULE_MAX_DATA_ROWS = 150;
+
+/** Листы служебные (не трогать GAS-экспортом). */
+export const META_SHEET_INSTRUCTION = '_Инструкция';
+export const META_SHEET_AUDIT = '_Проверка';
+
+/** Пары листов каталог ↔ расписание (порядок сезонов). */
+export const CATALOG_SCHEDULE_PAIRS = [
+  [CATALOG_SHEETS.winter, SCHEDULE_SHEETS.winter],
+  [CATALOG_SHEETS.spring, SCHEDULE_SHEETS.spring],
+  [CATALOG_SHEETS.summer, SCHEDULE_SHEETS.summer],
+  [CATALOG_SHEETS.fall, SCHEDULE_SHEETS.fall],
+];
+
+/**
+ * @param {string} catalogSheetName
+ * @returns {string}
+ */
+export function catalogDataRange(catalogSheetName) {
+  return sheetRange(catalogSheetName, `$A$2:$D$${CATALOG_MAX_DATA_ROW}`);
+}
+
+/**
+ * @param {string} catalogSheetName
+ * @returns {string}
+ */
+export function catalogPickRange(catalogSheetName) {
+  return sheetRange(catalogSheetName, `$E$2:$E$${CATALOG_MAX_DATA_ROW}`);
+}
+
 /** Значения выпадающего списка «Статус» (без запятых внутри). */
 export const STATUS_VALUES = ['запланирован', 'набор открыт', 'мест нет', 'отменён', 'завершился'];
 

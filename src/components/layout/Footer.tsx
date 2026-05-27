@@ -1,13 +1,20 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons/faEnvelope';
-import { faPhone } from '@fortawesome/free-solid-svg-icons/faPhone';
-import { faTelegram } from '@fortawesome/free-brands-svg-icons/faTelegram';
-import { faVk } from '@fortawesome/free-brands-svg-icons/faVk';
+import ContactMessengerLogo from '../icons/ContactMessengerLogo';
+import SeasonLinkLabel from '../shared/SeasonLinkLabel';
 import { UI } from '../../constants/ui';
 import { CONTACTS } from '../../constants/contacts';
 import { ROUTES } from '../../constants/routes';
 import { toSafeExternalHttpHref, toSafeMailtoHref, toSafePhoneHref } from '../../utils/safeHref';
+import type { Season } from '../../types';
+
+const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] = [
+  { season: 'winter', to: ROUTES.WINTER, hoverClass: 'hover:text-season-winter' },
+  { season: 'spring', to: ROUTES.SPRING, hoverClass: 'hover:text-season-spring' },
+  { season: 'summer', to: ROUTES.SUMMER, hoverClass: 'hover:text-season-summer' },
+  { season: 'fall', to: ROUTES.FALL, hoverClass: 'hover:text-season-fall' },
+];
 
 const Footer = () => (
   <footer className="bg-home-season-banner-stage text-text-inverse">
@@ -42,42 +49,20 @@ const Footer = () => (
                 </Link>
               </li>
             ))}
-            <li>
-              <Link
-                to={ROUTES.WINTER}
-                className="text-text-inverse/60 hover:text-season-winter transition-colors duration-hover text-sm"
-                prefetch="intent"
-              >
-                {UI.seasons.winter.emoji} {UI.seasons.winter.label}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={ROUTES.SPRING}
-                className="text-text-inverse/60 hover:text-season-spring transition-colors duration-hover text-sm"
-                prefetch="intent"
-              >
-                {UI.seasons.spring.emoji} {UI.seasons.spring.label}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={ROUTES.SUMMER}
-                className="text-text-inverse/60 hover:text-season-summer transition-colors duration-hover text-sm"
-                prefetch="intent"
-              >
-                {UI.seasons.summer.emoji} {UI.seasons.summer.label}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={ROUTES.FALL}
-                className="text-text-inverse/60 hover:text-season-fall transition-colors duration-hover text-sm"
-                prefetch="intent"
-              >
-                {UI.seasons.fall.emoji} {UI.seasons.fall.label}
-              </Link>
-            </li>
+            {FOOTER_SEASON_LINKS.map(({ season, to, hoverClass }) => (
+              <li key={season}>
+                <Link
+                  to={to}
+                  className={[
+                    'inline-flex items-center gap-1.5 text-text-inverse/60 transition-colors duration-hover text-sm',
+                    hoverClass,
+                  ].join(' ')}
+                  prefetch="intent"
+                >
+                  <SeasonLinkLabel season={season} />
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -89,7 +74,7 @@ const Footer = () => (
               href={toSafePhoneHref(CONTACTS.PHONE_HREF)}
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
-              <FontAwesomeIcon icon={faPhone} className="w-4 h-4" />
+              <ContactMessengerLogo variant="phone" className="h-4 w-4 shrink-0 object-contain" />
               {CONTACTS.PHONE_NUMBER}
             </a>
             <a
@@ -106,7 +91,7 @@ const Footer = () => (
               referrerPolicy="no-referrer"
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
-              <FontAwesomeIcon icon={faTelegram} className="w-4 h-4" />
+              <ContactMessengerLogo variant="telegram" className="h-4 w-4 shrink-0 object-contain" />
               {CONTACTS.TELEGRAM_HANDLE}
             </a>
             <a
@@ -116,7 +101,7 @@ const Footer = () => (
               referrerPolicy="no-referrer"
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
-              <FontAwesomeIcon icon={faVk} className="w-4 h-4" />
+              <ContactMessengerLogo variant="max" className="h-4 w-4 shrink-0 object-contain" />
               {UI.contact.max}
             </a>
           </div>

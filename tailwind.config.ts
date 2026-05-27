@@ -30,7 +30,28 @@ import {
 } from './src/constants/seasonPrimaryButton'
 import { HOME_HERO_CEILING_BOUNCE_DURATION_MS } from './src/constants/homeHeroCeiling'
 import { HOME_NAVBAR_CHROME_TRANSITION_MS } from './src/constants/homeNavbarChrome'
+import {
+  HOME_HERO_CONTACT_RAIL_FLOAT_AMPLITUDE_PX,
+  HOME_HERO_CONTACT_RAIL_FLOAT_DURATION_MS,
+  HOME_HERO_CONTACT_RAIL_TRANSITION_MS,
+} from './src/constants/homeHeroContactRail'
+import {
+  HOME_CONTACT_MESSENGER_GLOW_MAX,
+  HOME_CONTACT_MESSENGER_GLOW_PHONE,
+  HOME_CONTACT_MESSENGER_GLOW_TELEGRAM,
+  HOME_CONTACT_MESSENGER_GLOW_WHATSAPP,
+  HOME_CONTACT_MESSENGER_ICON_FILL_MAX,
+  HOME_CONTACT_MESSENGER_ICON_FILL_PHONE,
+  HOME_CONTACT_MESSENGER_ICON_FILL_TELEGRAM,
+  HOME_CONTACT_MESSENGER_ICON_FILL_WHATSAPP,
+} from './src/constants/homeContactMessengerGlow'
 import { HOME_GATE_SCROLL_HINT_FADE_MS } from './src/constants/homeGateScroll'
+import {
+  HOME_CONTACT_SECTION_BG_HEX,
+  HOME_CONTACT_SECTION_BUTTON_SIZE,
+  HOME_CONTACT_SECTION_GAP_SIZE,
+  HOME_CONTACT_SECTION_ICON_SIZE,
+} from './src/constants/homeContactSection'
 import { HOME_GATE_START_SCREEN_HEX } from './src/constants/homeGateSurface'
 import {
   MODAL_CHUNK_LOADER_DURATION_MS,
@@ -42,11 +63,23 @@ import {
 } from './src/constants/galleryGridVideoLoop'
 import {
   BREAKPOINT_2XL_PX,
+  BREAKPOINT_BELOW_NAV_DESKTOP_MAX_PX,
   BREAKPOINT_LG_PX,
   BREAKPOINT_MD_PX,
+  BREAKPOINT_META_MIN_PX,
+  BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX,
+  BREAKPOINT_NAV_DESKTOP_PX,
+  BREAKPOINT_PHONE_LG_PX,
+  BREAKPOINT_PHONE_PX,
+  BREAKPOINT_SEASON_BELOW_MD_MAX_PX,
+  BREAKPOINT_SEASON_MD_PX,
   BREAKPOINT_SM_PX,
+  BREAKPOINT_TABLET_PX,
+  BREAKPOINT_TEAM_HERO_BELOW_DESKTOP_MAX_PX,
   BREAKPOINT_TEAM_HERO_DESKTOP_PX,
+  BREAKPOINT_TOUR_COVER_WIDE_PX,
   BREAKPOINT_XL_PX,
+  BREAKPOINT_XS_PX,
 } from './src/constants/breakpoints'
 import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
 import { TOUR_CARD_SKELETON_SHIMMER_MS } from './src/constants/tourCardSkeletonShimmer'
@@ -100,6 +133,14 @@ import {
   TEAM_HERO_TEXT_STAGGER_DURATION_MS,
   TEAM_HERO_TEXT_STAGGER_TRANSLATE_Y_REM,
 } from './src/constants/teamHeroAnimation'
+import {
+  TOUR_DETAIL_HERO_CAPTION_Z_INDEX,
+  TOUR_DETAIL_HERO_GRADIENT_Z_INDEX,
+} from './src/constants/tourDetailHeroStack'
+import {
+  TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
+  TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
+} from './src/constants/tourCalendarLayout'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -334,228 +375,40 @@ const SEASON_PAGE_ATMOSPHERE = {
 } as const
 
 const config: Config = {
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  content: ['./index.html', './src/**/*.{ts,tsx}', './src/index.css'],
   safelist: [
     { pattern: /^(h|min-h|w)-nav-season-(circle|icon)-(fixed|fluid)$/, variants: ['md', 'max'] },
-    // @apply в index.css не подхватывает кастомные font-*; в JSX классы нужны в билде.
-    'font-heading',
-    'font-hero-heading',
-    'font-brand-wordmark',
-    'font-hero-carousel-phrase',
-    'text-brand-wordmark-nav',
-    'text-tour-detail-section',
-    'text-tour-detail-prose',
-    'text-tour-detail-hero-subtitle',
-    'text-tour-detail-program-heading',
-    'lg:text-tour-detail-section',
-    'sm:text-tour-detail-hero-subtitle',
-    'sm:text-tour-detail-prose',
-    'sm:text-tour-detail-program-heading',
-    'team-hero-desktop:text-tour-detail-hero-subtitle',
-    'team-hero-desktop:text-tour-detail-prose',
-    'team-hero-desktop:text-tour-detail-program-heading',
-    'text-tour-detail-program-body',
-    'text-tour-detail-meta',
-    'text-tour-detail-meta-prominent',
-    'text-tour-detail-meta-price-prominent',
-    'text-tour-detail-included-icon-idle-horizontal',
-    'text-tour-detail-included-icon-active-horizontal',
-    'text-safety-status-plaque',
-    'text-safety-status-plaque-mobile',
-    'line-clamp-2',
-    'text-home-season-strip-label',
-    'font-home-season-banner',
-    'text-home-season-banner-letter',
-    'text-home-hero-document-title',
-    'text-home-hero-carousel-phrase',
-    'max-w-home-hero-phrase',
-    'drop-shadow-home-season-banner-letter',
-    'z-home-season-banner',
-    'z-30',
-    'z-home-gate-letterbox',
-    'z-home-gate-glow',
-    'z-home-gate-return-veil',
-    'z-home-gate-scroll-hint',
-    'pb-home-gate-scroll-hint-bottom',
-    'px-home-gate-scroll-hint-pad-x',
-    'py-home-gate-scroll-hint-pad-y',
-    'min-h-home-gate-scroll-hint-target',
-    'min-w-home-gate-scroll-hint-target',
-    'h-home-gate-scroll-hint-icon',
-    'w-home-gate-scroll-hint-icon',
-    'motion-safe:animate-home-gate-scroll-hint-bob',
-    'duration-home-gate-scroll-hint-fade',
-    'bg-home-gate-letterbox',
-    'bg-home-gate-start-screen',
-    'min-h-home-gate-viewport',
-    'min-h-app-viewport',
-    'pt-navbar-chrome',
-    'pt-safe-top',
-    'top-navbar-chrome',
-    'top-safe-top',
-    '-top-safe-top',
-    'z-home-hero',
-    'z-home-team-backdrop',
-    'max-h-team-hero-portrait-mobile',
-    'max-h-team-hero-portrait-desktop',
-    'team-hero-desktop:max-h-team-hero-portrait-desktop',
-    'team-hero-desktop:grid-cols-[auto_minmax(0,1fr)]',
-    'team-hero-desktop:gap-x-team-hero-desktop',
-    'team-hero-desktop:mx-auto',
-    'team-hero-desktop:max-w-team-hero-slide',
-    'team-hero-desktop:w-full',
-    'gap-y-team-hero-slide-mobile-row-gap',
-    'flex',
-    'flex-col',
-    'gap-team-hero-members-stack-mobile',
-    'team-hero-desktop:gap-team-hero-members',
-    'lg:gap-team-hero-members-lg',
-    'team-hero-desktop:pb-team-hero-first-member-bottom-sm',
-    'md:pb-team-hero-first-member-bottom-md',
-    'lg:pb-team-hero-first-member-bottom-lg',
-    'leading-team-hero-bio',
-    'team-hero-desktop:leading-team-hero-bio',
-    'md:leading-team-hero-bio',
-    'lg:leading-team-hero-bio',
-    'team-hero-desktop:grid-cols-[minmax(0,1fr)_auto]',
-    'team-hero-desktop:col-start-1',
-    'team-hero-desktop:col-start-2',
-    'team-hero-desktop:-mt-team-hero-staircase-offset-sm',
-    'md:-mt-team-hero-staircase-offset-md',
-    'lg:-mt-team-hero-staircase-offset-lg',
-    'team-hero-desktop:overflow-visible',
-    'team-hero-desktop:z-10',
-    'team-hero-desktop:relative',
-    'team-hero-desktop:px-0',
-    'team-hero-desktop:pb-8',
-    'team-hero-desktop:pb-0',
-    'team-hero-desktop:items-end',
-    'team-hero-desktop:items-start',
-    'team-hero-desktop:pt-0',
-    'team-hero-desktop:space-y-3',
-    'team-hero-desktop:text-tour-detail-program-heading',
-    'team-hero-desktop:text-tour-detail-hero-subtitle',
-    'team-hero-desktop:text-tour-detail-prose',
-    'team-hero-desktop:block',
-    'gap-x-team-hero-desktop',
-    'w-fit',
-    'w-full',
-    'justify-self-center',
-    'motion-safe:animate-team-hero-text-stagger-in',
-    'duration-home-navbar-chrome',
-    'bg-home-gate-return-veil',
-    'top-navbar',
-    'duration-home-season-banner-crossfade',
-    'duration-home-season-banner-strip-in',
-    'duration-home-season-banner-letter-exit',
-    'duration-home-season-banner-letter-in',
-    'scale-home-season-banner-loop',
-    'animate-home-season-banner-letter-wave-exit',
-    'animate-home-season-banner-wordmark-shimmer',
-    'animate-home-hero-ceiling-bounce',
-    'bg-home-season-banner-wordmark-winter',
-    'bg-home-season-banner-wordmark-spring',
-    'bg-home-season-banner-wordmark-summer',
-    'bg-home-season-banner-wordmark-fall',
-    'bg-home-season-banner-wordmark-grid',
-    'aspect-home-season-banner-inner',
-    'min-h-home-season-banner-inner',
-    'bg-home-season-banner-stage',
-    'from-home-season-strip-btn-from',
-    'to-home-season-strip-btn-to',
+    { pattern: /^max-h-safety-status-stack-\d+$/, variants: ['sm'] },
     {
       pattern:
         /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13|-summer-1-cover|-summer-7-cover)?$/,
       variants: ['lg'],
     },
-    'object-tour-detail-hero-spring-3-tight',
-    'object-tour-detail-hero-spring-3-wide',
-    'object-tour-detail-hero-desktop-spring-3-wide',
-    'object-tour-card-cover-spring-3-tight',
-    'object-tour-card-cover-spring-3-wide',
-    'object-tour-card-cover-desktop-spring-3-wide',
-    'min-[620px]:object-tour-detail-hero-spring-3-wide',
-    'min-[620px]:object-tour-card-cover-spring-3-wide',
-    'lg:object-tour-detail-hero-desktop-spring-3-wide',
-    'lg:object-tour-card-cover-desktop-spring-3-wide',
-    'object-tour-detail-hero-spring-6-tight',
-    'object-tour-detail-hero-spring-6-wide',
-    'object-tour-card-cover-spring-6-tight',
-    'object-tour-card-cover-spring-6-wide',
-    'object-tour-detail-hero-desktop-spring-6-wide',
-    'object-tour-card-cover-desktop-spring-6-wide',
-    'min-[620px]:object-tour-detail-hero-spring-6-wide',
-    'min-[620px]:object-tour-card-cover-spring-6-wide',
-    'lg:object-tour-detail-hero-desktop-spring-6-wide',
-    'lg:object-tour-card-cover-desktop-spring-6-wide',
-    'object-gallery-winter-4-gora',
-    'object-gallery-gamova-view7',
-    'object-gallery-gamova-rocks',
-    'object-gallery-gamova-view3',
-    'object-gallery-summer-1-clip4-tall',
-    'object-tour-detail-hero-summer-1-cover',
-    'lg:object-tour-detail-hero-desktop-summer-1-cover',
-    'object-tour-detail-hero-summer-7-cover',
-    'lg:object-tour-detail-hero-desktop-summer-7-cover',
-    'object-home-season-banner-spring-loop',
-    'bg-preface-winter-3-boarder',
     { pattern: /^animate-tour-included-/ },
     { pattern: /^drop-shadow-tour-included-hover-/ },
     { pattern: /^shadow-season-strip-hover-(winter|spring|summer|fall)$/ },
     { pattern: /^text-tourIncludedIcon-active-/ },
-    /** Чтобы `@keyframes cta-letter-pop` попали в бандл (используются из `index.css`, не из утилит). */
-    'animate-cta-letter-pop',
-    'animate-tour-meta-stagger-in',
-    'motion-safe:animate-media-placeholder-shimmer',
-    'motion-safe:animate-tour-card-skeleton-sheen',
-    'h-safety-status-plaque',
-    'h-safety-status-plaque-mobile',
-    'h-safety-status-checkbox-mobile',
-    'w-safety-status-checkbox-mobile',
-    'h-safety-status-checkbox-sm-mobile',
-    'w-safety-status-checkbox-sm-mobile',
-    'h-safety-status-stack',
-    'min-h-safety-status-stack',
-    'max-h-safety-status-stack-1',
-    'max-h-safety-status-stack-2',
-    'max-h-safety-status-stack-3',
-    'max-h-safety-status-stack-4',
-    'max-h-safety-status-stack-5',
-    'max-h-safety-status-stack-6',
-    'duration-safety-stack-expand',
-    'duration-safety-plaque-enter',
-    'transition-[max-height]',
-    'ease-reveal-out',
-    'translate-x-safety-plaque-enter-x',
-    'motion-safe:animate-safety-plaque-enter',
-    'h-safety-status-checkbox',
-    'w-safety-status-checkbox',
-    'h-safety-status-checkbox-sm',
-    'w-safety-status-checkbox-sm',
-    'duration-safety-checkbox-grow',
-    'sm:order-1',
-    'sm:order-2',
-    'team-hero-text-stagger',
-    'motion-safe:animate-safety-status-checkbox-pulse',
-    'safety-status-plaque-checkbox',
-    'safety-status-plaque-checkbox--small',
-    'safety-status-plaque-checkbox--full',
-    'safety-status-plaque-checkbox--checked',
-    'delay-tour-meta-0',
-    'delay-tour-meta-1',
-    'delay-tour-meta-2',
-    /** `SEASON_PAGE_*` в `seasonTheme.ts` — только строковая подстановка по сезону. */
     { pattern: /^bg-season-page-(winter|spring|summer|fall)$/ },
     { pattern: /^bg-season-page-atmosphere-(winter|spring|summer|fall)$/ },
     { pattern: /^bg-home-page-sky-(winter|spring|summer|fall)$/ },
-    /** `TEAM_SECTION_DIVIDER_CLASS` — градиентная линия над «Команда». */
     { pattern: /^bg-team-section-divider-(winter|spring|summer|fall)$/ },
     { pattern: /^bg-season-chrome-text-(winter|spring|summer|fall)$/ },
     { pattern: /^bg-season-accent-bar-(winter|spring|summer|fall)$/ },
     { pattern: /^drop-shadow-season-chrome-icon-(winter|spring|summer|fall)$/ },
-    'max-w-team-section-divider',
-    'blur-season-page-soft',
-    'opacity-season-page-atmosphere',
+    'animate-cta-letter-pop',
+    'animate-tour-meta-stagger-in',
+    'delay-tour-meta-0',
+    'delay-tour-meta-1',
+    'delay-tour-meta-2',
+    'duration-safety-checkbox-grow',
+    'h-safety-status-checkbox',
+    'h-safety-status-checkbox-sm',
+    'motion-safe:animate-media-placeholder-shimmer',
+    'motion-safe:animate-safety-plaque-enter',
+    'motion-safe:animate-team-hero-text-stagger-in',
+    'motion-safe:animate-tour-card-skeleton-sheen',
+    'w-safety-status-checkbox',
+    'w-safety-status-checkbox-sm',
   ],
   theme: {
     extend: {
@@ -617,6 +470,8 @@ const config: Config = {
         'home-gate-letterbox': SURFACE_DARK_HEX,
         /** Стартовый экран ворот: сплошной фон под баннером (синхронно с `HOME_GATE_START_SCREEN_HEX`). */
         'home-gate-start-screen': HOME_GATE_START_SCREEN_HEX,
+        /** Секция `#contact` на главной (`HOME_CONTACT_SECTION_BG_HEX`). */
+        'home-contact-section': HOME_CONTACT_SECTION_BG_HEX,
         'home-gate-return-veil': SURFACE_DARK_HEX,
         /**
          * Градиент кругов `SeasonSwitcher` в секции главной (на светлой полосе под баннером):
@@ -671,6 +526,8 @@ const config: Config = {
         messenger: {
           whatsapp: '#25D366',
           telegram: '#229ED9',
+          /** Hover иконки звонка в `HomeHeroContactRail` (без цветной подложки). */
+          phone: '#E53935',
           max: '#6BAEF7',
           /** Фиолетово-синий для свечения выбранного MAX (см. `drop-shadow-messenger-max-selected`). */
           maxGlow: '#6366F1',
@@ -756,7 +613,7 @@ const config: Config = {
           { lineHeight: '1.2' },
         ],
         /**
-         * Подпись-фраза тура в hero (`HeroCarousel`): clamp по ширине вьюпорта, переносы через утилиты в JSX.
+         * Подпись-фраза тура в hero (`HeroCarousel`): clamp по ширине вьюпорта; переносы — `text-balance`, `hyphens-none` в JSX.
          */
         'home-hero-carousel-phrase': [
           'clamp(0.9375rem, 2.8vw + 0.55rem, 2rem)',
@@ -835,6 +692,21 @@ const config: Config = {
         'team-section-divider-spring': buildTeamSectionDividerGradient('spring'),
         'team-section-divider-summer': buildTeamSectionDividerGradient('summer'),
         'team-section-divider-fall': buildTeamSectionDividerGradient('fall'),
+        /**
+         * Круг hover MAX в `HomeHeroContactRail`: `colors.messenger.max` → `maxGlow`.
+         */
+        'messenger-max-rail':
+          'linear-gradient(135deg, #6BAEF7 0%, #6366F1 100%)',
+        /** Radial hover под icon-only контактами — см. `.home-contact-messenger-btn` в `index.css`. */
+        'home-contact-messenger-glow-phone': HOME_CONTACT_MESSENGER_GLOW_PHONE,
+        'home-contact-messenger-glow-telegram': HOME_CONTACT_MESSENGER_GLOW_TELEGRAM,
+        'home-contact-messenger-glow-whatsapp': HOME_CONTACT_MESSENGER_GLOW_WHATSAPP,
+        'home-contact-messenger-glow-max': HOME_CONTACT_MESSENGER_GLOW_MAX,
+        /** Заливка «чаши» иконки на hover — см. `.home-contact-messenger-icon-well` в `index.css`. */
+        'home-contact-messenger-icon-fill-phone': HOME_CONTACT_MESSENGER_ICON_FILL_PHONE,
+        'home-contact-messenger-icon-fill-telegram': HOME_CONTACT_MESSENGER_ICON_FILL_TELEGRAM,
+        'home-contact-messenger-icon-fill-whatsapp': HOME_CONTACT_MESSENGER_ICON_FILL_WHATSAPP,
+        'home-contact-messenger-icon-fill-max': HOME_CONTACT_MESSENGER_ICON_FILL_MAX,
       },
       backgroundSize: {
         /**
@@ -850,6 +722,8 @@ const config: Config = {
       opacity: {
         /** Непрозрачность радиального слоя перед `blur-season-page-soft`. */
         'season-page-atmosphere': '0.42',
+        /** Декоративный знак `HomeTeamContactBrandBridge`. */
+        'home-team-contact-bridge-mark': '0.5',
       },
       aspectRatio: {
         /** Первый ряд фотогалереи тура (широкий кадр под героем страницы). */
@@ -1048,16 +922,26 @@ const config: Config = {
         /** Подъём фото второго блока на lg+. */
         'team-hero-staircase-offset-lg': TEAM_HERO_STAIRCASE_OFFSET_LG,
         'section-y': '6rem',
+        /** Вертикальные отступы `HomeTeamContactBrandBridge`. */
+        'home-team-contact-bridge': 'clamp(2rem, 6vw, 3.5rem)',
+        /** Зазор divider → знак в bridge. */
+        'home-team-contact-bridge-divider-gap': '1.25rem',
         'card-p':    '1.75rem',
         'tooltip-gap': '0.375rem',
         'tooltip-x':   '0.625rem',
         'tooltip-y':   '0.375rem',
         'hero-phrase-cta-gap': '2.5rem',
+        /** Горизонтальный gap между кнопками `HomeHeroContactRail`. */
+        'home-hero-contact-rail': '0.25rem',
+        /** Горизонтальный gap между кнопками в `#contact` (+30% к rail gap). */
+        'home-contact-section': HOME_CONTACT_SECTION_GAP_SIZE,
         /**
-         * Home hero carousel: горизонтальный паддинг подписи/CTA на узких экранах.
-         * ≥ `left-4` + `w-12` кнопки навигации + небольшой зазор, чтобы текст не заходил под стрелки.
+         * Home hero carousel: горизонтальный паддинг подписи/CTA при стрелках (`lg+` в `HeroCarousel`).
+         * На mobile — `px-12` (≈ порог свайпа); ≥ `left-4` + `w-12` кнопки + зазор.
          */
         'home-hero-carousel-text-gutter-x': '4.5rem',
+        /** Зазор под navbar для `HomeHeroContactRail` (`top: calc(var(--navbar-chrome-height) + …)`). */
+        'home-hero-contact-rail-top-gap': '0.375rem',
         /** Зазор между списком ссылок (`nav-desktop:flex`) и блоком SeasonSwitcher+CTA в Navbar. */
         'navbar-nav-to-season': 'clamp(1rem, 2vw, 2rem)',
         /** Смещение по Y для scroll-reveal (translateY). */
@@ -1108,6 +992,14 @@ const config: Config = {
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
         /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`), увеличена в 2 раза. */
         'home-gate-scroll-hint-icon': '2.75rem',
+        /** Круглая icon-only кнопка в `HomeHeroContactRail` (~44px). */
+        'home-hero-contact-rail-button': '2.75rem',
+        /** Визуальный размер иконки внутри rail-кнопки (единый источник для phone/telegram/max). */
+        'home-hero-contact-rail-icon': '1.5rem',
+        /** Круглая icon-only кнопка в `#contact` (+30% к rail). */
+        'home-contact-section-button': HOME_CONTACT_SECTION_BUTTON_SIZE,
+        /** Иконка внутри кнопки `#contact`. */
+        'home-contact-section-icon': HOME_CONTACT_SECTION_ICON_SIZE,
         /** Hero страницы тура (карусель фото + градиент под заголовок). */
         'tour-detail-hero': 'clamp(28rem, 58vh, 48rem)',
         /** Одна плашка стека #safety (6 шт. + gap в max-h-tour-card). */
@@ -1123,6 +1015,14 @@ const config: Config = {
         'safety-status-checkbox-sm': SAFETY_STATUS_CHECKBOX_SIZE_SM,
         /** Иконка стрелки вниз на воротах (`HomeGateScrollToHeroLink`), увеличена в 2 раза. */
         'home-gate-scroll-hint-icon': '2.75rem',
+        /** Круглая icon-only кнопка в `HomeHeroContactRail` (~44px). */
+        'home-hero-contact-rail-button': '2.75rem',
+        /** Визуальный размер иконки внутри rail-кнопки (единый источник для phone/telegram/max). */
+        'home-hero-contact-rail-icon': '1.5rem',
+        /** Круглая icon-only кнопка в `#contact` (+30% к rail). */
+        'home-contact-section-button': HOME_CONTACT_SECTION_BUTTON_SIZE,
+        /** Иконка внутри кнопки `#contact`. */
+        'home-contact-section-icon': HOME_CONTACT_SECTION_ICON_SIZE,
         'nav-season-circle-fixed': '2.25rem',
         'nav-season-circle-fluid':
           'clamp(1.75rem, 1.75rem + (100vw - 20rem) * 0.0444, 2.25rem)',
@@ -1130,10 +1030,11 @@ const config: Config = {
         'nav-season-icon-fluid':
           'clamp(0.75rem, 0.75rem + (100vw - 20rem) * 0.0222, 1rem)',
         /**
-         * Выдвижная панель бургер-меню (`Navbar`): не шире `max-w-sm` (24rem), на узких экранах — 100vw.
-         * Синхронно с прежним `w-[min(100vw,theme(maxWidth.sm))]`.
+         * Выдвижная панель бургер-меню (`Navbar`): всегда уже viewport (peek слева ≥~48px на 320).
+         * От `mobile-nav-drawer-compact` (640px) — уже, больше видимой зоны страницы.
          */
-        'mobile-nav-drawer': 'min(100vw, 24rem)',
+        'mobile-nav-drawer': 'min(85vw, 24rem)',
+        'mobile-nav-drawer-compact': 'min(70vw, 22rem)',
       },
       maxHeight: {
         ...SAFETY_STATUS_STACK_MAX_HEIGHT_BY_COUNT,
@@ -1167,16 +1068,23 @@ const config: Config = {
         'team-section-divider': '28rem',
         /** Декоративный графический знак за контентом секции контактов (`ContactSection`); кап ×2 к прежнему 22rem. */
         'contact-section-mark': 'min(96vw, 44rem)',
+        /** Эмблема VKRAI в `HomeTeamContactBrandBridge`. */
+        'home-team-contact-bridge-mark': 'min(92vw, 36rem)',
+        /** Плашка CTA в `#contact` (`homeContactSection`). */
         /** Единая максимальная ширина карточки тура в сетке главной. */
         'tour-card': '22rem',
         /** Блок подписи/CTA карусели в hero: не шире контента и вьюпорта. */
-        'home-hero-phrase': 'min(100%, min(42rem, 92vw))',
+        'home-hero-phrase': 'min(100%, min(44rem, 96vw))',
         /** Слайд team-hero на sm+: центрирование, колонка bio получает `1fr` внутри заданной ширины. */
         'team-hero-slide': TEAM_HERO_SLIDE_MAX_WIDTH,
+        /** Кнопка дня в `DayPicker` (`tourCalendarClassNames`). */
+        'tour-calendar-day-cell': TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
       },
       minHeight: {
         /** Минимальная высота круглой кнопки «к hero» на воротах (`min-w-home-gate-scroll-hint-target`). */
         'home-gate-scroll-hint-target': '2.75rem',
+        /** Панель «выберите дату» (`TourCalendarDayPanel`). */
+        'tour-calendar-day-panel': TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
         /** Минимальная высота прямоугольника баннера внутри ворот (адаптивно для mobile/tablet/desktop). */
         'home-season-banner-inner': 'clamp(8.5rem, 18vw, 12.5rem)',
         /** Плейсхолдер ячейки видео в сетке до готовности плеера (`GalleryGridVideo`). */
@@ -1192,6 +1100,8 @@ const config: Config = {
         'safety-status-stack': SAFETY_STATUS_STACK_HEIGHT,
         /** Полный вьюпорт ворот; navbar — оверлей (`Home`). */
         'home-gate-viewport': '100svh',
+        /** Декоративный знак `HomeTeamContactBrandBridge`. */
+        'home-team-contact-bridge-mark': 'clamp(8rem, 22vw, 14rem)',
         /** Корневой layout: стабильная высота экрана (iOS Safari). */
         'app-viewport': '100svh',
         /**
@@ -1232,7 +1142,7 @@ const config: Config = {
       dropShadow: {
         /**
          * Компактное свечение у выбранной иконки мессенджера (после клика), от контура иконки.
-         * Цвета = `colors.messenger.*` / `messenger.maxGlow`.
+         * Цвета = `colors.messenger.*` / `messenger.maxGlow`; `phone` — hover звонка в rail.
          */
         'messenger-whatsapp-selected':
           '0 0 4px rgba(37, 211, 102, 0.55), 0 0 10px rgba(37, 211, 102, 0.22)',
@@ -1288,15 +1198,22 @@ const config: Config = {
         'home-gate-letterbox': '82',
         /** Секция `#home-hero`: стек над следующими секциями при наложении. */
         'home-hero': '12',
+        /** `HomeHeroContactRail`: под navbar (100), над hero (12). */
+        'home-hero-contact-rail': '99',
         'home-gate-glow': '83',
         'home-gate-return-veil': '84',
         /** Кнопка «к hero» на стартовом экране — над баннером (`z-home-season-banner` ниже). */
         'home-gate-scroll-hint': '25',
         /** Штора зоны «Команда» на главной: между небом (z-0) и контентом (z-10). */
         'home-team-backdrop': '5',
+        /** Переход team → contact: над backdrop, под `#contact`. */
+        'home-team-contact-bridge': '6',
         /** Стек двух `<video>` в `GalleryGridVideo` (seamless loop): нижний кадр под верхним. */
         'gallery-grid-video-loop-under': '1',
         'gallery-grid-video-loop-over': '2',
+        /** `TourDetailHero`: градиент над фото, подпись поверх градиента. */
+        'tour-detail-hero-gradient': `${TOUR_DETAIL_HERO_GRADIENT_Z_INDEX}`,
+        'tour-detail-hero-caption': `${TOUR_DETAIL_HERO_CAPTION_Z_INDEX}`,
       },
       transitionDuration: {
         'carousel':      '600ms',
@@ -1336,6 +1253,8 @@ const config: Config = {
         'home-season-banner-letter-in': `${HOME_SEASON_BANNER_LETTER_FADE_IN_MS}ms`,
         /** Navbar + SeasonNavDock: токен класса `duration-home-navbar-chrome` (на главной opacity transition отключён). */
         'home-navbar-chrome': `${HOME_NAVBAR_CHROME_TRANSITION_MS}ms`,
+        /** Enter/exit `HomeHeroContactRail` (синхрон с navbar chrome). */
+        'home-hero-contact-rail': `${HOME_HERO_CONTACT_RAIL_TRANSITION_MS}ms`,
         /** Рост чекбокса #safety; синхронно с `SAFETY_STATUS_CHECKBOX_GROW_MS`. */
         'safety-checkbox-grow': `${SAFETY_STATUS_CHECKBOX_GROW_MS}ms`,
         /** Рост стека плашек на mobile; синхронно с `SAFETY_STATUS_STACK_EXPAND_MS`. */
@@ -1500,6 +1419,13 @@ const config: Config = {
             transform: 'translateY(theme(spacing.home-gate-scroll-hint-bob-y))',
           },
         },
+        /** Левитация ряда `HomeHeroContactRail` в покое (внутренний слой, не enter/exit). */
+        'home-hero-contact-float': {
+          '0%, 100%': { transform: 'translate3d(0, 0, 0)' },
+          '50%': {
+            transform: `translate3d(0, -${HOME_HERO_CONTACT_RAIL_FLOAT_AMPLITUDE_PX}px, 0)`,
+          },
+        },
         /**
          * Hero: мягкая дуга к потолку (один пик, без второго «отскока» — нет конфликта с opacity-слайдами).
          * `translate3d` + полная амплитуда только в середине кривой timing на утилите анимации.
@@ -1567,6 +1493,7 @@ const config: Config = {
         'home-season-banner-letter-wave-exit': `home-season-banner-letter-wave-exit ${HOME_SEASON_BANNER_LETTER_EXIT_MS}ms ease-in-out forwards`,
         'home-season-banner-wordmark-shimmer': `home-season-banner-wordmark-shimmer ${HOME_SEASON_BANNER_WORDMARK_SHIMMER_MS}ms ease-in-out infinite alternate`,
         'home-hero-ceiling-bounce': `home-hero-ceiling-bounce ${HOME_HERO_CEILING_BOUNCE_DURATION} cubic-bezier(0.45, 0, 0.25, 1) forwards`,
+        'home-hero-contact-float': `home-hero-contact-float ${HOME_HERO_CONTACT_RAIL_FLOAT_DURATION_MS}ms ease-in-out infinite`,
         'home-gate-scroll-hint-bob': `home-gate-scroll-hint-bob ${HOME_GATE_SCROLL_HINT_BOB_DURATION} ease-in-out infinite`,
         'modal-chunk-loader-bubble': `modal-chunk-loader-bubble ${MODAL_CHUNK_LOADER_DURATION} linear infinite`,
         'media-placeholder-shimmer': `media-placeholder-shimmer ${MEDIA_PLACEHOLDER_SHIMMER_DURATION} ease-in-out infinite`,
@@ -1592,22 +1519,28 @@ const config: Config = {
         /**
          * Ряд «Срок / Сложность» (`TourDetailMetaFacts`): ниже 320px — столбец, от 320px — две колонки.
          */
-        'meta-min': '320px',
-        xs:         '360px',  // Small Androids
-        phone:      '375px',  // iPhone SE 2nd gen / mini class
-        'phone-lg': '390px',  // iPhone 14 Pro / Pixel 6
-        tablet:     '428px',  // iPhone Pro Max class
+        'meta-min': `${BREAKPOINT_META_MIN_PX}px`,
+        /** Spring-3/6 cover: tight → wide object-position (SSOT `BREAKPOINT_TOUR_COVER_WIDE_PX`). */
+        'tour-cover-wide': `${BREAKPOINT_TOUR_COVER_WIDE_PX}px`,
+        xs: `${BREAKPOINT_XS_PX}px`,
+        phone: `${BREAKPOINT_PHONE_PX}px`,
+        'phone-lg': `${BREAKPOINT_PHONE_LG_PX}px`,
+        tablet: `${BREAKPOINT_TABLET_PX}px`,
         /**
          * Дополняет `season-md` (min 500px): компактный dock, иконка сезона в navbar.
          * Не дублировать как `max-[499px]` — один порог задаётся здесь и в `season-md`.
          */
-        'season-below-md': { max: '499px' },
+        'season-below-md': { max: `${BREAKPOINT_SEASON_BELOW_MD_MAX_PX}px` },
         /** Подпись сезона в шапке и полный `SeasonSwitcher` в строке навбара. */
-        'season-md': '500px',
+        'season-md': `${BREAKPOINT_SEASON_MD_PX}px`,
         /** Ссылки Туры…Контакты, CTA в строке и бургер: ниже этого порога — мобильный режим навбара. */
-        'nav-desktop': '950px',
+        'nav-desktop': `${BREAKPOINT_NAV_DESKTOP_PX}px`,
+        /** Mobile/tablet navbar: скрытая полоса документа (`index.css`). */
+        'below-nav-desktop': { max: `${BREAKPOINT_BELOW_NAV_DESKTOP_MAX_PX}px` },
+        /** Уже drawer бургер-меню (`breakpoints.ts`, 640px). */
+        'mobile-nav-drawer-compact': `${BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX}px`,
         /** Секция «Команда»: mobile ≤649px, desktop grid с 650px (`breakpoints.ts`). */
-        'team-hero-below-desktop': { max: `${BREAKPOINT_TEAM_HERO_DESKTOP_PX - 1}px` },
+        'team-hero-below-desktop': { max: `${BREAKPOINT_TEAM_HERO_BELOW_DESKTOP_MAX_PX}px` },
         'team-hero-desktop': `${BREAKPOINT_TEAM_HERO_DESKTOP_PX}px`,
       },
     },

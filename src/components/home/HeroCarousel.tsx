@@ -78,7 +78,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
               tour.title
             )}
           >
-            <div className="flex w-full max-w-home-hero-phrase mx-auto justify-center px-home-hero-carousel-text-gutter-x pb-24 md:px-4">
+            <div className="flex w-full max-w-home-hero-phrase mx-auto justify-center px-12 pb-24 sm:px-8 md:px-6 lg:px-home-hero-carousel-text-gutter-x">
               <Link
                 to={buildTourDetailPath(tour.season, tour.id)}
                 className="text-center group flex min-w-0 w-full max-w-full flex-col items-center gap-hero-phrase-cta-gap"
@@ -87,7 +87,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
                 prefetch="intent"
               >
                 <p
-                  className="font-hero-carousel-phrase text-home-hero-carousel-phrase font-normal text-text-inverse hero-carousel-phrase-text-shadow w-full min-w-0 max-w-full text-pretty break-words hyphens-auto"
+                  className="font-hero-carousel-phrase text-home-hero-carousel-phrase font-normal text-text-inverse hero-carousel-phrase-text-shadow w-full min-w-0 max-w-full hyphens-none text-balance"
                 >
                   {tour.heroPhrase}
                 </p>

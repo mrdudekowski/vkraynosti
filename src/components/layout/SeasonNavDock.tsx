@@ -9,6 +9,8 @@ import {
   SEASON_STYLE,
   SEASON_TEXT_CLASS,
 } from '../../constants/seasonNavbarAppearance';
+import { computeHomeNavbarEffectiveTopChromeOpacity } from '../../constants/homeNavbarBridgeChrome';
+import { homeNavbarChromeOpacityShellClass } from '../../constants/homeNavbarChrome';
 import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
 import { useSeason } from '../../context/useSeason';
@@ -89,11 +91,16 @@ const SeasonNavDock = () => {
   const slideTransition = reducedMotion
     ? 'duration-0'
     : 'transition-[max-height,transform] duration-season-dock-slide ease-out';
-  const dockShellTransition = homeChrome.disableTopChromeTransition
-    ? 'duration-0'
-    : 'transition-opacity duration-home-navbar-chrome ease-out';
+  const dockShellTransition = homeNavbarChromeOpacityShellClass(
+    homeChrome.disableTopChromeTransition
+  );
   const isHomePath = pathname === ROUTES.HOME;
-  const dockShellOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
+  const dockShellOpacity = isHomePath
+    ? computeHomeNavbarEffectiveTopChromeOpacity(
+        homeChrome.topChromeOpacity,
+        homeChrome.bridgeHideProgress
+      )
+    : 1;
   const dockShellPointerEvents =
     isHomePath && dockShellOpacity < 0.001 && !open ? 'pointer-events-none' : '';
   const dockVisibleOpacity = open ? 1 : dockShellOpacity;
@@ -105,8 +112,6 @@ const SeasonNavDock = () => {
       className={[
         `block season-md:hidden fixed left-0 right-0 z-season-dock ${dockTop}`,
         'overflow-hidden',
-        dockShellTransition,
-        dockShellPointerEvents,
         open ? 'will-change-transform' : '',
         slideTransition,
         open
@@ -115,10 +120,17 @@ const SeasonNavDock = () => {
       ].join(' ')}
     >
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-stack-base bg-home-gate-start-screen"
-      />
-      <div className="relative" style={{ opacity: dockVisibleOpacity }}>
+        className={[
+          'relative',
+          dockShellTransition,
+          open ? '' : dockShellPointerEvents,
+        ].join(' ')}
+        style={{ opacity: dockVisibleOpacity }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-stack-base bg-home-gate-start-screen"
+        />
         <div
           className={[
             'relative z-10 border-b',

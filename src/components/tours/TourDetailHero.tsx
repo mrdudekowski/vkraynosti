@@ -4,6 +4,12 @@ import ScrollScrubFade from '../shared/ScrollScrubFade';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons/faArrowLeft';
 import PlaceholderImage from '../shared/PlaceholderImage';
+import SeasonLinkLabel from '../shared/SeasonLinkLabel';
+import type { Season } from '../../types';
+import {
+  TOUR_DETAIL_HERO_CAPTION_SHELL_CLASS,
+  TOUR_DETAIL_HERO_GRADIENT_OVERLAY_CLASS,
+} from '../../constants/tourDetailHeroStack';
 
 interface TourDetailHeroProps {
   imageUrl: string;
@@ -11,7 +17,7 @@ interface TourDetailHeroProps {
   title: string;
   subtitle: string;
   backLinkTo: string;
-  backLinkLabel: string;
+  backLinkSeason: Season;
   /** Классы `object-position` на `lg+` (токены `object-tour-detail-hero-desktop*` из темы). */
   desktopHeroImgClassName?: string;
   /**
@@ -27,7 +33,7 @@ const TourDetailHeroComponent = ({
   title,
   subtitle,
   backLinkTo,
-  backLinkLabel,
+  backLinkSeason,
   desktopHeroImgClassName,
   heroImageObjectClassName,
 }: TourDetailHeroProps) => (
@@ -43,16 +49,16 @@ const TourDetailHeroComponent = ({
       loading="eager"
       fetchPriority="high"
     />
-    <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
-    <div className="absolute bottom-0 left-0 right-0 z-30 tour-detail-page-gutter py-tour-detail-hero-overlay-y">
+    <div className={TOUR_DETAIL_HERO_GRADIENT_OVERLAY_CLASS} />
+    <div className={TOUR_DETAIL_HERO_CAPTION_SHELL_CLASS}>
       <div className="tour-detail-page-measure flex flex-col gap-4">
         <Link
           to={backLinkTo}
           className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors duration-hover"
           prefetch="intent"
         >
-          <FontAwesomeIcon icon={faArrowLeft} />
-          {backLinkLabel}
+          <FontAwesomeIcon icon={faArrowLeft} aria-hidden />
+          <SeasonLinkLabel season={backLinkSeason} />
         </Link>
         <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-white">
           {title}

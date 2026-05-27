@@ -2,7 +2,13 @@ import { HOME_SAFETY_STATUS_ICONS } from '../constants/images';
 
 const rawSvgByUrl = new Map<string, Promise<string>>();
 
+const allowedSafetyStatusIconUrls = new Set<string>(HOME_SAFETY_STATUS_ICONS);
+
 export function fetchSafetyStatusIconSvg(url: string): Promise<string> {
+  if (!allowedSafetyStatusIconUrls.has(url)) {
+    return Promise.reject(new Error(`Disallowed safety status icon URL: ${url}`));
+  }
+
   const cached = rawSvgByUrl.get(url);
   if (cached) {
     return cached;

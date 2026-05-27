@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import TourRequestModal from './TourRequestModal';
 import { UI } from '../../constants/ui';
+import { WHATSAPP_LOGO } from '../../constants/images';
 import { sendTourRequestLead } from '../../services/sendTourRequestLead';
 
 const mockClose = vi.fn();
@@ -54,6 +55,28 @@ describe('TourRequestModal', () => {
     render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
     await user.click(screen.getByRole('presentation'));
     expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders messenger radios as selectable contact buttons', async () => {
+    const user = userEvent.setup();
+    render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
+
+    const whatsappLabel = screen.getByRole('radio', {
+      name: UI.tourRequestModal.messengerWhatsappAria,
+    }).closest('label');
+    expect(whatsappLabel).toHaveClass('home-contact-messenger-btn--selectable');
+    expect(whatsappLabel).toHaveClass('home-contact-messenger-btn--whatsapp');
+    expect(whatsappLabel?.querySelector('.home-contact-messenger-icon-well')).toBeInTheDocument();
+    expect(whatsappLabel?.querySelector(`img[src="${WHATSAPP_LOGO}"]`)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: UI.tourRequestModal.messengerTelegramAria }));
+
+    const telegramLabel = screen.getByRole('radio', {
+      name: UI.tourRequestModal.messengerTelegramAria,
+    }).closest('label');
+    expect(telegramLabel).toHaveClass('home-contact-messenger-btn--selectable');
+    expect(telegramLabel).toHaveClass('home-contact-messenger-btn--telegram');
+    expect(telegramLabel?.querySelector('.home-contact-messenger-icon-well')).toBeInTheDocument();
   });
 
   it('emits non-sensitive submit event on successful submit', async () => {

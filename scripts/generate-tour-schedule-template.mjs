@@ -15,13 +15,16 @@ import {
 } from './lib/seasonDates.mjs';
 import {
   CATALOG_HEADERS,
+  CATALOG_MAX_DATA_ROW,
   CATALOG_SHEETS,
+  catalogDataRange,
+  catalogPickRange,
   DATES_HEADERS,
   DATES_SHEETS,
   SCHEDULE_HEADERS,
+  SCHEDULE_MAX_DATA_ROWS,
   SCHEDULE_SHEETS,
   STATUS_LIST,
-  sheetRange,
 } from './lib/scheduleSheetLabels.mjs';
 import { catalogPickFormula, scheduleTourIdFormula } from './lib/tourPickFormula.mjs';
 
@@ -30,8 +33,8 @@ const outPath = path.join(__dirname, '../content/Calendar/vkraynosti-tour-schedu
 
 const SEASONS = ['winter', 'spring', 'summer', 'fall'];
 
-/** Строк расписания на сезон. */
-const SCHEDULE_ROW_COUNT = 120;
+/** Строк расписания на сезон (sync: SCHEDULE_MAX_DATA_ROWS). */
+const SCHEDULE_ROW_COUNT = SCHEDULE_MAX_DATA_ROWS;
 
 const DURATION_LIST = '"однодневный,многодневный"';
 
@@ -79,7 +82,6 @@ function addCatalogSheet(wb, sheetName, rows) {
   styleHeaderRow(ws.addRow([...CATALOG_HEADERS]), 'FF2D6A4F');
 
   const firstDataRow = 2;
-  const lastDataRow = firstDataRow + rows.length - 1;
 
   for (const row of rows) {
     const excelRow = ws.addRow([row.id, row.title, row.priceRub, row.durationType, null]);
@@ -92,11 +94,23 @@ function addCatalogSheet(wb, sheetName, rows) {
     );
   }
 
-  for (let r = firstDataRow; r <= lastDataRow; r++) {
+  const catalogDataSlots = CATALOG_MAX_DATA_ROW - firstDataRow + 1;
+  const reserveRows = Math.max(0, catalogDataSlots - rows.length);
+  for (let i = 0; i < reserveRows; i++) {
+    const emptyRow = ws.addRow([null, null, null, null, null]);
+    addListValidation(
+      emptyRow.getCell(4),
+      [DURATION_LIST],
+      'Тип тура',
+      'Выберите: однодневный или многодневный'
+    );
+  }
+
+  for (let r = firstDataRow; r <= CATALOG_MAX_DATA_ROW; r++) {
     ws.getCell(`E${r}`).value = { formula: catalogPickFormula(r) };
   }
 
-  return lastDataRow;
+  return CATALOG_MAX_DATA_ROW;
 }
 
 function addDatePickerValidation(ws, col, fromRow, toRow, season) {
@@ -151,7 +165,7 @@ function addDatesSheet(wb, sheetName, season) {
   return ws;
 }
 
-function addScheduleSheet(wb, scheduleSheetName, catalogSheetName, catalogLastRow, season) {
+function addScheduleSheet(wb, scheduleSheetName, catalogSheetName, _catalogLastRow, season) {
   const ws = wb.addWorksheet(scheduleSheetName);
   ws.views = [{ state: 'frozen', ySplit: 1, activeCell: 'A2' }];
 
@@ -169,8 +183,8 @@ function addScheduleSheet(wb, scheduleSheetName, catalogSheetName, catalogLastRo
 
   styleHeaderRow(ws.addRow([...SCHEDULE_HEADERS]), 'FF1A3C2E');
 
-  const catalogRange = sheetRange(catalogSheetName, `$A$2:$D$${catalogLastRow}`);
-  const pickRange = sheetRange(catalogSheetName, `$E$2:$E$${catalogLastRow}`);
+  const catalogRange = catalogDataRange(catalogSheetName);
+  const pickRange = catalogPickRange(catalogSheetName);
   const lastScheduleRow = SCHEDULE_ROW_COUNT + 1;
 
   for (let i = 0; i < SCHEDULE_ROW_COUNT; i++) {

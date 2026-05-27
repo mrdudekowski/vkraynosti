@@ -3,8 +3,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import { ROUTES } from './constants/routes';
 import Layout from './components/layout/Layout';
 import RouteErrorFallback from './components/errors/RouteErrorFallback';
-import Home from './pages/Home';
 
+const HomePage = lazy(() => import('./pages/Home'));
 const WinterPage = lazy(() => import('./pages/seasons/WinterPage'));
 const SpringPage = lazy(() => import('./pages/seasons/SpringPage'));
 const SummerPage = lazy(() => import('./pages/seasons/SummerPage'));
@@ -21,7 +21,7 @@ export const router = createBrowserRouter(
       element: <Layout />,
       errorElement: <RouteErrorFallback />,
       children: [
-        { index: true,              element: <Home /> },
+        { index: true,              element: <HomePage /> },
         { path: ROUTES.WINTER,      element: <WinterPage /> },
         { path: ROUTES.SPRING,      element: <SpringPage /> },
         { path: ROUTES.SUMMER,      element: <SummerPage /> },

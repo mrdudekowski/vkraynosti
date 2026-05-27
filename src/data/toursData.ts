@@ -172,7 +172,7 @@ const TOURS_CORE: Tour[] = [
     season: 'winter',
     title: 'Восхождение на г. Голец',
     subtitle: 'Настоящее путешествие в зимнюю сказку!',
-    heroPhrase: 'Белоснежная сказка Сихотэ-Алиньского хребта',
+    heroPhrase: 'Белоснежная сказка Сихотэ‑Алиньского хребта',
     duration: '16,5 часов',
     difficulty: 'Medium',
     price: '6 500 ₽',
@@ -522,7 +522,7 @@ const TOURS_CORE: Tour[] = [
     season: 'spring',
     title: 'Маралы х Драконы',
     subtitle: 'Благородные олени и скальные драконы за один день',
-    heroPhrase: 'Ферма маралов и скалы-драконы за день',
+    heroPhrase: 'Ферма маралов и скалы‑драконы за день',
     duration: '14–16 часов',
     difficulty: 'Easy',
     price: 'от 7 200 ₽',
@@ -688,7 +688,7 @@ const TOURS_CORE: Tour[] = [
     season: 'spring',
     title: 'Путешествие на мыс Тобизина',
     subtitle: 'Край земли с каменной «шахматной доской»',
-    heroPhrase: 'Скалы-исполины и бескрайнее море',
+    heroPhrase: 'Скалы‑исполины и бескрайнее море',
     duration: '6–8 часов',
     difficulty: 'Easy',
     price: '5 000 ₽',
@@ -970,7 +970,7 @@ const TOURS_CORE: Tour[] = [
     season: 'spring',
     title: 'Восхождение на Ольховую',
     subtitle: 'Высочайшая вершина с горными озёрами',
-    heroPhrase: 'Высокогорные озёра и панорамы Сихотэ-Алиня',
+    heroPhrase: 'Высокогорные озёра и панорамы Сихотэ‑Алиня',
     duration: '16–18 часов',
     difficulty: 'Hard',
     price: 'от 7 000 ₽',
@@ -1097,8 +1097,7 @@ const TOURS_CORE: Tour[] = [
     season: 'summer',
     title: 'Северное Приморье: Тайны побережья',
     subtitle: 'Бухта Дубовая, маяк Балюзек и космическая тайна Дальнегорска',
-    heroPhrase:
-      'Туда, где кончаются дороги, а океан встречается со звёздами. Два дня, чтобы влюбиться в настоящий север Приморья.',
+    heroPhrase: 'Конец дорог — начало севера. Два дня у океана под звёздами',
     duration: '2 дня / 1 ночь',
     difficulty: 'Medium',
     difficultyDisplayLabel: UI.difficulty.labels.Medium,
@@ -1179,8 +1178,7 @@ const TOURS_CORE: Tour[] = [
     title: 'Полуостров Краббе с палатками',
     subtitle:
       'Два дня у моря, палаточный лагерь и один из самых красивых берегов Приморья',
-    heroPhrase:
-      'Уедем туда, где зелёные сопки уходят в море, а вечер в палатке хочется запомнить надолго',
+    heroPhrase: 'Зелёные холмы, море и ночь в палатке на полуострове Краббе',
     duration: '2 дня / 1 ночь',
     difficulty: 'Medium',
     difficultyDisplayLabel: UI.difficulty.labels.Medium,
@@ -1310,8 +1308,7 @@ const TOURS_CORE: Tour[] = [
     title: 'Бухта Ежовая + гора Сестра + бухта Спокойная / Окунёвая',
     subtitle:
       'Два дня у моря: видовая вершина, бирюзовая бухта и ещё один красивый день у воды',
-    heroPhrase:
-      'Сначала — Сестра и Ежовая. Потом — ночь у моря, сапы и ещё один день в одной из самых красивых бухт Приморья',
+    heroPhrase: 'Вершина, бирюзовая бухта, сапы — два дня, которые хочется повторить',
     duration: '2 дня / 1 ночь',
     difficulty: 'Easy',
     difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),
@@ -1385,8 +1382,7 @@ const TOURS_CORE: Tour[] = [
     season: 'summer',
     title: 'Релакс-тур в бухту Ежовую / Спокойную',
     subtitle: 'Один день у моря: отдых, сапы и красота Приморья без спешки',
-    heroPhrase:
-      'Бирюзовая вода, белый песок, сапы и день, после которого внутри становится легко',
+    heroPhrase: 'Бирюзовая вода, белый песок, сапы — день, после которого легко внутри',
     duration: '1 день',
     difficulty: 'Easy',
     difficultyDisplayLabel: UI.difficulty.labels.Easy,
@@ -1434,8 +1430,7 @@ const TOURS_CORE: Tour[] = [
     title: 'Пляж Трёх границ',
     subtitle:
       'Два дня на самом юге Приморья: бесконечный песок, палаточный лагерь и редкое чувство настоящего края света',
-    heroPhrase:
-      'Туда, где море, ветер и песок тянутся до самой границы, а закат в лагере хочется запомнить надолго',
+    heroPhrase: 'Туда, где море до самой границы — и закат, который запомнишь',
     duration: '2 дня / 1 ночь',
     difficulty: 'Easy',
     difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),

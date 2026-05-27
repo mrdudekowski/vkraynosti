@@ -1,3 +1,4 @@
+import { HOME_TEAM_CONTACT_BRIDGE_SELECTOR } from './homeTeamContactBridge';
 import { HOME_SECTION_CONTACT, HOME_SECTION_TEAM } from './routes';
 
 /** Верх `#team` на этой доле viewport → fade-in progress 0. */
@@ -11,6 +12,12 @@ export const TEAM_ZONE_FADE_OUT_START_SHARE = 0.88 as const;
 
 /** Верх `#contact` на этой доле viewport → fade-out progress 0. */
 export const TEAM_ZONE_FADE_OUT_END_SHARE = 0.08 as const;
+
+/** Верх bridge: штора ещё полная (ниже линии). Раньше contact — плавный стык team → знак. */
+export const TEAM_ZONE_FADE_OUT_BRIDGE_START_SHARE = 0.92 as const;
+
+/** Верх bridge: штора снята (выше линии). */
+export const TEAM_ZONE_FADE_OUT_BRIDGE_END_SHARE = 0.48 as const;
 
 /** Квантование rect для стабильности при Lenis (как navbar chrome). */
 export const TEAM_ZONE_SCROLL_QUANTIZE_PX = 4 as const;
@@ -45,6 +52,21 @@ export function computeTeamZoneFadeInProgress(
   return clampUnitProgress(t);
 }
 
+function computeTeamZoneFadeOutProgressWithShares(
+  sectionTopPx: number,
+  viewportHeightPx: number,
+  startShare: number,
+  endShare: number
+): number {
+  if (viewportHeightPx <= 0) return 0;
+  const startY = viewportHeightPx * startShare;
+  const endY = viewportHeightPx * endShare;
+  const denom = startY - endY;
+  if (denom <= 0) return 0;
+  const t = (sectionTopPx - endY) / denom;
+  return clampUnitProgress(t);
+}
+
 /**
  * Fade-out по верхней границе `#contact`: пока contact ниже start — 1, выше end — 0.
  */
@@ -52,23 +74,36 @@ export function computeTeamZoneFadeOutProgress(
   contactTopPx: number,
   viewportHeightPx: number
 ): number {
-  if (viewportHeightPx <= 0) return 0;
-  const startY = viewportHeightPx * TEAM_ZONE_FADE_OUT_START_SHARE;
-  const endY = viewportHeightPx * TEAM_ZONE_FADE_OUT_END_SHARE;
-  const denom = startY - endY;
-  if (denom <= 0) return 0;
-  const t = (contactTopPx - endY) / denom;
-  return clampUnitProgress(t);
+  return computeTeamZoneFadeOutProgressWithShares(
+    contactTopPx,
+    viewportHeightPx,
+    TEAM_ZONE_FADE_OUT_START_SHARE,
+    TEAM_ZONE_FADE_OUT_END_SHARE
+  );
+}
+
+/** Fade-out шторы при подъёме `HomeTeamContactBrandBridge` (стык team → логотип). */
+export function computeTeamZoneBridgeFadeOutProgress(
+  bridgeTopPx: number,
+  viewportHeightPx: number
+): number {
+  return computeTeamZoneFadeOutProgressWithShares(
+    bridgeTopPx,
+    viewportHeightPx,
+    TEAM_ZONE_FADE_OUT_BRIDGE_START_SHARE,
+    TEAM_ZONE_FADE_OUT_BRIDGE_END_SHARE
+  );
 }
 
 /**
  * Итоговая opacity шторы: `min(fadeIn, fadeOut)`.
- * Пока `#team` не вошёл — 0; в зоне команды — ≈1; при подъёме `#contact` — плавно к 0.
+ * Пока `#team` не вошёл — 0; в зоне команды — ≈1; при подъёме bridge/`#contact` — плавно к 0.
  */
 export function computeTeamZoneBackdropProgress(
   teamSectionEl: HTMLElement | null,
   contactSectionEl: HTMLElement | null,
-  viewportHeightPx: number
+  viewportHeightPx: number,
+  bridgeSectionEl: HTMLElement | null = null
 ): number {
   if (viewportHeightPx <= 0 || teamSectionEl == null) return 0;
 
@@ -76,12 +111,17 @@ export function computeTeamZoneBackdropProgress(
   const teamTop = quantizeTeamZoneScrollPx(teamRect.top);
   const fadeIn = computeTeamZoneFadeInProgress(teamTop, viewportHeightPx);
 
-  if (contactSectionEl == null) {
-    return fadeIn;
+  let fadeOut = 1;
+
+  if (bridgeSectionEl != null) {
+    const bridgeTop = quantizeTeamZoneScrollPx(bridgeSectionEl.getBoundingClientRect().top);
+    fadeOut = Math.min(fadeOut, computeTeamZoneBridgeFadeOutProgress(bridgeTop, viewportHeightPx));
   }
 
-  const contactTop = quantizeTeamZoneScrollPx(contactSectionEl.getBoundingClientRect().top);
-  const fadeOut = computeTeamZoneFadeOutProgress(contactTop, viewportHeightPx);
+  if (contactSectionEl != null) {
+    const contactTop = quantizeTeamZoneScrollPx(contactSectionEl.getBoundingClientRect().top);
+    fadeOut = Math.min(fadeOut, computeTeamZoneFadeOutProgress(contactTop, viewportHeightPx));
+  }
 
   return Math.min(fadeIn, fadeOut);
 }
@@ -93,4 +133,8 @@ export function getHomeTeamSectionElement(): HTMLElement | null {
 
 export function getHomeContactSectionElement(): HTMLElement | null {
   return document.getElementById(HOME_SECTION_CONTACT);
+}
+
+export function getHomeTeamContactBridgeElement(): HTMLElement | null {
+  return document.querySelector(HOME_TEAM_CONTACT_BRIDGE_SELECTOR);
 }

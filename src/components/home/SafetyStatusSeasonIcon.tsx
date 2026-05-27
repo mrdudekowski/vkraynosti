@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import {
   SAFETY_STATUS_PLAQUE_ICON_SIZE_CLASS,
 } from '../../constants/safetyStatusLayout';
@@ -9,6 +9,7 @@ import {
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import type { Season } from '../../types';
 import { fetchSafetyStatusIconSvg } from '../../utils/fetchSafetyStatusIconSvg';
+import { parseSanitizedSafetyStatusIconSvg } from '../../utils/sanitizeSafetyStatusIconSvg';
 import { transformSafetyStatusIconSvg } from '../../utils/transformSafetyStatusIconSvg';
 
 const statusFadeOpacityClass = (fadePhase: SafetyStatusFadePhase) =>
@@ -23,11 +24,12 @@ type SafetyStatusSeasonIconProps = {
 const SafetyStatusSeasonIcon = ({ src, season, fadePhase }: SafetyStatusSeasonIconProps) => {
   const instanceId = useId().replace(/:/g, '');
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [svgHtml, setSvgHtml] = useState('');
+  const svgHostRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     let cancelled = false;
     const gradientId = `safety-status-icon-grad-${instanceId}`;
+    const host = svgHostRef.current;
 
     void fetchSafetyStatusIconSvg(src)
       .then(raw =>
@@ -37,9 +39,12 @@ const SafetyStatusSeasonIcon = ({ src, season, fadePhase }: SafetyStatusSeasonIc
           solidHighlight: prefersReducedMotion,
         })
       )
-      .then(html => {
-        if (!cancelled) {
-          setSvgHtml(html);
+      .then(markup => {
+        if (cancelled || !host) return;
+        const svg = parseSanitizedSafetyStatusIconSvg(markup);
+        host.replaceChildren();
+        if (svg) {
+          host.appendChild(svg);
         }
       });
 
@@ -57,12 +62,10 @@ const SafetyStatusSeasonIcon = ({ src, season, fadePhase }: SafetyStatusSeasonIc
         statusFadeOpacityClass(fadePhase),
       ].join(' ')}
     >
-      {svgHtml.length > 0 ? (
-        <span
-          className="block size-full [&>svg]:h-full [&>svg]:w-full"
-          dangerouslySetInnerHTML={{ __html: svgHtml }}
-        />
-      ) : null}
+      <span
+        ref={svgHostRef}
+        className="block size-full [&>svg]:h-full [&>svg]:w-full"
+      />
     </span>
   );
 };

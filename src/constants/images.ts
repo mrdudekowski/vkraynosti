@@ -1241,8 +1241,22 @@ export const HOME_SAFETY_STATUS_ICONS = [
   `${PUBLIC_ASSET_BASE}safety/icons/6.svg`,
 ] as const;
 
-/** Логотип мессенджера MAX в модалке заявки — файл в `public/max-messenger-sign-logo.svg`. */
+/**
+ * Контактные логотипы (rail, `#contact`, footer, модалка заявки) — файлы в `public/`.
+ * Рендер: `ContactMessengerLogo`.
+ */
+export const PHONE_ALT_LOGO = `${PUBLIC_ASSET_BASE}phone-alt-logo.svg` as const;
+export const TELEGRAM_LOGO = `${PUBLIC_ASSET_BASE}telegram-logo.svg` as const;
+export const WHATSAPP_LOGO = `${PUBLIC_ASSET_BASE}whatsapp-brands-solid-full.svg` as const;
 export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-logo.svg` as const;
+
+/** Все contact SVG в `public/` — SSOT для тестов и `ContactMessengerLogo`. */
+export const CONTACT_MESSENGER_LOGO_URLS = [
+  PHONE_ALT_LOGO,
+  TELEGRAM_LOGO,
+  WHATSAPP_LOGO,
+  MAX_MESSENGER_SIGN_LOGO,
+] as const;
 
 /** Графический знак Вкрайности (лес), не текстовый вордмарк — `public/vkrai-logo.webp`. */
 export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.webp` as const;
@@ -1271,9 +1285,6 @@ export const TOUR_COVER_MOBILE_OVERRIDES: Record<string, string> = {
   [TOUR_WINTER_3_PREFACE_BACKGROUND]: TOUR_WINTER_3_PREFACE_BACKGROUND_MOBILE,
   [TOUR_SPRING_10_PREFACE_BACKGROUND]: TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE,
 };
-
-/** @deprecated Use resolveTourCoverMobileUrl + TOUR_COVER_MOBILE_OVERRIDES */
-export const TOUR_MOBILE_IMAGE_VARIANTS = TOUR_COVER_MOBILE_OVERRIDES;
 
 export const IMAGES = {
   hero: {

@@ -19,8 +19,12 @@ import { HOME_HERO_CEILING_EPSILON_PX } from '../constants/homeHeroCeiling';
 import {
   computeHomeHeroMinScrollY,
   getViewportScrollY,
+  scrollWindowToTopImmediate,
 } from '../constants/smoothScroll';
-import { HOME_GATE_SCROLL_HINT_VISIBLE_MAX_SCROLL_PX } from '../constants/homeGateScroll';
+import {
+  HOME_GATE_INITIAL_SCROLL_LOCK_MS,
+  HOME_GATE_SCROLL_HINT_VISIBLE_MAX_SCROLL_PX,
+} from '../constants/homeGateScroll';
 import { useHomeNavbarChrome } from '../context/useHomeNavbarChrome';
 import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
@@ -30,7 +34,7 @@ export interface UseHomeNavbarChromeScrollOptions {
 }
 
 function chromeSnapKey(s: HomeNavbarChromeSnap): string {
-  return `${s.topChromeOpacity}|${s.topChromeSurfaceOpacity}|${s.mainUsesNavbarTopPadding}|${s.gateStageFullBleedMinHeight}|${s.homeFlushWithViewportTop}|${s.disableTopChromeTransition}`;
+  return `${s.topChromeOpacity}|${s.topChromeSurfaceOpacity}|${s.mainUsesNavbarTopPadding}|${s.gateStageFullBleedMinHeight}|${s.homeFlushWithViewportTop}|${s.disableTopChromeTransition}|${s.bridgeHideProgress}`;
 }
 
 function resolveLenisVirtualScrollDelta(lenis: Lenis, data: VirtualScrollData): number {
@@ -121,7 +125,8 @@ export function useHomeNavbarChromeScroll({
 }: UseHomeNavbarChromeScrollOptions): void {
   const lenis = useLenis();
   const reducedMotion = usePrefersReducedMotion();
-  const { publishHomeNavbarChrome } = useHomeNavbarChrome();
+  const { publishHomeNavbarChrome, snap: homeNavbarChromeSnap } = useHomeNavbarChrome();
+  const homeNavbarChromeSnapRef = useRef(homeNavbarChromeSnap);
 
   const chromePublishRef = useRef<{
     lastKey: string;
@@ -134,13 +139,32 @@ export function useHomeNavbarChromeScroll({
   const heroTopCeilingMinScrollYRef = useRef<number | null>(null);
   /** Якорь потолка: фиксируется при первом arm в `publishChrome`. Сброс: resize hero, выход с главной. */
   const heroCeilingMinLockRef = useRef<number | null>(null);
+  const initialGateScrollLockRef = useRef(true);
+
+  useLayoutEffect(() => {
+    homeNavbarChromeSnapRef.current = homeNavbarChromeSnap;
+  }, [homeNavbarChromeSnap]);
+
+  useEffect(() => {
+    if (!enabled) {
+      initialGateScrollLockRef.current = true;
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      initialGateScrollLockRef.current = false;
+    }, HOME_GATE_INITIAL_SCROLL_LOCK_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [enabled]);
 
   const publishChrome = useCallback(() => {
     if (!enabled) {
       heroTopCeilingArmedRef.current = false;
       heroTopCeilingMinScrollYRef.current = null;
       heroCeilingMinLockRef.current = null;
-      const def: HomeNavbarChromeSnap = { ...HOME_NAVBAR_CHROME_LAYOUT_DEFAULT };
+      const def: HomeNavbarChromeSnap = {
+        ...HOME_NAVBAR_CHROME_LAYOUT_DEFAULT,
+        bridgeHideProgress: 0,
+      };
       const key = chromeSnapKey(def);
       if (key !== chromePublishRef.current.lastKey) {
         chromePublishRef.current.lastKey = key;
@@ -153,6 +177,18 @@ export function useHomeNavbarChromeScroll({
 
     let scrollRaw = getViewportScrollY(lenis);
     const heroMinRaw = computeHomeHeroMinScrollY(scrollRaw, heroSectionRef.current);
+
+    if (
+      initialGateScrollLockRef.current &&
+      heroMinRaw != null &&
+      scrollRaw >= heroMinRaw - HOME_HERO_CEILING_EPSILON_PX
+    ) {
+      scrollWindowToTopImmediate(lenis);
+      scrollRaw = 0;
+      heroTopCeilingArmedRef.current = false;
+      heroTopCeilingMinScrollYRef.current = null;
+      heroCeilingMinLockRef.current = null;
+    }
 
     const isAtGateTop = scrollRaw <= HOME_GATE_SCROLL_HINT_VISIBLE_MAX_SCROLL_PX;
     if (isAtGateTop && heroTopCeilingArmedRef.current) {
@@ -186,12 +222,15 @@ export function useHomeNavbarChromeScroll({
     const scrollForChrome = quantizeAxisPxForHomeNavbarChrome(scrollRaw);
     const heroMinForChrome =
       heroMinRaw == null ? null : quantizeAxisPxForHomeNavbarChrome(heroMinRaw);
-    const nextChrome = computeHomeNavbarChromeSnap({
-      enabled: true,
-      scroll: scrollForChrome,
-      heroMinScrollY: heroMinForChrome,
-      reducedMotion,
-    });
+    const nextChrome: HomeNavbarChromeSnap = {
+      ...computeHomeNavbarChromeSnap({
+        enabled: true,
+        scroll: scrollForChrome,
+        heroMinScrollY: heroMinForChrome,
+        reducedMotion,
+      }),
+      bridgeHideProgress: homeNavbarChromeSnapRef.current.bridgeHideProgress,
+    };
     const key = chromeSnapKey(nextChrome);
     if (key !== chromePublishRef.current.lastKey) {
       chromePublishRef.current.lastKey = key;

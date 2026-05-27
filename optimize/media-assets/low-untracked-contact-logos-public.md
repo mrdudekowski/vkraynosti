@@ -13,7 +13,7 @@ files:
   - public/whatsapp-brands-solid-full.svg
   - public/max-messenger-sign-logo.svg
   - src/constants/images.ts
-  - src/constants/contactMessengerLogos.test.ts
+  - scripts/contactMessengerLogos.test.ts
 effort: S
 tags: [public, contacts]
 related: []
@@ -32,7 +32,7 @@ Git status (сессия 2026-05-27): `?? public/telegram-logo.svg`, `?? public/
 ## Чеклист проверки
 
 - [x] Пути в `src/constants/images.ts` (`PHONE_ALT_LOGO`, `TELEGRAM_LOGO`, `WHATSAPP_LOGO`, `MAX_MESSENGER_SIGN_LOGO`, `CONTACT_MESSENGER_LOGO_URLS`)
-- [x] Файлы на диске в `public/` — `contactMessengerLogos.test.ts`
+- [x] Файлы на диске в `public/` — `scripts/contactMessengerLogos.test.ts`
 - [x] `ContactMessengerLogo` → единый SSOT; дублей путей в секциях нет
 - [ ] `git add public/*.svg` перед deploy (файлы были untracked в сессии аудита)
 

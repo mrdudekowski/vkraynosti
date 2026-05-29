@@ -90,12 +90,16 @@ export interface SafetyItem {
 
 export type Season = 'winter' | 'spring' | 'summer' | 'fall';
 
+export type { TourDepartureDateIso } from './tourSchedule';
+
 /** Данные тура для формы заявки (без полного объекта Tour). */
 export interface TourRequestModalPayload {
   tourId: string;
   title: string;
   subtitle?: string;
   season?: Season;
+  /** Уже выбранная дата выезда (страница тура / повторное открытие). */
+  preferredDepartureDateIso?: string;
 }
 
 export type ModalState =

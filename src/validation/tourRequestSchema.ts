@@ -4,6 +4,12 @@ import { UI } from '../constants/ui';
 const e = UI.tourRequestModal.errors;
 const namePattern = /^[\p{L}\p{M}\s'-]+$/u;
 const phonePattern = /^\+?[0-9()\-\s]{7,20}$/;
+const isoDepartureDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+const preferredDepartureDateField = z
+  .string()
+  .trim()
+  .regex(isoDepartureDatePattern, { message: e.departureDateRequired });
 
 /**
  * Поля формы заявки (без данных тура — они подставляются при отправке).
@@ -47,10 +53,20 @@ export const tourRequestFormSchema = z.object({
   privacyAccepted: z.boolean().refine((v): v is true => v === true, {
     message: e.privacyRequired,
   }),
+  preferredDepartureDate: z.string().optional(),
 });
 
 export type TourRequestFormValues = z.infer<typeof tourRequestFormSchema>;
 export type TourRequestFormInput = z.input<typeof tourRequestFormSchema>;
+
+export const createTourRequestFormSchema = (requiresDepartureDate: boolean) => {
+  if (!requiresDepartureDate) {
+    return tourRequestFormSchema;
+  }
+  return tourRequestFormSchema.extend({
+    preferredDepartureDate: preferredDepartureDateField,
+  });
+};
 
 export const defaultTourRequestFormValues: TourRequestFormInput = {
   name: '',
@@ -59,4 +75,5 @@ export const defaultTourRequestFormValues: TourRequestFormInput = {
   phone: '',
   question: '',
   privacyAccepted: false,
+  preferredDepartureDate: '',
 };

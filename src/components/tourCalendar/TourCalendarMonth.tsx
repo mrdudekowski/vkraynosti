@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { DayPicker, type CustomComponents, type DayButtonProps } from 'react-day-picker';
 import { ru } from 'date-fns/locale';
+import type { Season } from '../../types';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 import { monthHasEvents } from '../../utils/tourSchedule/monthHasEvents';
 import { toIsoDate } from '../../utils/tourSchedule/toIsoDate';
@@ -13,6 +14,7 @@ import {
 } from './tourCalendarClassNames';
 
 interface TourCalendarMonthProps {
+  season: Season;
   events: EnrichedScheduleEvent[];
   eventsByDate: Map<string, EnrichedScheduleEvent[]>;
   displayMonth: Date;
@@ -22,6 +24,7 @@ interface TourCalendarMonthProps {
 }
 
 const TourCalendarMonth = ({
+  season,
   events,
   eventsByDate,
   displayMonth,
@@ -51,7 +54,10 @@ const TourCalendarMonth = ({
   }), [eventsByDate]);
 
   return (
-    <div className="rounded-card border border-divider bg-surface-light/90 p-4 shadow-md backdrop-blur-sm sm:p-6">
+    <div
+      className="rounded-card border border-divider bg-surface-light/90 p-4 shadow-md backdrop-blur-sm sm:p-6"
+      data-season={season}
+    >
       <TourCalendarNav
         displayMonth={displayMonth}
         events={events}

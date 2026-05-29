@@ -46,6 +46,7 @@ import {
   HOME_CONTACT_MESSENGER_ICON_FILL_WHATSAPP,
 } from './src/constants/homeContactMessengerGlow'
 import { HOME_GATE_SCROLL_HINT_FADE_MS } from './src/constants/homeGateScroll'
+import { TOUR_REQUEST_STEP_CROSSFADE_MS } from './src/constants/tourRequestModalMotion'
 import {
   HOME_CONTACT_SECTION_BG_HEX,
   HOME_CONTACT_SECTION_BUTTON_SIZE,
@@ -1218,6 +1219,8 @@ const config: Config = {
       transitionDuration: {
         'carousel':      '600ms',
         'modal':         '300ms',
+        /** Crossfade шагов «дата» ↔ «форма» в `TourRequestModal`; синхронно с `TOUR_REQUEST_STEP_CROSSFADE_MS`. */
+        'tour-request-step-crossfade': `${TOUR_REQUEST_STEP_CROSSFADE_MS}ms`,
         'hover':         '200ms',
         'season-change': '600ms',
         /** Scroll-reveal: opacity + transform. */

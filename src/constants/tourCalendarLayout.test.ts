@@ -23,7 +23,8 @@ function getExtend<K extends string>(
 
 describe('tourCalendarLayout', () => {
   it('exposes class strings without arbitrary max-w/min-h', () => {
-    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('max-w-tour-calendar-day-cell');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('tour-calendar__day-btn');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('rounded-full');
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).not.toContain('max-w-[');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).toContain('min-h-tour-calendar-day-panel');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).not.toContain('min-h-[');

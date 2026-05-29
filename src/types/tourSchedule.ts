@@ -4,6 +4,12 @@ export type TourScheduleStatus = 'planned' | 'open' | 'full' | 'cancelled' | 'co
 
 export type TourScheduleDurationType = 'однодневный' | 'многодневный';
 
+/** ISO-дата выезда тура (YYYY-MM-DD). */
+export type TourDepartureDateIso = string;
+
+/** Режим календаря выездов на странице тура / в модалке заявки. */
+export type TourDepartureCalendarMode = 'display' | 'select';
+
 export interface TourScheduleEvent {
   date: string;
   tourId: string;

@@ -1,7 +1,6 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import TourCalendar from './TourCalendar';
 import { TourScheduleContext } from '../../context/tour-schedule-context-definition';
 import type {
@@ -69,29 +68,48 @@ const renderCalendar = () =>
           retry: vi.fn(),
         }}
       >
-        <TourCalendar />
+        <TourCalendar season="spring" />
       </TourScheduleContext.Provider>
     </MemoryRouter>
   );
 
 describe('TourCalendar', () => {
-  it('shows tour cards after clicking a day with events', async () => {
-    const user = userEvent.setup();
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 4, 9, 12, 0, 0));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('selects today on mount and shows day panel instead of select hint', () => {
     renderCalendar();
 
-    const dayButton = screen.getByRole('button', { name: /9 мая, 2 выезда/i });
-    await user.click(dayButton);
-
+    const todayButton = screen.getByRole('button', { name: /^9 мая/i });
+    expect(todayButton).toHaveClass('tour-calendar__day--selected');
+    expect(screen.queryByText(UI.tourCalendar.selectDateHint)).not.toBeInTheDocument();
     expect(screen.getByText(spring3.title)).toBeInTheDocument();
     expect(screen.getByText(spring6.title)).toBeInTheDocument();
   });
 
-  it('shows empty day message when day has no events', async () => {
-    const user = userEvent.setup();
+  it('shows tour cards after clicking a day with events', async () => {
+    vi.setSystemTime(new Date(2026, 4, 1, 12, 0, 0));
+    renderCalendar();
+
+    const dayButton = screen.getByRole('button', { name: /9 мая, 2 выезда/i });
+    fireEvent.click(dayButton);
+
+    expect(dayButton).toHaveClass('tour-calendar__day--selected');
+    expect(screen.getByText(spring3.title)).toBeInTheDocument();
+    expect(screen.getByText(spring6.title)).toBeInTheDocument();
+  });
+
+  it('shows empty day message when day has no events', () => {
     renderCalendar();
 
     const emptyDayButton = screen.getByRole('button', { name: /^1 мая/i });
-    await user.click(emptyDayButton);
+    fireEvent.click(emptyDayButton);
 
     expect(screen.getByText(UI.tourCalendar.emptyDay)).toBeInTheDocument();
   });

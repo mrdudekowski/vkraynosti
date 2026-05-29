@@ -6,6 +6,8 @@ import TourRequestModal from './TourRequestModal';
 import { UI } from '../../constants/ui';
 import { WHATSAPP_LOGO } from '../../constants/images';
 import { sendTourRequestLead } from '../../services/sendTourRequestLead';
+import { getTourById } from '../../data/toursData';
+import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 
 const mockClose = vi.fn();
 
@@ -19,6 +21,45 @@ vi.mock('../../context/useModal', () => ({
 
 vi.mock('../../services/sendTourRequestLead', () => ({
   sendTourRequestLead: vi.fn(),
+}));
+
+const spring3 = getTourById('spring-3');
+if (!spring3) {
+  throw new Error('spring-3 missing');
+}
+
+const makeScheduleEvent = (
+  date: string,
+  tourId: string = 'spring-3'
+): EnrichedScheduleEvent => ({
+  date,
+  tourId,
+  durationType: 'однодневный',
+  priceRub: 6000,
+  seats: 8,
+  status: 'open',
+  comment: null,
+  season: 'spring',
+  statusLabel: 'Набор открыт',
+  tour: spring3,
+});
+
+const { scheduleState } = vi.hoisted(() => ({
+  scheduleState: {
+    events: [] as EnrichedScheduleEvent[],
+  },
+}));
+
+vi.mock('../../hooks/useTourSchedule', () => ({
+  useTourSchedule: () => ({
+    status: 'success' as const,
+    events: scheduleState.events,
+    eventsByDate: new Map(scheduleState.events.map(event => [event.date, [event]])),
+    prices: new Map(),
+    durationTypes: new Map(),
+    error: null,
+    retry: vi.fn(),
+  }),
 }));
 
 const payload = {
@@ -37,17 +78,91 @@ describe('TourRequestModal', () => {
     mockClose.mockClear();
     vi.mocked(sendTourRequestLead).mockReset();
     vi.mocked(sendTourRequestLead).mockResolvedValue(undefined);
+    scheduleState.events = [makeScheduleEvent('2026-08-15')];
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('opens dialog with title and tour line', () => {
-    render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
+  it('opens form with pre-filled date when tour has a single future departure', async () => {
+    render(
+      <TourRequestModal
+        payload={{ tourId: 'spring-3', title: spring3.title, season: 'spring' }}
+      />,
+      { wrapper: RouterWrap }
+    );
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: UI.tourRequestModal.title })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: UI.tourRequestModal.dateStepTitle })
+    ).not.toBeInTheDocument();
+    expect(screen.getByDisplayValue(/15 августа 2026/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: UI.tourRequestModal.changeDepartureDate })
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`))).toBeInTheDocument();
+  });
+
+  it('opens calendar from single-departure form and returns after day click', async () => {
+    const user = userEvent.setup();
+    render(
+      <TourRequestModal
+        payload={{ tourId: 'spring-3', title: spring3.title, season: 'spring' }}
+      />,
+      { wrapper: RouterWrap }
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: UI.tourRequestModal.changeDepartureDate })
+    );
+    expect(
+      screen.getByRole('heading', { name: UI.tourRequestModal.dateStepTitle })
+    ).toBeInTheDocument();
+
+    const dayButton = screen.getByRole('button', { name: /Выезд: 15 августа 2026/i });
+    await user.click(dayButton);
+    await waitFor(() => {
+      expect(screen.getByDisplayValue(/15 августа 2026/i)).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`))).toBeInTheDocument();
+  });
+
+  it('opens date step first when tour has multiple future departures', async () => {
+    scheduleState.events = [
+      makeScheduleEvent('2026-08-15'),
+      makeScheduleEvent('2026-08-22'),
+    ];
+    const user = userEvent.setup();
+    render(
+      <TourRequestModal
+        payload={{ tourId: 'spring-3', title: spring3.title, season: 'spring' }}
+      />,
+      { wrapper: RouterWrap }
+    );
+    expect(
+      screen.getByRole('heading', { name: UI.tourRequestModal.dateStepTitle })
+    ).toBeInTheDocument();
+    const dayButton = screen.getByRole('button', { name: /Выезд: 15 августа 2026/i });
+    await user.click(dayButton);
+    await waitFor(() => {
+      expect(screen.getByDisplayValue(/15 августа 2026/i)).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`))).toBeInTheDocument();
+  });
+
+  it('opens form directly when tour has no departures in schedule', () => {
+    render(<TourRequestModal payload={payload} />, { wrapper: RouterWrap });
     expect(screen.getByDisplayValue(/Байкал Зимний/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: UI.tourRequestModal.dateStepTitle })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: UI.tourRequestModal.changeDepartureDate })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(new RegExp(`^${UI.tourRequestModal.departureDateLabel}`))
+    ).not.toBeInTheDocument();
   });
 
   it('closes when backdrop is clicked', async () => {

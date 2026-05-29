@@ -9,6 +9,7 @@ interface TourRequestLeadPayload extends TourRequestFormValues {
   sourceUrl: string;
   submittedAt: string;
   userAgent: string;
+  preferredDepartureDate?: string;
 }
 
 export type TourRequestLeadErrorCode = 'not-configured' | 'network' | 'rejected';
@@ -42,16 +43,26 @@ const getTourTitle = (tour: TourRequestModalPayload) => {
 const buildLeadPayload = (
   tour: TourRequestModalPayload,
   values: TourRequestFormValues
-): TourRequestLeadPayload => ({
-  ...values,
-  idempotencyKey: createIdempotencyKey(),
-  tourId: tour.tourId,
-  tourTitle: getTourTitle(tour),
-  season: tour.season,
-  sourceUrl: window.location.href,
-  submittedAt: new Date().toISOString(),
-  userAgent: navigator.userAgent,
-});
+): TourRequestLeadPayload => {
+  const departure =
+    values.preferredDepartureDate != null && values.preferredDepartureDate.length > 0
+      ? values.preferredDepartureDate
+      : tour.preferredDepartureDateIso;
+
+  return {
+    ...values,
+    idempotencyKey: createIdempotencyKey(),
+    tourId: tour.tourId,
+    tourTitle: getTourTitle(tour),
+    season: tour.season,
+    sourceUrl: window.location.href,
+    submittedAt: new Date().toISOString(),
+    userAgent: navigator.userAgent,
+    ...(departure != null && departure.length > 0
+      ? { preferredDepartureDate: departure }
+      : {}),
+  };
+};
 
 export const sendTourRequestLead = async (
   tour: TourRequestModalPayload,

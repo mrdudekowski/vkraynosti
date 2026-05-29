@@ -1,16 +1,22 @@
 import { useCallback, useState } from 'react';
+import { startOfDay } from 'date-fns';
+import type { Season } from '../../types';
 import { UI } from '../../constants/ui';
 import { useTourScheduleCalendarEvents } from '../../hooks/useTourScheduleCalendarEvents';
 import TourCalendarDayPanel from './TourCalendarDayPanel';
 import TourCalendarMonth from './TourCalendarMonth';
 
-const TourCalendar = () => {
+interface TourCalendarProps {
+  season: Season;
+}
+
+const TourCalendar = ({ season }: TourCalendarProps) => {
   const { status, events, eventsByDate, retry } = useTourScheduleCalendarEvents();
   const [displayMonth, setDisplayMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => startOfDay(new Date()));
 
   const handleMonthChange = useCallback((month: Date) => {
     setDisplayMonth(month);
@@ -36,6 +42,7 @@ const TourCalendar = () => {
       <div className="order-1 lg:order-2">
         {!isLoading && !hasError && !isEmptyAll && (
           <TourCalendarMonth
+            season={season}
             events={events}
             eventsByDate={eventsByDate}
             displayMonth={displayMonth}

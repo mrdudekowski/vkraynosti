@@ -8,6 +8,7 @@ import type {
 } from '../../types/tourSchedule';
 import { getTourById } from '../../data/toursData';
 import { UI } from '../../constants/ui';
+import { TOUR_DEPARTURE_DAY_DEPARTURE_CLASS } from '../../constants/tourDepartureCalendar';
 
 const spring3 = getTourById('spring-3');
 const spring1 = getTourById('spring-1');
@@ -70,8 +71,16 @@ describe('TourDetailPriceHighlight', () => {
     expect(screen.getByText(UI.tourDetail.priceHighlightLead)).toBeInTheDocument();
     expect(screen.getByText('6 500 ₽')).toBeInTheDocument();
     expect(screen.getByText(UI.tourDetail.departuresHeading)).toBeInTheDocument();
-    expect(screen.getByText('9 мая 2099')).toBeInTheDocument();
-    expect(screen.getByText('10 мая 2099')).toBeInTheDocument();
+    expect(
+      screen.getByRole('group', { name: UI.tourDepartureCalendar.calendarAriaLabel })
+    ).toBeInTheDocument();
+    const calendar = screen.getByRole('group', {
+      name: UI.tourDepartureCalendar.calendarAriaLabel,
+    });
+    expect(calendar.querySelectorAll(`.${TOUR_DEPARTURE_DAY_DEPARTURE_CLASS}`).length).toBeGreaterThan(
+      0
+    );
+    expect(screen.queryByRole('button', { name: /Выезд:/i })).not.toBeInTheDocument();
   });
 
   it('shows empty departures message when tour has no future dates', () => {

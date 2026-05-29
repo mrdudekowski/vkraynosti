@@ -40,7 +40,7 @@ const TourCalendarSection = () => {
         </div>
 
         <RevealBox as="div">
-          <TourCalendar />
+          <TourCalendar season={activeSeason} />
         </RevealBox>
       </div>
     </section>

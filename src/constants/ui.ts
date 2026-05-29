@@ -155,6 +155,11 @@ export const UI = {
   },
   tourRequestModal: {
     title: 'Заявка на тур',
+    dateStepTitle: 'Выберите дату выезда',
+    dateStepHint: 'Нажмите на день с выездом в календаре',
+    departureDateLabel: 'Дата выезда',
+    changeDepartureDate: 'Изменить дату',
+    selectedDepartureLive: (formatted: string) => `Выбрана дата выезда: ${formatted}`,
     nameLabel: 'Имя',
     nameHint: 'Как к вам обращаться?',
     emailLabel: 'Email',
@@ -177,6 +182,7 @@ export const UI = {
     success: 'Заявка отправлена. Мы свяжемся с вами.',
     submitError: 'Не получилось отправить заявку. Попробуйте ещё раз или напишите нам в Telegram.',
     errors: {
+      departureDateRequired: 'Выберите дату выезда',
       nameRequired: 'Укажите имя',
       emailInvalid: 'Некорректный email',
       phoneRequired: 'Укажите телефон',
@@ -270,6 +276,15 @@ export const UI = {
     title:       'Что-то пошло не так',
     message:     'Произошла ошибка. Попробуйте обновить страницу.',
     retryButton: 'Обновить страницу',
+  },
+  tourDepartureCalendar: {
+    calendarAriaLabel: 'Календарь дат выездов тура',
+    emptyMonth: 'В этом месяце выездов нет',
+    prevMonthAria: 'Предыдущий месяц с выездами',
+    nextMonthAria: 'Следующий месяц с выездами',
+    nextMonthDisabledTooltip: 'Других месяцев с выездами нет',
+    departureDayAria: (formattedDate: string) => `Выезд: ${formattedDate}`,
+    nonDepartureDayAria: (formattedDate: string) => `${formattedDate}, выезда нет`,
   },
   tourCalendar: {
     selectDateHint: 'Выберите дату в календаре',

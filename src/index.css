@@ -1102,6 +1102,7 @@
 }
 
 @layer components {
+  /** Сетка календарей туров: главный (#kalendar) и мини-календарь выездов. */
   .tour-calendar {
     --rdp-accent-color: theme('colors.season.spring');
     --rdp-day-height: 2.75rem;
@@ -1113,8 +1114,140 @@
     --rdp-day-width: 2rem;
   }
 
-  .tour-calendar__day--departure {
-    background-color: color-mix(in srgb, theme('colors.season.spring') 12%, transparent);
+  [data-season='winter'] .tour-calendar,
+  .tour-calendar[data-season='winter'] {
+    --rdp-accent-color: theme('colors.season.winter');
+  }
+
+  [data-season='spring'] .tour-calendar,
+  .tour-calendar[data-season='spring'] {
+    --rdp-accent-color: theme('colors.season.spring');
+  }
+
+  [data-season='summer'] .tour-calendar,
+  .tour-calendar[data-season='summer'] {
+    --rdp-accent-color: theme('colors.season.summer');
+  }
+
+  [data-season='fall'] .tour-calendar,
+  .tour-calendar[data-season='fall'] {
+    --rdp-accent-color: theme('colors.season.fall');
+  }
+
+  .tour-calendar .rdp-day,
+  .tour-calendar .rdp-day.tour-calendar__day-cell--has-events,
+  .tour-calendar .rdp-day.tour-departure-calendar__day-cell,
+  .tour-calendar .rdp-selected {
+    background-color: transparent;
+  }
+
+  .tour-calendar .rdp-day.rdp-today:not(.tour-calendar__day--selected) > .tour-calendar__day-btn {
+    box-shadow: 0 0 0 1px theme('colors.divider');
+  }
+
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-num,
+  .tour-departure-calendar--select
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.75rem;
+    min-height: 1.75rem;
+    border-radius: 9999px;
+    box-shadow: 0 0 0 2px var(--rdp-accent-color);
+  }
+
+  .tour-calendar__day-num {
+    display: inline-block;
+    transition: transform theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+  }
+
+  /** Главный #kalendar: корень без `.tour-departure-calendar`. */
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .rdp-day:not(.tour-calendar__day--selected)
+    .tour-calendar__day-btn:hover:not(:disabled)
+    .tour-calendar__day-num,
+  /** Модалка заявки (select); не мини display на странице тура. */
+  .tour-departure-calendar--select
+    .rdp-day:not(.tour-calendar__day--selected)
+    .tour-calendar__day-btn:hover:not(:disabled)
+    .tour-calendar__day-num {
+    transform: scale(1.1) translateY(-1px);
+  }
+
+  .tour-departure-calendar--display
+    .tour-calendar__day-btn:hover
+    .tour-calendar__day-num {
+    transform: none;
+  }
+
+  .tour-calendar .tour-calendar__day-btn.tour-calendar__day--selected:hover .tour-calendar__day-num,
+  .tour-calendar
+    .rdp-day.tour-calendar__day--selected
+    .tour-calendar__day-btn:hover
+    .tour-calendar__day-num {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-calendar__day-num {
+      transition: none;
+    }
+
+    .tour-calendar.rdp-root:not(.tour-departure-calendar)
+      .rdp-day:not(.tour-calendar__day--selected)
+      .tour-calendar__day-btn:hover:not(:disabled)
+      .tour-calendar__day-num,
+    .tour-departure-calendar--select
+      .rdp-day:not(.tour-calendar__day--selected)
+      .tour-calendar__day-btn:hover:not(:disabled)
+      .tour-calendar__day-num {
+      transform: none;
+    }
+  }
+
+  .tour-departure-calendar--display .tour-calendar__day-btn {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .tour-departure-calendar--display .tour-calendar__day-btn:active {
+    background-color: transparent;
+    color: inherit;
+    font-weight: inherit;
+  }
+
+  .tour-departure-calendar--display .rdp-day_button:not(.tour-departure-calendar__day--departure) {
+    cursor: default;
+  }
+
+  .tour-departure-calendar--display .rdp-day_button.tour-departure-calendar__day--departure {
+    cursor: default;
+  }
+
+  .tour-request-modal__steps {
+    @apply relative min-h-[13rem] overflow-hidden;
+  }
+
+  .tour-request-modal__step {
+    @apply transition-opacity duration-tour-request-step-crossfade ease-standard;
+  }
+
+  .tour-request-modal__step--active {
+    @apply relative z-10 opacity-100;
+  }
+
+  .tour-request-modal__step--inactive {
+    @apply pointer-events-none absolute inset-x-0 top-0 z-0 max-h-full overflow-hidden opacity-0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-request-modal__step {
+      transition: none;
+    }
   }
 }
 

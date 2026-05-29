@@ -1,11 +1,13 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import type { Tour } from "../../types";
 import { UI } from "../../constants/ui";
+import TourDepartureMonthCalendar from "../tourDeparture/TourDepartureMonthCalendar";
 import { useTourDisplayPrice } from "../../hooks/useTourDisplayPrice";
 import { useTourSchedule } from "../../hooks/useTourSchedule";
-import { getTourDepartureDates } from "../../utils/tourSchedule/getTourDepartureDates";
+import { buildTourDepartureCalendarModel } from "../../utils/tourSchedule/buildTourDepartureCalendarModel";
+import { buildTourDepartureEventsByDate } from "../../utils/tourSchedule/buildTourDepartureEventsByDate";
 import { parseIsoDate } from "../../utils/tourSchedule/parseIsoDate";
 
 const ACCENT_BG: Record<Tour['season'], string> = {
@@ -36,10 +38,28 @@ const TourDetailPriceHighlight = ({
   const { status, events } = useTourSchedule();
   const { displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
 
-  const futureDepartureDates = useMemo(() => {
-    const tourEvents = events.filter(event => event.tourId === tour.id);
-    return getTourDepartureDates(tour.id, tourEvents).futureDates;
-  }, [events, tour.id]);
+  const tourEvents = useMemo(
+    () => events.filter(event => event.tourId === tour.id),
+    [events, tour.id]
+  );
+
+  const departureCalendar = useMemo(
+    () => buildTourDepartureCalendarModel(tour.id, tourEvents),
+    [tour.id, tourEvents]
+  );
+
+  const eventsByDate = useMemo(
+    () => buildTourDepartureEventsByDate(tour.id, tourEvents),
+    [tour.id, tourEvents]
+  );
+
+  const [displayMonth, setDisplayMonth] = useState(departureCalendar.focusMonth);
+
+  useEffect(() => {
+    setDisplayMonth(departureCalendar.focusMonth);
+  }, [departureCalendar.focusMonth.getTime()]);
+
+  const { futureDates } = departureCalendar;
 
   const ariaPrice =
     displayPricePrevious != null && displayPricePrevious.length > 0
@@ -47,8 +67,8 @@ const TourDetailPriceHighlight = ({
       : displayPrice;
 
   const departuresAriaLabel =
-    futureDepartureDates.length > 0
-      ? `${UI.tourDetail.departuresHeading}: ${futureDepartureDates.map(formatDepartureDate).join(", ")}`
+    futureDates.length > 0
+      ? `${UI.tourDetail.departuresHeading}: ${futureDates.map(formatDepartureDate).join(", ")}`
       : `${UI.tourDetail.departuresHeading}: ${UI.tourDetail.departuresEmpty}`;
 
   const note = tour.priceFootnote ?? UI.tourDetail.priceHighlightNote;
@@ -89,15 +109,21 @@ const TourDetailPriceHighlight = ({
 
         {isDeparturesLoading ? (
           <div
-            className="mt-3 h-10 animate-pulse rounded bg-surface-dark/10"
+            className="mt-3 h-48 animate-pulse rounded bg-surface-dark/10"
             aria-label={UI.tourDetail.departuresLoadingAria}
           />
-        ) : futureDepartureDates.length > 0 ? (
-          <ul className="mt-3 space-y-1 text-center text-tour-detail-prose text-text-muted sm:text-left">
-            {futureDepartureDates.map(isoDate => (
-              <li key={isoDate}>{formatDepartureDate(isoDate)}</li>
-            ))}
-          </ul>
+        ) : futureDates.length > 0 ? (
+          <div className="mt-3">
+            <TourDepartureMonthCalendar
+              mode="display"
+              departureDateSet={departureCalendar.departureDateSet}
+              monthsWithDepartures={departureCalendar.monthsWithDepartures}
+              displayMonth={displayMonth}
+              onDisplayMonthChange={setDisplayMonth}
+              season={tour.season}
+              eventsByDate={eventsByDate}
+            />
+          </div>
         ) : (
           <p className="mt-3 text-center text-tooltip text-text-muted sm:text-left">
             {UI.tourDetail.departuresEmpty}

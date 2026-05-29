@@ -1,5 +1,9 @@
 import type { ClassNames } from 'react-day-picker';
 import { TOUR_CALENDAR_DAY_BUTTON_CLASS } from '../../constants/tourCalendarLayout';
+import {
+  TOUR_CALENDAR_DAY_CELL_HAS_EVENTS_CLASS,
+  TOUR_CALENDAR_DAY_SELECTED_CLASS,
+} from '../../constants/tourCalendarShared';
 
 export const tourCalendarClassNames: Partial<ClassNames> = {
   root: 'tour-calendar rdp-root w-full',
@@ -15,14 +19,12 @@ export const tourCalendarClassNames: Partial<ClassNames> = {
   day: 'flex flex-1 items-center justify-center p-0.5',
   day_button: TOUR_CALENDAR_DAY_BUTTON_CLASS,
   outside: 'text-text-muted/40',
-  today: 'font-semibold ring-1 ring-divider',
-  selected: 'bg-season-spring/15 ring-2 ring-season-spring font-semibold',
+  today: 'font-semibold',
+  selected: TOUR_CALENDAR_DAY_SELECTED_CLASS,
   disabled: 'opacity-30 pointer-events-none',
   hidden: 'invisible',
 };
 
 export const tourCalendarModifierClassNames = {
-  hasEvents: 'tour-calendar__day--has-events font-medium',
-  tourDeparture: 'tour-calendar__day--departure font-semibold',
-  nearest: 'tour-calendar__day--nearest ring-2',
+  hasEvents: TOUR_CALENDAR_DAY_CELL_HAS_EVENTS_CLASS,
 } as const;

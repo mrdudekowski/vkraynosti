@@ -4,6 +4,10 @@ import { faRoute } from '@fortawesome/free-solid-svg-icons/faRoute';
 import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers';
 import { UI } from "../../constants/ui";
 import type { Tour } from "../../types";
+import {
+  hasCustomTourDifficultyLabel,
+  resolveTourDifficultyLabel,
+} from "../../utils/tourDifficultyLabel";
 
 const DIFFICULTY_TEXT_FG: Record<Tour["difficulty"], string> = {
   Easy: "text-difficulty-easy-fg",
@@ -13,7 +17,7 @@ const DIFFICULTY_TEXT_FG: Record<Tour["difficulty"], string> = {
 };
 
 export interface TourDetailMetaFactsProps {
-  duration: string;
+  displayDuration: string;
   difficulty: Tour["difficulty"];
   metaAudienceLabel?: string;
   difficultyDisplayLabel?: string;
@@ -22,7 +26,7 @@ export interface TourDetailMetaFactsProps {
 }
 
 const TourDetailMetaFacts = ({
-  duration,
+  displayDuration,
   difficulty,
   metaAudienceLabel,
   difficultyDisplayLabel,
@@ -33,18 +37,12 @@ const TourDetailMetaFacts = ({
   const rowGapClass = size === "prominent" ? "gap-4" : "gap-2.5";
   const hasAudienceMeta =
     metaAudienceLabel != null && metaAudienceLabel.length > 0;
-  const customDifficultyText =
-    !hasAudienceMeta &&
-    difficultyDisplayLabel != null &&
-    difficultyDisplayLabel.length > 0
-      ? difficultyDisplayLabel
-      : null;
+  const hasCustomDifficulty =
+    !hasAudienceMeta && hasCustomTourDifficultyLabel({ difficultyDisplayLabel });
   const difficultyFactValue =
     hasAudienceMeta && metaAudienceLabel != null
       ? metaAudienceLabel
-      : customDifficultyText != null
-        ? customDifficultyText
-        : UI.difficulty.labels[difficulty];
+      : resolveTourDifficultyLabel({ difficulty, difficultyDisplayLabel });
 
   return (
   <section
@@ -53,7 +51,7 @@ const TourDetailMetaFacts = ({
   >
     <div
       className="tour-detail-key-facts__item tour-detail-key-facts__item--delay-0"
-      aria-label={`${UI.tourDetail.metaLabelDuration}: ${duration}`}
+      aria-label={`${UI.tourDetail.metaLabelDuration}: ${displayDuration}`}
     >
       <p className="tour-detail-key-facts__meta-title">
         {UI.tourDetail.metaDurationTitleAbove}
@@ -64,7 +62,7 @@ const TourDetailMetaFacts = ({
           className="shrink-0 text-brand-primary transition-colors duration-hover group-hover:text-brand-secondary"
           aria-hidden
         />
-        {duration}
+        {displayDuration}
       </span>
     </div>
     <div
@@ -78,7 +76,7 @@ const TourDetailMetaFacts = ({
       <p className="tour-detail-key-facts__meta-title">
         {hasAudienceMeta
           ? UI.tourDetail.metaAudienceTitleAbove
-          : customDifficultyText != null
+          : hasCustomDifficulty
             ? UI.tourDetail.metaLabelDifficulty
             : UI.tourDetail.metaDifficultyTitleAbove}
       </p>

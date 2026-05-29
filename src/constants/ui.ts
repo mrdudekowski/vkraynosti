@@ -111,7 +111,7 @@ export const UI = {
       'Формируем маршрут',
       'Отслеживаем погоду',
       'Проверяем снаряжение',
-      'Готовимся к внедорожью',
+      'Готовимся к "бездорожью"',
       'Ищем колышки от палатки',
       'Наполняем фляги водичкой',
     ] as const,
@@ -193,6 +193,10 @@ export const UI = {
       Hard:   'Сложный',
       Expert: 'Эксперт',
     },
+    /** Нестандартные подписи сложности (не совпадают с `labels`). Сборка диапазонов — `formatDifficultyRangeLabel`. */
+    customLabels: {
+      easyHiking: 'Лёгкий хайкинг',
+    },
     styles: {
       Easy:   'bg-difficulty-easy-bg text-difficulty-easy-fg',
       Medium: 'bg-difficulty-medium-bg text-difficulty-medium-fg',
@@ -205,7 +209,7 @@ export const UI = {
     audienceChipClasses: 'bg-brand-accent text-brand-primary',
     /**
      * Разделитель в подписи диапазона на чипе (как «Лёгкий / Средний» у Аскольда).
-     * В `toursData` собирать строку из `UI.difficulty.labels` и этого разделителя.
+     * Диапазоны собирать через `formatDifficultyRangeLabel` в `src/utils/tourDifficultyLabel.ts`.
      */
     metaAudienceDifficultyRangeSeparator: ' / ',
     /** Карточка тура на главной (сезон «зима»): основная строка цены; ниже — зачёркнутая ранее указанная сумма. */
@@ -233,6 +237,9 @@ export const UI = {
     metaLabelDifficulty: 'Сложность',
     /** Над значением длительности в `TourDetailMetaFacts` (полупрозрачная подпись). */
     metaDurationTitleAbove: 'Длительность',
+    /** Каталог Туры_* кол. D → блок «Длительность» и карточка тура. */
+    durationDisplayOneDay: '1 день',
+    durationDisplayMultiDay: '2 дня',
     /** Над значением сложности в `TourDetailMetaFacts` (полупрозрачная подпись). */
     metaDifficultyTitleAbove: 'Уровень сложности',
     /** Подпись и `aria-label` для блока аудитории, если задан `Tour.metaAudienceLabel`. */

@@ -30,6 +30,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Cursor local debug dumps (rules/settings may stay tracked for the team)
+.cursor/debug*.log
+
 # Исходники фото/видео туров (не в репозитории)
 /content/
 
@@ -43,12 +46,21 @@ public/**/source-*
 /perf-*.json
 /lighthouse-report*.json
 /lighthouse-*.json
+/.lighthouse*.json
 /video-audit*.json
 /phase4-network-snapshot.json
 /test-results/
+/playwright-report/
+/blob-report/
+*.tsbuildinfo
 
-# Docs can be generated / maintained externally; ignore folder by default.
-docs/
+# Internal docs & audits (not imported by build/test; keep locally)
+/docs/
+/optimize/
+
+# Markdown outside repo root (README.md at / is allowed)
+**/*.md
+!/*.md
 
 # Template / temporary project artifacts
 /pred-plan.md

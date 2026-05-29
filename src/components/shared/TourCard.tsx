@@ -5,6 +5,8 @@ import type { Tour } from '../../types';
 import { buildTourDetailPath } from '../../constants/routes';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import { UI } from '../../constants/ui';
+import { resolveTourDifficultyLabel } from '../../utils/tourDifficultyLabel';
+import { useTourDisplayDuration } from '../../hooks/useTourDisplayDuration';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import PlaceholderImage from './PlaceholderImage';
 
@@ -30,6 +32,12 @@ const winterCardStruckPrice = (tour: Tour): string | null => {
 interface TourCardPriceProps {
   tour: Tour;
 }
+
+const TourCardDuration = ({ tour }: TourCardPriceProps) => {
+  const { displayDuration } = useTourDisplayDuration(tour);
+  if (displayDuration.length === 0) return null;
+  return <span className="text-text-muted">{displayDuration}</span>;
+};
 
 const TourCardPrice = ({ tour }: TourCardPriceProps) => {
   const { priceRub, displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
@@ -66,10 +74,7 @@ const TourCardPrice = ({ tour }: TourCardPriceProps) => {
 const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
   const showAudienceLine =
     tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0;
-  const showCustomDifficultyChip =
-    !showAudienceLine &&
-    tour.difficultyDisplayLabel != null &&
-    tour.difficultyDisplayLabel.length > 0;
+  const difficultyLabel = resolveTourDifficultyLabel(tour);
 
   return (
     <>
@@ -97,14 +102,12 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
           >
             {showAudienceLine
               ? tour.metaAudienceLabel
-              : showCustomDifficultyChip
-                ? tour.difficultyDisplayLabel
-                : UI.difficulty.labels[tour.difficulty]}
+              : difficultyLabel}
           </span>
         </div>
         <p className="mb-3 text-sm text-text-muted">{tour.subtitle}</p>
         <div className="flex flex-col gap-2 text-sm">
-          <span className="text-text-muted">{tour.duration}</span>
+          <TourCardDuration tour={tour} />
           <div className="w-full text-right">
             <TourCardPrice tour={tour} />
           </div>

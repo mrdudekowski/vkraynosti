@@ -26,4 +26,6 @@ export interface TourSchedulePayload {
   events: TourScheduleEvent[];
   /** Каталог цен из листов Туры_* (tourId → ₽). */
   catalogPrices: Record<string, number>;
+  /** Каталог типов из листов Туры_* кол. D (tourId → однодневный | многодневный). */
+  catalogDurationTypes: Record<string, TourScheduleDurationType>;
 }

@@ -109,21 +109,28 @@ import {
   TOUR_SUMMER_12_GALLERY_VIEWER,
   TOUR_SUMMER_12_PREFACE_BACKGROUND,
 } from '../constants/images';
+import {
+  TOUR_SUMMER_13_STUB,
+  TOUR_SUMMER_14_STUB,
+  TOUR_SUMMER_15_STUB,
+  TOUR_SUMMER_16_STUB,
+  TOUR_SUMMER_17_STUB,
+  TOUR_SUMMER_18_STUB,
+  TOUR_SUMMER_19_STUB,
+} from '../constants/summerTourStubMedia';
 import { FALL_TOUR_MEDIA_BY_ID } from '../constants/generated/fallTourMedia.generated';
 import { SUMMER_PAIRED_TOUR_MEDIA_BY_ID } from '../constants/generated/summerPairedTourMedia.generated';
 import { UI } from '../constants/ui';
 import { buildFallToursFromSpring } from './createFallTourFromSpring';
+import { createSummerTourStub } from './createSummerTourStub';
 import { buildSummerToursFromSpring } from './createSummerTourFromSpring';
+
+import { formatDifficultyRangeLabel } from '../utils/tourDifficultyLabel';
 
 const inc = (text: string, icon: IconDefinition = faCheck): TourIncludedItem => ({
   text,
   icon,
 });
-
-/** Диапазон сложности из `UI.difficulty.labels` (склонение -ий: Лёгкий / Средний / Сложный). */
-const difficultyRangeLabel = (
-  ...levels: Array<keyof typeof UI.difficulty.labels>
-) => levels.join(UI.tourCard.metaAudienceDifficultyRangeSeparator);
 
 const TOURS_CORE: Tour[] = [
   // WINTER — 5 tours
@@ -339,7 +346,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Арсгора ждёт приморских райдеров',
     duration: '2 дня',
     difficulty: 'Medium',
-    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Hard'),
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Hard'),
     price: UI.tourCard.winterPricePlaceholderNoListing,
     pricePrevious: '13 000 ₽',
     priceFootnote: 'Актуальную стоимость сообщим по запросу.',
@@ -583,7 +590,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Катер, маяк, кекуры и лежбища ларг за один день',
     duration: '12–14 часов',
     difficulty: 'Medium',
-    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Hard'),
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Hard'),
     price: '7 000 ₽',
     descriptionLeadBold: 'Остров Аскольд',
     description:
@@ -745,7 +752,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Скалистые мысы, реликтовый лес и бескрайнее море!',
     duration: '15 часов',
     difficulty: 'Easy',
-    difficultyDisplayLabel: 'Лёгкий хайкинг',
+    difficultyDisplayLabel: UI.difficulty.customLabels.easyHiking,
     price: '6 500 ₽',
     priceFootnote: 'Июль-август: 7 200 ₽.',
     descriptionLeadBold: 'Полуостров Гамова',
@@ -1046,7 +1053,7 @@ const TOURS_CORE: Tour[] = [
     galleryGridUrls: [...TOUR_SPRING_1_GALLERY_GRID],
   },
 
-  // SUMMER — 12 tours (summer-1, summer-7…12 — уникальные; summer-2…6 — фабрика)
+  // SUMMER — 19 tours (summer-1, summer-7…19 — уникальные; summer-2…6 — фабрика)
   {
     id: 'summer-1',
     season: 'summer',
@@ -1055,7 +1062,6 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Бирюзовое море, скалы и ферма маралов',
     duration: '2 дня / 1 ночь',
     difficulty: 'Easy',
-    difficultyDisplayLabel: UI.difficulty.labels.Easy,
     price: 'от 15 000 ₽',
     priceFootnote: 'группа от 4 человек',
     description:
@@ -1100,7 +1106,6 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Конец дорог — начало севера. Два дня у океана под звёздами',
     duration: '2 дня / 1 ночь',
     difficulty: 'Medium',
-    difficultyDisplayLabel: UI.difficulty.labels.Medium,
     price: '19 500 ₽',
     priceFootnote: 'на одного участника, группа от 5 человек',
     description:
@@ -1181,7 +1186,6 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Зелёные холмы, море и ночь в палатке на полуострове Краббе',
     duration: '2 дня / 1 ночь',
     difficulty: 'Medium',
-    difficultyDisplayLabel: UI.difficulty.labels.Medium,
     price: 'по запросу',
     description:
       'Это путешествие для тех, кто любит не спешить: красивую дорогу, море с двух сторон, живые разговоры, ужин в лагере и такие места, после которых внутри становится тихо и хорошо.\n\nПолуостров Краббе — одно из самых атмосферных мест юга Приморья: он необитаем, входит в буферную зону охраняемых территорий и известен вулканическими берегами, гротами, арками, кекурами и бухтой Агатовой с разноцветной галькой.',
@@ -1267,7 +1271,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Пикник у водопада и посещение местной винодельни',
     duration: '1 день',
     difficulty: 'Easy',
-    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
     price: 'по запросу',
     description:
       'Это путешествие для тех, кто любит, когда в одном дне красиво сочетаются природа, отдых и вкусные впечатления. Сначала нас ждёт водопад Неожиданный: лес, шум воды, пикник, отдых у водопада и, по желанию, купание. А потом — переезд в Майхинское хозяйство, чтобы завершить день в атмосфере уюта, тишины и приморского виноделия.\n\nЭтот маршрут — про живое удовольствие от простых вещей: пройтись по лесу, посидеть у воды, выдохнуть, вкусно провести день и разделить всё это с хорошими людьми. Именно такие поездки мы любим больше всего — лёгкие, красивые и по-настоящему душевные.',
@@ -1311,7 +1315,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Вершина, бирюзовая бухта, сапы — два дня, которые хочется повторить',
     duration: '2 дня / 1 ночь',
     difficulty: 'Easy',
-    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
     price: 'по запросу',
     description:
       'Это два дня среди тех красот Приморья, в которые мы сами искренне влюблены. Сначала — лёгкое восхождение на Сестру, потом — бухта Ежовая с прозрачной водой и белым песком, а на следующий день — ещё одна красивая морская локация: бухта Спокойная или Окунёвая. Всё, чтобы уехать домой с лёгкой головой, красивыми фотографиями и очень тёплым чувством внутри.',
@@ -1385,7 +1389,6 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Бирюзовая вода, белый песок, сапы — день, после которого легко внутри',
     duration: '1 день',
     difficulty: 'Easy',
-    difficultyDisplayLabel: UI.difficulty.labels.Easy,
     price: 'по запросу',
     description:
       'Это день для тех, кто хочет просто выдохнуть и красиво провести время у моря. В зависимости от дорожных условий мы отправимся в бухту Ежовую или бухту Спокойную — в те места, где Приморье особенно нежное: светлая вода, белый песок, тёплые камни, спокойный отдых и никакой гонки.\n\nБерём с собой сапы, чтобы ещё сильнее почувствовать море, проплыть вдоль берега, полюбоваться бухтой с воды и просто побыть в моменте. Такой выезд мы любим за лёгкость, душевную компанию и то самое маленькое счастье, которое дарят красивые дороги, море и живые путешествия.',
@@ -1433,7 +1436,7 @@ const TOURS_CORE: Tour[] = [
     heroPhrase: 'Туда, где море до самой границы — и закат, который запомнишь',
     duration: '2 дня / 1 ночь',
     difficulty: 'Easy',
-    difficultyDisplayLabel: difficultyRangeLabel('Easy', 'Medium'),
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
     price: 'по запросу',
     description:
       'Это маршрут для тех, кто любит живые путешествия и места с характером. Пляж Трёх границ — одна из самых необычных точек Приморья: огромная песчаная полоса у самой южной части края, рядом с рекой Туманной и местом, где сходятся границы России, Китая и КНДР.',
@@ -1510,6 +1513,59 @@ const TOURS_CORE: Tour[] = [
     galleryImages: [...TOUR_SUMMER_12_GALLERY_VIEWER],
     galleryGridUrls: [...TOUR_SUMMER_12_GALLERY_GRID],
   },
+  createSummerTourStub({
+    id: 'summer-13',
+    title: 'Один день в Та-Чингоузе',
+    duration: '1 день',
+    difficulty: 'Easy',
+    media: TOUR_SUMMER_13_STUB,
+  }),
+  createSummerTourStub({
+    id: 'summer-14',
+    title: 'Уникальный остров Петрова',
+    duration: '1 день',
+    difficulty: 'Easy',
+    media: TOUR_SUMMER_14_STUB,
+  }),
+  createSummerTourStub({
+    id: 'summer-15',
+    title: 'Один день в Дубовой',
+    duration: '1 день',
+    difficulty: 'Easy',
+    media: TOUR_SUMMER_15_STUB,
+  }),
+  createSummerTourStub({
+    id: 'summer-16',
+    title: 'Робинзонада Краббе х Гамова',
+    duration: '2 дня / 1 ночь',
+    difficulty: 'Medium',
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
+    media: TOUR_SUMMER_16_STUB,
+  }),
+  createSummerTourStub({
+    id: 'summer-17',
+    title: 'Робинзонада на Север Приморья',
+    duration: '2 дня / 1 ночь',
+    difficulty: 'Medium',
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
+    media: TOUR_SUMMER_17_STUB,
+  }),
+  createSummerTourStub({
+    id: 'summer-18',
+    title: 'Робинзонада в Ежовую',
+    duration: '2 дня / 1 ночь',
+    difficulty: 'Easy',
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
+    media: TOUR_SUMMER_18_STUB,
+  }),
+  createSummerTourStub({
+    id: 'summer-19',
+    title: 'Робинзонада на Пляж 3х Границ',
+    duration: '2 дня / 1 ночь',
+    difficulty: 'Easy',
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
+    media: TOUR_SUMMER_19_STUB,
+  }),
 ];
 
 const springTours = TOURS_CORE.filter((tour) => tour.season === 'spring');

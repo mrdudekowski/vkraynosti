@@ -33,6 +33,7 @@ describe('fetchTourSchedule', () => {
     expect(payload.events).toHaveLength(1);
     expect(payload.events[0]?.tourId).toBe('spring-3');
     expect(payload.catalogPrices).toEqual({ 'spring-3': 6000 });
+    expect(payload.catalogDurationTypes).toEqual({ 'spring-3': 'однодневный' });
   });
 
   it('parses wrapped response with catalog prices', async () => {
@@ -62,6 +63,35 @@ describe('fetchTourSchedule', () => {
     expect(payload.catalogPrices).toEqual({
       'spring-3': 6500,
       'spring-1': 6000,
+    });
+  });
+
+  it('parses wrapped response with catalog duration types', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        events: [
+          {
+            date: '2026-05-09',
+            tourId: 'spring-3',
+            durationType: 'многодневный',
+            priceRub: 6000,
+            seats: 8,
+            status: 'open',
+            comment: null,
+          },
+        ],
+        durationTypes: {
+          'spring-3': 'однодневный',
+          'summer-7': 'многодневный',
+        },
+      }),
+    } as Response);
+
+    const payload = await fetchTourSchedule();
+    expect(payload.catalogDurationTypes).toEqual({
+      'spring-3': 'однодневный',
+      'summer-7': 'многодневный',
     });
   });
 

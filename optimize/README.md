@@ -41,6 +41,7 @@
 | `documentation-dx/` | README, промпты, DX |
 | `questions/` | открытые вопросы к команде |
 | [`tailwind/`](tailwind/) | **глубокий Tailwind/design-system аудит** (`TW-*`) — см. [`docs/TAILWIND_EXPERT_DEEP_AUDIT_AGENT_PROMPT.md`](../docs/TAILWIND_EXPERT_DEEP_AUDIT_AGENT_PROMPT.md) |
+| [`home-funnel/`](home-funnel/) | **воронка главной (core F0–F6)** (`HF-*`) — см. [`docs/HOME_FUNNEL_AUDIT_AGENT_PROMPT.md`](../docs/HOME_FUNNEL_AUDIT_AGENT_PROMPT.md) |
 
 ## ID находок
 

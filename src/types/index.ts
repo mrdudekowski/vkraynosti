@@ -17,16 +17,18 @@ export interface Tour {
   title: string;
   subtitle: string;
   heroPhrase: string;
+  /** @deprecated для UI — `durationTypes` из расписания / `useTourDisplayDuration`. */
   duration: string;
   difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert';
   /**
    * Если задано, на карточке и в мета-блоке страницы тура показывается этот текст
-   * вместо уровня сложности (например диапазон «Лёгкий / Средний» или «Лёгкий / Сложный» из `UI.difficulty.labels`).
+   * вместо `UI.difficulty.labels[difficulty]`. Диапазоны — `formatDifficultyRangeLabel`;
+   * канон подписей — `UI.difficulty.labels` / `UI.difficulty.customLabels`.
    */
   metaAudienceLabel?: string;
   /**
    * Текст сложности под заголовком «Сложность» (`UI.tourDetail.metaLabelDifficulty`) в мета-блоке
-   * и в чипе карточки. Не сочетать с `metaAudienceLabel`.
+   * и в чипе карточки. Не сочетать с `metaAudienceLabel`. Резолв в UI — `resolveTourDifficultyLabel`.
    */
   difficultyDisplayLabel?: string;
   price: string;

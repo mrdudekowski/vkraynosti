@@ -2,6 +2,10 @@ import { CONTACTS, SITE_URL } from './contacts';
 import { ROUTES, buildTourDetailPath } from './routes';
 import type { Season, Tour } from '../types';
 import { UI } from './ui';
+import {
+  hasCustomTourDifficultyLabel,
+  resolveTourDifficultyLabel,
+} from '../utils/tourDifficultyLabel';
 
 export type RobotsDirective = 'index,follow' | 'noindex,nofollow' | 'noindex,follow';
 
@@ -72,17 +76,29 @@ export const getSeasonSeoEntry = (season: Season, path: string): SeoEntry => ({
   path,
 });
 
-export const getTourSeoEntry = (tour: Tour): SeoEntry => {
+export interface TourSeoDurationOptions {
+  displayDuration?: string;
+}
+
+export const getTourSeoEntry = (
+  tour: Tour,
+  options?: TourSeoDurationOptions
+): SeoEntry => {
   const metaSnippet = tour.program
     .slice(0, 3)
     .map(step => step.description)
     .join(', ');
 
   const seasonLabel = UI.seasons[tour.season].label;
+  const durationSnippet = options?.displayDuration?.trim();
+  const durationPart =
+    durationSnippet != null && durationSnippet.length > 0
+      ? `${durationSnippet}, `
+      : '';
 
   return {
     title: `${tour.title} — ${seasonLabel} | ${SITE_NAME}`,
-    description: `${seasonLabel}: ${tour.subtitle}. ${tour.duration}, ${tour.price}. ${metaSnippet}.`,
+    description: `${seasonLabel}: ${tour.subtitle}. ${durationPart}${tour.price}. ${metaSnippet}.`,
     path: buildTourDetailPath(tour.season, tour.id),
   };
 };
@@ -137,8 +153,11 @@ export const getTourBreadcrumbSchema = (tour: Tour) => {
   } as const;
 };
 
-export const getTourStructuredData = (tour: Tour) => {
-  const seoEntry = getTourSeoEntry(tour);
+export const getTourStructuredData = (
+  tour: Tour,
+  options?: TourSeoDurationOptions
+) => {
+  const seoEntry = getTourSeoEntry(tour, options);
 
   return {
     '@context': 'https://schema.org',
@@ -155,7 +174,8 @@ export const getTourStructuredData = (tour: Tour) => {
     },
     touristType:
       tour.metaAudienceLabel ??
-      tour.difficultyDisplayLabel ??
-      'Для взрослых путешественников',
+      (hasCustomTourDifficultyLabel(tour)
+        ? resolveTourDifficultyLabel(tour)
+        : 'Для взрослых путешественников'),
   } as const;
 };

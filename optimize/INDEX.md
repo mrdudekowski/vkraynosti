@@ -72,6 +72,22 @@
 
 ---
 
+## Home funnel / core главная (2026-05-27)
+
+Отдельный проход: [`home-funnel/INDEX.md`](home-funnel/INDEX.md) · [`home-funnel/SUMMARY.md`](home-funnel/SUMMARY.md)
+
+| id | title | stage | severity | status | file |
+|----|-------|-------|----------|--------|------|
+| HF-2026-001 | Cross-ref OPT/TW F0–F6 | F0-F6 | info | confirmed | [home-funnel/chrome-scroll/info-related-findings-crossref.md](home-funnel/chrome-scroll/info-related-findings-crossref.md) |
+| HF-2026-002 | Нет e2e scroll F1→F6 | F1 | low | fixed | [home-funnel/tests-e2e/low-no-e2e-core-funnel-scroll-journey.md](home-funnel/tests-e2e/low-no-e2e-core-funnel-scroll-journey.md) |
+| HF-2026-003 | F1–F3 eager Home chunk | F1 | low | confirmed | [home-funnel/lazy-performance/low-home-chunk-f1-f3-eager.md](home-funnel/lazy-performance/low-home-chunk-f1-f3-eager.md) |
+| HF-2026-004 | Stacking F3 matrix | F3 | info | wont-fix | [home-funnel/stacking-clicks/info-f3-overlay-stacking-matrix.md](home-funnel/stacking-clicks/info-f3-overlay-stacking-matrix.md) |
+| HF-2026-005 | Tablet 650–767 | F1 | info | wont-fix | [home-funnel/breakpoints-tablet/info-tablet-zone-650-767-gate-team.md](home-funnel/breakpoints-tablet/info-tablet-zone-650-767-gate-team.md) |
+
+**Open HF (actionable):** HF-003 · **Critical:** 0
+
+---
+
 ## Baseline (_runs/)
 
 

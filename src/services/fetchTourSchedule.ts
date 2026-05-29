@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { TourSchedulePayload } from '../types/tourSchedule';
+import { buildCatalogDurationTypesFromEvents } from '../utils/tourSchedule/buildCatalogDurationTypesFromEvents';
 import { buildTourPricesFromEvents } from '../utils/tourSchedule/buildTourPricesFromEvents';
 
 const tourScheduleStatusSchema = z.enum(['planned', 'open', 'full', 'cancelled', 'completed']);
@@ -17,12 +18,14 @@ export const tourScheduleEventSchema = z.object({
 });
 
 const tourSchedulePricesSchema = z.record(z.string(), z.number());
+const tourScheduleDurationTypesSchema = z.record(z.string(), tourScheduleDurationTypeSchema);
 
 export const tourScheduleResponseSchema = z.union([
   z.array(tourScheduleEventSchema),
   z.object({
     events: z.array(tourScheduleEventSchema),
     prices: tourSchedulePricesSchema.optional(),
+    durationTypes: tourScheduleDurationTypesSchema.optional(),
   }),
 ]);
 
@@ -50,6 +53,7 @@ const normalizeResponse = (
     return {
       events,
       catalogPrices: buildTourPricesFromEvents(events),
+      catalogDurationTypes: buildCatalogDurationTypesFromEvents(events),
     };
   }
 
@@ -57,6 +61,8 @@ const normalizeResponse = (
   return {
     events,
     catalogPrices: parsed.prices ?? buildTourPricesFromEvents(events),
+    catalogDurationTypes:
+      parsed.durationTypes ?? buildCatalogDurationTypesFromEvents(events),
   };
 };
 

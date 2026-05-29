@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { fetchTourSchedule } from '../services/fetchTourSchedule';
-import type { EnrichedScheduleEvent, TourScheduleLoadStatus } from '../types/tourSchedule';
+import type {
+  EnrichedScheduleEvent,
+  TourScheduleDurationType,
+  TourScheduleLoadStatus,
+} from '../types/tourSchedule';
 import { enrichScheduleEvents } from '../utils/tourSchedule/enrichScheduleEvents';
 import { groupEventsByIsoDate } from '../utils/tourSchedule/groupEventsByIsoDate';
 import { mergeTourPrices } from '../utils/tourSchedule/mergeTourPrices';
@@ -11,7 +15,13 @@ interface CachedSchedule {
   events: EnrichedScheduleEvent[];
   eventsByDate: Map<string, EnrichedScheduleEvent[]>;
   prices: ReadonlyMap<string, number>;
+  durationTypes: ReadonlyMap<string, TourScheduleDurationType>;
 }
+
+const toDurationTypesMap = (
+  catalogDurationTypes: Record<string, TourScheduleDurationType>
+): ReadonlyMap<string, TourScheduleDurationType> =>
+  new Map(Object.entries(catalogDurationTypes));
 
 let cachedSchedule: CachedSchedule | null = null;
 let inflightPromise: Promise<CachedSchedule> | null = null;
@@ -21,12 +31,13 @@ const loadSchedule = async (): Promise<CachedSchedule> => {
   if (inflightPromise) return inflightPromise;
 
   inflightPromise = fetchTourSchedule()
-    .then(({ events: rawEvents, catalogPrices }) => {
+    .then(({ events: rawEvents, catalogPrices, catalogDurationTypes }) => {
       const events = enrichScheduleEvents(rawEvents);
       const result: CachedSchedule = {
         events,
         eventsByDate: groupEventsByIsoDate(events),
         prices: mergeTourPrices(rawEvents, catalogPrices),
+        durationTypes: toDurationTypesMap(catalogDurationTypes),
       };
       cachedSchedule = result;
       return result;
@@ -64,6 +75,9 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   const [prices, setPrices] = useState<ReadonlyMap<string, number>>(
     cachedSchedule?.prices ?? new Map()
   );
+  const [durationTypes, setDurationTypes] = useState<
+    ReadonlyMap<string, TourScheduleDurationType>
+  >(cachedSchedule?.durationTypes ?? new Map());
   const [error, setError] = useState<Error | null>(null);
   const retryNonce = useRef(0);
 
@@ -71,6 +85,7 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
     setEvents(result.events);
     setEventsByDate(result.eventsByDate);
     setPrices(result.prices);
+    setDurationTypes(result.durationTypes);
     setStatus('success');
     setError(null);
   }, []);
@@ -117,8 +132,8 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   }, [applySchedule]);
 
   const value = useMemo(
-    () => ({ status, events, eventsByDate, prices, error, retry }),
-    [status, events, eventsByDate, prices, error, retry]
+    () => ({ status, events, eventsByDate, prices, durationTypes, error, retry }),
+    [status, events, eventsByDate, prices, durationTypes, error, retry]
   );
 
   return <TourScheduleContext.Provider value={value}>{children}</TourScheduleContext.Provider>;

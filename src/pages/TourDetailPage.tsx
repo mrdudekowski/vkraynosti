@@ -39,6 +39,7 @@ import { useTourProgramScrollReveal } from "../hooks/useTourProgramScrollReveal"
 import { useTourProgramViewportTrack } from "../hooks/useTourProgramViewportTrack";
 import { useModal } from "../context/useModal";
 import { useBrowserBackToHomeTours } from "../hooks/useBrowserBackToHomeTours";
+import { useTourDisplayDuration } from "../hooks/useTourDisplayDuration";
 import {
   resolveTourHeroImageUrl,
   resolveTourPrefaceBackgroundUrl,
@@ -132,6 +133,7 @@ const TourDetailPage = () => {
     tour?.description ?? "",
     tour?.descriptionAside
   );
+  const { displayDuration } = useTourDisplayDuration(tour ?? { id: tourId });
 
   if (!tour) {
     const notFoundBody = UI.tourDetail.notFoundWithId.replace("{id}", tourId);
@@ -167,8 +169,8 @@ const TourDetailPage = () => {
     summer: 'text-surface-dark',
     fall: 'text-text-inverse',
   }[tour.season];
-  const seoEntry = getTourSeoEntry(tour);
-  const tourStructuredData = getTourStructuredData(tour);
+  const seoEntry = getTourSeoEntry(tour, { displayDuration });
+  const tourStructuredData = getTourStructuredData(tour, { displayDuration });
   const breadcrumbStructuredData = getTourBreadcrumbSchema(tour);
   /** Bento/crop по маршруту; медиа — только `tour.id`. */
   const heroLayoutTourId = tour.contentSourceTourId ?? tour.id;
@@ -263,7 +265,7 @@ const TourDetailPage = () => {
                 <div className="tour-detail-meta-below-hero mb-tour-detail-meta-to-preface">
                   <TourDetailMetaFacts
                     size="prominent"
-                    duration={tour.duration}
+                    displayDuration={displayDuration}
                     difficulty={tour.difficulty}
                     metaAudienceLabel={tour.metaAudienceLabel}
                     difficultyDisplayLabel={tour.difficultyDisplayLabel}
@@ -324,7 +326,7 @@ const TourDetailPage = () => {
                   <div className={aboutTopClassName}>
                     <div className="tour-detail-about-column min-w-0">
                       <TourDetailMetaFacts
-                        duration={tour.duration}
+                        displayDuration={displayDuration}
                         difficulty={tour.difficulty}
                         metaAudienceLabel={tour.metaAudienceLabel}
                         difficultyDisplayLabel={tour.difficultyDisplayLabel}

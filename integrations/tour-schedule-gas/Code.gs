@@ -679,18 +679,22 @@ function rebuildCatalogPricesInCache_() {
   try {
     SpreadsheetApp.flush();
     var cached = getCachedScheduleJson_();
-    /** @type {{ events: Object[], prices: Object<string, number> }} */
-    var payload = cached ? JSON.parse(cached) : { events: [], prices: {} };
+    /** @type {{ events: Object[], prices: Object<string, number>, durationTypes: Object<string, string> }} */
+    var payload = cached ? JSON.parse(cached) : { events: [], prices: {}, durationTypes: {} };
     if (!payload.events) payload.events = [];
 
-    payload.prices = readCatalogPrices_(SpreadsheetApp.getActiveSpreadsheet());
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    payload.prices = readCatalogPrices_(ss);
+    payload.durationTypes = readCatalogDurationTypes_(ss);
     var json = JSON.stringify(payload);
     CacheService.getScriptCache().put(CACHE_KEY, json, CACHE_TTL_SEC);
     Logger.log(
       'rebuildCatalogPricesInCache_: events=' +
         payload.events.length +
         ' (unchanged), prices=' +
-        Object.keys(payload.prices).length
+        Object.keys(payload.prices).length +
+        ', durationTypes=' +
+        Object.keys(payload.durationTypes).length
     );
   } catch (err) {
     Logger.log('rebuildCatalogPricesInCache_: ' + err);
@@ -709,7 +713,7 @@ function rebuildScheduleCache_(fromEdit) {
     Logger.log('rebuildScheduleCache_: другой запуск уже идёт, пропуск.');
     var cached = getCachedScheduleJson_();
     if (cached) return cached;
-    return JSON.stringify({ events: [], prices: {} });
+    return JSON.stringify({ events: [], prices: {}, durationTypes: {} });
   }
 
   try {
@@ -734,9 +738,17 @@ function rebuildScheduleCache_(fromEdit) {
     });
 
     var prices = readCatalogPrices_(ss);
-    var payload = JSON.stringify({ events: events, prices: prices });
+    var durationTypes = readCatalogDurationTypes_(ss);
+    var payload = JSON.stringify({ events: events, prices: prices, durationTypes: durationTypes });
     CacheService.getScriptCache().put(CACHE_KEY, payload, CACHE_TTL_SEC);
-    Logger.log('rebuildScheduleCache_: events=' + events.length + ', prices=' + Object.keys(prices).length);
+    Logger.log(
+      'rebuildScheduleCache_: events=' +
+        events.length +
+        ', prices=' +
+        Object.keys(prices).length +
+        ', durationTypes=' +
+        Object.keys(durationTypes).length
+    );
     return payload;
   } finally {
     lock.releaseLock();
@@ -818,6 +830,43 @@ function readCatalogPrices_(ss) {
   }
 
   return prices;
+}
+
+/**
+ * Каталог Туры_*: кол. A (id), D (однодневный | многодневный). sync: scheduleSheetLabels.mjs CATALOG_HEADERS.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ * @returns {Object<string, string>}
+ */
+function readCatalogDurationTypes_(ss) {
+  /** @type {Object<string, string>} */
+  var durationTypes = {};
+
+  for (var i = 0; i < CATALOG_SHEET_NAMES.length; i++) {
+    var sheet = ss.getSheetByName(CATALOG_SHEET_NAMES[i]);
+    if (!sheet) continue;
+
+    var rows = sheet
+      .getRange(CATALOG_FIRST_DATA_ROW, 1, CATALOG_MAX_DATA_ROW - CATALOG_FIRST_DATA_ROW + 1, 4)
+      .getValues();
+
+    for (var r = 0; r < rows.length; r++) {
+      var tourId = normalizeTourId_(rows[r][0], null);
+      if (!tourId) continue;
+
+      var durationType = String(rows[r][3] || '').trim();
+      if (durationType !== 'однодневный' && durationType !== 'многодневный') {
+        if (durationType) {
+          Logger.log(
+            'readCatalogDurationTypes_: skip invalid type for ' + tourId + ': ' + durationType
+          );
+        }
+        continue;
+      }
+      durationTypes[tourId] = durationType;
+    }
+  }
+
+  return durationTypes;
 }
 
 /**

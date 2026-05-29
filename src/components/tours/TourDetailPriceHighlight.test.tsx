@@ -2,7 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import TourDetailPriceHighlight from './TourDetailPriceHighlight';
 import { TourScheduleContext } from '../../context/tour-schedule-context-definition';
-import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
+import type {
+  EnrichedScheduleEvent,
+  TourScheduleDurationType,
+} from '../../types/tourSchedule';
 import { getTourById } from '../../data/toursData';
 import { UI } from '../../constants/ui';
 
@@ -48,6 +51,9 @@ const scheduleContextValue = (
   events: enrichedEvents,
   eventsByDate: new Map(),
   prices: new Map([['spring-3', 6500]]),
+  durationTypes: new Map<string, TourScheduleDurationType>([
+    ['spring-3', 'однодневный'],
+  ]),
   error: null,
   retry: vi.fn(),
   ...overrides,

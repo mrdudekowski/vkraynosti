@@ -1157,6 +1157,8 @@ export const TOUR_SUMMER_12_GALLERY_VIEWER = [
 
 export const TOUR_SUMMER_12_GALLERY_GRID = TOUR_SUMMER_12_GALLERY_VIEWER;
 
+/** Заглушки медиа summer-13…19 до финального encode — `summerTourStubMedia.ts`. */
+
 /**
  * Секунда входа 5-секундного сегмента в исходном `*.grid.webm` для баннера зимы (колонки 0…9).
  * Синхронно с `cuts[].startSec` в `scripts/generate-home-season-banner-loop-videos.cjs`.

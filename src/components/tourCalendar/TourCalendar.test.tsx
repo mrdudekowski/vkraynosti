@@ -4,7 +4,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import TourCalendar from './TourCalendar';
 import { TourScheduleContext } from '../../context/tour-schedule-context-definition';
-import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
+import type {
+  EnrichedScheduleEvent,
+  TourScheduleDurationType,
+} from '../../types/tourSchedule';
 import { getTourById } from '../../data/toursData';
 import { UI } from '../../constants/ui';
 
@@ -57,6 +60,10 @@ const renderCalendar = () =>
           prices: new Map([
             ['spring-3', 6000],
             ['spring-6', 5500],
+          ]),
+          durationTypes: new Map<string, TourScheduleDurationType>([
+            ['spring-3', 'однодневный'],
+            ['spring-6', 'однодневный'],
           ]),
           error: null,
           retry: vi.fn(),

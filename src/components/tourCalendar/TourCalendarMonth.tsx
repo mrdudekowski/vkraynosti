@@ -55,7 +55,7 @@ const TourCalendarMonth = ({
 
   return (
     <div
-      className="rounded-card border border-divider bg-surface-light/90 p-4 shadow-md backdrop-blur-sm sm:p-6"
+      className="min-w-0 rounded-card border border-divider bg-surface-light/90 p-4 shadow-md backdrop-blur-sm sm:p-6"
       data-season={season}
     >
       <TourCalendarNav

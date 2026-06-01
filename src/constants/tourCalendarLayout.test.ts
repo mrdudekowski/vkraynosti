@@ -3,10 +3,12 @@ import type { Config } from 'tailwindcss';
 import tailwindConfig from '../../tailwind.config';
 import {
   TOUR_CALENDAR_DAY_BUTTON_CLASS,
+  TOUR_CALENDAR_DAY_CELL_CLASS,
   TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
   TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
   TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS,
 } from './tourCalendarLayout';
+import { TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH } from './tourDepartureCalendar';
 
 function getExtend<K extends string>(
   config: Config,
@@ -24,8 +26,11 @@ function getExtend<K extends string>(
 describe('tourCalendarLayout', () => {
   it('exposes class strings without arbitrary max-w/min-h', () => {
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('tour-calendar__day-btn');
-    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('rounded-full');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('max-w-tour-calendar-day-cell');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('overflow-hidden');
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).not.toContain('max-w-[');
+    expect(TOUR_CALENDAR_DAY_CELL_CLASS).toContain('min-w-0');
+    expect(TOUR_CALENDAR_DAY_CELL_CLASS).not.toContain('max-w-tour-calendar-day-cell');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).toContain('min-h-tour-calendar-day-panel');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).not.toContain('min-h-[');
   });
@@ -34,6 +39,7 @@ describe('tourCalendarLayout', () => {
     const maxWidth = getExtend(tailwindConfig as Config, 'maxWidth');
     const minHeight = getExtend(tailwindConfig as Config, 'minHeight');
     expect(maxWidth?.['tour-calendar-day-cell']).toBe(TOUR_CALENDAR_DAY_CELL_MAX_WIDTH);
+    expect(maxWidth?.['tour-departure-day-cell']).toBe(TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH);
     expect(minHeight?.['tour-calendar-day-panel']).toBe(TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT);
   });
 });

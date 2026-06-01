@@ -8,10 +8,9 @@ interface TourCalendarDayEventDotsProps {
 
 const TourCalendarDayEventDots = ({ events }: TourCalendarDayEventDotsProps) => {
   const visible = events.slice(0, 3);
-  const overflow = events.length - visible.length;
 
   return (
-    <span className="mt-0.5 flex items-center justify-center gap-0.5" aria-hidden>
+    <span className="mt-0.5 flex max-w-full items-center justify-center gap-0.5 overflow-hidden" aria-hidden>
       {visible.map(event => (
         <span
           key={`${event.tourId}-${event.date}`}
@@ -22,9 +21,6 @@ const TourCalendarDayEventDots = ({ events }: TourCalendarDayEventDotsProps) => 
           }}
         />
       ))}
-      {overflow > 0 && (
-        <span className="text-[10px] leading-none text-text-muted">+{overflow}</span>
-      )}
     </span>
   );
 };

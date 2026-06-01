@@ -142,6 +142,7 @@ import {
   TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
   TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
 } from './src/constants/tourCalendarLayout'
+import { TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH } from './src/constants/tourDepartureCalendar'
 
 /** Синхронно с `TOUR_INCLUDED_MOTOR_DURATION_MS` и `transitionDuration.tour-included`. */
 const TOUR_INCLUDED_MOTOR_DURATION = `${TOUR_INCLUDED_MOTOR_DURATION_MS}ms` as const
@@ -1080,6 +1081,8 @@ const config: Config = {
         'team-hero-slide': TEAM_HERO_SLIDE_MAX_WIDTH,
         /** Кнопка дня в `DayPicker` (`tourCalendarClassNames`). */
         'tour-calendar-day-cell': TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
+        /** Ячейка дня мини-календаря выездов. */
+        'tour-departure-day-cell': TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH,
       },
       minHeight: {
         /** Минимальная высота круглой кнопки «к hero» на воротах (`min-w-home-gate-scroll-hint-target`). */

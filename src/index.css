@@ -1114,6 +1114,10 @@
     --rdp-day-width: 2rem;
   }
 
+  .tour-calendar.rdp-root:not(.tour-departure-calendar) {
+    overflow-x: clip;
+  }
+
   [data-season='winter'] .tour-calendar,
   .tour-calendar[data-season='winter'] {
     --rdp-accent-color: theme('colors.season.winter');

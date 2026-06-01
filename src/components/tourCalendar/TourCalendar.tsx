@@ -39,7 +39,7 @@ const TourCalendar = ({ season }: TourCalendarProps) => {
           onRetry={retry}
         />
       </div>
-      <div className="order-1 lg:order-2">
+      <div className="order-1 min-w-0 lg:order-2">
         {!isLoading && !hasError && !isEmptyAll && (
           <TourCalendarMonth
             season={season}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import type { Tour } from "../../types";
@@ -6,6 +6,7 @@ import { UI } from "../../constants/ui";
 import TourDepartureMonthCalendar from "../tourDeparture/TourDepartureMonthCalendar";
 import { useTourDisplayPrice } from "../../hooks/useTourDisplayPrice";
 import { useTourSchedule } from "../../hooks/useTourSchedule";
+import { useSyncedDepartureDisplayMonth } from "../../hooks/useSyncedDepartureDisplayMonth";
 import { buildTourDepartureCalendarModel } from "../../utils/tourSchedule/buildTourDepartureCalendarModel";
 import { buildTourDepartureEventsByDate } from "../../utils/tourSchedule/buildTourDepartureEventsByDate";
 import { parseIsoDate } from "../../utils/tourSchedule/parseIsoDate";
@@ -53,11 +54,9 @@ const TourDetailPriceHighlight = ({
     [tour.id, tourEvents]
   );
 
-  const [displayMonth, setDisplayMonth] = useState(departureCalendar.focusMonth);
-
-  useEffect(() => {
-    setDisplayMonth(departureCalendar.focusMonth);
-  }, [departureCalendar.focusMonth.getTime()]);
+  const [displayMonth, setDisplayMonth] = useSyncedDepartureDisplayMonth(
+    departureCalendar.focusMonth
+  );
 
   const { futureDates } = departureCalendar;
 

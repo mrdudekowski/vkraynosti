@@ -22,6 +22,7 @@ import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useTourSchedule } from '../../hooks/useTourSchedule';
+import { useSyncedDepartureDisplayMonth } from '../../hooks/useSyncedDepartureDisplayMonth';
 import {
   useTourRequestModalSteps,
   type TourRequestModalStep,
@@ -116,7 +117,9 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
   );
 
   const [step, setStep] = useState<TourRequestModalStep>(initialStep);
-  const [displayMonth, setDisplayMonth] = useState(departureCalendar.focusMonth);
+  const [displayMonth, setDisplayMonth] = useSyncedDepartureDisplayMonth(
+    departureCalendar.focusMonth
+  );
   const [values, setValues] = useState<TourRequestFormInput>(() => ({
     ...defaultTourRequestFormValues,
     preferredDepartureDate: initialDepartureDateIso,
@@ -128,10 +131,6 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
   const successCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const season: Season = payload.season ?? tourEvents[0]?.season ?? 'spring';
-
-  useEffect(() => {
-    setDisplayMonth(departureCalendar.focusMonth);
-  }, [departureCalendar.focusMonth.getTime()]);
 
   useEffect(() => {
     modalAliveRef.current = true;

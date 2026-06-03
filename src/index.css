@@ -630,8 +630,10 @@
 
   .btn-cta-tour--dual {
     @apply font-body font-semibold;
-    --cta-letter-stagger-duration: theme('transitionDuration.cta-letter-stagger');
-    --cta-letter-pop-duration: theme('transitionDuration.cta-letter-pop');
+  }
+
+  .btn-cta-tour--dual::after {
+    background-color: theme('colors.home-gate-start-screen');
   }
 
   .btn-cta-tour--dual > .btn-cta-tour__layer {
@@ -649,7 +651,7 @@
 
   .btn-cta-tour__default {
     color: theme('colors.text.inverse');
-    transition: opacity theme('transitionDuration.cta-sweep') ease-in-out;
+    transition: opacity calc(theme('transitionDuration.cta-sweep') / 2) ease-in-out;
   }
 
   .btn-cta-tour__hover {
@@ -664,25 +666,15 @@
     display: inline-flex;
     align-items: center;
     gap: theme('spacing.2');
-    color: theme('colors.text.inverse');
-    /** Не наследовать `letterSpacing.cta` с кнопки — слово читается как обычный текст CTA. */
+    /** Не наследовать `letterSpacing.cta` с кнопки — wordmark задаёт свой tracking. */
     letter-spacing: normal;
-  }
-
-  .btn-cta-tour__wordmark {
-    display: inline-flex;
-    align-items: center;
-    letter-spacing: normal;
-    font: inherit;
-  }
-
-  .btn-cta-tour__letter,
-  .btn-cta-tour__arrow {
-    opacity: 0;
   }
 
   .btn-cta-tour__arrow {
     @apply inline-flex shrink-0 items-center justify-center;
+    opacity: 0;
+    color: theme('colors.text.inverse');
+    transition: opacity theme('transitionDuration.cta-sweep') ease-in-out;
   }
 
   .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__default,
@@ -696,15 +688,10 @@
     transition-duration: 0ms;
   }
 
-  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
   .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow,
-  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
   .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow {
-    animation-name: cta-letter-pop;
-    animation-duration: var(--cta-letter-pop-duration);
-    animation-timing-function: ease;
-    animation-fill-mode: forwards;
-    animation-delay: calc(var(--cta-letter-index) * var(--cta-letter-stagger-duration));
+    opacity: 1;
+    transition-delay: calc(theme('transitionDuration.cta-sweep') / 2);
   }
 
   .btn-cta-tour:disabled,
@@ -735,11 +722,9 @@
       animation: none;
     }
 
-    .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
     .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow,
-    .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__letter,
     .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow {
-      animation: none;
+      transition: none;
       opacity: 1;
     }
 

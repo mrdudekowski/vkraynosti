@@ -6,6 +6,7 @@ import {
   hasCustomTourDifficultyLabel,
   resolveTourDifficultyLabel,
 } from '../utils/tourDifficultyLabel';
+import type { TourPublicationStatus } from '../types/tourSchedule';
 
 export type RobotsDirective = 'index,follow' | 'noindex,nofollow' | 'noindex,follow';
 
@@ -78,16 +79,22 @@ export const getSeasonSeoEntry = (season: Season, path: string): SeoEntry => ({
 
 export interface TourSeoDurationOptions {
   displayDuration?: string;
+  publicationStatus?: TourPublicationStatus;
 }
 
 export const getTourSeoEntry = (
   tour: Tour,
   options?: TourSeoDurationOptions
 ): SeoEntry => {
-  const metaSnippet = tour.program
-    .slice(0, 3)
-    .map(step => step.description)
-    .join(', ');
+  const publicationStatus =
+    options?.publicationStatus ?? (tour.inDevelopment ? 'in_development' : 'active');
+  const metaSnippet =
+    publicationStatus === 'in_development'
+    ? UI.tourDetail.programInDevelopment
+    : tour.program
+        .slice(0, 3)
+        .map(step => step.description)
+        .join(', ');
 
   const seasonLabel = UI.seasons[tour.season].label;
   const durationSnippet = options?.displayDuration?.trim();

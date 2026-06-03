@@ -6,6 +6,7 @@ import SeasonLinkLabel from '../shared/SeasonLinkLabel';
 import { UI } from '../../constants/ui';
 import { CONTACTS } from '../../constants/contacts';
 import { ROUTES } from '../../constants/routes';
+import { useCookieConsent } from '../../context/useCookieConsent';
 import { toSafeExternalHttpHref, toSafeMailtoHref, toSafePhoneHref } from '../../utils/safeHref';
 import type { Season } from '../../types';
 
@@ -16,7 +17,10 @@ const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] 
   { season: 'fall', to: ROUTES.FALL, hoverClass: 'hover:text-season-fall' },
 ];
 
-const Footer = () => (
+const Footer = () => {
+  const { openBanner } = useCookieConsent();
+
+  return (
   <footer className="bg-home-season-banner-stage text-text-inverse">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -110,16 +114,26 @@ const Footer = () => (
 
       <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-text-inverse/40 text-sm">{UI.footer.rights}</p>
-        <Link
-          to={ROUTES.PRIVACY}
-          className="text-text-inverse/40 hover:text-text-inverse text-sm transition-colors duration-hover"
-          prefetch="intent"
-        >
-          {UI.footer.privacy}
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+          <button
+            type="button"
+            onClick={openBanner}
+            className="text-text-inverse/40 hover:text-text-inverse text-sm transition-colors duration-hover"
+          >
+            {UI.footer.cookieSettings}
+          </button>
+          <Link
+            to={ROUTES.PRIVACY}
+            className="text-text-inverse/40 hover:text-text-inverse text-sm transition-colors duration-hover"
+            prefetch="intent"
+          >
+            {UI.footer.privacy}
+          </Link>
+        </div>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;

@@ -1,4 +1,4 @@
-import { forwardRef, memo, useCallback, useRef, type MutableRefObject, type Ref } from 'react';
+import { forwardRef, memo, useCallback, useMemo, useRef, type MutableRefObject, type Ref } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
@@ -15,8 +15,9 @@ import { resolveTourHeroCoverBackgroundPosition } from '../../constants/tourCove
 import { TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX } from '../../constants/tourSpring3CoverCrop';
 import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { getToursBySeason } from '../../data/toursData';
+import { useTourSchedule } from '../../hooks/useTourSchedule';
 import { useSeason } from '../../context/useSeason';
+import { getVisibleToursBySeason } from '../../utils/tourSchedule/getVisibleToursBySeason';
 import type { Season } from '../../types';
 
 const HERO_PAGINATION_ACTIVE_DOT_CLASS: Record<Season, string> = {
@@ -44,7 +45,11 @@ function assignRef<T>(ref: Ref<T> | undefined, value: T | null): void {
 
 /** Смонтирован с `key={activeSeason}` в родителе — сброс индекса слайда без setState в эффекте. */
 function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
-  const tours = getToursBySeason(activeSeason);
+  const { publicationStatuses } = useTourSchedule();
+  const tours = useMemo(
+    () => getVisibleToursBySeason(activeSeason, publicationStatuses),
+    [activeSeason, publicationStatuses],
+  );
   const { current, next, prev, goTo, visitedSlideIndices } = useCarousel({
     total: tours.length,
     autoplayMs: UI.hero.autoplayIntervalMs,

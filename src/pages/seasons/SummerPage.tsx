@@ -1,11 +1,22 @@
+import { useMemo } from 'react';
 import TourCard from '../../components/shared/TourCard';
 import SeasonPageLayout from '../../components/seasons/SeasonPageLayout';
-import { getToursBySeason } from '../../data/toursData';
 import { ROUTES } from '../../constants/routes';
 import { getSeasonSeoEntry } from '../../constants/seo';
+import { useTourSchedule } from '../../hooks/useTourSchedule';
+import { sortToursInDevelopmentLast } from '../../utils/sortToursInDevelopmentLast';
+import { getVisibleToursBySeason } from '../../utils/tourSchedule/getVisibleToursBySeason';
 
 const SummerPage = () => {
-  const tours = getToursBySeason('summer');
+  const { publicationStatuses } = useTourSchedule();
+  const tours = useMemo(
+    () =>
+      sortToursInDevelopmentLast(
+        getVisibleToursBySeason('summer', publicationStatuses),
+        publicationStatuses,
+      ),
+    [publicationStatuses],
+  );
   const seoEntry = getSeasonSeoEntry('summer', ROUTES.SUMMER);
 
   return (

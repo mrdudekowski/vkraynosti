@@ -1,6 +1,9 @@
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS } from '../../constants/tourCalendarLayout';
+import {
+  TOUR_CALENDAR_DAY_HEADING_CLASS,
+  TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS,
+} from '../../constants/tourCalendarLayout';
 import { UI } from '../../constants/ui';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 import { toIsoDate } from '../../utils/tourSchedule/toIsoDate';
@@ -69,7 +72,7 @@ const TourCalendarDayPanel = ({
 
   return (
     <div aria-live="polite" aria-label={UI.tourCalendar.dayPanelAriaLabel}>
-      <h3 className="mb-4 font-heading text-lg capitalize text-text-primary">{formattedDate}</h3>
+      <h3 className={TOUR_CALENDAR_DAY_HEADING_CLASS}>{formattedDate}</h3>
       {dayEvents.length === 0 ? (
         <p className="text-text-muted">{UI.tourCalendar.emptyDay}</p>
       ) : (

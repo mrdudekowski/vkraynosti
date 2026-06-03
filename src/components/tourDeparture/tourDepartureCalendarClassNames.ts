@@ -3,7 +3,11 @@ import {
   TOUR_DEPARTURE_DAY_BUTTON_CLASS,
   TOUR_DEPARTURE_DAY_CELL_CLASS,
   TOUR_DEPARTURE_DAY_DEPARTURE_CLASS,
+  TOUR_DEPARTURE_WEEKDAY_CLASS,
 } from '../../constants/tourDepartureCalendar';
+import {
+  TOUR_CALENDAR_MONTH_GRID_CLASS,
+} from '../../constants/tourCalendarLayout';
 import { TOUR_CALENDAR_DAY_SELECTED_CLASS } from '../../constants/tourCalendarShared';
 
 export const tourDepartureCalendarClassNames: Partial<ClassNames> = {
@@ -12,11 +16,10 @@ export const tourDepartureCalendarClassNames: Partial<ClassNames> = {
   month: 'min-w-0 space-y-2',
   month_caption: 'hidden',
   nav: 'hidden',
-  month_grid: 'w-full min-w-0 border-collapse',
-  weekdays: 'flex min-w-0',
-  weekday:
-    'flex min-w-0 flex-1 text-center text-xs font-body uppercase tracking-wide text-text-muted pb-1',
-  week: 'mt-0.5 flex w-full min-w-0',
+  month_grid: TOUR_CALENDAR_MONTH_GRID_CLASS,
+  weekdays: '',
+  weekday: TOUR_DEPARTURE_WEEKDAY_CLASS,
+  week: '',
   day: TOUR_DEPARTURE_DAY_CELL_CLASS,
   day_button: TOUR_DEPARTURE_DAY_BUTTON_CLASS,
   outside: 'text-text-muted/40',

@@ -20,12 +20,16 @@ export const tourScheduleEventSchema = z.object({
 const tourSchedulePricesSchema = z.record(z.string(), z.number());
 const tourScheduleDurationTypesSchema = z.record(z.string(), tourScheduleDurationTypeSchema);
 
+const tourPublicationStatusSchema = z.enum(['active', 'hidden', 'in_development']);
+const tourSchedulePublicationStatusesSchema = z.record(z.string(), tourPublicationStatusSchema);
+
 export const tourScheduleResponseSchema = z.union([
   z.array(tourScheduleEventSchema),
   z.object({
     events: z.array(tourScheduleEventSchema),
     prices: tourSchedulePricesSchema.optional(),
     durationTypes: tourScheduleDurationTypesSchema.optional(),
+    publicationStatuses: tourSchedulePublicationStatusesSchema.optional(),
   }),
 ]);
 
@@ -54,6 +58,7 @@ const normalizeResponse = (
       events,
       catalogPrices: buildTourPricesFromEvents(events),
       catalogDurationTypes: buildCatalogDurationTypesFromEvents(events),
+      catalogPublicationStatuses: {},
     };
   }
 
@@ -63,6 +68,7 @@ const normalizeResponse = (
     catalogPrices: parsed.prices ?? buildTourPricesFromEvents(events),
     catalogDurationTypes:
       parsed.durationTypes ?? buildCatalogDurationTypesFromEvents(events),
+    catalogPublicationStatuses: parsed.publicationStatuses ?? {},
   };
 };
 

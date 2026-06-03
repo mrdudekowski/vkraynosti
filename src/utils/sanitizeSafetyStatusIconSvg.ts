@@ -47,6 +47,8 @@ const ALLOWED_ATTRS = new Set([
   'transform',
   'fill-rule',
   'clip-rule',
+  'stroke',
+  'stroke-width',
   'stroke-linejoin',
   'stroke-miterlimit',
 ]);

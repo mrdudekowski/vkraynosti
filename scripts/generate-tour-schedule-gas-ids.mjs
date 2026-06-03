@@ -6,7 +6,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadTourCatalog } from './lib/tourScheduleCatalog.mjs';
+import { loadSiteTourIds } from './lib/tourScheduleCatalog.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const gasPath = path.join(__dirname, '../integrations/tour-schedule-gas/Code.gs');
@@ -14,7 +14,7 @@ const gasPath = path.join(__dirname, '../integrations/tour-schedule-gas/Code.gs'
 const BEGIN = '// <SITE_TOUR_IDS_BEGIN>';
 const END = '// <SITE_TOUR_IDS_END>';
 
-const ids = loadTourCatalog().map((t) => t.id);
+const ids = loadSiteTourIds();
 const block = `${BEGIN}\nvar SITE_TOUR_IDS = ${JSON.stringify(ids)};\n${END}`;
 
 let source = readFileSync(gasPath, 'utf8');

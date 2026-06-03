@@ -6,6 +6,7 @@ import { buildTourDetailPath } from '../../constants/routes';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import { UI } from '../../constants/ui';
 import { resolveTourDifficultyLabel } from '../../utils/tourDifficultyLabel';
+import { useIsTourInDevelopment } from '../../hooks/useTourPublicationStatus';
 import { useTourDisplayDuration } from '../../hooks/useTourDisplayDuration';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import PlaceholderImage from './PlaceholderImage';
@@ -71,10 +72,32 @@ const TourCardPrice = ({ tour }: TourCardPriceProps) => {
   );
 };
 
-const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
+const cardInner = (
+  tour: Tour,
+  compact: boolean,
+  priorityImage: boolean,
+  inDevelopment: boolean,
+) => {
   const showAudienceLine =
-    tour.metaAudienceLabel != null && tour.metaAudienceLabel.length > 0;
+    !inDevelopment &&
+    tour.metaAudienceLabel != null &&
+    tour.metaAudienceLabel.length > 0;
   const difficultyLabel = resolveTourDifficultyLabel(tour);
+
+  const titleRow = (
+    <div className="mb-1 flex items-start justify-between gap-2">
+      <h3 className="min-w-0 flex-1 font-heading font-normal text-card leading-tight text-text-primary">
+        {tour.title}
+      </h3>
+      <span
+        className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+          showAudienceLine ? UI.tourCard.audienceChipClasses : UI.difficulty.styles[tour.difficulty]
+        }`}
+      >
+        {showAudienceLine ? tour.metaAudienceLabel : difficultyLabel}
+      </span>
+    </div>
+  );
 
   return (
     <>
@@ -90,42 +113,39 @@ const cardInner = (tour: Tour, compact: boolean, priorityImage: boolean) => {
           fetchPriority={priorityImage ? 'high' : 'auto'}
         />
       </div>
-      <div className="p-card-p">
-        <div className="mb-1 flex items-start justify-between gap-2">
-          <h3 className="min-w-0 flex-1 font-heading font-normal text-card leading-tight text-text-primary">
-            {tour.title}
-          </h3>
-          <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
-              showAudienceLine ? UI.tourCard.audienceChipClasses : UI.difficulty.styles[tour.difficulty]
-            }`}
-          >
-            {showAudienceLine
-              ? tour.metaAudienceLabel
-              : difficultyLabel}
-          </span>
-        </div>
-        <p className="mb-3 text-sm text-text-muted">{tour.subtitle}</p>
-        <div className="flex flex-col gap-2 text-sm">
-          <TourCardDuration tour={tour} />
-          <div className="w-full text-right">
-            <TourCardPrice tour={tour} />
+      <div className={`flex flex-1 flex-col p-card-p ${inDevelopment ? 'min-h-0' : ''}`}>
+        {titleRow}
+        <p className={`text-sm text-text-muted ${inDevelopment ? 'mb-0 flex-1' : 'mb-3'}`}>
+          {tour.subtitle}
+        </p>
+        {inDevelopment ? (
+          <p className="mt-3 font-brand-wordmark text-brand-wordmark-nav text-brand-primary text-center sm:text-left">
+            {UI.tourDetail.inDevelopmentPageAriaLabel}
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2 text-sm">
+            <TourCardDuration tour={tour} />
+            <div className="w-full text-right">
+              <TourCardPrice tour={tour} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );
 };
 
 const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = false }: TourCardProps) => {
+  const inDevelopment = useIsTourInDevelopment(tour);
+
   if (!onClick) {
     return (
       <Link
         to={buildTourDetailPath(tour.season, tour.id)}
-        className="card-base block h-full w-full max-h-tour-card max-w-tour-card justify-self-center cursor-pointer no-underline text-inherit"
+        className="card-base flex h-full w-full max-h-tour-card max-w-tour-card flex-col justify-self-center cursor-pointer no-underline text-inherit"
         prefetch="intent"
       >
-        {cardInner(tour, compact, priorityImage)}
+        {cardInner(tour, compact, priorityImage, inDevelopment)}
       </Link>
     );
   }
@@ -139,13 +159,13 @@ const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = fal
 
   return (
     <div
-      className="card-base h-full w-full max-h-tour-card max-w-tour-card justify-self-center cursor-pointer"
+      className="card-base flex h-full w-full max-h-tour-card max-w-tour-card flex-col justify-self-center cursor-pointer"
       onClick={onClick}
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
-      {cardInner(tour, compact, priorityImage)}
+      {cardInner(tour, compact, priorityImage, inDevelopment)}
     </div>
   );
 };

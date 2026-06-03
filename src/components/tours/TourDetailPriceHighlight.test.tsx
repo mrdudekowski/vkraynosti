@@ -55,6 +55,7 @@ const scheduleContextValue = (
   durationTypes: new Map<string, TourScheduleDurationType>([
     ['spring-3', 'однодневный'],
   ]),
+  publicationStatuses: new Map(),
   error: null,
   retry: vi.fn(),
   ...overrides,
@@ -107,5 +108,28 @@ describe('TourDetailPriceHighlight', () => {
     expect(
       screen.getByLabelText(UI.tourDetail.departuresLoadingAria)
     ).toBeInTheDocument();
+  });
+
+  it('shows empty departures immediately when forceDeparturesEmpty is set', () => {
+    const summer13 = getTourById('summer-13');
+    if (!summer13) throw new Error('summer-13 missing');
+
+    render(
+      <TourScheduleContext.Provider
+        value={scheduleContextValue({ status: 'loading', events: enrichedEvents })}
+      >
+        <TourDetailPriceHighlight
+          tour={summer13}
+          forceDeparturesEmpty
+          preferCatalogPrice={false}
+        />
+      </TourScheduleContext.Provider>
+    );
+
+    expect(screen.getByText(summer13.price)).toBeInTheDocument();
+    expect(screen.getByText(UI.tourDetail.departuresEmpty)).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(UI.tourDetail.departuresLoadingAria)
+    ).not.toBeInTheDocument();
   });
 });

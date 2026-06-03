@@ -59,6 +59,18 @@ var META_SHEET_AUDIT = '_Проверка';
 
 var DURATION_LIST = ['однодневный', 'многодневный'];
 
+/** sync: scheduleSheetLabels.mjs CATALOG_PUBLICATION_STATUS_VALUES */
+var CATALOG_PUBLICATION_STATUS_VALUES = ['активен', 'скрыт', 'в разработке'];
+
+/** sync: scheduleSheetLabels.mjs PUBLICATION_STATUS_TO_EXPORT_CODE — статус тура на сайте (кол. F), не статус выезда (H). */
+var PUBLICATION_STATUS_TO_EXPORT_CODE = {
+  'активен': 'active',
+  'скрыт': 'hidden',
+  'в разработке': 'in_development',
+};
+
+var CATALOG_PUBLICATION_STATUS_COLUMN = 6;
+
 /**
  * В ru/de и др. локалях Google Таблиц разделитель аргументов — «;», не «,».
  * @param {GoogleAppsScript.Spreadsheet} ss
@@ -250,11 +262,46 @@ function setupAllTableAutomationsForMenu() {
  */
 function setupAllTableAutomationsCore_(ss) {
   ensureInstructionSheet_(ss);
+  setupCatalogPublicationStatusValidationCore_(ss);
   setupCatalogTourPickLabelsCore_(ss);
   setupScheduleTourDropdownCore_(ss);
   setupScheduleDerivedFormulasCore_(ss);
   setupScheduleDateValidationCore_();
   applySheetUxCore_(ss);
+}
+
+function setupCatalogPublicationStatusValidationForMenu() {
+  setupCatalogPublicationStatusValidationCore_(SpreadsheetApp.getActiveSpreadsheet());
+  SpreadsheetApp.getUi().alert(
+    'Готово: колонка F «Статус на сайте» на листах «Туры_*» — список активен / скрыт / в разработке.\n' +
+      'Пустая ячейка = активен.'
+  );
+}
+
+/**
+ * Заголовок F1 и валидация F2:F80 на всех «Туры_*».
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ */
+function setupCatalogPublicationStatusValidationCore_(ss) {
+  var rule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(CATALOG_PUBLICATION_STATUS_VALUES, true)
+    .setAllowInvalid(false)
+    .setHelpText('активен — полная публикация; в разработке — карточка и анонс; скрыт — не на сайте и не в календаре.')
+    .build();
+
+  for (var i = 0; i < CATALOG_SHEET_NAMES.length; i++) {
+    var sheet = ss.getSheetByName(CATALOG_SHEET_NAMES[i]);
+    if (!sheet) continue;
+    sheet.getRange(1, CATALOG_PUBLICATION_STATUS_COLUMN).setValue('Статус на сайте');
+    sheet
+      .getRange(
+        CATALOG_FIRST_DATA_ROW,
+        CATALOG_PUBLICATION_STATUS_COLUMN,
+        CATALOG_MAX_DATA_ROW - CATALOG_FIRST_DATA_ROW + 1,
+        1
+      )
+      .setDataValidation(rule);
+  }
 }
 
 function setupCatalogTourPickLabelsForMenu() {
@@ -453,6 +500,7 @@ function runTableHealthCheckForMenu() {
 function runTableHealthCheckCore_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var siteSet = buildSiteTourIdSet_();
+  var publicationStatuses = readCatalogPublicationStatuses_(ss);
   /** @type {string[]} */
   var issues = [];
   /** @type {string[]} */
@@ -464,12 +512,24 @@ function runTableHealthCheckCore_() {
       issues.push('Нет листа: ' + CATALOG_SHEET_NAMES[i]);
       continue;
     }
-    var rows = sheet.getRange(CATALOG_FIRST_DATA_ROW, 1, CATALOG_MAX_DATA_ROW - 1, 4).getValues();
+    var rows = sheet.getRange(CATALOG_FIRST_DATA_ROW, 1, CATALOG_MAX_DATA_ROW - 1, 6).getValues();
     for (var r = 0; r < rows.length; r++) {
       var id = normalizeTourId_(rows[r][0], null);
       if (!id) continue;
-      if (!siteSet[id]) {
-        warnings.push('Каталог «' + sheet.getName() + '» строка ' + (r + CATALOG_FIRST_DATA_ROW) + ': ' + id + ' — нет на сайте');
+      var pubCode = publicationStatuses[id] || 'active';
+      var statusRaw = String(rows[r][5] || '').trim();
+      if (statusRaw) {
+        var normalized = normalizePublicationStatusCode_(statusRaw);
+        if (!normalized) {
+          issues.push(
+            'Каталог «' + sheet.getName() + '» ' + id + ': неверный статус публикации «' + statusRaw + '»'
+          );
+        }
+      }
+      if (!siteSet[id] && pubCode !== 'hidden') {
+        warnings.push(
+          'Каталог «' + sheet.getName() + '» ' + id + ': статус «' + pubCode + '», но тура нет в toursData.ts'
+        );
       }
       var duration = String(rows[r][3] || '').trim();
       if (duration && DURATION_LIST.indexOf(duration) === -1) {
@@ -493,7 +553,12 @@ function runTableHealthCheckCore_() {
       var tourId = normalizeTourId_(data[j][3], data[j][2]);
       var statusRu = String(data[j][7] || '').trim().toLowerCase();
       if (!dateIso && !tourId && !statusRu) continue;
-      if (tourId && !siteSet[tourId]) {
+      if (tourId && publicationStatuses[tourId] === 'hidden' && dateIso && statusRu) {
+        issues.push(
+          'Расписание «' + sched.getName() + '» строка ' + (j + 2) + ': выезд для скрытого тура ' + tourId
+        );
+      }
+      if (tourId && !siteSet[tourId] && publicationStatuses[tourId] !== 'hidden') {
         warnings.push('Расписание «' + sched.getName() + '» строка ' + (j + 2) + ': ' + tourId + ' — нет на сайте');
       }
       if (tourId && !dateIso) {
@@ -580,6 +645,7 @@ function applySheetUxCore_(ss) {
     3: 'Число в ₽ или пусто (по запросу).',
     4: 'однодневный или многодневный',
     5: 'Заполняется автоматически — не редактировать',
+    6: 'активен / в разработке / скрыт. Пусто = активен. Скрыт — без карточки и выездов в JSON.',
   };
 
   for (var i = 0; i < CATALOG_SHEET_NAMES.length; i++) {
@@ -640,8 +706,9 @@ function ensureInstructionSheet_(ss) {
     [''],
     ['1. Добавить тур в сезон'],
     ['   Лист «Туры_Зима» / «Туры_Весна» / «Туры_Лето» / «Туры_Осень»'],
-    ['   Заполните: A = ID (summer-3), B = название, C = цена, D = тип из списка'],
+    ['   Заполните: A = ID (summer-3), B = название, C = цена, D = тип из списка, F = статус на сайте'],
     ['   Колонку E не трогайте — подпись для списка появится сама'],
+    ['   F: активен (по умолчанию), в разработке, скрыт — меню «Настроить статус публикации»'],
     [''],
     ['2. Добавить выезд'],
     ['   Лист «Расписание_*» того же сезона'],
@@ -679,13 +746,16 @@ function rebuildCatalogPricesInCache_() {
   try {
     SpreadsheetApp.flush();
     var cached = getCachedScheduleJson_();
-    /** @type {{ events: Object[], prices: Object<string, number>, durationTypes: Object<string, string> }} */
-    var payload = cached ? JSON.parse(cached) : { events: [], prices: {}, durationTypes: {} };
+    /** @type {{ events: Object[], prices: Object<string, number>, durationTypes: Object<string, string>, publicationStatuses: Object<string, string> }} */
+    var payload = cached
+      ? JSON.parse(cached)
+      : { events: [], prices: {}, durationTypes: {}, publicationStatuses: {} };
     if (!payload.events) payload.events = [];
 
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     payload.prices = readCatalogPrices_(ss);
     payload.durationTypes = readCatalogDurationTypes_(ss);
+    payload.publicationStatuses = readCatalogPublicationStatuses_(ss);
     var json = JSON.stringify(payload);
     CacheService.getScriptCache().put(CACHE_KEY, json, CACHE_TTL_SEC);
     Logger.log(
@@ -713,7 +783,7 @@ function rebuildScheduleCache_(fromEdit) {
     Logger.log('rebuildScheduleCache_: другой запуск уже идёт, пропуск.');
     var cached = getCachedScheduleJson_();
     if (cached) return cached;
-    return JSON.stringify({ events: [], prices: {}, durationTypes: {} });
+    return JSON.stringify({ events: [], prices: {}, durationTypes: {}, publicationStatuses: {} });
   }
 
   try {
@@ -724,12 +794,13 @@ function rebuildScheduleCache_(fromEdit) {
 
     var events = [];
     var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var publicationStatuses = readCatalogPublicationStatuses_(ss);
 
     for (var i = 0; i < SCHEDULE_SHEET_NAMES.length; i++) {
       var sheetName = SCHEDULE_SHEET_NAMES[i];
       var sheet = ss.getSheetByName(sheetName);
       if (!sheet) continue;
-      events = events.concat(readScheduleSheet_(sheet));
+      events = events.concat(readScheduleSheet_(sheet, publicationStatuses));
     }
 
     events.sort(function (a, b) {
@@ -739,7 +810,12 @@ function rebuildScheduleCache_(fromEdit) {
 
     var prices = readCatalogPrices_(ss);
     var durationTypes = readCatalogDurationTypes_(ss);
-    var payload = JSON.stringify({ events: events, prices: prices, durationTypes: durationTypes });
+    var payload = JSON.stringify({
+      events: events,
+      prices: prices,
+      durationTypes: durationTypes,
+      publicationStatuses: publicationStatuses,
+    });
     CacheService.getScriptCache().put(CACHE_KEY, payload, CACHE_TTL_SEC);
     Logger.log(
       'rebuildScheduleCache_: events=' +
@@ -757,9 +833,10 @@ function rebuildScheduleCache_(fromEdit) {
 
 /**
  * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
+ * @param {Object<string, string>} publicationStatuses
  * @returns {Object[]}
  */
-function readScheduleSheet_(sheet) {
+function readScheduleSheet_(sheet, publicationStatuses) {
   var lastRow = getScheduleLastDataRow_(sheet);
   if (lastRow < 2) return [];
 
@@ -789,6 +866,7 @@ function readScheduleSheet_(sheet) {
 
     if (!dateIso || !tourId || !statusCode) continue;
     if (durationType !== 'однодневный' && durationType !== 'многодневный') continue;
+    if (publicationStatuses[tourId] === 'hidden') continue;
 
     events.push({
       date: dateIso,
@@ -867,6 +945,64 @@ function readCatalogDurationTypes_(ss) {
   }
 
   return durationTypes;
+}
+
+/**
+ * Каталог Туры_*: кол. A (id), F (статус на сайте). sync: scheduleSheetLabels.mjs.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ * @returns {Object<string, string>}
+ */
+function readCatalogPublicationStatuses_(ss) {
+  /** @type {Object<string, string>} */
+  var publicationStatuses = {};
+
+  for (var i = 0; i < CATALOG_SHEET_NAMES.length; i++) {
+    var sheet = ss.getSheetByName(CATALOG_SHEET_NAMES[i]);
+    if (!sheet) continue;
+
+    var rows = sheet
+      .getRange(
+        CATALOG_FIRST_DATA_ROW,
+        1,
+        CATALOG_MAX_DATA_ROW - CATALOG_FIRST_DATA_ROW + 1,
+        CATALOG_PUBLICATION_STATUS_COLUMN
+      )
+      .getValues();
+
+    for (var r = 0; r < rows.length; r++) {
+      var tourId = normalizeTourId_(rows[r][0], null);
+      if (!tourId) continue;
+
+      var statusRaw = String(rows[r][CATALOG_PUBLICATION_STATUS_COLUMN - 1] || '').trim();
+      var code = normalizePublicationStatusCode_(statusRaw);
+      if (!code) {
+        Logger.log(
+          'readCatalogPublicationStatuses_: invalid status for ' +
+            tourId +
+            ' on ' +
+            sheet.getName() +
+            ': ' +
+            statusRaw
+        );
+        code = 'active';
+      }
+      publicationStatuses[tourId] = code;
+    }
+  }
+
+  return publicationStatuses;
+}
+
+/**
+ * @param {string} statusRaw
+ * @returns {string|null}
+ */
+function normalizePublicationStatusCode_(statusRaw) {
+  var normalized = String(statusRaw || '')
+    .trim()
+    .toLowerCase();
+  if (!normalized) return 'active';
+  return PUBLICATION_STATUS_TO_EXPORT_CODE[normalized] || null;
 }
 
 /**
@@ -955,6 +1091,7 @@ function onOpen() {
     .addItem('Установить автообновление (onEdit)', 'installTourScheduleExportForMenu')
     .addItem('Настроить списки туров (колонка C)', 'setupScheduleTourDropdownForMenu')
     .addItem('Настроить каталог (подписи E)', 'setupCatalogTourPickLabelsForMenu')
+    .addItem('Настроить статус публикации (колонка F)', 'setupCatalogPublicationStatusValidationForMenu')
     .addItem('Настроить календарь дат (колонка A)', 'setupScheduleDateValidationForMenu')
     .addSeparator()
     .addItem('Проверить таблицу', 'runTableHealthCheckForMenu')

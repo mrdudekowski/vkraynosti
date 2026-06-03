@@ -143,4 +143,24 @@ export function loadTourCatalog() {
   return sorted;
 }
 
+/**
+ * ID туров на сайте (каталог таблицы + заглушки createSummerTourStub).
+ * @returns {string[]}
+ */
+export function loadSiteTourIds() {
+  const source = readFileSync(resolve(rootDir, 'src/data/toursData.ts'), 'utf8');
+  const stubIds = [
+    ...source.matchAll(/createSummerTourStub\(\{\s*\n\s*id:\s*'([^']+)'/g),
+  ].map((match) => match[1]);
+  const ids = new Set([...loadTourCatalog().map((tour) => tour.id), ...stubIds]);
+  const seasons = ['winter', 'spring', 'summer', 'fall'];
+  return [...ids].sort((a, b) => {
+    const [seasonA, numA] = a.split('-');
+    const [seasonB, numB] = b.split('-');
+    const seasonCompare = seasons.indexOf(seasonA) - seasons.indexOf(seasonB);
+    if (seasonCompare !== 0) return seasonCompare;
+    return Number.parseInt(numA, 10) - Number.parseInt(numB, 10);
+  });
+}
+
 export { DURATION_DAY, DURATION_MULTI };

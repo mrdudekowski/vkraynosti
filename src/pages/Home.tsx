@@ -25,15 +25,19 @@ import {
   homeGateStageVisibleHeightShare,
 } from '../constants/homeGateScroll';
 import {
+  getHomeSeasonBannerFallVideoPreloadLinks,
   getHomeSeasonBannerSpringVideoPreloadLinks,
+  getHomeSeasonBannerSummerVideoPreloadLinks,
   getHomeSeasonBannerWinterVideoPreloadLinks,
 } from '../constants/homeSeasonBannerVideoPreload';
 import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfadeVideoIntersection';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
-import { getToursBySeason } from '../data/toursData';
+import { getVisibleToursBySeason } from '../utils/tourSchedule/getVisibleToursBySeason';
+import { sortToursInDevelopmentLast } from '../utils/sortToursInDevelopmentLast';
 import { useSeason } from '../context/useSeason';
+import { useTourSchedule } from '../hooks/useTourSchedule';
 import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
 import { useHomeGateDesktopLayout } from '../hooks/useHomeGateDesktopLayout';
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
@@ -73,8 +77,19 @@ const Home = () => {
   const location = useLocation();
   const lenis = useLenis();
   const { activeSeason } = useSeason();
-  const tours = useMemo(() => getToursBySeason(activeSeason), [activeSeason]);
-  const springTours = useMemo(() => getToursBySeason('spring'), []);
+  const { publicationStatuses } = useTourSchedule();
+  const tours = useMemo(
+    () =>
+      sortToursInDevelopmentLast(
+        getVisibleToursBySeason(activeSeason, publicationStatuses),
+        publicationStatuses,
+      ),
+    [activeSeason, publicationStatuses],
+  );
+  const springTours = useMemo(
+    () => getVisibleToursBySeason('spring', publicationStatuses),
+    [publicationStatuses],
+  );
   const [expandedSeason, setExpandedSeason] = useState<Season | null>(null);
   const isAllToursExpanded = expandedSeason === activeSeason;
   const [toursPromoVideoIndex, setToursPromoVideoIndex] = useState(0);
@@ -159,7 +174,11 @@ const Home = () => {
         ? getHomeSeasonBannerWinterVideoPreloadLinks()
         : activeSeason === 'spring'
           ? getHomeSeasonBannerSpringVideoPreloadLinks()
-          : undefined,
+          : activeSeason === 'summer'
+            ? getHomeSeasonBannerSummerVideoPreloadLinks()
+            : activeSeason === 'fall'
+              ? getHomeSeasonBannerFallVideoPreloadLinks()
+              : undefined,
     [activeSeason]
   );
 

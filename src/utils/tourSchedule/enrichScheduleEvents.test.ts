@@ -56,6 +56,25 @@ describe('enrichScheduleEvents', () => {
     expect(enriched[0]?.statusLabel).toBe('Завершился');
   });
 
+  it('skips hidden tours', () => {
+    const events: TourScheduleEvent[] = [
+      {
+        date: '2026-05-09',
+        tourId: 'spring-3',
+        durationType: 'однодневный',
+        priceRub: 6000,
+        seats: 8,
+        status: 'open',
+        comment: null,
+      },
+    ];
+    const publicationStatuses = new Map([
+      ['spring-3', 'hidden' as const],
+    ]);
+
+    expect(enrichScheduleEvents(events, publicationStatuses)).toHaveLength(0);
+  });
+
   it('enriches known tour', () => {
     const events: TourScheduleEvent[] = [
       {

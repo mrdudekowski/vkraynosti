@@ -4,6 +4,8 @@ export type TourScheduleStatus = 'planned' | 'open' | 'full' | 'cancelled' | 'co
 
 export type TourScheduleDurationType = 'однодневный' | 'многодневный';
 
+export type TourPublicationStatus = 'active' | 'hidden' | 'in_development';
+
 /** ISO-дата выезда тура (YYYY-MM-DD). */
 export type TourDepartureDateIso = string;
 
@@ -34,4 +36,6 @@ export interface TourSchedulePayload {
   catalogPrices: Record<string, number>;
   /** Каталог типов из листов Туры_* кол. D (tourId → однодневный | многодневный). */
   catalogDurationTypes: Record<string, TourScheduleDurationType>;
+  /** Статус публикации из листов Туры_* кол. F (tourId → active | hidden | in_development). */
+  catalogPublicationStatuses: Record<string, TourPublicationStatus>;
 }

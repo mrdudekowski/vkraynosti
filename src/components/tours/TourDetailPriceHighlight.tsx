@@ -23,6 +23,10 @@ export interface TourDetailPriceHighlightProps {
   className?: string;
   /** Дублирующий экземпляр: скрыть от вспомогательных технологий, если блок показан в другом месте. */
   ariaHidden?: boolean;
+  /** Принудительно показать empty state дат (режим «в разработке»). */
+  forceDeparturesEmpty?: boolean;
+  /** Не подставлять цену из расписания (всегда `tour.price`). По умолчанию true. */
+  preferCatalogPrice?: boolean;
 }
 
 const formatDepartureDate = (isoDate: string): string =>
@@ -35,9 +39,13 @@ const TourDetailPriceHighlight = ({
   tour,
   className = "",
   ariaHidden,
+  forceDeparturesEmpty = false,
+  preferCatalogPrice = true,
 }: TourDetailPriceHighlightProps) => {
   const { status, events } = useTourSchedule();
-  const { displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
+  const { displayPrice, displayPricePrevious } = useTourDisplayPrice(tour, {
+    preferCatalogPrice,
+  });
 
   const tourEvents = useMemo(
     () => events.filter(event => event.tourId === tour.id),
@@ -71,7 +79,9 @@ const TourDetailPriceHighlight = ({
       : `${UI.tourDetail.departuresHeading}: ${UI.tourDetail.departuresEmpty}`;
 
   const note = tour.priceFootnote ?? UI.tourDetail.priceHighlightNote;
-  const isDeparturesLoading = status === "loading" || status === "idle";
+  const isDeparturesLoading =
+    forceDeparturesEmpty ? false : status === "loading" || status === "idle";
+  const showDeparturesEmpty = forceDeparturesEmpty || futureDates.length === 0;
 
   return (
     <section
@@ -111,7 +121,11 @@ const TourDetailPriceHighlight = ({
             className="mt-3 h-48 animate-pulse rounded bg-surface-dark/10"
             aria-label={UI.tourDetail.departuresLoadingAria}
           />
-        ) : futureDates.length > 0 ? (
+        ) : showDeparturesEmpty ? (
+          <p className="mt-3 text-center text-tooltip text-text-muted sm:text-left">
+            {UI.tourDetail.departuresEmpty}
+          </p>
+        ) : (
           <div className="mt-3">
             <TourDepartureMonthCalendar
               mode="display"
@@ -123,10 +137,6 @@ const TourDetailPriceHighlight = ({
               eventsByDate={eventsByDate}
             />
           </div>
-        ) : (
-          <p className="mt-3 text-center text-tooltip text-text-muted sm:text-left">
-            {UI.tourDetail.departuresEmpty}
-          </p>
         )}
       </div>
     </section>

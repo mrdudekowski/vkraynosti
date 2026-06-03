@@ -1,9 +1,12 @@
 /** Макс. ширина ячейки дня мини-календаря (2rem, `.tour-calendar-mini`). */
 export const TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH = '2rem' as const;
 
-/** Ячейка дня в мини-календаре выездов. */
-export const TOUR_DEPARTURE_DAY_CELL_CLASS =
-  'flex flex-1 min-w-0 items-center justify-center p-0.5' as const;
+/** Заголовок дня недели в мини-календаре (`<th>`). */
+export const TOUR_DEPARTURE_WEEKDAY_CLASS =
+  'p-0.5 pb-1 text-center text-xs font-body uppercase tracking-wide text-text-muted' as const;
+
+/** Ячейка дня в мини-календаре выездов (`<td>`). */
+export const TOUR_DEPARTURE_DAY_CELL_CLASS = 'p-0.5 text-center align-middle' as const;
 
 /** Круглая кнопка дня мини-календаря (2rem, `.tour-calendar-mini`). */
 export const TOUR_DEPARTURE_DAY_BUTTON_CLASS =

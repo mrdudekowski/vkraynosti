@@ -6,9 +6,15 @@ import {
   TOUR_CALENDAR_DAY_CELL_CLASS,
   TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
   TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
+  TOUR_CALENDAR_MONTH_GRID_CLASS,
   TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS,
+  TOUR_CALENDAR_WEEKDAY_CLASS,
 } from './tourCalendarLayout';
-import { TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH } from './tourDepartureCalendar';
+import {
+  TOUR_DEPARTURE_DAY_CELL_CLASS,
+  TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH,
+  TOUR_DEPARTURE_WEEKDAY_CLASS,
+} from './tourDepartureCalendar';
 
 function getExtend<K extends string>(
   config: Config,
@@ -29,7 +35,8 @@ describe('tourCalendarLayout', () => {
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('max-w-tour-calendar-day-cell');
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('overflow-hidden');
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).not.toContain('max-w-[');
-    expect(TOUR_CALENDAR_DAY_CELL_CLASS).toContain('min-w-0');
+    expect(TOUR_CALENDAR_DAY_CELL_CLASS).toContain('align-middle');
+    expect(TOUR_CALENDAR_DAY_CELL_CLASS).not.toContain('flex');
     expect(TOUR_CALENDAR_DAY_CELL_CLASS).not.toContain('max-w-tour-calendar-day-cell');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).toContain('min-h-tour-calendar-day-panel');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).not.toContain('min-h-[');
@@ -41,5 +48,13 @@ describe('tourCalendarLayout', () => {
     expect(maxWidth?.['tour-calendar-day-cell']).toBe(TOUR_CALENDAR_DAY_CELL_MAX_WIDTH);
     expect(maxWidth?.['tour-departure-day-cell']).toBe(TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH);
     expect(minHeight?.['tour-calendar-day-panel']).toBe(TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT);
+  });
+
+  it('uses table-fixed grid without flex on weekday and day cells', () => {
+    expect(TOUR_CALENDAR_MONTH_GRID_CLASS).toContain('table-fixed');
+    expect(TOUR_CALENDAR_WEEKDAY_CLASS).not.toContain('flex');
+    expect(TOUR_CALENDAR_DAY_CELL_CLASS).not.toContain('flex');
+    expect(TOUR_DEPARTURE_WEEKDAY_CLASS).not.toContain('flex');
+    expect(TOUR_DEPARTURE_DAY_CELL_CLASS).not.toContain('flex');
   });
 });

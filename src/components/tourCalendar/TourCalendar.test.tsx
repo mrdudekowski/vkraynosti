@@ -64,6 +64,7 @@ const renderCalendar = () =>
             ['spring-3', 'однодневный'],
             ['spring-6', 'однодневный'],
           ]),
+          publicationStatuses: new Map(),
           error: null,
           retry: vi.fn(),
         }}

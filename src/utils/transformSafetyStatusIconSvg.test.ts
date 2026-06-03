@@ -7,14 +7,15 @@ const SAMPLE_SVG = `<svg viewBox="0 0 10 10">
 </svg>`;
 
 describe('transformSafetyStatusIconSvg', () => {
-  it('keeps dark fills and applies gradient to light fills', () => {
+  it('outlines silhouette without fill and applies gradient to light fills', () => {
     const result = transformSafetyStatusIconSvg(SAMPLE_SVG, {
       gradientId: 'test-grad',
       season: 'spring',
       solidHighlight: false,
     });
 
-    expect(result).toContain('fill:#030404');
+    expect(result).toContain('fill="none" stroke="#030404"');
+    expect(result).not.toContain('fill:#030404');
     expect(result).toContain('fill:url(#test-grad)');
     expect(result).toContain('<linearGradient id="test-grad"');
     expect(result).toContain('stop-color="#C76B7E"');

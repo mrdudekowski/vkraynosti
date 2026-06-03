@@ -1,11 +1,14 @@
 import { HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC } from '../constants/homeSeasonBannerAnimation';
 import {
+  HOME_SEASON_BANNER_FALL_LOOP_VIDEO_POSTERS,
+  HOME_SEASON_BANNER_FALL_LOOP_VIDEOS,
   HOME_SEASON_BANNER_SPRING_LOOP_VIDEO_POSTERS,
   HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS,
+  HOME_SEASON_BANNER_SUMMER_LOOP_VIDEO_POSTERS,
+  HOME_SEASON_BANNER_SUMMER_LOOP_VIDEOS,
   HOME_SEASON_BANNER_WINTER_CLIP_SOURCE_START_SEC,
   HOME_SEASON_BANNER_WINTER_LOOP_VIDEO_POSTERS,
   HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS,
-  IMAGES,
 } from '../constants/images';
 import type { Season } from '../types';
 
@@ -24,12 +27,6 @@ export interface HomeSeasonBannerClip {
    */
   durationSec: number;
 }
-
-const posterClip = (posterSrc: string): HomeSeasonBannerClip => ({
-  posterSrc,
-  startSec: 0,
-  durationSec: 0,
-});
 
 const WINTER_BANNER_CLIP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
@@ -61,11 +58,37 @@ const SPRING_CLIPS: HomeSeasonBannerClip[] = SPRING_BANNER_CLIP_INDICES.map((i) 
   };
 });
 
+const SUMMER_BANNER_CLIP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+
+/** Лето: 10 клипов из summer `*.grid.webm` (summer-1/3/5/7/10/11), без повторов URL. */
+const SUMMER_CLIPS: HomeSeasonBannerClip[] = SUMMER_BANNER_CLIP_INDICES.map((i) => {
+  const videoSrc = HOME_SEASON_BANNER_SUMMER_LOOP_VIDEOS[i];
+  return {
+    videoSrc,
+    posterSrc: HOME_SEASON_BANNER_SUMMER_LOOP_VIDEO_POSTERS[videoSrc]!,
+    startSec: 0,
+    durationSec: HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC,
+  };
+});
+
+const FALL_BANNER_CLIP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+
+/** Осень: 10 клипов из fall `*.grid.webm` (fall-2/3/4), зеркало весеннего шортлиста. */
+const FALL_CLIPS: HomeSeasonBannerClip[] = FALL_BANNER_CLIP_INDICES.map((i) => {
+  const videoSrc = HOME_SEASON_BANNER_FALL_LOOP_VIDEOS[i];
+  return {
+    videoSrc,
+    posterSrc: HOME_SEASON_BANNER_FALL_LOOP_VIDEO_POSTERS[videoSrc]!,
+    startSec: 0,
+    durationSec: HOME_SEASON_BANNER_COLUMN_VIDEO_PLAY_SEC,
+  };
+});
+
 const CLIPS_BY_SEASON: Record<Season, HomeSeasonBannerClip[]> = {
   winter: WINTER_CLIPS,
   spring: SPRING_CLIPS,
-  summer: Array.from({ length: 10 }, () => posterClip(IMAGES.seasonSection.summer)),
-  fall: Array.from({ length: 10 }, () => posterClip(IMAGES.seasonSection.fall)),
+  summer: SUMMER_CLIPS,
+  fall: FALL_CLIPS,
 };
 
 export function getHomeSeasonBannerClips(season: Season): HomeSeasonBannerClip[] {

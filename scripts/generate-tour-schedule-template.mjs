@@ -16,6 +16,7 @@ import {
 import {
   CATALOG_HEADERS,
   CATALOG_MAX_DATA_ROW,
+  CATALOG_PUBLICATION_STATUS_LIST,
   CATALOG_SHEETS,
   catalogDataRange,
   catalogPickRange,
@@ -77,6 +78,7 @@ function addCatalogSheet(wb, sheetName, rows) {
     { width: 12 },
     { width: 16 },
     { width: 52 },
+    { width: 18 },
   ];
 
   styleHeaderRow(ws.addRow([...CATALOG_HEADERS]), 'FF2D6A4F');
@@ -109,6 +111,16 @@ function addCatalogSheet(wb, sheetName, rows) {
   for (let r = firstDataRow; r <= CATALOG_MAX_DATA_ROW; r++) {
     ws.getCell(`E${r}`).value = { formula: catalogPickFormula(r) };
   }
+
+  addColumnListValidation(
+    ws,
+    'F',
+    firstDataRow,
+    CATALOG_MAX_DATA_ROW,
+    [CATALOG_PUBLICATION_STATUS_LIST],
+    'Статус на сайте',
+    'активен / скрыт / в разработке'
+  );
 
   return CATALOG_MAX_DATA_ROW;
 }

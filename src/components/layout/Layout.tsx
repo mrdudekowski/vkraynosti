@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import { CookieConsentProvider } from '../../context/CookieConsentProvider';
 import { MobileNavMenuProvider } from '../../context/MobileNavMenuProvider';
 import { SeasonNavMenuProvider } from '../../context/SeasonNavMenuProvider';
 import {
@@ -9,6 +10,7 @@ import {
 import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
 import Navbar from './Navbar';
 import SeasonNavDock from './SeasonNavDock';
+import CookieConsentBanner from '../consent/CookieConsentBanner';
 import Footer from './Footer';
 import SeasonRouteSync from './SeasonRouteSync';
 import ScrollToTopOnNavigate from './ScrollToTopOnNavigate';
@@ -35,6 +37,7 @@ function LayoutChrome() {
       <SeasonNavDock />
       <LayoutMain />
       <Footer />
+      <CookieConsentBanner />
     </>
   );
 }
@@ -74,13 +77,15 @@ const Layout = () => {
       <SeasonRouteSync />
       <ScrollToTopOnNavigate />
       <ScrollRestoration />
-      <SeasonNavMenuProvider>
-        <MobileNavMenuProvider>
-          <HomeNavbarChromeProvider>
-            <LayoutChrome />
-          </HomeNavbarChromeProvider>
-        </MobileNavMenuProvider>
-      </SeasonNavMenuProvider>
+      <CookieConsentProvider>
+        <SeasonNavMenuProvider>
+          <MobileNavMenuProvider>
+            <HomeNavbarChromeProvider>
+              <LayoutChrome />
+            </HomeNavbarChromeProvider>
+          </MobileNavMenuProvider>
+        </SeasonNavMenuProvider>
+      </CookieConsentProvider>
       {modal.type === 'tourRequest' && (
         <Suspense fallback={<ModalLazyChunkFallback />}>
           <TourRequestModal key={modal.payload.tourId} payload={modal.payload} />

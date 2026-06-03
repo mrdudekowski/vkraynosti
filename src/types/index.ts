@@ -1,4 +1,5 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { TourBentoGalleryLayout } from './tourBento';
 
 export interface TourProgramStep {
   timeLabel: string;
@@ -67,6 +68,15 @@ export interface Tour {
    * Медиа всегда из папки `public/tours/{id}/` этого тура, не из source.
    */
   contentSourceTourId?: string;
+  /**
+   * Data-driven bento-галерея; при отсутствии — `tourBentoLayouts` / legacy `TourDetailGallery`.
+   */
+  bentoLayout?: TourBentoGalleryLayout;
+  /**
+   * Тур опубликован в каталоге, но страница — заглушка до готовности контента.
+   * Hero + анонс; без «О туре», галереи и полной программы.
+   */
+  inDevelopment?: boolean;
 }
 
 export interface TeamMember {

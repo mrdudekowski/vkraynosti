@@ -28,6 +28,7 @@
     "media:verify-covers": "node scripts/verify-tour-cover-media.mjs",
     "generate:tour-schedule-template": "node scripts/generate-tour-schedule-template.mjs",
     "generate:tour-schedule-gas-ids": "node scripts/generate-tour-schedule-gas-ids.mjs",
+    "patch:tour-schedule-publication-status": "node scripts/patch-catalog-publication-status-column.mjs",
     "media:bootstrap-season": "node scripts/generate-isolated-season-media.mjs"
   },
   "dependencies": {

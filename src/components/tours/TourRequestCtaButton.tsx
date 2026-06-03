@@ -1,25 +1,22 @@
-import type { CSSProperties } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
 import { UI } from "../../constants/ui";
+import type { Season } from "../../types";
+import BrandWordmark from "../shared/BrandWordmark";
 
 type TourRequestCtaButtonProps = {
   onClick: () => void;
+  season: Season;
   className?: string;
 };
 
-const hoverWordChars = [...UI.tourDetail.requestTourCtaHoverWordmark];
-
-function ctaLetterIndexStyle(index: number): CSSProperties {
-  return { ["--cta-letter-index"]: String(index) } as CSSProperties;
-}
-
 /**
- * CTA заявки на тур: апельсиновый фон, светлый текст (`text.inverse`) → зелёный sweep; при наведении —
- * слово «Вкрайности» и стрелка появляются по буквам в такт заливке (см. `.btn-cta-tour--dual`).
+ * CTA заявки на тур: апельсиновый фон, светлый текст (`text.inverse`); при наведении —
+ * чёрная заливка, логотип «Вкрайности» как в navbar и стрелка (см. `.btn-cta-tour--dual`).
  */
 const TourRequestCtaButton = ({
   onClick,
+  season,
   className = "",
 }: TourRequestCtaButtonProps) => (
   <button
@@ -32,22 +29,8 @@ const TourRequestCtaButton = ({
       <span className="btn-cta-tour__default">{UI.tourDetail.requestTourCta}</span>
       <span className="btn-cta-tour__hover" aria-hidden>
         <span className="btn-cta-tour__hover-inner">
-          <span className="btn-cta-tour__wordmark" aria-hidden>
-            {hoverWordChars.map((char, index) => (
-              <span
-                key={`${char}-${index}`}
-                className="btn-cta-tour__letter"
-                style={ctaLetterIndexStyle(index)}
-              >
-                {char}
-              </span>
-            ))}
-          </span>
-          <span
-            className="btn-cta-tour__arrow"
-            style={ctaLetterIndexStyle(hoverWordChars.length)}
-            aria-hidden
-          >
+          <BrandWordmark season={season} size="nav" />
+          <span className="btn-cta-tour__arrow" aria-hidden>
             <FontAwesomeIcon icon={faArrowRight} className="block h-4 w-4" />
           </span>
         </span>

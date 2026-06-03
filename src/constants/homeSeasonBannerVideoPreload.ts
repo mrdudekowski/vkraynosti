@@ -1,5 +1,7 @@
 import {
+  HOME_SEASON_BANNER_FALL_LOOP_VIDEOS,
   HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS,
+  HOME_SEASON_BANNER_SUMMER_LOOP_VIDEOS,
   HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS,
 } from './images';
 
@@ -17,6 +19,8 @@ import {
  */
 export const HOME_SEASON_BANNER_WINTER_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
 export const HOME_SEASON_BANNER_SPRING_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
+export const HOME_SEASON_BANNER_SUMMER_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
+export const HOME_SEASON_BANNER_FALL_HEAD_PRELOAD_CLIP_COUNT = 1 as const;
 
 export interface HomeSeasonBannerVideoPreloadLink {
   href: string;
@@ -34,6 +38,18 @@ export function getHomeSeasonBannerWinterVideoPreloadLinks(): readonly HomeSeaso
 
 export function getHomeSeasonBannerSpringVideoPreloadLinks(): readonly HomeSeasonBannerVideoPreloadLink[] {
   return HOME_SEASON_BANNER_SPRING_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_SPRING_HEAD_PRELOAD_CLIP_COUNT).map(
+    (href) => ({ href, fetchPriority: 'low' as const })
+  );
+}
+
+export function getHomeSeasonBannerSummerVideoPreloadLinks(): readonly HomeSeasonBannerVideoPreloadLink[] {
+  return HOME_SEASON_BANNER_SUMMER_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_SUMMER_HEAD_PRELOAD_CLIP_COUNT).map(
+    (href) => ({ href, fetchPriority: 'low' as const })
+  );
+}
+
+export function getHomeSeasonBannerFallVideoPreloadLinks(): readonly HomeSeasonBannerVideoPreloadLink[] {
+  return HOME_SEASON_BANNER_FALL_LOOP_VIDEOS.slice(0, HOME_SEASON_BANNER_FALL_HEAD_PRELOAD_CLIP_COUNT).map(
     (href) => ({ href, fetchPriority: 'low' as const })
   );
 }

@@ -57,6 +57,7 @@ vi.mock('../../hooks/useTourSchedule', () => ({
     eventsByDate: new Map(scheduleState.events.map(event => [event.date, [event]])),
     prices: new Map(),
     durationTypes: new Map(),
+    publicationStatuses: new Map(),
     error: null,
     retry: vi.fn(),
   }),

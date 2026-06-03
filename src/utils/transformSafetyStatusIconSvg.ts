@@ -4,7 +4,9 @@ import type { Season } from '../types';
 const DARK_FILL_PATTERN = /style="fill:rgb\(3,4,4\);?"/gi;
 const LIGHT_FILL_PATTERN = /style="fill:white;?"/gi;
 
-const SAFETY_ICON_DARK_FILL = '#030404' as const;
+/** Контур силуэта (исходный `rgb(3,4,4)` — заливка фона, не линии). */
+const SAFETY_ICON_OUTLINE_STROKE = '#030404' as const;
+const SAFETY_ICON_OUTLINE_STROKE_WIDTH = '2' as const;
 
 type TransformSafetyStatusIconSvgOptions = {
   gradientId: string;
@@ -22,7 +24,7 @@ function buildHighlightGradientDefs(gradientId: string, season: Season): string 
 }
 
 /**
- * Подготавливает SVG статуса: тёмные контуры фиксированные, светлые детали — сезонный акцент.
+ * Подготавливает SVG статуса: силуэт — обводка без заливки, светлые детали — сезонный акцент.
  */
 const SAFE_GRADIENT_ID_RE = /^[a-zA-Z][\w-]*$/;
 
@@ -39,7 +41,10 @@ export function transformSafetyStatusIconSvg(
     : `url(#${gradientId})`;
 
   const withFills = svgMarkup
-    .replace(DARK_FILL_PATTERN, `style="fill:${SAFETY_ICON_DARK_FILL}"`)
+    .replace(
+      DARK_FILL_PATTERN,
+      `fill="none" stroke="${SAFETY_ICON_OUTLINE_STROKE}" stroke-width="${SAFETY_ICON_OUTLINE_STROKE_WIDTH}"`
+    )
     .replace(LIGHT_FILL_PATTERN, `style="fill:${highlightFill}"`);
 
   const defs = solidHighlight ? '' : buildHighlightGradientDefs(gradientId, season);

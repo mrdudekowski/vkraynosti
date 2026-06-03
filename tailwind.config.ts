@@ -114,6 +114,11 @@ import {
   TOUR_SUMMER_7_COVER_OBJECT_POSITION_LG,
 } from './src/constants/tourSummer7CoverCrop'
 import {
+  TOUR_SUMMER_11_COVER_OBJECT_POSITION,
+  TOUR_SUMMER_11_COVER_OBJECT_POSITION_LG,
+  TOUR_SUMMER_11_CLIP2_WIDE_OBJECT_POSITION,
+} from './src/constants/tourSummer11CoverCrop'
+import {
   TEAM_HERO_DESKTOP_COLUMN_GAP,
   TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
   TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_MD,
@@ -383,7 +388,7 @@ const config: Config = {
     { pattern: /^max-h-safety-status-stack-\d+$/, variants: ['sm'] },
     {
       pattern:
-        /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13|-summer-1-cover|-summer-7-cover)?$/,
+        /^object-tour-detail-hero-desktop(-winter-[34]|-spring-[145]|-spring-13|-summer-1-cover|-summer-7-cover|-summer-11-cover)?$/,
       variants: ['lg'],
     },
     { pattern: /^animate-tour-included-/ },
@@ -551,9 +556,10 @@ const config: Config = {
         /** Тонкая линия под заголовками «О туре» / «Что включено» (см. `.tour-detail-section-heading`). */
         'tour-detail-heading-rule': 'color-mix(in srgb, #1A1A1A 11%, transparent)',
         /**
-         * CTA тура (TourRequestCtaButton): насыщенный оранжевый «как апельсин» + зелёный sweep при hover/focus.
+         * CTA тура (TourRequestCtaButton): насыщенный оранжевый «как апельсин».
+         * Non-dual `.btn-cta-tour`: зелёный sweep при hover/focus (`sweep` = `brand.primary`).
+         * Dual `.btn-cta-tour--dual`: чёрная заливка `home-gate-start-screen` + `BrandWordmark`.
          * Начальный текст — `text.inverse` (см. `.btn-cta-tour__default` в `index.css`).
-         * sweep: совпадает с `brand.primary`.
          */
         cta: {
           fill:  '#F97316',
@@ -595,6 +601,11 @@ const config: Config = {
         'tour-detail-hero-subtitle': ['1.125rem', { lineHeight: '1.5' }],
         /** Заголовок карточки «Программа тура» (сайдбар). */
         'tour-detail-program-heading': ['1.5rem', { lineHeight: '1.25' }],
+        /** Заголовок «Тур в Разработке» на странице тура в режиме `inDevelopment`. */
+        'tour-detail-in-development-title': [
+          'clamp(1.5rem, 4vw + 0.5rem, 2.5rem)',
+          { lineHeight: '1.15' },
+        ],
         /** Текст шагов программы (описание этапа). */
         'tour-detail-program-body': ['1rem', { lineHeight: '1.5' }],
         /** Бейджи длительности / сложности / цены под hero. */
@@ -833,6 +844,14 @@ const config: Config = {
          */
         'tour-detail-hero-summer-7-cover': TOUR_SUMMER_7_COVER_OBJECT_POSITION,
         'tour-detail-hero-desktop-summer-7-cover': TOUR_SUMMER_7_COVER_OBJECT_POSITION_LG,
+        /**
+         * Ежовая / Спокойная (summer-11): портретная панорама — якорь ниже центра, больше бухты.
+         */
+        'tour-detail-hero-summer-11-cover': TOUR_SUMMER_11_COVER_OBJECT_POSITION,
+        'tour-detail-hero-desktop-summer-11-cover':
+          TOUR_SUMMER_11_COVER_OBJECT_POSITION_LG,
+        /** summer-11: view (clip2) в широком bento-center-top. */
+        'gallery-summer-11-clip2-wide': TOUR_SUMMER_11_CLIP2_WIDE_OBJECT_POSITION,
         /**
          * Главная, баннер весны: только колонка буквы «н» — правый край кадра loop-видео/постера при `object-cover`.
          */
@@ -1186,6 +1205,8 @@ const config: Config = {
         /** Локальный слой над z-0 внутри абсолютного стека (оверлеи под контентом). */
         'stack-base': '1',
         'navbar':      '100',
+        /** Баннер согласия на cookies — над navbar, под модалками. */
+        'cookie-consent': '105',
         /** Под навбаром: полоса `SeasonNavDock`. */
         'season-dock': '90',
         'tooltip':     '150',

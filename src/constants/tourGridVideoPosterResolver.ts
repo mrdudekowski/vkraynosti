@@ -5,6 +5,8 @@ import {
   TOUR_SPRING_13_GRID_VIDEO_POSTERS,
   TOUR_SUMMER_1_GRID_VIDEO_POSTERS,
   TOUR_SUMMER_7_GRID_VIDEO_POSTERS,
+  TOUR_SUMMER_10_GRID_VIDEO_POSTERS,
+  TOUR_SUMMER_11_GRID_VIDEO_POSTERS,
   TOUR_SPRING_2_GRID_VIDEO_POSTERS,
   TOUR_SPRING_3_GRID_VIDEO_POSTERS,
   TOUR_SPRING_4_GRID_VIDEO_POSTERS,
@@ -61,6 +63,8 @@ const SPRING_WINTER_SUMMER_UNIQUE_STRATEGIES: Record<string, TourGridVideoPoster
   'spring-13': { mode: 'fixed', posters: TOUR_SPRING_13_GRID_VIDEO_POSTERS },
   'summer-1': { mode: 'fixed', posters: TOUR_SUMMER_1_GRID_VIDEO_POSTERS },
   'summer-7': { mode: 'fixed', posters: TOUR_SUMMER_7_GRID_VIDEO_POSTERS },
+  'summer-10': { mode: 'fixed', posters: TOUR_SUMMER_10_GRID_VIDEO_POSTERS },
+  'summer-11': { mode: 'fixed', posters: TOUR_SUMMER_11_GRID_VIDEO_POSTERS },
 };
 
 function strategiesFromMediaBundles(

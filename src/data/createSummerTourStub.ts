@@ -1,12 +1,5 @@
 import type { Tour } from '../types';
 import type { SummerTourStubMediaBundle } from '../constants/summerTourStubMedia';
-import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
-import { faShuttleVan } from '@fortawesome/free-solid-svg-icons/faShuttleVan';
-import { faUserTie } from '@fortawesome/free-solid-svg-icons/faUserTie';
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faCheck } from '@fortawesome/free-solid-svg-icons/faCheck';
-
-const inc = (text: string, icon: IconDefinition = faCheck) => ({ text, icon });
 
 export type CreateSummerTourStubParams = {
   id: Tour['id'];
@@ -19,6 +12,7 @@ export type CreateSummerTourStubParams = {
 
 /**
  * Заглушка тура в каталоге до наполнения программой, ценой и финальной галереей.
+ * Страница тура — режим `inDevelopment` (hero + анонс).
  */
 export function createSummerTourStub({
   id,
@@ -39,15 +33,9 @@ export function createSummerTourStub({
     difficultyDisplayLabel,
     price: 'по запросу',
     priceFootnote: 'Актуальную стоимость сообщим по запросу.',
-    description:
-      'Описание маршрута готовится. Скоро здесь появится программа, условия участия и галерея.',
-    program: [{ timeLabel: '—', description: 'Программа уточняется.' }],
-    programAdditionalNotes: ['Расписание и тайминг могут измениться.'],
-    includedInPrice: [
-      inc('Трансфер туда и обратно', faShuttleVan),
-      inc('Сопровождение команды Вкрайности', faUserTie),
-      inc('Организация маршрута и наша забота в поездке', faHeart),
-    ],
+    description: 'Описание маршрута готовится.',
+    program: [],
+    includedInPrice: [],
     imageUrl: media.coverGrid,
     prefaceBackgroundImageUrl: media.prefaceBackground,
     galleryImages: [...media.galleryViewer],

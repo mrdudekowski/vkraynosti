@@ -1,6 +1,18 @@
 import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as typeof ResizeObserver;
+}
+
+if (typeof HTMLMediaElement !== 'undefined') {
+  HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined);
+}
+
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,

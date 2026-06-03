@@ -47,8 +47,5 @@ export const TOUR_SUMMER_16_STUB = defineSummerTourStubMedia('summer-16');
 /** Робинзонада на Север Приморья (summer-17). */
 export const TOUR_SUMMER_17_STUB = defineSummerTourStubMedia('summer-17');
 
-/** Робинзонада в Ежовую (summer-18). */
-export const TOUR_SUMMER_18_STUB = defineSummerTourStubMedia('summer-18');
-
 /** Робинзонада на Пляж 3х Границ (summer-19). */
 export const TOUR_SUMMER_19_STUB = defineSummerTourStubMedia('summer-19');

@@ -95,6 +95,25 @@ describe('fetchTourSchedule', () => {
     });
   });
 
+  it('parses wrapped response with publication statuses', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        events: [],
+        publicationStatuses: {
+          'summer-13': 'in_development',
+          'summer-18': 'hidden',
+        },
+      }),
+    } as Response);
+
+    const payload = await fetchTourSchedule();
+    expect(payload.catalogPublicationStatuses).toEqual({
+      'summer-13': 'in_development',
+      'summer-18': 'hidden',
+    });
+  });
+
   it('throws parse error on invalid payload', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: true,

@@ -21,7 +21,26 @@ export const SCHEDULE_SHEETS = {
   fall: 'Расписание_Осень',
 };
 
-export const CATALOG_HEADERS = ['ID тура', 'Название', 'Цена ₽', 'Тип тура', 'Подпись списка'];
+export const CATALOG_HEADERS = [
+  'ID тура',
+  'Название',
+  'Цена ₽',
+  'Тип тура',
+  'Подпись списка',
+  'Статус на сайте',
+];
+
+/** Значения выпадающего списка «Статус на сайте» (кол. F), без запятых внутри. */
+export const CATALOG_PUBLICATION_STATUS_VALUES = ['активен', 'скрыт', 'в разработке'];
+
+export const CATALOG_PUBLICATION_STATUS_LIST = `"${CATALOG_PUBLICATION_STATUS_VALUES.join(',')}"`;
+
+/** Маппинг статуса публикации тура (кол. F каталога) → код JSON. */
+export const PUBLICATION_STATUS_TO_EXPORT_CODE = {
+  активен: 'active',
+  скрыт: 'hidden',
+  'в разработке': 'in_development',
+};
 
 export const DATES_HEADERS = ['Месяц', 'Дата', 'Подпись', 'День'];
 

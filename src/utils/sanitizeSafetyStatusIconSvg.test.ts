@@ -20,6 +20,9 @@ describe('parseSanitizedSafetyStatusIconSvg', () => {
     expect(svg?.tagName.toLowerCase()).toBe('svg');
     expect(svg?.querySelector('linearGradient#test-grad')).not.toBeNull();
     expect(svg?.querySelectorAll('path')).toHaveLength(2);
+    const outline = svg?.querySelector('path[stroke]');
+    expect(outline?.getAttribute('fill')).toBe('none');
+    expect(outline?.getAttribute('stroke')).toBe('#030404');
   });
 
   it('strips script and event handler attributes', () => {

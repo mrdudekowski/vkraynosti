@@ -15,9 +15,18 @@ export interface TourDisplayPrice {
   displayPricePrevious?: string;
 }
 
-export const useTourDisplayPrice = (tour: TourDisplayPriceSource): TourDisplayPrice => {
+export interface UseTourDisplayPriceOptions {
+  /** По умолчанию true. При false — всегда `tour.price`, без цены из расписания. */
+  preferCatalogPrice?: boolean;
+}
+
+export const useTourDisplayPrice = (
+  tour: TourDisplayPriceSource,
+  options?: UseTourDisplayPriceOptions
+): TourDisplayPrice => {
+  const preferCatalogPrice = options?.preferCatalogPrice !== false;
   const { prices } = useTourSchedule();
-  const priceRub = prices.get(tour.id) ?? null;
+  const priceRub = preferCatalogPrice ? (prices.get(tour.id) ?? null) : null;
 
   if (priceRub != null) {
     return {

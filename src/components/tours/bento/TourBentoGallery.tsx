@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import type { TourBentoGalleryLayout } from '../../../types/tourBento';
 import { getBentoBlockSlotCount } from '../../../constants/tourBento';
 import BentoBlockRenderer from './BentoBlockRenderer';
@@ -16,28 +16,34 @@ const TourBentoGalleryComponent = ({
   prefersReducedMotion = false,
   getVideoPosterForGridSrc,
 }: TourBentoGalleryProps) => {
-  if (layout.blocks.length === 0) {
+  const blocksWithOffsets = useMemo(
+    () =>
+      layout.blocks.map((block, blockIndex) => ({
+        block,
+        blockIndex,
+        slotIndexOffset: layout.blocks
+          .slice(0, blockIndex)
+          .reduce((sum, prior) => sum + getBentoBlockSlotCount(prior.type), 0),
+      })),
+    [layout.blocks]
+  );
+
+  if (blocksWithOffsets.length === 0) {
     return null;
   }
 
-  let slotIndexOffset = 0;
-
   return (
     <div className="flex flex-col gap-gallery-gap w-full min-w-0">
-      {layout.blocks.map((block, blockIndex) => {
-        const offset = slotIndexOffset;
-        slotIndexOffset += getBentoBlockSlotCount(block.type);
-        return (
-          <BentoBlockRenderer
-            key={`${block.type}-${blockIndex}`}
-            block={block}
-            tourTitle={tourTitle}
-            slotIndexOffset={offset}
-            prefersReducedMotion={prefersReducedMotion}
-            getVideoPosterForGridSrc={getVideoPosterForGridSrc}
-          />
-        );
-      })}
+      {blocksWithOffsets.map(({ block, blockIndex, slotIndexOffset }) => (
+        <BentoBlockRenderer
+          key={`${block.type}-${blockIndex}`}
+          block={block}
+          tourTitle={tourTitle}
+          slotIndexOffset={slotIndexOffset}
+          prefersReducedMotion={prefersReducedMotion}
+          getVideoPosterForGridSrc={getVideoPosterForGridSrc}
+        />
+      ))}
     </div>
   );
 };

@@ -7,51 +7,60 @@ import {
   type CookieConsentStatus,
 } from './cookieConsentContextDefinition';
 
+type CookieConsentUiState = {
+  status: CookieConsentStatus;
+  analytics: boolean;
+  isBannerOpen: boolean;
+};
+
+const readInitialCookieConsentUiState = (): CookieConsentUiState => {
+  if (typeof window === 'undefined') {
+    return { status: 'pending', analytics: false, isBannerOpen: false };
+  }
+
+  const stored = readStoredCookieConsent();
+  if (stored) {
+    return {
+      status: 'decided',
+      analytics: stored.analytics,
+      isBannerOpen: false,
+    };
+  }
+
+  return { status: 'pending', analytics: false, isBannerOpen: true };
+};
+
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<CookieConsentStatus>('pending');
-  const [analytics, setAnalytics] = useState(false);
-  const [isBannerOpen, setIsBannerOpen] = useState(false);
+  const [{ status, analytics, isBannerOpen }, setUiState] = useState(
+    readInitialCookieConsentUiState
+  );
 
   useEffect(() => {
-    const stored = readStoredCookieConsent();
-    if (stored) {
-      setStatus('decided');
-      setAnalytics(stored.analytics);
-      setIsBannerOpen(false);
-      if (stored.analytics) {
-        loadYandexMetrika();
-      }
-      return;
+    if (readStoredCookieConsent()?.analytics) {
+      loadYandexMetrika();
     }
-
-    setStatus('pending');
-    setIsBannerOpen(true);
   }, []);
 
   const acceptAnalytics = useCallback(() => {
     writeStoredCookieConsent(true);
-    setStatus('decided');
-    setAnalytics(true);
-    setIsBannerOpen(false);
+    setUiState({ status: 'decided', analytics: true, isBannerOpen: false });
     loadYandexMetrika();
   }, []);
 
   const rejectAnalytics = useCallback(() => {
     writeStoredCookieConsent(false);
-    setStatus('decided');
-    setAnalytics(false);
-    setIsBannerOpen(false);
+    setUiState({ status: 'decided', analytics: false, isBannerOpen: false });
   }, []);
 
   const openBanner = useCallback(() => {
-    setIsBannerOpen(true);
+    setUiState(prev => ({ ...prev, isBannerOpen: true }));
   }, []);
 
   const closeBanner = useCallback(() => {
-    if (status === 'decided') {
-      setIsBannerOpen(false);
-    }
-  }, [status]);
+    setUiState(prev =>
+      prev.status === 'decided' ? { ...prev, isBannerOpen: false } : prev
+    );
+  }, []);
 
   const value = useMemo(
     () => ({

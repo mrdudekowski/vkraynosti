@@ -1,10 +1,38 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import {
+  buildContentSecurityPolicy,
+  parseMediaOriginFromAssetBaseUrl,
+} from './src/constants/contentSecurityPolicy.ts'
+
+const mediaCdnOrigin = parseMediaOriginFromAssetBaseUrl(
+  process.env.VITE_PUBLIC_ASSET_BASE_URL ?? ''
+)
+const contentSecurityPolicy = buildContentSecurityPolicy(
+  mediaCdnOrigin != null ? [mediaCdnOrigin] : []
+)
+
+function injectContentSecurityPolicyPlugin(csp: string): Plugin {
+  const cspMetaPattern =
+    /http-equiv="Content-Security-Policy"\s+content="[^"]*"/;
+
+  return {
+    name: 'inject-content-security-policy',
+    transformIndexHtml(html) {
+      if (!cspMetaPattern.test(html)) {
+        return html;
+      }
+      return html.replace(
+        cspMetaPattern,
+        `http-equiv="Content-Security-Policy" content="${csp}"`
+      );
+    },
+  };
+}
 
 const securityHeaders = {
-  'Content-Security-Policy':
-    "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://placehold.co; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; media-src 'self' blob:; upgrade-insecure-requests",
+  'Content-Security-Policy': contentSecurityPolicy,
   'Referrer-Policy': 'no-referrer',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
@@ -14,7 +42,7 @@ const securityHeaders = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), injectContentSecurityPolicyPlugin(contentSecurityPolicy)],
   server: {
     headers: securityHeaders,
   },

@@ -52,9 +52,18 @@
 
 ## CI и деплой
 
-При пуше в ветку `main` GitHub Actions выполняет: `npm ci` → **`npm audit --audit-level=high`** → `lint` → `test` → `build` → публикация **`dist/`** на GitHub Pages. См. `.github/workflows/deploy.yml`. При появлении уязвимостей уровня **high** и выше сборка остановится, пока их не устранят (часто помогает `npm audit fix`).
+| Workflow | Когда | Назначение |
+|----------|-------|------------|
+| [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | PR на любую ветку; `push` кроме `main` | audit, lint, test, sitemap, seo, build |
+| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) | `push` → `main` | то же + GitHub Pages |
+| [`.github/workflows/sync-s3.yml`](.github/workflows/sync-s3.yml) | вручную (Run workflow) | зеркало `public/` → TimeWeb S3 |
 
-Локально: **`npm run audit`** (или `npm audit`). После **`npm audit fix`** — снова `npm test` и `npm run build`. Зависимости отслеживаются через `package.json` и `package-lock.json`.
+- **`main`:** без `VITE_PUBLIC_ASSET_BASE_URL` — медиа из `public/`, превью на Pages.
+- **`web-vkr`:** в GitHub **vars** задать `VITE_PUBLIC_ASSET_BASE_URL` (CDN); после push — артефакт `dist-web-vkr`, затем ручной деплой в TimeWeb (см. `TimeWebDoc/examples/env.branches.example`).
+
+Порядок для prod: зелёный CI на `web-vkr` → (опционально) Sync public to S3 → Deploy в панели TimeWeb.
+
+При появлении уязвимостей уровня **high** и выше сборка остановится (часто помогает `npm audit fix`). Локально: **`npm run audit`**, затем `npm test` и `npm run build`.
 
 ## Стек (кратко)
 

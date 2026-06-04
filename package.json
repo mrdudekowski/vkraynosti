@@ -31,7 +31,9 @@
     "generate:tour-schedule-template": "node scripts/generate-tour-schedule-template.mjs",
     "generate:tour-schedule-gas-ids": "node scripts/generate-tour-schedule-gas-ids.mjs",
     "patch:tour-schedule-publication-status": "node scripts/patch-catalog-publication-status-column.mjs",
-    "media:bootstrap-season": "node scripts/generate-isolated-season-media.mjs"
+    "media:bootstrap-season": "node scripts/generate-isolated-season-media.mjs",
+    "sync:s3": "node scripts/sync-public-to-s3.mjs",
+    "sync:s3:dry-run": "node scripts/sync-public-to-s3.mjs --dry-run"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^7.2.0",

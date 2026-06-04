@@ -1,0 +1,59 @@
+name: Sync public to S3
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        description: 'true = npm run sync:s3:dry-run; false = full sync'
+        default: true
+      verify_sample:
+        type: boolean
+        description: 'After sync, curl -I sample URLs (needs S3_PUBLIC_BASE_URL var)'
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dry-run sync
+        if: inputs.dry_run
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_PUBLIC_BASE_URL: ${{ vars.S3_PUBLIC_BASE_URL }}
+        run: npm run sync:s3:dry-run
+
+      - name: Sync to S3
+        if: ${{ !inputs.dry_run }}
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_PUBLIC_BASE_URL: ${{ vars.S3_PUBLIC_BASE_URL }}
+        run: |
+          ARGS=()
+          if [ "${{ inputs.verify_sample }}" = "true" ]; then
+            ARGS+=(--verify-sample)
+          fi
+          npm run sync:s3 -- "${ARGS[@]}"

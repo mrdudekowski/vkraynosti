@@ -1,0 +1,90 @@
+Vkraynosti — S3 sync runbook (Phase 4)
+=====================================
+
+Цель: зеркало public/ → бакет TimeWeb. Ключ объекта = путь без public/
+  Пример: public/tours/spring-1/cover.webp → tours/spring-1/cover.webp
+  URL:    {VITE_PUBLIC_ASSET_BASE_URL}tours/spring-1/cover.webp
+
+НЕ заливается: public/fonts/ (шрифты остаются в TimeWeb App / BASE_URL).
+
+--- 1. Создать бакет (панель TimeWeb) ---
+
+1. TimeWeb Cloud → S3 → создать бакет.
+2. Включить публичный read для объектов (или подключить CDN с origin = бакет).
+3. Создать ключи доступа (Access key + Secret).
+4. Записать endpoint (часто https://s3.twcstorage.ru) и имя бакета.
+5. CORS: до первого sync применить политику из TimeWebDoc/examples/s3-cors.json
+   (панель S3 → CORS; заменить YOUR-TIMEWEB-APP-DOMAIN на боевой домен App).
+   Док: https://timeweb.cloud/docs/s3-storage/supported-features/cors-setup
+
+Документация: https://timeweb.cloud/docs/s3-storage
+
+--- 2. Локальные переменные ---
+
+См. TimeWebDoc/examples/s3.env.example — скопировать в .env.local (не в git).
+
+Обязательно: S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT_URL
+
+--- 3. Первая заливка ---
+
+  npm run sync:s3:dry-run    # просмотр без загрузки
+  npm run sync:s3            # полная синхронизация (~900 MB, долго)
+
+Опции скрипта:
+  --verify-sample   curl -I на 5 эталонных URL (нужен S3_PUBLIC_BASE_URL)
+  --delete          ОПАСНО: удалить объекты в бакете, которых нет в public/
+
+--- 4. Инкремент (после правок тура) ---
+
+  git add public/tours/...
+  npm run sync:s3
+
+Снова только изменённые файлы (aws s3 sync по умолчанию).
+
+--- 5. Сборка web-vkr (CSP) ---
+
+В TimeWeb / GitHub vars для ветки web-vkr:
+
+  VITE_PUBLIC_ASSET_BASE_URL=https://YOUR-CDN-OR-BUCKET-ORIGIN/
+
+Должен совпадать с origin, откуда отдаются tours/team/banners/safety.
+При сборке origin попадает в CSP (img-src, media-src) из src/constants/contentSecurityPolicy.ts.
+Если CDN host ≠ origin в VITE_PUBLIC_ASSET_BASE_URL — в vars укажите тот же origin, что в URL медиа.
+
+--- 5b. Проверка CORS (опционально) ---
+
+  curl -I -H "Origin: https://YOUR-TIMEWEB-APP-DOMAIN" "https://YOUR-ORIGIN/tours/fall-1/cover.webp"
+
+Ожидается Access-Control-Allow-Origin (или * в политике) для GET с вашего сайта.
+
+--- 6. Проверка ---
+
+  npm run sync:s3 -- --verify-sample
+
+Или вручную:
+  curl -I "https://YOUR-ORIGIN/tours/fall-1/cover.webp"
+
+Ожидается HTTP 200 и Content-Type image/webp.
+
+--- 7. CI: ручной S3 sync (Фаза 6) ---
+
+Workflow: .github/workflows/sync-s3.yml — только workflow_dispatch (кнопка Run workflow).
+
+Перед первым запуском в GitHub → Settings → Secrets and variables:
+  Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET, AWS_ENDPOINT_URL
+  Variables (опционально): S3_PUBLIC_BASE_URL (= VITE_PUBLIC_ASSET_BASE_URL) для verify_sample
+
+Inputs:
+  dry_run=true (по умолчанию) → npm run sync:s3:dry-run
+  dry_run=false → полный sync; verify_sample=true добавляет --verify-sample
+
+Запускайте с ветки, где актуален public/ (обычно main после merge медиа).
+Флаг --delete в CI не используется.
+
+Ритуал prod: green ci.yml на web-vkr → (опционально) Sync public to S3 → ручной Deploy в TimeWeb.
+
+--- Риски ---
+
+- --delete на prod-бакете без бэкапа — не использовать без явного решения.
+- summer-12: в SSOT есть пути, файлов нет (Фаза 2) — 404 на prod до загрузки контента.
+- Фаза 5: CSP inject при сборке + CORS в панели (s3-cors.json). Шрифты не на S3 — font-src без CDN.

@@ -53,6 +53,7 @@ jobs:
         env:
           VITE_TOUR_SCHEDULE_ENDPOINT_URL: ${{ vars.VITE_TOUR_SCHEDULE_ENDPOINT_URL }}
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
+          VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
         run: npm run build
 
       - name: Setup Pages

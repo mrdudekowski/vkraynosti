@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Generate sitemap
+        run: npm run generate:sitemap
+
+      - name: SEO checks
+        run: npm run seo:check
+
+      - name: Build
+        env:
+          VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
+          VITE_TOUR_SCHEDULE_ENDPOINT_URL: ${{ vars.VITE_TOUR_SCHEDULE_ENDPOINT_URL }}
+          VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
+          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
+        run: npm run build
+
+      - name: Verify CDN origin in CSP
+        if: github.ref == 'refs/heads/web-vkr' && github.event_name == 'push'
+        env:
+          CDN_BASE: ${{ vars.VITE_PUBLIC_ASSET_BASE_URL }}
+        run: |
+          if [ -z "$CDN_BASE" ]; then
+            echo "::warning::VITE_PUBLIC_ASSET_BASE_URL is not set; web-vkr build uses BASE_URL for tour media"
+            exit 0
+          fi
+          ORIGIN=$(node -e "const u=process.env.CDN_BASE.trim(); if(!u) process.exit(2); try { console.log(new URL(u).origin) } catch { process.exit(1) }")
+          if ! grep -qF "$ORIGIN" dist/index.html; then
+            echo "dist/index.html CSP does not include CDN origin: $ORIGIN"
+            exit 1
+          fi
+          echo "CSP includes $ORIGIN"
+
+      - name: Upload dist artifact for TimeWeb
+        if: github.ref == 'refs/heads/web-vkr' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-web-vkr
+          path: dist
+          retention-days: 14

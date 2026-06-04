@@ -1,6 +1,7 @@
 import type { Tour } from '../types';
 import type { FallTourId } from '../constants/fallTourImages';
 import type { TourMediaBundle } from '../constants/generated/fallTourMedia.generated';
+import { resolveTourMediaBundleUrls } from '../utils/resolveTourMediaBundleUrls';
 
 export type { TourMediaBundle };
 
@@ -9,7 +10,8 @@ export function createFallTourFromSpring(
   fallId: FallTourId,
   media: TourMediaBundle
 ): Tour {
-  const { imageUrl, galleryImages, galleryGridUrls, prefaceBackgroundImageUrl } = media;
+  const resolved = resolveTourMediaBundleUrls(media);
+  const { imageUrl, galleryImages, galleryGridUrls, prefaceBackgroundImageUrl } = resolved;
 
   return {
     ...springTour,

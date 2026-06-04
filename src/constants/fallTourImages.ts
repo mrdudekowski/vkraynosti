@@ -1,6 +1,6 @@
-import { PUBLIC_ASSET_BASE } from './fonts';
+import { MEDIA_ASSET_BASE } from './publicAssetBase';
 
-const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours` as const;
+const TOURS_ASSET_BASE = `${MEDIA_ASSET_BASE}tours` as const;
 
 const FALL_TOUR_IDS = [
   'fall-1',

@@ -34,9 +34,10 @@ export const NORD_FONT_FILES = {
 /** Баннер «В другой сезон»: один начертание, `public/fonts/satyr-sp-basic.otf`. */
 export const SATYR_SP_BASIC_FONT_FILE = 'satyr-sp-basic.otf' as const;
 
-const viteBase = import.meta.env.BASE_URL ?? '/';
+import { APP_ASSET_BASE } from './publicAssetBase';
 
-export const PUBLIC_ASSET_BASE = viteBase.endsWith('/') ? viteBase : `${viteBase}/`;
+/** @deprecated Prefer APP_ASSET_BASE for app-hosted files; MEDIA_ASSET_BASE for tour media. */
+export const PUBLIC_ASSET_BASE = APP_ASSET_BASE;
 
 /** Абсолютные URL файлов Nord для `@font-face` и preload (подкаталог деплоя). */
 export const NORD_FONT_URLS = {

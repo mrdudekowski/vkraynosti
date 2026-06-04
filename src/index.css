@@ -301,6 +301,18 @@
   }
 
   /**
+   * Футер: постоянный чёрный круг и белые логотипы мессенджеров (`ContactMessengerLogo`).
+   */
+  .footer-contact-messenger-icon-well {
+    @apply relative isolate flex h-home-hero-contact-rail-icon w-home-hero-contact-rail-icon shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-dark;
+  }
+
+  .footer-contact-messenger-icon-well .footer-contact-messenger-icon,
+  .footer-contact-messenger-icon-well img {
+    @apply h-[70%] w-[70%] object-contain brightness-0 invert;
+  }
+
+  /**
    * Страница тура: горизонтальный gutter как у Navbar/Footer (`px-4 sm:px-6 lg:px-8`).
    * Внешний слой на всю ширину viewport — нужен для левого выравнивания от `xl` без «центрированного» padding.
    */

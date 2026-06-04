@@ -5,6 +5,12 @@ import ContactMessengerLogo from '../icons/ContactMessengerLogo';
 import SeasonLinkLabel from '../shared/SeasonLinkLabel';
 import { UI } from '../../constants/ui';
 import { CONTACTS } from '../../constants/contacts';
+import {
+  FOOTER_CONTACT_LINK_CLASS,
+  FOOTER_CONTACT_MESSENGER_ICON_CLASS,
+  FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS,
+} from '../../constants/footerContact';
+import { LEGAL_ENTITY } from '../../constants/legalEntity';
 import { ROUTES } from '../../constants/routes';
 import { useCookieConsent } from '../../context/useCookieConsent';
 import { toSafeExternalHttpHref, toSafeMailtoHref, toSafePhoneHref } from '../../utils/safeHref';
@@ -23,7 +29,7 @@ const Footer = () => {
   return (
   <footer className="bg-home-season-banner-stage text-text-inverse">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
         {/* Brand */}
         <div>
           <Link
@@ -36,6 +42,18 @@ const Footer = () => {
           <p className="mt-3 text-text-inverse/60 text-sm leading-relaxed">
             {UI.footer.tagline}
           </p>
+        </div>
+
+        {/* Legal */}
+        <div>
+          <h4 className="font-normal text-text-inverse mb-4">{UI.footer.legalHeading}</h4>
+          <div className="flex flex-col gap-2 text-text-inverse/60 text-sm leading-relaxed">
+            <p>{LEGAL_ENTITY.fullName}</p>
+            <p>
+              {UI.footer.innLabel} {LEGAL_ENTITY.inn}
+            </p>
+            <p>{LEGAL_ENTITY.legalAddress}</p>
+          </div>
         </div>
 
         {/* Quick links */}
@@ -76,26 +94,32 @@ const Footer = () => {
           <div className="flex flex-col gap-3">
             <a
               href={toSafePhoneHref(CONTACTS.PHONE_HREF)}
-              className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
+              className={FOOTER_CONTACT_LINK_CLASS}
+              aria-label={UI.contact.phone}
             >
-              <ContactMessengerLogo variant="phone" className="h-4 w-4 shrink-0 object-contain" />
+              <span className={FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS}>
+                <ContactMessengerLogo variant="phone" className={FOOTER_CONTACT_MESSENGER_ICON_CLASS} />
+              </span>
               {CONTACTS.PHONE_NUMBER}
             </a>
             <a
-              href={toSafeMailtoHref(`mailto:${CONTACTS.EMAIL}`)}
+              href={toSafeMailtoHref(`mailto:${CONTACTS.PERSONAL_DATA_EMAIL}`)}
               className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
             >
-              <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4" />
-              {CONTACTS.EMAIL}
+              <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4 shrink-0" />
+              {CONTACTS.PERSONAL_DATA_EMAIL}
             </a>
             <a
               href={toSafeExternalHttpHref(CONTACTS.TELEGRAM_HREF)}
               target="_blank"
               rel="noopener noreferrer external"
               referrerPolicy="no-referrer"
-              className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
+              className={FOOTER_CONTACT_LINK_CLASS}
+              aria-label={UI.contact.telegram}
             >
-              <ContactMessengerLogo variant="telegram" className="h-4 w-4 shrink-0 object-contain" />
+              <span className={FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS}>
+                <ContactMessengerLogo variant="telegram" className={FOOTER_CONTACT_MESSENGER_ICON_CLASS} />
+              </span>
               {CONTACTS.TELEGRAM_HANDLE}
             </a>
             <a
@@ -103,9 +127,12 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer external"
               referrerPolicy="no-referrer"
-              className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
+              className={FOOTER_CONTACT_LINK_CLASS}
+              aria-label={UI.contact.max}
             >
-              <ContactMessengerLogo variant="max" className="h-4 w-4 shrink-0 object-contain" />
+              <span className={FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS}>
+                <ContactMessengerLogo variant="max" className={FOOTER_CONTACT_MESSENGER_ICON_CLASS} />
+              </span>
               {UI.contact.max}
             </a>
           </div>

@@ -4,7 +4,7 @@ import { toSafePhoneHref } from './safeHref';
 
 describe('toSafePhoneHref', () => {
   it('accepts canonical CONTACTS.PHONE_HREF', () => {
-    expect(toSafePhoneHref(CONTACTS.PHONE_HREF)).toBe('tel:+79000000000');
+    expect(toSafePhoneHref(CONTACTS.PHONE_HREF)).toBe('tel:+79140668099');
   });
 
   it('rejects placeholder letters in tel payload', () => {

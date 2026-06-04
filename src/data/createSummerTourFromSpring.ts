@@ -4,13 +4,15 @@ import {
   type SummerContentSourceTourId,
 } from './seasonTourRegistry';
 import type { TourMediaBundle } from '../constants/generated/summerPairedTourMedia.generated';
+import { resolveTourMediaBundleUrls } from '../utils/resolveTourMediaBundleUrls';
 
 export function createSummerTourFromSpring(
   springTour: Tour,
   summerId: SummerContentSourceTourId,
   media: TourMediaBundle
 ): Tour {
-  const { imageUrl, galleryImages, galleryGridUrls, prefaceBackgroundImageUrl } = media;
+  const resolved = resolveTourMediaBundleUrls(media);
+  const { imageUrl, galleryImages, galleryGridUrls, prefaceBackgroundImageUrl } = resolved;
 
   return {
     ...springTour,

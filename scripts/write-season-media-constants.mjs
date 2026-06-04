@@ -74,6 +74,43 @@ function bundleForTour(fromSpringId, toTourId, imageUrl, spring) {
   };
 }
 
+function toLogicalMediaPath(url) {
+  const idx = url.indexOf('/tours/');
+  if (idx < 0) {
+    return url;
+  }
+  return url.slice(idx);
+}
+
+function normalizePosterMap(posters) {
+  if (posters == null) {
+    return undefined;
+  }
+  return Object.fromEntries(
+    Object.entries(posters).map(([gridSrc, posterSrc]) => [
+      toLogicalMediaPath(gridSrc),
+      toLogicalMediaPath(posterSrc),
+    ])
+  );
+}
+
+function normalizeBundleUrls(bundle) {
+  return {
+    imageUrl: toLogicalMediaPath(bundle.imageUrl),
+    galleryImages: bundle.galleryImages.map(toLogicalMediaPath),
+    galleryGridUrls: bundle.galleryGridUrls.map(toLogicalMediaPath),
+    ...(bundle.prefaceBackgroundImageUrl != null
+      ? { prefaceBackgroundImageUrl: toLogicalMediaPath(bundle.prefaceBackgroundImageUrl) }
+      : {}),
+    ...(bundle.gridVideoPosters != null
+      ? { gridVideoPosters: normalizePosterMap(bundle.gridVideoPosters) }
+      : {}),
+    ...(bundle.gridVideoPostersMobile != null
+      ? { gridVideoPostersMobile: normalizePosterMap(bundle.gridVideoPostersMobile) }
+      : {}),
+  };
+}
+
 function serializeValue(value) {
   return JSON.stringify(value, null, 2);
 }
@@ -102,7 +139,7 @@ async function main() {
         fallTourImages.FALL_TOUR_COVERS[fallId],
         spring
       );
-      fallEntries.push(`  '${fallId}': ${serializeValue(bundle)}`);
+      fallEntries.push(`  '${fallId}': ${serializeValue(normalizeBundleUrls(bundle))}`);
     }
 
     const fallFile = `
@@ -129,7 +166,7 @@ ${fallEntries.join(',\n')}
       const springCover = images.SPRING_TOUR_COVERS[springId];
       const imageUrl = springCover.replace(`/tours/${springId}/`, `/tours/${summerId}/`);
       const bundle = bundleForTour(springId, summerId, imageUrl, spring);
-      summerEntries.push(`  '${summerId}': ${serializeValue(bundle)}`);
+      summerEntries.push(`  '${summerId}': ${serializeValue(normalizeBundleUrls(bundle))}`);
     }
 
     const summerFile = `

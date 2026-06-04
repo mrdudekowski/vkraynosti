@@ -29,6 +29,7 @@ import {
   tourGridVideoPosterStrategyFromBundle,
   type TourGridVideoPosterStrategy,
 } from './tourGridVideoPosterStrategyFromBundle';
+import { resolveTourMediaBundleUrls } from '../utils/resolveTourMediaBundleUrls';
 
 const SPRING_WINTER_SUMMER_UNIQUE_STRATEGIES: Record<string, TourGridVideoPosterStrategy> = {
   'winter-3': { mode: 'fixed', posters: TOUR_WINTER_3_GRID_VIDEO_POSTERS },
@@ -72,7 +73,7 @@ function strategiesFromMediaBundles(
 ): Record<string, TourGridVideoPosterStrategy> {
   const out: Record<string, TourGridVideoPosterStrategy> = {};
   for (const [tourId, bundle] of Object.entries(bundles)) {
-    const strategy = tourGridVideoPosterStrategyFromBundle(bundle);
+    const strategy = tourGridVideoPosterStrategyFromBundle(resolveTourMediaBundleUrls(bundle));
     if (strategy != null) {
       out[tourId] = strategy;
     }

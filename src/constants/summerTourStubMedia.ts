@@ -1,6 +1,6 @@
-import { PUBLIC_ASSET_BASE } from './fonts';
+import { MEDIA_ASSET_BASE } from './publicAssetBase';
 
-const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours`;
+const TOURS_ASSET_BASE = `${MEDIA_ASSET_BASE}tours`;
 
 export type SummerTourStubMediaBundle = {
   readonly assetBase: string;

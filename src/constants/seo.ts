@@ -117,7 +117,7 @@ export const ORGANIZATION_SCHEMA = {
   '@type': 'Organization',
   name: SITE_NAME,
   url: SITE_URL,
-  email: CONTACTS.EMAIL,
+  email: CONTACTS.PERSONAL_DATA_EMAIL,
   sameAs: [CONTACTS.TELEGRAM_HREF, CONTACTS.MAX_HREF],
 } as const;
 

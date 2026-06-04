@@ -1,10 +1,10 @@
-import { PUBLIC_ASSET_BASE } from './fonts';
+import { APP_ASSET_BASE, MEDIA_ASSET_BASE } from './publicAssetBase';
 import type { Season } from '../types';
 
 const BASE = 'https://placehold.co';
 
 /** Портреты команды: `public/team/team-{n}.webp`. */
-const TEAM_ASSET_BASE = `${PUBLIC_ASSET_BASE}team`;
+const TEAM_ASSET_BASE = `${MEDIA_ASSET_BASE}team`;
 
 /** Портрет члена команды по `teamData` id; fallback — placeholder. */
 export const getTeamPortraitUrl = (id: string): string => {
@@ -16,17 +16,17 @@ export const getTeamPortraitUrl = (id: string): string => {
 };
 
 /** Папки туров: `public/tours/{tourId}/` — обложка и галерея одного маршрута. */
-const TOURS_ASSET_BASE = `${PUBLIC_ASSET_BASE}tours`;
+const TOURS_ASSET_BASE = `${MEDIA_ASSET_BASE}tours`;
 
 /**
  * Стартовый экран главной (`HomeSeasonBanner`): базовые папки сезона (`public/banners_*`).
  * Зимние/весенние видео колонок — сжатые `*.grid.webm` из `public/tours/` (`HOME_SEASON_BANNER_*_LOOP_VIDEOS`).
  */
 export const HOME_SEASON_BANNER_MEDIA_BASE: Record<Season, string> = {
-  winter: `${PUBLIC_ASSET_BASE}banners_winter`,
-  spring: `${PUBLIC_ASSET_BASE}banners_spring`,
-  summer: `${PUBLIC_ASSET_BASE}banners_summer`,
-  fall: `${PUBLIC_ASSET_BASE}banners_fall`,
+  winter: `${MEDIA_ASSET_BASE}banners_winter`,
+  spring: `${MEDIA_ASSET_BASE}banners_spring`,
+  summer: `${MEDIA_ASSET_BASE}banners_summer`,
+  fall: `${MEDIA_ASSET_BASE}banners_fall`,
 } as const;
 
 const TOUR_WINTER_1 = `${TOURS_ASSET_BASE}/winter-1`;
@@ -140,7 +140,7 @@ export const TOUR_WINTER_3_LIFT_IMAGE = TOUR_WINTER_3_GALLERY_GRID[2];
 export const HOME_SAFETY_SECTION_HERO_IMAGE = TOUR_WINTER_3_GALLERY_GRID[8];
 
 /** Главная: левая колонка teaser #safety — `public/safety/safety.webp`. */
-export const HOME_SAFETY_TEASER_HERO_IMAGE = `${PUBLIC_ASSET_BASE}safety/safety.webp`;
+export const HOME_SAFETY_TEASER_HERO_IMAGE = `${MEDIA_ASSET_BASE}safety/safety.webp`;
 export const TOUR_WINTER_3_CLIP1_VIDEO = TOUR_WINTER_3_GALLERY_GRID[3];
 export const TOUR_WINTER_3_CLIP2_VIDEO = TOUR_WINTER_3_GALLERY_GRID[6];
 export const TOUR_WINTER_3_CLIP3_VIDEO = TOUR_WINTER_3_GALLERY_GRID[9];
@@ -1427,26 +1427,26 @@ export const HOME_SEASON_BANNER_FALL_LOOP_VIDEO_POSTERS: Record<string, string> 
 
 /** Иконки статусов подготовки на главной (#safety): `public/safety/icons/1.svg` … `6.svg`. */
 export const HOME_SAFETY_STATUS_ICONS = [
-  `${PUBLIC_ASSET_BASE}safety/icons/1.svg`,
-  `${PUBLIC_ASSET_BASE}safety/icons/2.svg`,
-  `${PUBLIC_ASSET_BASE}safety/icons/3.svg`,
-  `${PUBLIC_ASSET_BASE}safety/icons/4.svg`,
-  `${PUBLIC_ASSET_BASE}safety/icons/5.svg`,
-  `${PUBLIC_ASSET_BASE}safety/icons/6.svg`,
+  `${MEDIA_ASSET_BASE}safety/icons/1.svg`,
+  `${MEDIA_ASSET_BASE}safety/icons/2.svg`,
+  `${MEDIA_ASSET_BASE}safety/icons/3.svg`,
+  `${MEDIA_ASSET_BASE}safety/icons/4.svg`,
+  `${MEDIA_ASSET_BASE}safety/icons/5.svg`,
+  `${MEDIA_ASSET_BASE}safety/icons/6.svg`,
 ] as const;
 
 /**
  * Контактные логотипы (rail, `#contact`, footer, модалка заявки) — файлы в `public/`.
  * Рендер: `ContactMessengerLogo`.
  */
-export const PHONE_ALT_LOGO = `${PUBLIC_ASSET_BASE}phone-alt-logo.svg` as const;
-export const TELEGRAM_LOGO = `${PUBLIC_ASSET_BASE}telegram-logo.svg` as const;
-export const WHATSAPP_LOGO = `${PUBLIC_ASSET_BASE}whatsapp-brands-solid-full.svg` as const;
-export const MAX_MESSENGER_SIGN_LOGO = `${PUBLIC_ASSET_BASE}max-messenger-sign-logo.svg` as const;
+export const PHONE_ALT_LOGO = `${APP_ASSET_BASE}phone-alt-logo.svg` as const;
+export const TELEGRAM_LOGO = `${APP_ASSET_BASE}telegram-logo.svg` as const;
+export const WHATSAPP_LOGO = `${APP_ASSET_BASE}whatsapp-brands-solid-full.svg` as const;
+export const MAX_MESSENGER_SIGN_LOGO = `${APP_ASSET_BASE}max-messenger-sign-logo.svg` as const;
 
 /** Иконка баннера согласия на cookies — `public/cookies/cookie-15_128x128.svg`. */
 export const COOKIE_BANNER_ICON =
-  `${PUBLIC_ASSET_BASE}cookies/cookie-15_128x128.svg` as const;
+  `${APP_ASSET_BASE}cookies/cookie-15_128x128.svg` as const;
 
 /** Все contact SVG в `public/` — SSOT для тестов и `ContactMessengerLogo`. */
 export const CONTACT_MESSENGER_LOGO_URLS = [
@@ -1457,7 +1457,7 @@ export const CONTACT_MESSENGER_LOGO_URLS = [
 ] as const;
 
 /** Графический знак Вкрайности (лес), не текстовый вордмарк — `public/vkrai-logo.webp`. */
-export const VKRAI_FOREST_LOGO = `${PUBLIC_ASSET_BASE}vkrai-logo.webp` as const;
+export const VKRAI_FOREST_LOGO = `${APP_ASSET_BASE}vkrai-logo.webp` as const;
 
 /**
  * Обложки весенних туров: spring-1…13 — реальные файлы в `public/tours/spring-N/`.

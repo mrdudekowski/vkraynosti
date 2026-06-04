@@ -155,6 +155,8 @@ export const UI = {
   },
   footer: {
     tagline:        'Открываем дикую природу России',
+    legalHeading:   'Юридическая информация',
+    innLabel:       'ИНН',
     privacy:        'Политика конфиденциальности',
     cookieSettings: 'Настройки cookies',
     rights:         '© 2025 Вкрайности. Все права защищены.',

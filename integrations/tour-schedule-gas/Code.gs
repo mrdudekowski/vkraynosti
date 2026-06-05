@@ -216,7 +216,11 @@ function onScheduleEdit(e) {
   var name = sheet.getName();
 
   if (CATALOG_SHEET_NAMES.indexOf(name) !== -1) {
-    rebuildCatalogPricesInCache_();
+    if (e.range.getColumn() === CATALOG_PUBLICATION_STATUS_COLUMN) {
+      rebuildScheduleCache_(true);
+    } else {
+      rebuildCatalogPricesInCache_();
+    }
     return;
   }
 
@@ -756,15 +760,18 @@ function rebuildCatalogPricesInCache_() {
     payload.prices = readCatalogPrices_(ss);
     payload.durationTypes = readCatalogDurationTypes_(ss);
     payload.publicationStatuses = readCatalogPublicationStatuses_(ss);
+    payload.events = filterEventsByPublicationStatuses_(payload.events, payload.publicationStatuses);
     var json = JSON.stringify(payload);
     CacheService.getScriptCache().put(CACHE_KEY, json, CACHE_TTL_SEC);
     Logger.log(
       'rebuildCatalogPricesInCache_: events=' +
         payload.events.length +
-        ' (unchanged), prices=' +
+        ', prices=' +
         Object.keys(payload.prices).length +
         ', durationTypes=' +
-        Object.keys(payload.durationTypes).length
+        Object.keys(payload.durationTypes).length +
+        ', publicationStatuses=' +
+        Object.keys(payload.publicationStatuses).length
     );
   } catch (err) {
     Logger.log('rebuildCatalogPricesInCache_: ' + err);
@@ -991,6 +998,17 @@ function readCatalogPublicationStatuses_(ss) {
   }
 
   return publicationStatuses;
+}
+
+/**
+ * @param {Object[]} events
+ * @param {Object<string, string>} publicationStatuses
+ * @returns {Object[]}
+ */
+function filterEventsByPublicationStatuses_(events, publicationStatuses) {
+  return events.filter(function (ev) {
+    return publicationStatuses[ev.tourId] !== 'hidden';
+  });
 }
 
 /**

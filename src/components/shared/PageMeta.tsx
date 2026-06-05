@@ -1,6 +1,11 @@
 import { Helmet } from 'react-helmet-async';
 import type { HomeSeasonBannerVideoPreloadLink } from '../../constants/homeSeasonBannerVideoPreload';
-import { SEO_DEFAULTS, getCanonicalUrl, type RobotsDirective } from '../../constants/seo';
+import {
+  SEO_DEFAULTS,
+  getAbsoluteOgImageUrl,
+  getCanonicalUrl,
+  type RobotsDirective,
+} from '../../constants/seo';
 
 interface PageMetaProps {
   title: string;
@@ -36,6 +41,9 @@ const PageMeta = ({
   const heroPreloadPriority = preloadHeroImageFetchPriority ?? 'high';
 
   const canonicalUrl = getCanonicalUrl(canonicalPath ?? path);
+  const ogImage = imageUrl
+    ? getAbsoluteOgImageUrl(imageUrl)
+    : SEO_DEFAULTS.defaultOgImage;
 
   return (
     <Helmet>
@@ -55,12 +63,12 @@ const PageMeta = ({
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:site_name" content={SEO_DEFAULTS.siteName} />
       <meta property="og:locale" content="ru_RU" />
-      {imageUrl && <meta property="og:image" content={imageUrl} />}
-      {imageUrl && <meta property="og:image:alt" content={title} />}
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:image:alt" content={title} />
       <meta name="twitter:card" content={SEO_DEFAULTS.twitterCard} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      {imageUrl && <meta name="twitter:image" content={imageUrl} />}
+      <meta name="twitter:image" content={ogImage} />
       <meta name="twitter:url" content={canonicalUrl} />
       {structuredData?.map((schema, index) => (
         <script key={`schema-${index}`} type="application/ld+json">

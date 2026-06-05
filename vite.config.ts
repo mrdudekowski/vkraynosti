@@ -1,17 +1,31 @@
 /// <reference types="vitest/config" />
+import path from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import {
   buildContentSecurityPolicy,
   parseMediaOriginFromAssetBaseUrl,
 } from './src/constants/contentSecurityPolicy.ts'
-
+import { pruneDistForCdn as pruneDistForCdnFromLib } from './scripts/lib/pruneDistForCdn.ts'
 const mediaCdnOrigin = parseMediaOriginFromAssetBaseUrl(
   process.env.VITE_PUBLIC_ASSET_BASE_URL ?? ''
 )
 const contentSecurityPolicy = buildContentSecurityPolicy(
   mediaCdnOrigin != null ? [mediaCdnOrigin] : []
 )
+
+function pruneDistForCdnPlugin(): Plugin {
+  return {
+    name: 'prune-dist-for-cdn',
+    closeBundle() {
+      const distDir = path.resolve(process.cwd(), 'dist')
+      const { pruned } = pruneDistForCdnFromLib(distDir)
+      if (pruned.length > 0) {
+        console.log(`[prune-dist-for-cdn] Removed from dist: ${pruned.join(', ')}`)
+      }
+    },
+  }
+}
 
 function injectContentSecurityPolicyPlugin(csp: string): Plugin {
   const cspMetaPattern =
@@ -41,8 +55,14 @@ const securityHeaders = {
 } as const;
 
 // https://vite.dev/config/
+const appBasePath = process.env.VITE_BASE_PATH?.trim() || '/vkraynosti/'
+
 export default defineConfig({
-  plugins: [react(), injectContentSecurityPolicyPlugin(contentSecurityPolicy)],
+  plugins: [
+    react(),
+    injectContentSecurityPolicyPlugin(contentSecurityPolicy),
+    pruneDistForCdnPlugin(),
+  ],
   server: {
     headers: securityHeaders,
   },
@@ -55,7 +75,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.test.ts', 'scripts/**/*.test.mjs'],
   },
-  base: '/vkraynosti/',
+  base: appBasePath.endsWith('/') ? appBasePath : `${appBasePath}/`,
   build: {
     rollupOptions: {
       output: {

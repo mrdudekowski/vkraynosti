@@ -1,4 +1,4 @@
-export const SITE_URL = 'https://mrdudekowski.github.io/vkraynosti';
+export { DEFAULT_SITE_URL, SITE_URL } from './siteUrl';
 
 export const CONTACTS = {
   PHONE_NUMBER:    '8 (914) 066-80-99',

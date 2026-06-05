@@ -15,7 +15,10 @@ const scheduleContextValue = {
   eventsByDate: new Map(),
   prices: new Map(),
   durationTypes: new Map(),
-  publicationStatuses: new Map([['summer-13', 'in_development' as const]]),
+  publicationStatuses: new Map([
+    ['spring-1', 'active' as const],
+    ['summer-13', 'in_development' as const],
+  ]),
   error: null,
   retry: vi.fn(),
 };
@@ -40,7 +43,7 @@ const renderTourDetailPage = (tourId: string) => {
 };
 
 describe('TourDetailPage hidden', () => {
-  it('shows not found for hidden tour', () => {
+  it('shows not found for hidden tour after schedule loaded', () => {
     const tour = getTourById('spring-1');
     if (!tour) throw new Error('spring-1 missing');
 
@@ -49,6 +52,7 @@ describe('TourDetailPage hidden', () => {
         <TourScheduleContext.Provider
           value={{
             ...scheduleContextValue,
+            status: 'success',
             publicationStatuses: new Map([['spring-1', 'hidden']]),
           }}
         >

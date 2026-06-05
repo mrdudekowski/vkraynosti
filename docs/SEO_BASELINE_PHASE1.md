@@ -1,12 +1,12 @@
 # SEO Baseline Audit (Phase 1)
 
-Generated: 2026-04-29T06:57:19.353Z
+Generated: 2026-06-05T09:47:53.095Z
 
 ## Route Inventory
 
 - Static indexable routes: /, /tours/winter, /tours/spring, /tours/summer, /tours/fall, /safety, /privacy
-- Tour detail routes: 23
-- Total planned indexable URLs: 30
+- Tour detail routes: 25
+- Total planned indexable URLs: 32
 
 ## Metadata Foundation Checks
 
@@ -20,7 +20,7 @@ Generated: 2026-04-29T06:57:19.353Z
 ## Crawlability & Indexability Checks
 
 - [x] robots.txt exists: public/robots.txt found
-- [x] sitemap.xml exists: public/sitemap.xml found (30 URLs)
+- [x] sitemap.xml exists: public/sitemap.xml found (45 URLs)
 - [x] Single SEO source of truth: src/constants/seo.ts detected
 
 ## SPA SEO Risk Snapshot

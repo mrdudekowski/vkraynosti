@@ -1,4 +1,6 @@
 import { CONTACTS, SITE_URL } from './contacts';
+import { IMAGES } from './images';
+import { resolveMediaAssetUrl } from './publicAssetBase';
 import { ROUTES, buildTourDetailPath } from './routes';
 import type { Season, Tour } from '../types';
 import { UI } from './ui';
@@ -20,16 +22,36 @@ export interface SeoEntry {
 const SITE_NAME = 'Вкрайности' as const;
 const TWITTER_CARD_TYPE = 'summary_large_image' as const;
 
+export const getCanonicalUrl = (path: string): string => `${SITE_URL}${path}`;
+
+/** Absolute HTTPS URL for Open Graph / Twitter (social crawlers require full URL). */
+export const getAbsoluteOgImageUrl = (pathOrUrl: string): string => {
+  if (/^https?:\/\//i.test(pathOrUrl)) {
+    return pathOrUrl;
+  }
+  const resolved = resolveMediaAssetUrl(pathOrUrl);
+  if (/^https?:\/\//i.test(resolved)) {
+    return resolved;
+  }
+  const origin = SITE_URL.replace(/\/+$/, '');
+  let assetPath = resolved.startsWith('/') ? resolved : `/${resolved}`;
+  // SITE_URL already ends with /vkraynosti; media paths include APP base — avoid doubling.
+  if (assetPath.startsWith('/vkraynosti/') && origin.endsWith('/vkraynosti')) {
+    assetPath = assetPath.slice('/vkraynosti'.length) || '/';
+  }
+  return `${origin}${assetPath}`;
+};
+
 const SEASON_META_BY_KEY: Record<Season, Omit<SeoEntry, 'path'>> = {
   winter: {
-    title: 'Зимние туры — Байкал, Хибины, Алтай | Вкрайности',
+    title: 'Зимние туры Приморья — сопки и море | Вкрайности',
     description:
-      'Зимние приключения в России: ледяные пещеры Байкала, фрирайд в Хибинах, экспедиции по Алтаю. Маршруты для любого уровня подготовки.',
+      'Зима из Владивостока: снежные сопки, ледяное побережье и уютные выезды по Приморью. Маршруты для разного уровня подготовки с опытными гидами.',
   },
   spring: {
-    title: 'Весенние туры — Алтай, Камчатка, Байкал | Вкрайности',
+    title: 'Весенние туры Приморья — Пидан, Сестра, Аскольд | Вкрайности',
     description:
-      'Весна в России: цветение маральника на Алтае, вулканы Камчатки и Байкал. Маршруты на любой уровень от лёгких до сложных.',
+      'Весна из Владивостока: Лысый Дед, Пидан, Сестра, Аскольд, Шкота, Гамова и другие маршруты Приморья. От лёгких однодневных до многодневных походов.',
   },
   summer: {
     title: 'Летние туры Приморья — заповедное побережье | Вкрайности',
@@ -48,9 +70,9 @@ export const SEO_DEFAULTS = {
   twitterCard: TWITTER_CARD_TYPE,
   robots: 'index,follow' as RobotsDirective,
   home: {
-    title: 'Вкрайности — Туры по дикой природе России',
+    title: 'Вкрайности — Туры по Приморью из Владивостока',
     description:
-      'Авторские туры по Алтаю, Байкалу, Камчатке и Кавказу. Зима, весна, лето и осень — четыре сезона приключений с опытными гидами.',
+      'Авторские туры по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.',
     path: ROUTES.HOME,
   } satisfies SeoEntry,
   safety: {
@@ -70,6 +92,7 @@ export const SEO_DEFAULTS = {
     path: ROUTES.HOME,
     robots: 'noindex,nofollow' as RobotsDirective,
   } satisfies SeoEntry,
+  defaultOgImage: getAbsoluteOgImageUrl(IMAGES.seasonSection.summer),
 } as const;
 
 export const getSeasonSeoEntry = (season: Season, path: string): SeoEntry => ({
@@ -109,8 +132,6 @@ export const getTourSeoEntry = (
     path: buildTourDetailPath(tour.season, tour.id),
   };
 };
-
-export const getCanonicalUrl = (path: string): string => `${SITE_URL}${path}`;
 
 export const ORGANIZATION_SCHEMA = {
   '@context': 'https://schema.org',
@@ -172,7 +193,7 @@ export const getTourStructuredData = (
     name: tour.title,
     description: seoEntry.description,
     url: getCanonicalUrl(seoEntry.path),
-    image: tour.imageUrl,
+    image: getAbsoluteOgImageUrl(tour.imageUrl),
     itinerary: tour.program.map(step => step.description),
     provider: {
       '@type': 'Organization',

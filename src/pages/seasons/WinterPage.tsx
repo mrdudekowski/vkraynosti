@@ -1,22 +1,11 @@
-import { useMemo } from 'react';
 import TourCard from '../../components/shared/TourCard';
 import SeasonPageLayout from '../../components/seasons/SeasonPageLayout';
 import { ROUTES } from '../../constants/routes';
 import { getSeasonSeoEntry } from '../../constants/seo';
-import { useTourSchedule } from '../../hooks/useTourSchedule';
-import { sortToursInDevelopmentLast } from '../../utils/sortToursInDevelopmentLast';
-import { getVisibleToursBySeason } from '../../utils/tourSchedule/getVisibleToursBySeason';
+import { useVisibleToursBySeason } from '../../hooks/useVisibleToursBySeason';
 
 const WinterPage = () => {
-  const { publicationStatuses } = useTourSchedule();
-  const tours = useMemo(
-    () =>
-      sortToursInDevelopmentLast(
-        getVisibleToursBySeason('winter', publicationStatuses),
-        publicationStatuses,
-      ),
-    [publicationStatuses],
-  );
+  const { tours } = useVisibleToursBySeason('winter');
   const seoEntry = getSeasonSeoEntry('winter', ROUTES.WINTER);
 
   return (

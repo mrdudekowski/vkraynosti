@@ -1,0 +1,24 @@
+Vkraynosti — staging smoke (фаза 9)
+====================================
+
+Окружение: TimeWeb App (ветка web-vkr), VITE_PUBLIC_ASSET_BASE_URL задан, S3 sync выполнен.
+
+| # | Сценарий | web-vkr local/preview | TimeWeb staging | Pass |
+|---|----------|----------------------|-----------------|------|
+| 1 | Главная, сезонный баннер (видео/постер) | | | |
+| 2 | Список туров сезона | | | |
+| 3 | Страница тура: обложка, галерея, grid .webm | | | |
+| 4 | Deep link /tours/{season}/{id} в новой вкладке | | | |
+| 5 | 404 → NotFound, noindex | | | |
+| 6 | Модалка заявки → GAS (нет false success) | | | |
+| 7 | Расписание: API или mock JSON осознанно | | | |
+| 8 | Cookie consent + Метрика (если ID задан) | | | |
+| 9 | Console: нет CSP/CORS errors на медиа | | | |
+| 10 | Шрифты с App (не с CDN) | | | |
+| 11 | summer-12 скрыт (in_development) до медиа | | | |
+
+Команды перед smoke:
+  npm ci && npm test && npm run build
+  npm run preview  (или артефакт dist-web-vkr)
+
+Sign-off: дата ______  ответственный ______

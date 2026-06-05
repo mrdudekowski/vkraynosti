@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isTourHiddenFromSite,
   isTourPublicationHidden,
   isTourPublicationInDevelopment,
   resolveTourPublicationStatus,
@@ -34,6 +35,20 @@ describe('resolveTourPublicationStatus', () => {
 describe('isTourPublicationHidden', () => {
   it('detects hidden status', () => {
     expect(isTourPublicationHidden('summer-18', map({ 'summer-18': 'hidden' }))).toBe(true);
+  });
+});
+
+describe('isTourHiddenFromSite', () => {
+  it('returns false before schedule is loaded', () => {
+    expect(isTourHiddenFromSite('summer-18', map({ 'summer-18': 'hidden' }), false)).toBe(
+      false,
+    );
+  });
+
+  it('returns true for hidden and for ids missing from non-empty catalog', () => {
+    const statuses = map({ 'summer-1': 'active' });
+    expect(isTourHiddenFromSite('summer-18', statuses, true)).toBe(true);
+    expect(isTourHiddenFromSite('summer-1', statuses, true)).toBe(false);
   });
 });
 

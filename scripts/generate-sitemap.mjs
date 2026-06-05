@@ -1,44 +1,21 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import {
+  getIndexableRoutePaths,
+  resolveSiteRoot,
+} from './lib/seoRoutes.mjs';
 
 const rootDir = process.cwd();
-const SITE_URL = 'https://mrdudekowski.github.io/vkraynosti';
+const SITE_ROOT = resolveSiteRoot();
 
-const read = async (filePath) => readFile(resolve(rootDir, filePath), 'utf8');
-
-const extractStaticRoutes = (routesSource) => {
-  const matches = [...routesSource.matchAll(/^\s+([A-Z_]+):\s+'([^']+)'/gm)];
-  return matches
-    .map(([, key, path]) => ({ key, path }))
-    .filter(route => !route.path.includes(':'));
+const createUrlNode = (routePath) => {
+  const route = routePath.startsWith('/') ? routePath : `/${routePath}`;
+  const loc = `${SITE_ROOT}${route}`;
+  return `  <url><loc>${loc}</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>`;
 };
-
-const extractTourUrlsFromCore = (toursSource) => {
-  const matches = [...toursSource.matchAll(/id:\s*'([^']+)'.*?season:\s*'(winter|spring|summer)'/gs)];
-  return matches.map(([, id, season]) => `/tours/${season}/${id}`);
-};
-
-const extractFallTourUrls = (fallImagesSource) => {
-  const ids = [...fallImagesSource.matchAll(/'fall-\d+'/g)].map((m) => m[0].slice(1, -1));
-  return [...new Set(ids)].map((id) => `/tours/fall/${id}`);
-};
-
-const createUrlNode = (path) => `  <url><loc>${SITE_URL}${path}</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>`;
 
 const run = async () => {
-  const [routesSource, toursSource, fallImagesSource] = await Promise.all([
-    read('src/constants/routes.ts'),
-    read('src/data/toursData.ts'),
-    read('src/constants/fallTourImages.ts'),
-  ]);
-
-  const staticRoutes = extractStaticRoutes(routesSource).map(route => route.path);
-  const tourRoutes = [
-    ...extractTourUrlsFromCore(toursSource),
-    ...extractFallTourUrls(fallImagesSource),
-  ];
-
-  const allRoutes = [...new Set([...(staticRoutes.includes('/') ? [] : ['/']), ...staticRoutes, ...tourRoutes])];
+  const allRoutes = await getIndexableRoutePaths(rootDir);
   const xmlLines = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

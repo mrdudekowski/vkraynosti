@@ -11,12 +11,24 @@ const assertCheck = (condition, label, details) => ({
 });
 
 const run = async () => {
-  const [pageMetaSource, notFoundSource, robotsSource, sitemapSource, seoSource] = await Promise.all([
+  const [
+    pageMetaSource,
+    notFoundSource,
+    robotsSource,
+    sitemapSource,
+    seoSource,
+    homeSource,
+    seasonLayoutSource,
+    safetySource,
+  ] = await Promise.all([
     read('src/components/shared/PageMeta.tsx'),
     read('src/pages/NotFoundPage.tsx'),
     read('public/robots.txt'),
     read('public/sitemap.xml'),
     read('src/constants/seo.ts'),
+    read('src/pages/Home.tsx'),
+    read('src/components/seasons/SeasonPageLayout.tsx'),
+    read('src/pages/SafetyPage.tsx'),
   ]);
 
   const checks = [
@@ -29,6 +41,43 @@ const run = async () => {
     assertCheck(robotsSource.includes('Sitemap:'), 'robots sitemap link', 'robots.txt must include sitemap'),
     assertCheck((sitemapSource.match(/<url>/g) ?? []).length > 0, 'sitemap urls', 'sitemap must include at least one URL'),
     assertCheck(seoSource.includes('SEO_DEFAULTS'), 'single source', 'seo constants must exist'),
+    assertCheck(
+      seoSource.includes('getAbsoluteOgImageUrl'),
+      'absolute og image helper',
+      'seo.ts must define getAbsoluteOgImageUrl',
+    ),
+    assertCheck(
+      seoSource.includes('defaultOgImage'),
+      'default og image',
+      'SEO_DEFAULTS must include defaultOgImage',
+    ),
+    assertCheck(
+      pageMetaSource.includes('getAbsoluteOgImageUrl'),
+      'page meta absolute og',
+      'PageMeta must normalize og:image via getAbsoluteOgImageUrl',
+    ),
+    assertCheck(
+      pageMetaSource.includes('SEO_DEFAULTS.defaultOgImage'),
+      'page meta og fallback',
+      'PageMeta must fall back to SEO_DEFAULTS.defaultOgImage',
+    ),
+    assertCheck(
+      !homeSource.includes('IMAGES.hero[activeSeason]') &&
+        homeSource.includes('IMAGES.seasonSection[activeSeason]'),
+      'home og image source',
+      'Home PageMeta must use seasonSection, not placehold hero',
+    ),
+    assertCheck(
+      seasonLayoutSource.includes('IMAGES.seasonSection[seasonKey]'),
+      'season og image source',
+      'SeasonPageLayout PageMeta must use seasonSection',
+    ),
+    assertCheck(
+      !safetySource.includes('IMAGES.hero[activeSeason]') &&
+        safetySource.includes('IMAGES.seasonSection[activeSeason]'),
+      'safety og image source',
+      'SafetyPage PageMeta must use seasonSection, not placehold hero',
+    ),
   ];
 
   const failedChecks = checks.filter(check => !check.ok);

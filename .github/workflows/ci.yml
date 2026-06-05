@@ -40,8 +40,13 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Generate sitemap
-        run: npm run generate:sitemap
+      - name: Generate sitemap and robots
+        env:
+          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_SITE_URL || '' }}
+          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && '/' || '/vkraynosti/' }}
+        run: |
+          npm run generate:sitemap
+          npm run generate:robots
 
       - name: SEO checks
         run: npm run seo:check
@@ -52,7 +57,25 @@ jobs:
           VITE_TOUR_SCHEDULE_ENDPOINT_URL: ${{ vars.VITE_TOUR_SCHEDULE_ENDPOINT_URL }}
           VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
           VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
+          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_SITE_URL || '' }}
+          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && '/' || '/vkraynosti/' }}
         run: npm run build
+
+      - name: Install Playwright Chromium for prerender
+        run: npx playwright install chromium
+
+      - name: Prerender dist for SEO
+        env:
+          VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
+          VITE_TOUR_SCHEDULE_ENDPOINT_URL: ${{ vars.VITE_TOUR_SCHEDULE_ENDPOINT_URL }}
+          VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
+          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
+          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_SITE_URL || '' }}
+          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && '/' || '/vkraynosti/' }}
+        run: npm run prerender
+
+      - name: Verify prerendered meta
+        run: npm run verify:prerender
 
       - name: Verify CDN origin in CSP
         if: github.ref == 'refs/heads/web-vkr' && github.event_name == 'push'
@@ -69,6 +92,17 @@ jobs:
             exit 1
           fi
           echo "CSP includes $ORIGIN"
+
+      - name: Verify lean dist for CDN build
+        if: github.ref == 'refs/heads/web-vkr' && github.event_name == 'push'
+        env:
+          CDN_BASE: ${{ vars.VITE_PUBLIC_ASSET_BASE_URL }}
+        run: |
+          if [ -z "$CDN_BASE" ]; then
+            echo "::warning::VITE_PUBLIC_ASSET_BASE_URL is not set; skipping lean dist check"
+            exit 0
+          fi
+          node scripts/verify-lean-dist.mjs
 
       - name: Upload dist artifact for TimeWeb
         if: github.ref == 'refs/heads/web-vkr' && github.event_name == 'push'

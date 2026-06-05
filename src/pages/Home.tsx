@@ -34,10 +34,8 @@ import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfade
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
 import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
-import { getVisibleToursBySeason } from '../utils/tourSchedule/getVisibleToursBySeason';
-import { sortToursInDevelopmentLast } from '../utils/sortToursInDevelopmentLast';
 import { useSeason } from '../context/useSeason';
-import { useTourSchedule } from '../hooks/useTourSchedule';
+import { useVisibleToursBySeason } from '../hooks/useVisibleToursBySeason';
 import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
 import { useHomeGateDesktopLayout } from '../hooks/useHomeGateDesktopLayout';
 import { useHomeNavbarChromeScroll } from '../hooks/useHomeNavbarChromeScroll';
@@ -77,19 +75,8 @@ const Home = () => {
   const location = useLocation();
   const lenis = useLenis();
   const { activeSeason } = useSeason();
-  const { publicationStatuses } = useTourSchedule();
-  const tours = useMemo(
-    () =>
-      sortToursInDevelopmentLast(
-        getVisibleToursBySeason(activeSeason, publicationStatuses),
-        publicationStatuses,
-      ),
-    [activeSeason, publicationStatuses],
-  );
-  const springTours = useMemo(
-    () => getVisibleToursBySeason('spring', publicationStatuses),
-    [publicationStatuses],
-  );
+  const { tours } = useVisibleToursBySeason(activeSeason);
+  const { tours: springTours } = useVisibleToursBySeason('spring');
   const [expandedSeason, setExpandedSeason] = useState<Season | null>(null);
   const isAllToursExpanded = expandedSeason === activeSeason;
   const [toursPromoVideoIndex, setToursPromoVideoIndex] = useState(0);
@@ -338,7 +325,7 @@ const Home = () => {
       <PageMeta
         title={SEO_DEFAULTS.home.title}
         description={SEO_DEFAULTS.home.description}
-        imageUrl={IMAGES.hero[activeSeason]}
+        imageUrl={IMAGES.seasonSection[activeSeason]}
         path={SEO_DEFAULTS.home.path}
         structuredData={[ORGANIZATION_SCHEMA, WEBSITE_SCHEMA]}
         preloadHeroImageUrl={lcpPreloadImageUrl}

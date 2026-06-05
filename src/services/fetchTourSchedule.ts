@@ -77,7 +77,7 @@ export const fetchTourSchedule = async (): Promise<TourSchedulePayload> => {
 
   let response: Response;
   try {
-    response = await fetch(url);
+    response = await fetch(url, { cache: 'no-store' });
   } catch {
     throw new TourScheduleFetchError('network', 'Failed to fetch tour schedule');
   }

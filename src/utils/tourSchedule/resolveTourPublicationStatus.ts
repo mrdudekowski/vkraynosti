@@ -19,6 +19,23 @@ export function isTourPublicationHidden(
   return resolveTourPublicationStatus(tourId, publicationStatuses) === 'hidden';
 }
 
+/**
+ * Скрыт с сайта, когда расписание загружено и в каталоге статус hidden
+ * или тура нет в publicationStatuses при непустом каталоге.
+ */
+export function isTourHiddenFromSite(
+  tourId: string,
+  publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,
+  scheduleLoaded: boolean,
+): boolean {
+  if (!scheduleLoaded) return false;
+
+  const fromCatalog = publicationStatuses.get(tourId);
+  if (fromCatalog === 'hidden') return true;
+  if (publicationStatuses.size > 0 && fromCatalog === undefined) return true;
+  return false;
+}
+
 export function isTourPublicationInDevelopment(
   tourId: string,
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,

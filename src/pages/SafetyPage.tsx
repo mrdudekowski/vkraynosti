@@ -63,7 +63,7 @@ const SafetyPage = () => {
       <PageMeta
         title={SEO_DEFAULTS.safety.title}
         description={SEO_DEFAULTS.safety.description}
-        imageUrl={IMAGES.hero[activeSeason]}
+        imageUrl={IMAGES.seasonSection[activeSeason]}
         path={SEO_DEFAULTS.safety.path}
       />
       {/* Hero */}

@@ -8,6 +8,7 @@ import type {
   TourScheduleLoadStatus,
 } from '../types/tourSchedule';
 import { enrichScheduleEvents } from '../utils/tourSchedule/enrichScheduleEvents';
+import { filterEventsByPublicationStatuses } from '../utils/tourSchedule/filterEventsByPublicationStatuses';
 import { groupEventsByIsoDate } from '../utils/tourSchedule/groupEventsByIsoDate';
 import { mergeTourPrices } from '../utils/tourSchedule/mergeTourPrices';
 import { TourScheduleContext } from './tour-schedule-context-definition';
@@ -40,7 +41,11 @@ const loadSchedule = async (): Promise<CachedSchedule> => {
   inflightPromise = fetchTourSchedule()
     .then(({ events: rawEvents, catalogPrices, catalogDurationTypes, catalogPublicationStatuses }) => {
       const publicationStatuses = toPublicationStatusesMap(catalogPublicationStatuses);
-      const events = enrichScheduleEvents(rawEvents, publicationStatuses);
+      const visibleRawEvents = filterEventsByPublicationStatuses(
+        rawEvents,
+        publicationStatuses,
+      );
+      const events = enrichScheduleEvents(visibleRawEvents, publicationStatuses);
       const result: CachedSchedule = {
         events,
         eventsByDate: groupEventsByIsoDate(events),

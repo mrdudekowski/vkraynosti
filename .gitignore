@@ -32,6 +32,15 @@ dist-ssr
 
 # Cursor local debug dumps (rules/settings may stay tracked for the team)
 .cursor/debug*.log
+.cursor/plans/
+.cursor/preview-ezh/
+
+# TimeWeb media inventory dumps (regenerate: npm run media:inventory)
+TimeWebDoc/audit-*.json
+
+# Windows folder metadata (never deploy)
+**/desktop.ini
+**/Thumbs.db
 
 # Исходники фото/видео туров (не в репозитории)
 /content/

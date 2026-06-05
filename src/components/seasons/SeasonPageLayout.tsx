@@ -26,6 +26,7 @@ const SeasonPageLayout = ({
 }: SeasonPageLayoutProps) => {
   const season = UI.seasons[seasonKey];
   const heroImageUrl = IMAGES.hero[seasonKey];
+  const ogImageUrl = IMAGES.seasonSection[seasonKey];
 
   return (
     <div className="relative min-h-screen">
@@ -33,7 +34,7 @@ const SeasonPageLayout = ({
       <PageMeta
         title={metaTitle}
         description={metaDescription}
-        imageUrl={heroImageUrl}
+        imageUrl={ogImageUrl}
         path={metaPath}
       />
 

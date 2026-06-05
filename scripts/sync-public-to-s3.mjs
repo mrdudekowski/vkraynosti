@@ -15,6 +15,8 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadDotEnvLocal } from './lib/loadDotEnvLocal.mjs';
+import { resolveAwsCliExecutable } from './lib/resolveAwsCliExecutable.mjs';
 import {
   S3_VERIFY_SAMPLE_KEYS,
   buildAwsS3SyncArgs,
@@ -24,6 +26,8 @@ import {
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(repoRoot, 'public');
+
+loadDotEnvLocal(repoRoot);
 
 function parseFlags(argv) {
   return {
@@ -42,16 +46,21 @@ function requireEnv(name) {
   return value;
 }
 
-function assertAwsCliAvailable() {
-  const probe = spawnSync('aws', ['--version'], { encoding: 'utf8', shell: true });
-  if (probe.status !== 0) {
-    throw new Error(
-      'AWS CLI not found. Install AWS CLI v2 and configure credentials for TimeWeb S3.'
-    );
-  }
+function getAwsCliExecutable() {
+  return resolveAwsCliExecutable();
 }
 
-function runAwsSync(flags) {
+function assertAwsCliAvailable(awsExecutable) {
+  const probe = spawnSync(awsExecutable, ['--version'], { encoding: 'utf8' });
+  if (probe.status !== 0) {
+    throw new Error(
+      `AWS CLI probe failed (${awsExecutable}). Install AWS CLI v2 or set AWS_CLI_EXECUTABLE.`
+    );
+  }
+  process.stdout.write(`Using AWS CLI: ${awsExecutable} (${(probe.stdout ?? '').trim()})\n`);
+}
+
+function runAwsSync(flags, awsExecutable) {
   if (!fs.existsSync(publicDir)) {
     throw new Error(`Missing directory: ${publicDir}`);
   }
@@ -75,7 +84,10 @@ function runAwsSync(flags) {
       `Scope: public/ → ${buildS3SyncTarget(bucket, prefix)} (excludes fonts/)\n`
   );
 
-  const result = spawnSync('aws', args, { stdio: 'inherit', shell: true });
+  const result = spawnSync(awsExecutable, args, {
+    stdio: 'inherit',
+    env: process.env,
+  });
   if (result.status !== 0) {
     process.exitCode = result.status ?? 1;
     return false;
@@ -155,8 +167,9 @@ function main() {
       return;
     }
 
-    assertAwsCliAvailable();
-    const ok = runAwsSync(flags);
+    const awsExecutable = getAwsCliExecutable();
+    assertAwsCliAvailable(awsExecutable);
+    const ok = runAwsSync(flags, awsExecutable);
     if (!ok) {
       return;
     }

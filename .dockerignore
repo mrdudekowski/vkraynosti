@@ -1,0 +1,58 @@
+# TimeWeb App Platform: shrink Docker build context for web-vkr.
+# Tour/team/banner/safety media load from S3 (VITE_PUBLIC_ASSET_BASE_URL).
+# Keep public/fonts/, public/data/, favicon, og, robots, sitemap, 404.html.
+
+# S3/CDN scope (mirrors scripts/lib/pruneDistForCdn.ts + s3SyncScope)
+public/tours/
+public/team/
+public/banners_winter/
+public/banners_spring/
+public/banners_summer/
+public/banners_fall/
+public/safety/
+
+# Installed fresh in the image
+node_modules/
+dist/
+coverage/
+dist-ssr/
+
+# VCS and local env
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Dev, test, CI artifacts (not needed for npm run build)
+e2e/
+test-results/
+playwright-report/
+blob-report/
+*.tsbuildinfo
+
+# Docs and ops (not imported by Vite build)
+TimeWebDoc/
+docs/
+optimize/
+.cursor/
+content/
+
+# Local dumps and recovery trees
+perf-*.json
+lighthouse-*.json
+lighthouse-report*.json
+video-audit*.json
+phase4-network-snapshot.json
+recovered-final/
+recovered-team/
+extracted-from-transcript/
+extracted-writes/
+pred-plan.md
+
+# OS / editor noise
+**/.DS_Store
+**/desktop.ini
+**/Thumbs.db
+.vscode/
+.idea/

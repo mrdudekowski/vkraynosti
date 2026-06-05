@@ -12,6 +12,15 @@ const IMG_SRC_BASE = [
 
 const MEDIA_SRC_BASE = ["'self'", 'blob:'] as const;
 
+/** GAS (расписание, заявки), Метрика; CDN origin added when VITE_PUBLIC_ASSET_BASE_URL is set. */
+const CONNECT_SRC_BASE = [
+  "'self'",
+  'https://script.google.com',
+  'https://script.googleusercontent.com',
+  'https://mc.yandex.ru',
+  'https://yandex.ru',
+] as const;
+
 function uniqueOrigins(origins: readonly string[]): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
@@ -53,6 +62,7 @@ export function parseMediaOriginFromAssetBaseUrl(url: string): string | null {
 export function buildContentSecurityPolicy(extraMediaOrigins: string[] = []): string {
   const imgSrc = joinSources(IMG_SRC_BASE, extraMediaOrigins);
   const mediaSrc = joinSources(MEDIA_SRC_BASE, extraMediaOrigins);
+  const connectSrc = joinSources(CONNECT_SRC_BASE, extraMediaOrigins);
 
   return [
     "default-src 'self'",
@@ -64,7 +74,7 @@ export function buildContentSecurityPolicy(extraMediaOrigins: string[] = []): st
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     `img-src ${imgSrc}`,
     "font-src 'self' https://fonts.gstatic.com data:",
-    "connect-src 'self' https://script.google.com https://script.googleusercontent.com https://mc.yandex.ru https://yandex.ru",
+    `connect-src ${connectSrc}`,
     `media-src ${mediaSrc}`,
     'upgrade-insecure-requests',
   ].join('; ');

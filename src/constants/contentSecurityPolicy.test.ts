@@ -28,7 +28,7 @@ describe('buildContentSecurityPolicy', () => {
     expect(csp).not.toContain('cdn.example.com');
   });
 
-  it('adds CDN origin to img-src and media-src once', () => {
+  it('adds CDN origin to img-src, media-src, and connect-src once', () => {
     const csp = buildContentSecurityPolicy([
       'https://cdn.example.com',
       'https://cdn.example.com',
@@ -36,7 +36,8 @@ describe('buildContentSecurityPolicy', () => {
     expect(csp).toContain('img-src');
     expect(csp).toMatch(/img-src[^;]*https:\/\/cdn\.example\.com/);
     expect(csp).toMatch(/media-src[^;]*https:\/\/cdn\.example\.com/);
+    expect(csp).toMatch(/connect-src[^;]*https:\/\/cdn\.example\.com/);
     const matches = csp.match(/https:\/\/cdn\.example\.com/g);
-    expect(matches?.length).toBe(2);
+    expect(matches?.length).toBe(3);
   });
 });

@@ -25,12 +25,11 @@ function buildPreviewBaseUrl() {
   return basePath === '/' ? `${origin}/` : `${origin}${basePath}`;
 }
 
-/** GH Pages / index.html SPA restore uses `?p=/path` (see public/404.html). */
 function routeToAbsoluteUrl(routePath, previewBaseUrl) {
   const base = previewBaseUrl.endsWith('/') ? previewBaseUrl : `${previewBaseUrl}/`;
   if (routePath === '/') return base;
-  const encodedPath = routePath.startsWith('/') ? routePath : `/${routePath}`;
-  return `${base}?p=${encodeURIComponent(encodedPath)}`;
+  const suffix = routePath.startsWith('/') ? routePath.slice(1) : routePath;
+  return `${base}${suffix}`;
 }
 
 async function waitForPreviewReady(url, timeoutMs = 60_000) {
@@ -130,7 +129,7 @@ async function patch404Shell() {
 
 async function prerenderRoute(page, routePath, basePath, previewBaseUrl) {
   const targetUrl = routeToAbsoluteUrl(routePath, previewBaseUrl);
-  await page.goto(targetUrl, { waitUntil: 'load', timeout: 60_000 });
+  await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60_000 });
   await page.waitForLoadState('networkidle', { timeout: 20_000 }).catch(() => {});
 
   await page.waitForFunction(

@@ -6,6 +6,8 @@ describe('getAbsoluteOgImageUrl', () => {
   });
 
   it('returns https URLs unchanged', async () => {
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', '');
+    vi.resetModules();
     const { getAbsoluteOgImageUrl } = await import('./seo');
     expect(getAbsoluteOgImageUrl('https://cdn.example.com/tours/summer-1/first.webp')).toBe(
       'https://cdn.example.com/tours/summer-1/first.webp',
@@ -15,6 +17,7 @@ describe('getAbsoluteOgImageUrl', () => {
   it('prefixes SITE_URL for app-relative tour paths without doubling base', async () => {
     vi.stubEnv('VITE_SITE_URL', 'https://example.com/vkraynosti');
     vi.stubEnv('VITE_BASE_PATH', '/vkraynosti/');
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', '');
     vi.resetModules();
     const { getAbsoluteOgImageUrl } = await import('./seo');
     expect(getAbsoluteOgImageUrl('/vkraynosti/tours/summer-1/first.webp')).toBe(
@@ -43,6 +46,7 @@ describe('SEO_DEFAULTS.defaultOgImage', () => {
   });
 
   it('is an absolute https URL', async () => {
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', '');
     vi.resetModules();
     const { SEO_DEFAULTS } = await import('./seo');
     expect(SEO_DEFAULTS.defaultOgImage).toMatch(/^https:\/\//);

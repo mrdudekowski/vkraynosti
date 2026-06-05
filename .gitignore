@@ -45,11 +45,14 @@ TimeWebDoc/audit-*.json
 # Исходники фото/видео туров (не в репозитории)
 /content/
 
-# Generated/raw media should never go to production artifact
-public/tours/**/*.mov
-public/tours/**/*.source.*
-public/**/source.*
-public/**/source-*
+# web-vkr only: tour media on S3 — SSOT and public/ copies live on main (npm run sync:s3)
+public/tours/
+public/team/
+public/banners_winter/
+public/banners_spring/
+public/banners_summer/
+public/banners_fall/
+public/safety/
 
 # Local measurement / audit dumps (not source of truth; regenerate locally or in CI artifacts)
 /perf-*.json

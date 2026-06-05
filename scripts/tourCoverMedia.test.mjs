@@ -12,8 +12,10 @@ import {
 } from './lib/tourCoverMobile.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const hasLocalTourMedia = fs.existsSync(path.join(repoRoot, 'public', 'tours'));
 
-describe('tour cover mobile variants on disk', () => {
+/** web-vkr: media on S3 only; disk checks run on main where public/tours exists. */
+describe.skipIf(!hasLocalTourMedia)('tour cover mobile variants on disk', () => {
   it(
     'every tour with desktop cover on disk has matching .mobile.webp',
     async () => {

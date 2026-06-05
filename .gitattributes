@@ -1,0 +1,9 @@
+# web-vkr: when merging from main, keep media absent (S3 is runtime source).
+# Requires: git config merge.ours.driver true  (or [merge "ours"] driver = true in .git/config)
+public/tours/** merge=ours
+public/team/** merge=ours
+public/banners_winter/** merge=ours
+public/banners_spring/** merge=ours
+public/banners_summer/** merge=ours
+public/banners_fall/** merge=ours
+public/safety/** merge=ours

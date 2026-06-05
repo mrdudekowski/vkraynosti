@@ -36,6 +36,8 @@ Vkraynosti — S3 sync runbook (Phase 4)
 
 --- 4. Инкремент (после правок тура) ---
 
+  # Только на ветке main (public/ медиа не в git на web-vkr)
+  git checkout main
   git add public/tours/...
   npm run sync:s3
 
@@ -78,10 +80,10 @@ Inputs:
   dry_run=true (по умолчанию) → npm run sync:s3:dry-run
   dry_run=false → полный sync; verify_sample=true добавляет --verify-sample
 
-Запускайте с ветки, где актуален public/ (обычно main после merge медиа).
+Запускайте только с ветки main (на web-vkr public/ медиа нет в git).
 Флаг --delete в CI не используется.
 
-Ритуал prod: green ci.yml на web-vkr → (опционально) Sync public to S3 → ручной Deploy в TimeWeb.
+Ритуал prod: sync:s3 с main → green ci.yml на web-vkr → ручной Deploy в TimeWeb.
 
 --- Риски ---
 

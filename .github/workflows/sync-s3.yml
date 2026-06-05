@@ -2,6 +2,8 @@ name: Sync public to S3
 
 on:
   workflow_dispatch:
+    branches:
+      - main
     inputs:
       dry_run:
         type: boolean
@@ -22,6 +24,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Assert public media present (main only)
+        run: test -d public/tours
 
       - name: Setup Node
         uses: actions/setup-node@v4

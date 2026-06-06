@@ -119,11 +119,11 @@ test.describe('Home funnel: якоря nav → team / contact', () => {
 test.describe('Home funnel: H3 tours anchor', () => {
   test.setTimeout(60_000);
 
-  test('desktop: nav «Туры» открывает #tours', async ({ page }) => {
+  test('desktop: nav «Направления» открывает #tours', async ({ page }) => {
     await page.setViewportSize({ width: 950, height: 900 });
     await gotoHome(page);
 
-    await clickNavbarHomeLink(page, 'Туры');
+    await clickNavbarHomeLink(page, UI.nav.links[0].label);
     await expect(page).toHaveURL(
       new RegExp(`#${UI.sections.homeToursSectionElementId}$`)
     );

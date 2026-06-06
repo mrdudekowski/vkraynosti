@@ -1,7 +1,7 @@
 {
   "name": "Вкрайности",
   "short_name": "Вкрайности",
-  "description": "Авторские туры по Приморью из Владивостока",
+  "description": "Авторские поездки по Приморью из Владивостока",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f5f0e6",

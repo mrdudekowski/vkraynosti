@@ -7,7 +7,7 @@ export const UI = {
   hero: {
     /** Основной h1 главной страницы (SEO и скринридеры). */
     documentTitle: '',
-    viewTour:      'Забронировать тур',
+    viewTour:      'Забронировать поездку',
     /** Интервал автосмены слайдов героя (мс). */
     autoplayIntervalMs: 7000,
     /** Кнопка «назад» карусели героя (desktop). */
@@ -40,7 +40,7 @@ export const UI = {
       'Настоящая политика описывает общие принципы обработки данных при использовании сайта «Вкрайности». Актуальная юридическая редакция может быть предоставлена по запросу.',
     paragraphs: [
       'Мы собираем только те данные, которые вы добровольно передаёте при обращении через формы обратной связи, мессенджеры или по телефону (например, имя и контакт для связи).',
-      'Персональные данные используются для ответа на запросы о турах, бронировании и информирования об услугах. Мы не продаём данные третьим лицам.',
+      'Персональные данные используются для ответа на запросы о поездках, бронировании и информирования об услугах. Мы не продаём данные третьим лицам.',
       'Технические данные (cookies, IP-адрес в обезличенном виде) могут обрабатываться для стабильной работы сайта и аналитики в объёме, предусмотренном законодательством.',
       'Для удобства навигации сайт может сохранять позицию прокрутки в sessionStorage браузера на время сессии — это необходимо для работы интерфейса и не используется для рекламы.',
       'Сервис веб-аналитики (Яндекс.Метрика) подключается только после вашего согласия в баннере cookies; без согласия счётчик не загружается.',
@@ -52,19 +52,19 @@ export const UI = {
   nav: {
     brand: 'Вкрайности',
     links: [
-      { label: 'Туры',         hash: 'tours' },
+      { label: 'Направления',  hash: 'tours' },
       { label: 'Календарь',    hash: 'kalendar' },
       { label: 'Безопасность', hash: 'safety' },
       { label: 'Команда',      hash: 'team' },
       { label: 'Контакты',     hash: 'contact' },
     ],
-    cta: 'Выбрать тур',
+    cta: 'Выбрать поездку',
     /** Свёрнутый выбор сезона под навбаром (&lt;500px): раскрыть панель. */
     seasonDockExpand: 'Показать сезоны',
     /** Кнопка-стрелка у dock (aria-label). */
     seasonDockToggleArrow: 'Раскрыть или свернуть выбор сезона',
     /** Свёрнутая панель раскрыта: переход к списку туров активного сезона. */
-    seasonDockGoToList: 'Список туров этого сезона',
+    seasonDockGoToList: 'Список направлений этого сезона',
     /** Кнопка сезона в navbar (&lt;500px): панель открыта. */
     seasonNavMenuToggleCollapse: 'Свернуть выбор сезона',
     /** Статичный значок сезона в navbar (&lt;500px): группа с иконкой и стрелкой. */
@@ -79,16 +79,16 @@ export const UI = {
     homeToursSectionElementId: 'tours' as const,
     /** `id` секции календаря на главной (якорь «Календарь»). */
     homeTourCalendarSectionElementId: 'kalendar' as const,
-    tourCalendarTitle: 'Календарь туров',
+    tourCalendarTitle: 'Календарь поездок',
     tourCalendarLead:
       'Выберите дату — и посмотрите, какие выезды запланированы. Актуальное расписание по всем сезонам.',
-    tours:        'Туры по сезонам',
+    tours:        'Поездки по сезонам',
     toursSub:     'Четыре сезона — четыре разных приключения',
     toursTitleBySeason: {
-      winter: 'Туры зимой',
-      spring: 'Туры весной',
-      summer: 'Туры летом',
-      fall:   'Туры осенью',
+      winter: 'Поездки зимой',
+      spring: 'Поездки весной',
+      summer: 'Поездки летом',
+      fall:   'Поездки осенью',
     },
     otherSeasons:  'Другие сезоны',
     switchSeason:  'В другой сезон',
@@ -102,12 +102,12 @@ export const UI = {
      * Кнопка-стрелка внизу стартового экрана: тот же переход, что у ссылок навбара на секции
      * (`Link` + `hash`, скролл через `ScrollToTopOnNavigate` и `NAVBAR_SCROLL_OFFSET_PX`).
      */
-    homeGateScrollToHeroAriaLabel: 'Перейти к обзору туров' as const,
+    homeGateScrollToHeroAriaLabel: 'Перейти к обзору направлений' as const,
     teamHeadingPrefix: 'Команда ',
     teamSub:      'У кого в крови текут приключения',
     safety:       'Безопасность в наших походах',
     /** Заголовок на hero-карточке teaser #safety на главной. */
-    safetyTeaserTitle: 'Безопасность в турах',
+    safetyTeaserTitle: 'Безопасность в поездках',
     safetySub:    'Ваша безопасность — наш приоритет',
     /** Циклические статусы «подготовки» в teaser #safety на главной (Sims-style). */
     safetyStatusLines: [
@@ -128,7 +128,7 @@ export const UI = {
     contact:      'Связаться с нами',
   },
   contact: {
-    subtitle: 'Готовы ответить на любые вопросы о наших турах',
+    subtitle: 'Готовы ответить на любые вопросы о наших поездках',
     phone:    'Позвонить',
     telegram: 'Написать в Telegram',
     max:      'Написать в Max',
@@ -169,7 +169,7 @@ export const UI = {
     lazyChunkLoadingLabel: 'Загрузка окна',
   },
   tourRequestModal: {
-    title: 'Заявка на тур',
+    title: 'Заявка на поездку',
     dateStepTitle: 'Выберите дату выезда',
     dateStepHint: 'Нажмите на день с выездом в календаре',
     departureDateLabel: 'Дата выезда',
@@ -182,7 +182,7 @@ export const UI = {
     phoneLabel: 'Телефон',
     /** Плейсхолдер-маска без привязки к коду страны. */
     phonePlaceholder: '+7 (___) ___-__-__',
-    tourLabel: 'Выбранный тур',
+    tourLabel: 'Выбранная поездка',
     questionLabel: 'Ваш вопрос',
     questionHint: 'С каким вопросом мы можем вам помочь?',
     messengerLabel: 'В каком мессенджере вам удобнее общаться?',
@@ -238,22 +238,22 @@ export const UI = {
     /** Значение `Tour.price`, когда вместо суммы — заглушка; на карточке не дублируем её в зачёркнутой строке. */
     winterPricePlaceholderNoListing: 'БЕЗ ЦЕНЫ',
     /** Карточка в гриде главной: раскрыть полный список туров активного сезона. */
-    showMoreCta: 'Показать все туры',
+    showMoreCta: 'Показать все направления',
     /** Карточка в гриде главной: вернуть сокращённый список туров (3 карточки). */
-    showLessCta: 'Свернуть туры',
+    showLessCta: 'Свернуть направления',
     /** Alt префикс фона кнопки «Показать все / Свернуть туры» на главной. */
     nextSeasonCloneImageAltPrefix: 'Постер сезона',
     /** Доступная подпись для скелетной сетки туров при lazy-загрузке маршрута. */
-    loadingLabel: 'Загрузка туров',
+    loadingLabel: 'Загрузка направлений',
   },
   tourDetail: {
-    about:      'Об этом туре',
+    about:      'О поездке',
     gallery:    'Наши Подвиги',
-    programHeading: 'Программа тура',
+    programHeading: 'Программа поездки',
     programTimeDisclaimer:
       '*Время указано примерно и может меняться из-за погодных или иных условий',
-    includedHeading: 'Что включено в стоимость тура',
-    tourMetaFactsAriaLabel: 'Срок и сведения о туре',
+    includedHeading: 'Что включено в стоимость участия',
+    tourMetaFactsAriaLabel: 'Срок и сведения о поездке',
     metaLabelDuration: 'Срок',
     metaLabelDifficulty: 'Сложность',
     /** Над значением длительности в `TourDetailMetaFacts` (полупрозрачная подпись). */
@@ -269,23 +269,23 @@ export const UI = {
     /** Блок цены под галереей (десктоп) или под программой (мобильные). */
     priceHighlightLead: 'Стоимость участия',
     priceHighlightNote: 'Указана на одного участника, в рублях.',
-    priceHighlightAriaLabel: 'Стоимость тура',
+    priceHighlightAriaLabel: 'Стоимость участия',
     departuresHeading: 'Даты выездов',
     departuresEmpty:
-      'Следите за обновлениями, чтобы не упустить анонс этого тура!',
+      'Следите за обновлениями, чтобы не упустить анонс этой поездки!',
     departuresLoadingAria: 'Загрузка дат выездов',
-    inDevelopmentHeading: 'Тур в Разработке',
+    inDevelopmentHeading: 'Поездка в разработке',
     programInDevelopment: 'В разработке',
-    inDevelopmentPageAriaLabel: 'Тур в разработке',
-    requestTourCta:  'Оставить заявку на тур',
+    inDevelopmentPageAriaLabel: 'Поездка в разработке',
+    requestTourCta:  'Оставить заявку на поездку',
     /** Нижний CTA страницы тура: `.btn-tour-detail-footer-cta`, модальное окно заявки на тур. */
-    askQuestionCta: 'Уточнить про тур',
+    askQuestionCta: 'Уточнить про поездку',
     /** Текст перед нижним CTA «Уточнить про тур». */
     askQuestionFooterLead:
       'Остались вопросы по маршруту, датам или условиям — напишите, ответим.',
-    backToToursCta: 'Еще туры',
-    notFound:        'Тур не найден',
-    notFoundWithId:  'Тур с ID «{id}» не существует.',
+    backToToursCta: 'Ещё поездки',
+    notFound:        'Поездка не найдена',
+    notFoundWithId:  'Поездка с ID «{id}» не существует.',
     homeLink:   'На главную',
   },
   errorFallback: {
@@ -294,7 +294,7 @@ export const UI = {
     retryButton: 'Обновить страницу',
   },
   tourDepartureCalendar: {
-    calendarAriaLabel: 'Календарь дат выездов тура',
+    calendarAriaLabel: 'Календарь дат выездов поездки',
     emptyMonth: 'В этом месяце выездов нет',
     prevMonthAria: 'Предыдущий месяц с выездами',
     nextMonthAria: 'Следующий месяц с выездами',
@@ -312,7 +312,7 @@ export const UI = {
     nextMonthDisabledTooltip: 'Расписание на этот месяц ещё не опубликовано',
     retryLoad: 'Повторить',
     loadingAria: 'Загрузка расписания',
-    dayPanelAriaLabel: 'Туры на выбранную дату',
+    dayPanelAriaLabel: 'Поездки на выбранную дату',
     status: {
       open: 'Набор открыт',
       planned: 'Скоро',

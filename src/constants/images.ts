@@ -1516,7 +1516,7 @@ export const IMAGES = {
     },
   },
   tours: {
-    placeholder: `${BASE}/600x400/1A3C2E/C8A96E?text=Тур`,
-    gallery:     `${BASE}/800x600/1A3C2E/C8A96E?text=Фото+тура`,
+    placeholder: `${BASE}/600x400/1A3C2E/C8A96E?text=Поездка`,
+    gallery:     `${BASE}/800x600/1A3C2E/C8A96E?text=Фото+поездки`,
   },
 } as const;

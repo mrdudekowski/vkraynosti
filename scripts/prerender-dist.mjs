@@ -105,9 +105,9 @@ async function patch404Shell() {
   const appleTouchIconHref =
     basePath === '/' ? '/apple-touch-icon.png' : `${basePath}apple-touch-icon.png`;
   const ogImage = `${siteRoot}/banners_summer/Summer.webp`;
-  const ogTitle = 'Вкрайности — Туры по Приморью из Владивостока';
+  const ogTitle = 'Вкрайности — Поездки по Приморью из Владивостока';
   const ogDescription =
-    'Авторские туры по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.';
+    'Авторские поездки по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.';
 
   const headInjection = `
     <link rel="icon" type="image/png" href="${faviconLightHref}" media="(prefers-color-scheme: light)" />

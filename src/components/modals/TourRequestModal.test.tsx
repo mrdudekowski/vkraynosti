@@ -202,7 +202,7 @@ describe('TourRequestModal', () => {
 
     await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`)), 'Иван');
     await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.phoneLabel}`)), '+79991234567');
-    await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.questionLabel}`)), 'Вопрос по туру');
+    await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.questionLabel}`)), 'Вопрос по поездке');
     await user.click(screen.getByRole('radio', { name: UI.tourRequestModal.messengerTelegramAria }));
     await user.click(screen.getByRole('checkbox'));
     await user.click(screen.getByRole('button', { name: UI.tourRequestModal.submit }));
@@ -214,7 +214,7 @@ describe('TourRequestModal', () => {
           expect.objectContaining({
             name: 'Иван',
             phone: '+79991234567',
-            question: 'Вопрос по туру',
+            question: 'Вопрос по поездке',
             preferredMessenger: 'telegram',
             privacyAccepted: true,
           })

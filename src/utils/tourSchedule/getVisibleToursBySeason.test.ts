@@ -36,4 +36,16 @@ describe('getVisibleToursBySeason', () => {
 
     expect(visibleIds).toEqual(['summer-1']);
   });
+
+  it('returns empty list when schedule loaded but publicationStatuses map is empty', () => {
+    expect(
+      getVisibleToursBySeason('summer', new Map(), { scheduleLoaded: true }),
+    ).toHaveLength(0);
+  });
+
+  it('does not fall back to static inDevelopment when catalog is empty', () => {
+    const visibleIds = getVisibleToursBySeason('summer', new Map(), { scheduleLoaded: true })
+      .map(item => item.id);
+    expect(visibleIds).toEqual([]);
+  });
 });

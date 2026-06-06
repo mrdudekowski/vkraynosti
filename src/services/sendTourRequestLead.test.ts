@@ -98,6 +98,36 @@ describe('sendTourRequestLead', () => {
     });
   });
 
+  it('includes preferredDepartureDate from form values in the lead payload', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(new Response('ok', { status: 200 }));
+
+    const { sendTourRequestLead } = await importService();
+    await sendTourRequestLead(tour, {
+      ...values,
+      preferredDepartureDate: '2026-06-14',
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const payload = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(payload.preferredDepartureDate).toBe('2026-06-14');
+  });
+
+  it('falls back to tour.preferredDepartureDateIso when form date is empty', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(new Response('ok', { status: 200 }));
+
+    const { sendTourRequestLead } = await importService();
+    await sendTourRequestLead(
+      { ...tour, preferredDepartureDateIso: '2026-07-11' },
+      values
+    );
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const payload = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(payload.preferredDepartureDate).toBe('2026-07-11');
+  });
+
   it('fails fast when the public endpoint is not configured', async () => {
     vi.stubEnv('VITE_TOUR_REQUEST_ENDPOINT_URL', '');
 

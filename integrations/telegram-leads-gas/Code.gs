@@ -89,6 +89,7 @@ function sendTestLead() {
     preferredMessenger: 'telegram',
     question: 'Проверка отправки заявки из Google Apps Script.',
     privacyAccepted: true,
+    preferredDepartureDate: '2026-06-14',
     sourceUrl: 'https://vkraynosti.ru/tours/winter-1',
     submittedAt: new Date().toISOString(),
     userAgent: 'Apps Script test',
@@ -252,10 +253,13 @@ function buildLeadMessage_(body) {
   var idempotencyKey = body.idempotencyKey ? escapeHtml_(String(body.idempotencyKey)) : '—';
   var privacyAccepted = body.privacyAccepted === true ? 'Да' : 'Нет';
 
+  var departureDate = formatDepartureDate_(body.preferredDepartureDate);
+
   var lines = [
     '<b>Новая заявка с сайта</b>',
     '<b>Тур:</b> ' + tourTitle + ' (id: ' + tourId + ')',
     '<b>Сезон:</b> ' + season,
+    '<b>Дата выезда:</b> ' + departureDate,
     '',
     '<b>Имя:</b> ' + escapeHtml_(String(body.name).trim()),
     '<b>Телефон:</b> <code>' + escapeHtml_(String(body.phone).trim()) + '</code>',
@@ -276,6 +280,46 @@ function buildLeadMessage_(body) {
   ];
 
   return lines.join('\n');
+}
+
+/**
+ * ISO YYYY-MM-DD → «d MMMM yyyy» (как в модалке заявки на сайте).
+ * @param {string|undefined} iso
+ * @return {string}
+ */
+function formatDepartureDate_(iso) {
+  if (iso == null || typeof iso !== 'string') {
+    return '—';
+  }
+  var trimmed = String(iso).trim();
+  if (!trimmed) {
+    return '—';
+  }
+  var match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) {
+    return escapeHtml_(trimmed);
+  }
+  var day = parseInt(match[3], 10);
+  var month = parseInt(match[2], 10);
+  var year = match[1];
+  var monthNames = [
+    'января',
+    'февраля',
+    'марта',
+    'апреля',
+    'мая',
+    'июня',
+    'июля',
+    'августа',
+    'сентября',
+    'октября',
+    'ноября',
+    'декабря',
+  ];
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    return escapeHtml_(trimmed);
+  }
+  return escapeHtml_(day + ' ' + monthNames[month - 1] + ' ' + year);
 }
 
 /**

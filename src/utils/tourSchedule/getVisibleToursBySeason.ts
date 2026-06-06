@@ -1,10 +1,9 @@
 import { getToursBySeason } from '../../data/toursData';
 import type { Season, Tour } from '../../types';
 import type { TourPublicationStatus } from '../../types/tourSchedule';
-import { resolveTourPublicationStatus } from './resolveTourPublicationStatus';
 
 export type GetVisibleToursBySeasonOptions = {
-  /** Пока false — не показываем туры (пустая map иначе = все «активен»). */
+  /** Пока false — не показываем туры (ждём authoritative catalog из расписания). */
   scheduleLoaded?: boolean;
 };
 
@@ -17,20 +16,14 @@ export function getVisibleToursBySeason(
     return [];
   }
 
-  const catalogHasStatuses = publicationStatuses.size > 0;
+  if (publicationStatuses.size === 0) {
+    return [];
+  }
 
   return getToursBySeason(season).filter(tour => {
     const fromCatalog = publicationStatuses.get(tour.id);
     if (fromCatalog === 'hidden') return false;
     if (fromCatalog === 'active' || fromCatalog === 'in_development') return true;
-
-    if (catalogHasStatuses) {
-      return false;
-    }
-
-    return (
-      resolveTourPublicationStatus(tour.id, publicationStatuses, tour.inDevelopment) !==
-      'hidden'
-    );
+    return false;
   });
 }

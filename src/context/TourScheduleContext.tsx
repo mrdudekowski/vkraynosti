@@ -31,11 +31,24 @@ const toPublicationStatusesMap = (
 ): ReadonlyMap<string, TourPublicationStatus> =>
   new Map(Object.entries(catalogPublicationStatuses));
 
+/** Повторный fetch после TTL — статусы публикации в таблице не должны «залипать» в SPA. */
+const SCHEDULE_CLIENT_CACHE_MAX_AGE_MS = 5 * 60 * 1000;
+
 let cachedSchedule: CachedSchedule | null = null;
+let cachedScheduleFetchedAt: number | null = null;
 let inflightPromise: Promise<CachedSchedule> | null = null;
 
-const loadSchedule = async (): Promise<CachedSchedule> => {
-  if (cachedSchedule) return cachedSchedule;
+const isClientScheduleCacheStale = (): boolean => {
+  if (cachedScheduleFetchedAt == null) return true;
+  return Date.now() - cachedScheduleFetchedAt > SCHEDULE_CLIENT_CACHE_MAX_AGE_MS;
+};
+
+const loadSchedule = async (force = false): Promise<CachedSchedule> => {
+  if (cachedSchedule && !force && !isClientScheduleCacheStale()) return cachedSchedule;
+  if (force || isClientScheduleCacheStale()) {
+    cachedSchedule = null;
+    cachedScheduleFetchedAt = null;
+  }
   if (inflightPromise) return inflightPromise;
 
   inflightPromise = fetchTourSchedule()
@@ -54,6 +67,7 @@ const loadSchedule = async (): Promise<CachedSchedule> => {
         publicationStatuses,
       };
       cachedSchedule = result;
+      cachedScheduleFetchedAt = Date.now();
       return result;
     })
     .finally(() => {
@@ -109,13 +123,14 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (cachedSchedule) return;
+    if (cachedSchedule && !isClientScheduleCacheStale()) return;
 
     let cancelled = false;
 
     const runLoad = () => {
       if (cancelled) return;
-      void loadSchedule()
+      const force = cachedSchedule != null && isClientScheduleCacheStale();
+      void loadSchedule(force)
         .then(result => {
           if (!cancelled) applySchedule(result);
         })
@@ -135,13 +150,29 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [applySchedule]);
 
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState !== 'visible' || !isClientScheduleCacheStale()) return;
+      void loadSchedule(true)
+        .then(applySchedule)
+        .catch(err => {
+          setStatus('error');
+          setError(scheduleError(err));
+        });
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [applySchedule]);
+
   const retry = useCallback(() => {
     retryNonce.current += 1;
     cachedSchedule = null;
+    cachedScheduleFetchedAt = null;
     setStatus('loading');
     setError(null);
 
-    void loadSchedule()
+    void loadSchedule(true)
       .then(applySchedule)
       .catch(err => {
         setStatus('error');

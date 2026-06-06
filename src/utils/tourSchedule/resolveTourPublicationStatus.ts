@@ -30,9 +30,11 @@ export function isTourHiddenFromSite(
 ): boolean {
   if (!scheduleLoaded) return false;
 
+  if (publicationStatuses.size === 0) return true;
+
   const fromCatalog = publicationStatuses.get(tourId);
   if (fromCatalog === 'hidden') return true;
-  if (publicationStatuses.size > 0 && fromCatalog === undefined) return true;
+  if (fromCatalog === undefined) return true;
   return false;
 }
 

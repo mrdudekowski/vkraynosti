@@ -201,8 +201,31 @@ function doGet(_e) {
   var json = getCachedScheduleJson_();
   if (!json) {
     json = rebuildScheduleCache_();
+  } else {
+    json = mergeFreshPublicationStatusesIntoCachedJson_(json);
   }
   return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Кол. F каталога меняется чаще кэша выездов — всегда подмешиваем актуальные статусы в ответ API.
+ * @param {string} cachedJson
+ * @returns {string}
+ */
+function mergeFreshPublicationStatusesIntoCachedJson_(cachedJson) {
+  try {
+    var payload = JSON.parse(cachedJson);
+    if (!payload || typeof payload !== 'object') return cachedJson;
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var freshStatuses = readCatalogPublicationStatuses_(ss);
+    payload.publicationStatuses = freshStatuses;
+    payload.events = filterEventsByPublicationStatuses_(payload.events || [], freshStatuses);
+    return JSON.stringify(payload);
+  } catch (err) {
+    Logger.log('mergeFreshPublicationStatusesIntoCachedJson_: ' + err);
+    return cachedJson;
+  }
 }
 
 /**

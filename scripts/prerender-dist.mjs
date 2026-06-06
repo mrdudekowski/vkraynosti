@@ -98,14 +98,22 @@ async function patch404Shell() {
 
   const siteRoot = resolveSiteRoot();
   const basePath = normalizeBasePath();
-  const faviconHref = basePath === '/' ? '/favicon.svg' : `${basePath}favicon.svg`;
+  const faviconLightHref =
+    basePath === '/' ? '/flavicon-light.png' : `${basePath}flavicon-light.png`;
+  const faviconDarkHref =
+    basePath === '/' ? '/flavicon-dark.png' : `${basePath}flavicon-dark.png`;
+  const appleTouchIconHref =
+    basePath === '/' ? '/apple-touch-icon.png' : `${basePath}apple-touch-icon.png`;
   const ogImage = `${siteRoot}/banners_summer/Summer.webp`;
   const ogTitle = 'Вкрайности — Туры по Приморью из Владивостока';
   const ogDescription =
     'Авторские туры по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.';
 
   const headInjection = `
-    <link rel="icon" type="image/svg+xml" href="${faviconHref}" />
+    <link rel="icon" type="image/png" href="${faviconLightHref}" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href="${faviconDarkHref}" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" href="${faviconLightHref}" />
+    <link rel="apple-touch-icon" href="${appleTouchIconHref}" />
     <meta name="description" content="${ogDescription}" />
     <meta property="og:title" content="${ogTitle}" />
     <meta property="og:description" content="${ogDescription}" />

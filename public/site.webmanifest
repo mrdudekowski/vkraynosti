@@ -4,20 +4,26 @@
   "description": "Авторские туры по Приморью из Владивостока",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#f5f0e6",
   "theme_color": "#0f172a",
   "lang": "ru",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "flavicon-light.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "vkrai-logo.webp",
+      "src": "flavicon-dark.png",
       "sizes": "512x512",
-      "type": "image/webp",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

@@ -40,6 +40,8 @@ function maxLongSideFor(filePath) {
   const rp = rel(filePath);
   if (rp.includes('/banners_')) return 900;
   if (rp.endsWith('/vkrai-logo.png')) return 512;
+  if (rp.endsWith('/flavicon-light.png') || rp.endsWith('/flavicon-dark.png')) return 512;
+  if (rp.endsWith('/apple-touch-icon.png')) return 180;
   if (rp.includes('.grid.')) return 900;
   return 1920;
 }

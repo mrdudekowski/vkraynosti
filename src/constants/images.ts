@@ -1456,6 +1456,15 @@ export const CONTACT_MESSENGER_LOGO_URLS = [
   MAX_MESSENGER_SIGN_LOGO,
 ] as const;
 
+/** Favicon вкладки (светлая тема ОС) — `public/flavicon-light.png`. */
+export const FAVICON_LIGHT_PNG = `${APP_ASSET_BASE}flavicon-light.png` as const;
+
+/** Favicon вкладки (тёмная тема ОС) — `public/flavicon-dark.png`. */
+export const FAVICON_DARK_PNG = `${APP_ASSET_BASE}flavicon-dark.png` as const;
+
+/** Иконка «Добавить на экран» / PWA — `public/apple-touch-icon.png`. */
+export const APPLE_TOUCH_ICON_PNG = `${APP_ASSET_BASE}apple-touch-icon.png` as const;
+
 /** Графический знак Вкрайности (лес), не текстовый вордмарк — `public/vkrai-logo.webp`. */
 export const VKRAI_FOREST_LOGO = `${APP_ASSET_BASE}vkrai-logo.webp` as const;
 

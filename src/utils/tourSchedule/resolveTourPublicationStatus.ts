@@ -30,7 +30,8 @@ export function isTourHiddenFromSite(
 ): boolean {
   if (!scheduleLoaded) return false;
 
-  if (publicationStatuses.size === 0) return true;
+  /** Нет каталога публикации (legacy API / только events) — не скрываем туры fail-closed. */
+  if (publicationStatuses.size === 0) return false;
 
   const fromCatalog = publicationStatuses.get(tourId);
   if (fromCatalog === 'hidden') return true;

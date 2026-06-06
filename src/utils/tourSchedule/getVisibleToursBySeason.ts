@@ -17,7 +17,7 @@ export function getVisibleToursBySeason(
   }
 
   if (publicationStatuses.size === 0) {
-    return [];
+    return getToursBySeason(season);
   }
 
   return getToursBySeason(season).filter(tour => {

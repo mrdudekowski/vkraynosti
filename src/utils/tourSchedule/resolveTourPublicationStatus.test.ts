@@ -51,8 +51,8 @@ describe('isTourHiddenFromSite', () => {
     expect(isTourHiddenFromSite('summer-1', statuses, true)).toBe(false);
   });
 
-  it('hides all tours when schedule loaded but catalog map is empty', () => {
-    expect(isTourHiddenFromSite('summer-13', new Map(), true)).toBe(true);
+  it('does not hide tours when schedule loaded but catalog map is empty', () => {
+    expect(isTourHiddenFromSite('summer-13', new Map(), true)).toBe(false);
   });
 });
 

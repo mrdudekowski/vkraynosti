@@ -31,8 +31,12 @@ export function extractTourUrlsFromCore(toursSource) {
 }
 
 export function extractFallTourUrls(fallImagesSource) {
-  const ids = [...fallImagesSource.matchAll(/'fall-\d+'/g)].map((m) => m[0].slice(1, -1));
-  return [...new Set(ids)].map((id) => `/tours/fall/${id}`);
+  const arrayMatch = /const FALL_TOUR_IDS = \[([\s\S]*?)\] as const/.exec(fallImagesSource);
+  if (!arrayMatch) {
+    throw new Error('FALL_TOUR_IDS not found in fallTourImages.ts');
+  }
+  const ids = [...arrayMatch[1].matchAll(/'(fall-\d+)'/g)].map((match) => match[1]);
+  return ids.map((id) => `/tours/fall/${id}`);
 }
 
 export async function loadSeoRouteSources(rootDir = process.cwd()) {

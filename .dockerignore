@@ -9,7 +9,10 @@ public/banners_winter/
 public/banners_spring/
 public/banners_summer/
 public/banners_fall/
-public/safety/
+# safety.webp — S3; status SVGs stay in App (see .gitignore)
+public/safety/*
+!public/safety/icons/
+!public/safety/icons/**
 
 # Installed fresh in the image
 node_modules/

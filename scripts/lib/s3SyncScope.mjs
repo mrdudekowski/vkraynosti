@@ -7,6 +7,7 @@ import path from 'node:path';
 /** AWS CLI --exclude patterns (relative to `public/`). */
 export const S3_SYNC_EXCLUDE_PATTERNS = [
   'fonts/*',
+  'safety/icons/*',
   '**/desktop.ini',
 ];
 
@@ -32,7 +33,7 @@ export function publicPathToObjectKey(repoRelativePath) {
   if (!key || key.includes('..')) {
     return null;
   }
-  if (key.startsWith('fonts/')) {
+  if (key.startsWith('fonts/') || key.startsWith('safety/icons/')) {
     return null;
   }
   return key;

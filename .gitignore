@@ -52,7 +52,10 @@ public/banners_winter/
 public/banners_spring/
 public/banners_summer/
 public/banners_fall/
-public/safety/
+# safety.webp и прочее — S3; иконки статусов — в App (public/safety/icons/)
+public/safety/*
+!public/safety/icons/
+!public/safety/icons/**
 
 # Local measurement / audit dumps (not source of truth; regenerate locally or in CI artifacts)
 /perf-*.json

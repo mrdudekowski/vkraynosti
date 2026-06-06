@@ -27,6 +27,11 @@ describe('s3SyncScope', () => {
     expect(publicPathToObjectKey('public/fonts/nord_bold.ttf')).toBeNull();
   });
 
+  it('rejects safety status icons (App-only)', () => {
+    expect(publicPathToObjectKey('public/safety/icons/1.svg')).toBeNull();
+    expect(S3_SYNC_EXCLUDE_PATTERNS).toContain('safety/icons/*');
+  });
+
   it('builds public URL with trailing slash on base', () => {
     expect(
       buildPublicObjectUrl('https://cdn.example.com/', 'tours/fall-1/cover.webp')

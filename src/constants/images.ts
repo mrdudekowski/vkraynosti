@@ -1425,14 +1425,14 @@ export const HOME_SEASON_BANNER_FALL_LOOP_VIDEO_POSTERS: Record<string, string> 
   [HOME_SEASON_BANNER_FALL_LOOP_VIDEOS[9]]: `${TOUR_FALL_4}/ss.clip5.poster.webp`,
 };
 
-/** Иконки статусов подготовки на главной (#safety): `public/safety/icons/1.svg` … `6.svg`. */
+/** Иконки статусов подготовки на главной (#safety): `public/safety/icons/1.svg` … `6.svg` (App, не S3). */
 export const HOME_SAFETY_STATUS_ICONS = [
-  `${MEDIA_ASSET_BASE}safety/icons/1.svg`,
-  `${MEDIA_ASSET_BASE}safety/icons/2.svg`,
-  `${MEDIA_ASSET_BASE}safety/icons/3.svg`,
-  `${MEDIA_ASSET_BASE}safety/icons/4.svg`,
-  `${MEDIA_ASSET_BASE}safety/icons/5.svg`,
-  `${MEDIA_ASSET_BASE}safety/icons/6.svg`,
+  `${APP_ASSET_BASE}safety/icons/1.svg`,
+  `${APP_ASSET_BASE}safety/icons/2.svg`,
+  `${APP_ASSET_BASE}safety/icons/3.svg`,
+  `${APP_ASSET_BASE}safety/icons/4.svg`,
+  `${APP_ASSET_BASE}safety/icons/5.svg`,
+  `${APP_ASSET_BASE}safety/icons/6.svg`,
 ] as const;
 
 /**

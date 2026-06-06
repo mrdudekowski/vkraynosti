@@ -28,4 +28,9 @@ describe('fall tours mirrored from spring', () => {
   it('bento-сетка fall-4 как у spring-4 (через contentSource)', () => {
     expect(getTourGalleryLayoutVariant('fall-4')).toBe(getTourGalleryLayoutVariant('spring-4'));
   });
+
+  it('fall-6 использует уникальный осенний hero.webp', () => {
+    const fall = getTourById('fall-6');
+    expect(fall?.imageUrl).toContain('/tours/fall-6/hero.webp');
+  });
 });

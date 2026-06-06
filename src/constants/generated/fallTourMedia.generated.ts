@@ -175,7 +175,7 @@ export const FALL_TOUR_MEDIA_BY_ID = {
   }
 },
   'fall-6': {
-  "imageUrl": "/tours/fall-6/cover.webp",
+  "imageUrl": "/tours/fall-6/hero.webp",
   "galleryImages": [
     "/tours/fall-6/deerlol.webp",
     "/tours/fall-6/view.webp",
@@ -223,7 +223,7 @@ export const FALL_TOUR_MEDIA_BY_ID = {
   }
 },
   'fall-7': {
-  "imageUrl": "/tours/fall-7/cover.webp",
+  "imageUrl": "/tours/fall-7/hero.webp",
   "galleryImages": [
     "/tours/fall-7/view.webp",
     "/tours/fall-7/view3.webp",
@@ -276,7 +276,7 @@ export const FALL_TOUR_MEDIA_BY_ID = {
   }
 },
   'fall-9': {
-  "imageUrl": "/tours/fall-9/cover.webp",
+  "imageUrl": "/tours/fall-9/hero.webp",
   "galleryImages": [
     "/tours/fall-9/top3.webp",
     "/tours/fall-9/wine.webp",
@@ -316,7 +316,7 @@ export const FALL_TOUR_MEDIA_BY_ID = {
   }
 },
   'fall-10': {
-  "imageUrl": "/tours/fall-10/cover.webp",
+  "imageUrl": "/tours/fall-10/hero.webp",
   "galleryImages": [
     "/tours/fall-10/view.webp",
     "/tours/fall-10/beach.webp",

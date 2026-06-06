@@ -85,7 +85,11 @@ function readSummerPairs() {
  */
 function readFallIds() {
   const source = readFileSync(resolve(rootDir, 'src/constants/fallTourImages.ts'), 'utf8');
-  return [...source.matchAll(/'(fall-\d+)'/g)].map((m) => m[1]);
+  const arrayMatch = /const FALL_TOUR_IDS = \[([\s\S]*?)\] as const/.exec(source);
+  if (!arrayMatch) {
+    throw new Error('FALL_TOUR_IDS not found in fallTourImages.ts');
+  }
+  return [...arrayMatch[1].matchAll(/'(fall-\d+)'/g)].map((match) => match[1]);
 }
 
 /**

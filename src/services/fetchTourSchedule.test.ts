@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchTourSchedule, TourScheduleFetchError } from './fetchTourSchedule';
 
+const ENDPOINT = 'https://example.com/tour-schedule';
+
 describe('fetchTourSchedule', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
-    vi.unstubAllEnvs();
+    vi.stubEnv('VITE_TOUR_SCHEDULE_ENDPOINT_URL', ENDPOINT);
   });
 
   afterEach(() => {
@@ -13,20 +15,32 @@ describe('fetchTourSchedule', () => {
     vi.restoreAllMocks();
   });
 
-  it('parses array response and builds prices from events', async () => {
+  it('throws not-configured when endpoint env is missing', async () => {
+    vi.stubEnv('VITE_TOUR_SCHEDULE_ENDPOINT_URL', '');
+    await expect(fetchTourSchedule()).rejects.toMatchObject({
+      code: 'not-configured',
+    } satisfies Partial<TourScheduleFetchError>);
+  });
+
+  it('parses wrapped response with events and publicationStatuses', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
-      json: async () => [
-        {
-          date: '2026-05-09',
-          tourId: 'spring-3',
-          durationType: 'однодневный',
-          priceRub: 6000,
-          seats: 8,
-          status: 'open',
-          comment: null,
+      json: async () => ({
+        events: [
+          {
+            date: '2026-05-09',
+            tourId: 'spring-3',
+            durationType: 'однодневный',
+            priceRub: 6000,
+            seats: 8,
+            status: 'open',
+            comment: null,
+          },
+        ],
+        publicationStatuses: {
+          'spring-3': 'active',
         },
-      ],
+      }),
     } as Response);
 
     const payload = await fetchTourSchedule();
@@ -34,6 +48,7 @@ describe('fetchTourSchedule', () => {
     expect(payload.events[0]?.tourId).toBe('spring-3');
     expect(payload.catalogPrices).toEqual({ 'spring-3': 6000 });
     expect(payload.catalogDurationTypes).toEqual({ 'spring-3': 'однодневный' });
+    expect(payload.catalogPublicationStatuses).toEqual({ 'spring-3': 'active' });
   });
 
   it('parses wrapped response with catalog prices', async () => {
@@ -55,6 +70,7 @@ describe('fetchTourSchedule', () => {
           'spring-3': 6500,
           'spring-1': 6000,
         },
+        publicationStatuses: {},
       }),
     } as Response);
 
@@ -85,6 +101,7 @@ describe('fetchTourSchedule', () => {
           'spring-3': 'однодневный',
           'summer-7': 'многодневный',
         },
+        publicationStatuses: {},
       }),
     } as Response);
 
@@ -112,6 +129,27 @@ describe('fetchTourSchedule', () => {
       'summer-13': 'in_development',
       'summer-18': 'hidden',
     });
+  });
+
+  it('throws parse error on legacy array-only payload', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => [
+        {
+          date: '2026-05-09',
+          tourId: 'spring-3',
+          durationType: 'однодневный',
+          priceRub: 6000,
+          seats: 8,
+          status: 'open',
+          comment: null,
+        },
+      ],
+    } as Response);
+
+    await expect(fetchTourSchedule()).rejects.toMatchObject({
+      code: 'parse',
+    } satisfies Partial<TourScheduleFetchError>);
   });
 
   it('throws parse error on invalid payload', async () => {

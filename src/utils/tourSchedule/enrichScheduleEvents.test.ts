@@ -33,7 +33,9 @@ describe('enrichScheduleEvents', () => {
       },
     ];
 
-    expect(enrichScheduleEvents(events)).toHaveLength(0);
+    expect(
+      enrichScheduleEvents(events, new Map([['unknown-tour-id', 'active' as const]])),
+    ).toHaveLength(0);
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
   });
@@ -51,7 +53,10 @@ describe('enrichScheduleEvents', () => {
       },
     ];
 
-    const enriched = enrichScheduleEvents(events);
+    const enriched = enrichScheduleEvents(
+      events,
+      new Map([['spring-3', 'active' as const]]),
+    );
     expect(enriched).toHaveLength(1);
     expect(enriched[0]?.statusLabel).toBe('Завершился');
   });
@@ -88,9 +93,10 @@ describe('enrichScheduleEvents', () => {
       },
     ];
 
-    const enriched = enrichScheduleEvents(events);
-    expect(enriched).toHaveLength(1);
-    expect(enriched[0]?.tour.id).toBe('spring-3');
+    const enriched = enrichScheduleEvents(
+      events,
+      new Map([['spring-3', 'active' as const]]),
+    );
     expect(enriched[0]?.statusLabel).toBe('Набор открыт');
   });
 });

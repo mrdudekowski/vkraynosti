@@ -18,5 +18,8 @@ export default defineConfig({
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      VITE_TOUR_SCHEDULE_ENDPOINT_URL: `${DEV_ORIGIN}data/tour-schedule.json`,
+    },
   },
 });

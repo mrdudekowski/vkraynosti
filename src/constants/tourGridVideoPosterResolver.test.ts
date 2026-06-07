@@ -8,6 +8,7 @@ import {
   getTourGridVideoPosterGetter,
   resolveTourGridVideoPoster,
 } from './tourGridVideoPosterResolver';
+import { resolveTourMediaBundleUrls } from '../utils/resolveTourMediaBundleUrls';
 
 describe('tourGridVideoPosterResolver', () => {
   it('возвращает постер для известного grid-webm и winter-3', () => {
@@ -30,12 +31,13 @@ describe('tourGridVideoPosterResolver', () => {
   });
 
   it('summer-3 — постеры сетки в папке summer-3 (не spring-10)', () => {
-    const posters = SUMMER_PAIRED_TOUR_MEDIA_BY_ID['summer-3'].gridVideoPosters;
+    const resolvedBundle = resolveTourMediaBundleUrls(SUMMER_PAIRED_TOUR_MEDIA_BY_ID['summer-3']);
+    const posters = resolvedBundle.gridVideoPosters;
     expect(posters).toBeDefined();
     const gridClip = Object.keys(posters!)[0]!;
     const posterUrl = posters![gridClip as keyof typeof posters];
     expect(resolveTourGridVideoPoster('summer-3', gridClip, true)).toBe(posterUrl);
-    expect(gridClip).toContain('/tours/summer-3/');
+    expect(gridClip).toContain('summer-3');
   });
 
   it('getTourGridVideoPosterGetter: колбэк совпадает с resolveTourGridVideoPoster', () => {

@@ -136,7 +136,7 @@ const cardInner = (
 };
 
 const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = false }: TourCardProps) => {
-  const inDevelopment = useIsTourInDevelopment(tour);
+  const inDevelopment = useIsTourInDevelopment(tour.id);
 
   if (!onClick) {
     return (

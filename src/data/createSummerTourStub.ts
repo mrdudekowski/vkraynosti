@@ -12,7 +12,7 @@ export type CreateSummerTourStubParams = {
 
 /**
  * Заглушка тура в каталоге до наполнения программой, ценой и финальной галереей.
- * Страница тура — режим `inDevelopment` (hero + анонс).
+ * Режим «в разработке» на сайте задаётся статусом «в разработке» в Sheets (кол. F).
  */
 export function createSummerTourStub({
   id,

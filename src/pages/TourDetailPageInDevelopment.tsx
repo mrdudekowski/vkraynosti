@@ -43,8 +43,14 @@ const TourDetailPageInDevelopment = ({ tour }: TourDetailPageInDevelopmentProps)
     });
   };
 
-  const seoEntry = getTourSeoEntry(tour, { displayDuration });
-  const tourStructuredData = getTourStructuredData(tour, { displayDuration });
+  const seoEntry = getTourSeoEntry(tour, {
+    displayDuration,
+    publicationStatus: 'in_development',
+  });
+  const tourStructuredData = getTourStructuredData(tour, {
+    displayDuration,
+    publicationStatus: 'in_development',
+  });
   const breadcrumbStructuredData = getTourBreadcrumbSchema(tour);
 
   return (

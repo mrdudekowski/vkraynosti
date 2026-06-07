@@ -1,5 +1,4 @@
 import {
-  startTransition,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -60,9 +59,7 @@ export function useTeamZoneViewportBackdrop({
       if (prev.bridgeHideProgress === bridgeHideProgress) return;
       if (lastPublishedBridgeHideRef.current === bridgeHideProgress) return;
       lastPublishedBridgeHideRef.current = bridgeHideProgress;
-      startTransition(() => {
-        publishHomeNavbarChrome({ ...prev, bridgeHideProgress });
-      });
+      publishHomeNavbarChrome({ ...prev, bridgeHideProgress });
     },
     [publishHomeNavbarChrome]
   );

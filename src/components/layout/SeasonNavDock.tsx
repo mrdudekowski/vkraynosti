@@ -9,7 +9,7 @@ import {
   SEASON_STYLE,
   SEASON_TEXT_CLASS,
 } from '../../constants/seasonNavbarAppearance';
-import { computeHomeNavbarEffectiveTopChromeOpacity } from '../../constants/homeNavbarBridgeChrome';
+import { homeNavbarChromeTeamHideShellClass } from '../../constants/homeNavbarBridgeChrome';
 import { homeNavbarChromeOpacityShellClass } from '../../constants/homeNavbarChrome';
 import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
 import { useSeasonNavMenu } from '../../context/useSeasonNavMenu';
@@ -95,15 +95,14 @@ const SeasonNavDock = () => {
     homeChrome.disableTopChromeTransition
   );
   const isHomePath = pathname === ROUTES.HOME;
-  const dockShellOpacity = isHomePath
-    ? computeHomeNavbarEffectiveTopChromeOpacity(
-        homeChrome.topChromeOpacity,
-        homeChrome.bridgeHideProgress
-      )
-    : 1;
+  const dockHeroOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
+  const dockTeamHideOpacity = isHomePath && !open ? 1 - homeChrome.bridgeHideProgress : 1;
+  const dockEffectiveOpacity = dockHeroOpacity * dockTeamHideOpacity;
   const dockShellPointerEvents =
-    isHomePath && dockShellOpacity < 0.001 && !open ? 'pointer-events-none' : '';
-  const dockVisibleOpacity = open ? 1 : dockShellOpacity;
+    isHomePath && dockEffectiveOpacity < 0.001 && !open ? 'pointer-events-none' : '';
+  const dockTeamHideShellTransition = homeNavbarChromeTeamHideShellClass(
+    homeChrome.disableTopChromeTransition
+  );
 
   return (
     <div
@@ -120,13 +119,17 @@ const SeasonNavDock = () => {
       ].join(' ')}
     >
       <div
-        className={[
-          'relative',
-          dockShellTransition,
-          open ? '' : dockShellPointerEvents,
-        ].join(' ')}
-        style={{ opacity: dockVisibleOpacity }}
+        className={['relative', dockShellTransition].join(' ')}
+        style={{ opacity: dockHeroOpacity }}
       >
+        <div
+          className={[
+            'relative',
+            dockTeamHideShellTransition,
+            open ? '' : dockShellPointerEvents,
+          ].join(' ')}
+          style={{ opacity: dockTeamHideOpacity }}
+        >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 z-stack-base bg-home-gate-start-screen"
@@ -171,6 +174,7 @@ const SeasonNavDock = () => {
               </button>
             );
           })}
+        </div>
         </div>
         </div>
       </div>

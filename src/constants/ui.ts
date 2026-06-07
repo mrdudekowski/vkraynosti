@@ -287,6 +287,9 @@ export const UI = {
     notFound:        'Поездка не найдена',
     notFoundWithId:  'Поездка с ID «{id}» не существует.',
     homeLink:   'На главную',
+    loadingPublicationCatalog: 'Загрузка каталога поездок…',
+    scheduleLoadError:
+      'Не удалось загрузить каталог поездок. Проверьте подключение или повторите попытку.',
   },
   errorFallback: {
     title:       'Что-то пошло не так',

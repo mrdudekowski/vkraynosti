@@ -12,12 +12,12 @@ export function getVisibleToursBySeason(
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,
   options?: GetVisibleToursBySeasonOptions,
 ): Tour[] {
-  if (options?.scheduleLoaded === false) {
+  if (options?.scheduleLoaded !== true) {
     return [];
   }
 
   if (publicationStatuses.size === 0) {
-    return getToursBySeason(season);
+    return [];
   }
 
   return getToursBySeason(season).filter(tour => {

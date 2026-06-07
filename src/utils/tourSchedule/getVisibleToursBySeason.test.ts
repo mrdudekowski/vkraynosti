@@ -9,7 +9,7 @@ describe('getVisibleToursBySeason', () => {
       ['summer-14', 'hidden'],
     ]);
 
-    const visibleIds = getVisibleToursBySeason('summer', statuses)
+    const visibleIds = getVisibleToursBySeason('summer', statuses, { scheduleLoaded: true })
       .filter((item) => item.id === 'summer-13' || item.id === 'summer-14')
       .map((item) => item.id);
 
@@ -20,7 +20,7 @@ describe('getVisibleToursBySeason', () => {
     const statuses = new Map([['summer-14', 'hidden' as const]]);
     expect(
       getVisibleToursBySeason('summer', statuses, { scheduleLoaded: false }).some(
-        item => item.id === 'summer-14',
+        (item) => item.id === 'summer-14',
       ),
     ).toBe(false);
     expect(getVisibleToursBySeason('summer', statuses, { scheduleLoaded: false })).toHaveLength(
@@ -31,23 +31,15 @@ describe('getVisibleToursBySeason', () => {
   it('hides tours missing from publicationStatuses when catalog is non-empty', () => {
     const statuses = new Map([['summer-1', 'active' as const]]);
     const visibleIds = getVisibleToursBySeason('summer', statuses, { scheduleLoaded: true })
-      .filter(item => item.id === 'summer-1' || item.id === 'summer-14')
-      .map(item => item.id);
+      .filter((item) => item.id === 'summer-1' || item.id === 'summer-14')
+      .map((item) => item.id);
 
     expect(visibleIds).toEqual(['summer-1']);
   });
 
-  it('returns all season tours when schedule loaded but publicationStatuses map is empty', () => {
-    const visible = getVisibleToursBySeason('summer', new Map(), { scheduleLoaded: true });
-    expect(visible.length).toBeGreaterThan(0);
-    expect(visible.some(item => item.id === 'summer-1')).toBe(true);
-  });
-
-  it('does not filter by static inDevelopment when catalog is empty', () => {
-    const visibleIds = getVisibleToursBySeason('summer', new Map(), { scheduleLoaded: true })
-      .filter(item => item.id === 'summer-13' || item.id === 'summer-14')
-      .map(item => item.id);
-    expect(visibleIds).toContain('summer-13');
-    expect(visibleIds).toContain('summer-14');
+  it('returns empty list when schedule loaded but publicationStatuses map is empty', () => {
+    expect(getVisibleToursBySeason('summer', new Map(), { scheduleLoaded: true })).toHaveLength(
+      0,
+    );
   });
 });

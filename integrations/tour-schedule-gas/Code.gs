@@ -13,7 +13,7 @@
  */
 
 // <SITE_TOUR_IDS_BEGIN>
-var SITE_TOUR_IDS = ["winter-1","winter-2","winter-3","winter-4","winter-5","spring-1","spring-2","spring-3","spring-4","spring-5","spring-6","spring-7","spring-8","spring-9","spring-10","spring-11","spring-12","spring-13","summer-1","summer-2","summer-3","summer-4","summer-5","summer-6","summer-7","summer-8","summer-9","summer-10","summer-11","summer-12","fall-1","fall-2","fall-3","fall-4","fall-5","fall-6","fall-7","fall-8","fall-9","fall-10","fall-11","fall-12","fall-13"];
+var SITE_TOUR_IDS = ["winter-1","winter-2","winter-3","winter-4","winter-5","spring-1","spring-2","spring-3","spring-4","spring-5","spring-6","spring-7","spring-8","spring-9","spring-10","spring-11","spring-12","spring-13","summer-1","summer-2","summer-3","summer-4","summer-5","summer-6","summer-7","summer-8","summer-9","summer-10","summer-11","summer-12","summer-13","summer-14","summer-15","summer-16","summer-17","summer-19","fall-1","fall-2","fall-3","fall-4","fall-5","fall-6","fall-7","fall-8","fall-9","fall-10","fall-11","fall-12","fall-13"];
 // <SITE_TOUR_IDS_END>
 
 var SCHEDULE_SHEET_NAMES = [

@@ -12,17 +12,19 @@ export const enrichScheduleEvents = (
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus> = new Map(),
 ): EnrichedScheduleEvent[] => {
   const enriched: EnrichedScheduleEvent[] = [];
+  const scheduleLoaded = true;
 
   for (const event of events) {
     if (event.status === 'cancelled') continue;
 
-    const tour = getTourById(event.tourId);
     if (
-      resolveTourPublicationStatus(event.tourId, publicationStatuses, tour?.inDevelopment) ===
+      resolveTourPublicationStatus(event.tourId, publicationStatuses, { scheduleLoaded }) ===
       'hidden'
     ) {
       continue;
     }
+
+    const tour = getTourById(event.tourId);
     if (!tour) {
       console.warn(`[tourSchedule] Unknown tourId: ${event.tourId}`);
       continue;

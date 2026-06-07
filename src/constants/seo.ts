@@ -109,8 +109,7 @@ export const getTourSeoEntry = (
   tour: Tour,
   options?: TourSeoDurationOptions
 ): SeoEntry => {
-  const publicationStatus =
-    options?.publicationStatus ?? (tour.inDevelopment ? 'in_development' : 'active');
+  const publicationStatus = options?.publicationStatus ?? 'active';
   const metaSnippet =
     publicationStatus === 'in_development'
     ? UI.tourDetail.programInDevelopment

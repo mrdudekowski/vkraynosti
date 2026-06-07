@@ -1,37 +1,54 @@
 import type { TourPublicationStatus } from '../../types/tourSchedule';
 
+export type ResolveTourPublicationStatusOptions = {
+  scheduleLoaded: boolean;
+};
+
+/**
+ * Publication status from GAS catalog (Sheets col F). Requires scheduleLoaded.
+ * Missing id or empty catalog → hidden (strict SSOT).
+ */
 export function resolveTourPublicationStatus(
   tourId: string,
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,
-  /** @deprecated fallback из toursData, пока schedule не загрузился */
-  staticInDevelopment?: boolean,
-): TourPublicationStatus {
-  const fromSchedule = publicationStatuses.get(tourId);
-  if (fromSchedule) return fromSchedule;
-  if (staticInDevelopment) return 'in_development';
-  return 'active';
+  options: ResolveTourPublicationStatusOptions,
+): TourPublicationStatus | null {
+  if (!options.scheduleLoaded) {
+    return null;
+  }
+
+  if (publicationStatuses.size === 0) {
+    return 'hidden';
+  }
+
+  return publicationStatuses.get(tourId) ?? 'hidden';
 }
 
 export function isTourPublicationHidden(
   tourId: string,
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,
+  scheduleLoaded: boolean,
 ): boolean {
-  return resolveTourPublicationStatus(tourId, publicationStatuses) === 'hidden';
+  return (
+    resolveTourPublicationStatus(tourId, publicationStatuses, { scheduleLoaded }) === 'hidden'
+  );
 }
 
 /**
- * Скрыт с сайта, когда расписание загружено и в каталоге статус hidden
- * или тура нет в publicationStatuses при непустом каталоге.
+ * Hidden when schedule not loaded yet, catalog empty, status hidden, or id missing from catalog.
  */
 export function isTourHiddenFromSite(
   tourId: string,
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,
   scheduleLoaded: boolean,
 ): boolean {
-  if (!scheduleLoaded) return false;
+  if (!scheduleLoaded) {
+    return true;
+  }
 
-  /** Нет каталога публикации (legacy API / только events) — не скрываем туры fail-closed. */
-  if (publicationStatuses.size === 0) return false;
+  if (publicationStatuses.size === 0) {
+    return true;
+  }
 
   const fromCatalog = publicationStatuses.get(tourId);
   if (fromCatalog === 'hidden') return true;
@@ -42,10 +59,10 @@ export function isTourHiddenFromSite(
 export function isTourPublicationInDevelopment(
   tourId: string,
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,
-  staticInDevelopment?: boolean,
+  scheduleLoaded: boolean,
 ): boolean {
   return (
-    resolveTourPublicationStatus(tourId, publicationStatuses, staticInDevelopment) ===
+    resolveTourPublicationStatus(tourId, publicationStatuses, { scheduleLoaded }) ===
     'in_development'
   );
 }

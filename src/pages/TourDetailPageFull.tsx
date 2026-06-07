@@ -137,8 +137,11 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     summer: 'text-surface-dark',
     fall: 'text-text-inverse',
   }[tour.season];
-  const seoEntry = getTourSeoEntry(tour, { displayDuration });
-  const tourStructuredData = getTourStructuredData(tour, { displayDuration });
+  const seoEntry = getTourSeoEntry(tour, { displayDuration, publicationStatus: 'active' });
+  const tourStructuredData = getTourStructuredData(tour, {
+    displayDuration,
+    publicationStatus: 'active',
+  });
   const breadcrumbStructuredData = getTourBreadcrumbSchema(tour);
   /** Bento/crop по маршруту; медиа — только `tour.id`. */
   const heroLayoutTourId = tour.contentSourceTourId ?? tour.id;

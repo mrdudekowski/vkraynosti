@@ -11,7 +11,7 @@ export function sortToursInDevelopmentLast(
   const inDevelopment: Tour[] = [];
 
   for (const tour of tours) {
-    if (isTourInDevelopment(tour, publicationStatuses)) {
+    if (isTourInDevelopment(tour.id, publicationStatuses)) {
       inDevelopment.push(tour);
     } else {
       published.push(tour);

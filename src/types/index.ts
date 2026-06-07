@@ -73,8 +73,7 @@ export interface Tour {
    */
   bentoLayout?: TourBentoGalleryLayout;
   /**
-   * Тур опубликован в каталоге, но страница — заглушка до готовности контента.
-   * Hero + анонс; без «О туре», галереи и полной программы.
+   * @deprecated Видимость и режим «в разработке» — только из GAS `publicationStatuses` (Sheets col F).
    */
   inDevelopment?: boolean;
 }

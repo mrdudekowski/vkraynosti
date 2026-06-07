@@ -23,15 +23,16 @@ const tourScheduleDurationTypesSchema = z.record(z.string(), tourScheduleDuratio
 const tourPublicationStatusSchema = z.enum(['active', 'hidden', 'in_development']);
 const tourSchedulePublicationStatusesSchema = z.record(z.string(), tourPublicationStatusSchema);
 
-export const tourScheduleResponseSchema = z.union([
-  z.array(tourScheduleEventSchema),
-  z.object({
+const tourScheduleWrappedResponseSchema = z
+  .object({
     events: z.array(tourScheduleEventSchema),
     prices: tourSchedulePricesSchema.optional(),
     durationTypes: tourScheduleDurationTypesSchema.optional(),
-    publicationStatuses: tourSchedulePublicationStatusesSchema.optional(),
-  }),
-]);
+    publicationStatuses: tourSchedulePublicationStatusesSchema,
+  })
+  .strict();
+
+export const tourScheduleResponseSchema = tourScheduleWrappedResponseSchema;
 
 export type TourScheduleFetchErrorCode = 'network' | 'parse' | 'not-configured';
 
@@ -45,35 +46,27 @@ export class TourScheduleFetchError extends Error {
   }
 }
 
-const tourScheduleEndpointUrl = import.meta.env.VITE_TOUR_SCHEDULE_ENDPOINT_URL;
-
-const MOCK_SCHEDULE_URL = `${import.meta.env.BASE_URL}data/tour-schedule.json`;
-
 const normalizeResponse = (
-  parsed: z.infer<typeof tourScheduleResponseSchema>
+  parsed: z.infer<typeof tourScheduleWrappedResponseSchema>,
 ): TourSchedulePayload => {
-  if (Array.isArray(parsed)) {
-    const events = parsed;
-    return {
-      events,
-      catalogPrices: buildTourPricesFromEvents(events),
-      catalogDurationTypes: buildCatalogDurationTypesFromEvents(events),
-      catalogPublicationStatuses: {},
-    };
-  }
-
   const events = parsed.events;
   return {
     events,
     catalogPrices: parsed.prices ?? buildTourPricesFromEvents(events),
     catalogDurationTypes:
       parsed.durationTypes ?? buildCatalogDurationTypesFromEvents(events),
-    catalogPublicationStatuses: parsed.publicationStatuses ?? {},
+    catalogPublicationStatuses: parsed.publicationStatuses,
   };
 };
 
 export const fetchTourSchedule = async (): Promise<TourSchedulePayload> => {
-  const url = tourScheduleEndpointUrl?.trim() || MOCK_SCHEDULE_URL;
+  const url = import.meta.env.VITE_TOUR_SCHEDULE_ENDPOINT_URL?.trim();
+  if (!url) {
+    throw new TourScheduleFetchError(
+      'not-configured',
+      'VITE_TOUR_SCHEDULE_ENDPOINT_URL is not configured',
+    );
+  }
 
   let response: Response;
   try {
@@ -95,7 +88,10 @@ export const fetchTourSchedule = async (): Promise<TourSchedulePayload> => {
 
   const parsed = tourScheduleResponseSchema.safeParse(json);
   if (!parsed.success) {
-    throw new TourScheduleFetchError('parse', 'Tour schedule response failed validation');
+    throw new TourScheduleFetchError(
+      'parse',
+      'Tour schedule response must include events and publicationStatuses (wrapped JSON)',
+    );
   }
 
   return normalizeResponse(parsed.data);

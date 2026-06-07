@@ -9,7 +9,7 @@ import { ROUTES } from '../../constants/routes';
 import { scrollHomeHeroTopImmediate, scrollHomeHeroTopSmooth } from '../../constants/smoothScroll';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { SEASON_ICON, SEASON_STYLE, SEASON_TEXT_CLASS } from '../../constants/seasonNavbarAppearance';
-import { computeHomeNavbarEffectiveTopChromeOpacity } from '../../constants/homeNavbarBridgeChrome';
+import { homeNavbarChromeTeamHideShellClass } from '../../constants/homeNavbarBridgeChrome';
 import { homeNavbarChromeOpacityShellClass } from '../../constants/homeNavbarChrome';
 import { useHomeNavbarChrome } from '../../context/useHomeNavbarChrome';
 import { useMobileNavMenu } from '../../context/useMobileNavMenu';
@@ -197,21 +197,25 @@ const Navbar = () => {
   const mobileOverlayTop = homeChrome.mainUsesNavbarTopPadding ? 'top-16' : 'top-0';
 
   const isHomePath = location.pathname === ROUTES.HOME;
-  const navShellOpacity = isHomePath
-    ? computeHomeNavbarEffectiveTopChromeOpacity(
-        homeChrome.topChromeOpacity,
-        homeChrome.bridgeHideProgress
-      )
-    : 1;
+  const navHeroOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
+  const navTeamHideOpacity = isHomePath ? 1 - homeChrome.bridgeHideProgress : 1;
+  const navEffectiveOpacity = navHeroOpacity * navTeamHideOpacity;
   const navShellPointerEvents =
-    isHomePath && navShellOpacity < 0.001 ? 'pointer-events-none' : '';
+    isHomePath && navEffectiveOpacity < 0.001 ? 'pointer-events-none' : '';
+  const navTeamHideShellTransition = homeNavbarChromeTeamHideShellClass(
+    homeChrome.disableTopChromeTransition
+  );
 
   return (
     <nav data-layout-navbar className="fixed top-0 left-0 right-0 z-navbar">
       <div
-        className={`relative ${navShellTransition} ${navShellPointerEvents}`.trim()}
-        style={{ opacity: navShellOpacity }}
+        className={`relative ${navShellTransition}`.trim()}
+        style={{ opacity: navHeroOpacity }}
       >
+        <div
+          className={`relative ${navTeamHideShellTransition} ${navShellPointerEvents}`.trim()}
+          style={{ opacity: navTeamHideOpacity }}
+        >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 h-navbar-chrome bg-home-gate-start-screen"
@@ -347,6 +351,7 @@ const Navbar = () => {
           handleMobilePanelTransitionEnd={handleMobilePanelTransitionEnd}
           navLinkClassMobile={navLinkClassMobile}
         />
+        </div>
       </div>
     </nav>
   );

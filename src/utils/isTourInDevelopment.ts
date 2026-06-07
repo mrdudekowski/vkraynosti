@@ -1,10 +1,10 @@
-import type { Tour } from '../types';
 import type { TourPublicationStatus } from '../types/tourSchedule';
 import { isTourPublicationInDevelopment } from './tourSchedule/resolveTourPublicationStatus';
 
 export function isTourInDevelopment(
-  tour: Pick<Tour, 'id' | 'inDevelopment'>,
+  tourId: string,
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus> = new Map(),
+  scheduleLoaded = true,
 ): boolean {
-  return isTourPublicationInDevelopment(tour.id, publicationStatuses, tour.inDevelopment);
+  return isTourPublicationInDevelopment(tourId, publicationStatuses, scheduleLoaded);
 }

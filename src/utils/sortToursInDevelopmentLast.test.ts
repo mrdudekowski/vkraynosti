@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Tour } from '../types';
 import { sortToursInDevelopmentLast } from './sortToursInDevelopmentLast';
 
-const tour = (id: string, inDevelopment?: boolean): Tour =>
+const tour = (id: string): Tour =>
   ({
     id,
     season: 'summer',
@@ -17,17 +17,11 @@ const tour = (id: string, inDevelopment?: boolean): Tour =>
     includedInPrice: [],
     imageUrl: '/x.webp',
     galleryImages: [],
-    inDevelopment,
   }) as Tour;
 
 describe('sortToursInDevelopmentLast', () => {
   it('moves inDevelopment tours to the end while preserving relative order', () => {
-    const input = [
-      tour('summer-13', true),
-      tour('summer-1'),
-      tour('summer-14', true),
-      tour('summer-2'),
-    ];
+    const input = [tour('summer-13'), tour('summer-1'), tour('summer-14'), tour('summer-2')];
 
     expect(
       sortToursInDevelopmentLast(input, new Map([['summer-13', 'in_development'], ['summer-14', 'in_development']])).map(

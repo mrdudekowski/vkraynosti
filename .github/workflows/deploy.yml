@@ -53,7 +53,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_TOUR_SCHEDULE_ENDPOINT_URL: ${{ vars.VITE_TOUR_SCHEDULE_ENDPOINT_URL }}
+          VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
           VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
         run: npm run build
@@ -63,7 +63,7 @@ jobs:
 
       - name: Prerender dist for SEO
         env:
-          VITE_TOUR_SCHEDULE_ENDPOINT_URL: ${{ vars.VITE_TOUR_SCHEDULE_ENDPOINT_URL }}
+          VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
           VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
         run: npm run prerender

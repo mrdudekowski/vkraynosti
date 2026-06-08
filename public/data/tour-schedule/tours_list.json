@@ -1,0 +1,349 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-08T09:45:59.288Z",
+  "tours": [
+    {
+      "id": "fall-1",
+      "title": "Восхождение на Лысого Деда",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-10",
+      "title": "Путешествие на остров Аскольд",
+      "priceRub": 7000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-11",
+      "title": "Путешествие на остров Шкота",
+      "priceRub": 5000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-12",
+      "title": "Путешествие на мыс Тобизина",
+      "priceRub": 5000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-13",
+      "title": "Полуостров Гамова",
+      "priceRub": 6500,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-2",
+      "title": "Восхождение на Ольховую",
+      "priceRub": 7000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-3",
+      "title": "Восхождение на Пидан (Ливадийскую)",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-4",
+      "title": "Восхождение на гору Сестра",
+      "priceRub": 9000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-5",
+      "title": "Восхождение на Читинзу (Скалистую)",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-6",
+      "title": "Маралы х Драконы",
+      "priceRub": 7200,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-7",
+      "title": "Путешествие в ущелье Дарданеллы",
+      "priceRub": 4500,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-8",
+      "title": "Восхождение на г. Фалаза",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-9",
+      "title": "Восхождение на г. Воробей + Дегустация",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-1",
+      "title": "Восхождение на Лысого Деда",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-10",
+      "title": "Путешествие на остров Аскольд",
+      "priceRub": 7000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-11",
+      "title": "Путешествие на остров Шкота",
+      "priceRub": 5000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-12",
+      "title": "Путешествие на мыс Тобизина",
+      "priceRub": 5000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-13",
+      "title": "Полуостров Гамова",
+      "priceRub": 6500,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-2",
+      "title": "Восхождение на Ольховую",
+      "priceRub": 7000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-3",
+      "title": "Восхождение на Пидан (Ливадийскую)",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-4",
+      "title": "Восхождение на гору Сестра",
+      "priceRub": 9000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-5",
+      "title": "Восхождение на Читинзу (Скалистую)",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-6",
+      "title": "Маралы х Драконы",
+      "priceRub": 7200,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-7",
+      "title": "Путешествие в ущелье Дарданеллы",
+      "priceRub": 4500,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-8",
+      "title": "Восхождение на г. Фалаза",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "spring-9",
+      "title": "Восхождение на г. Воробей + Дегустация",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-1",
+      "title": "Заповедная Та-Чингоуза",
+      "priceRub": 15000,
+      "durationType": "многодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-10",
+      "title": "Робинзонада в районе Трёхи",
+      "priceRub": null,
+      "durationType": "многодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-11",
+      "title": "Релакс-поездка в бухту Ежовую / Спокойную",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-12",
+      "title": "Пляж Трёх границ",
+      "priceRub": null,
+      "durationType": "многодневный",
+      "publicationStatus": "in_development"
+    },
+    {
+      "id": "summer-13",
+      "title": "summer-13",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "in_development"
+    },
+    {
+      "id": "summer-14",
+      "title": "summer-14",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "in_development"
+    },
+    {
+      "id": "summer-15",
+      "title": "summer-15",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "in_development"
+    },
+    {
+      "id": "summer-16",
+      "title": "summer-16",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "in_development"
+    },
+    {
+      "id": "summer-17",
+      "title": "summer-17",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "in_development"
+    },
+    {
+      "id": "summer-19",
+      "title": "summer-19",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "in_development"
+    },
+    {
+      "id": "summer-2",
+      "title": "Путешествие на мыс Тобизина",
+      "priceRub": 5000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-3",
+      "title": "Путешествие на остров Аскольд",
+      "priceRub": 7000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-4",
+      "title": "Путешествие на остров Шкота",
+      "priceRub": 5000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-5",
+      "title": "Полуостров Гамова",
+      "priceRub": 6500,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-6",
+      "title": "Путешествие в ущелье Дарданеллы",
+      "priceRub": 4500,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-7",
+      "title": "Северное Приморье: Тайны побережья",
+      "priceRub": 19500,
+      "durationType": "многодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-8",
+      "title": "Полуостров Краббе",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "summer-9",
+      "title": "Водопад Неожиданный х Майхинское хозяйство",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "winter-1",
+      "title": "Восхождение на Изюбриную",
+      "priceRub": 6000,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "winter-2",
+      "title": "Восхождение на г. Голец",
+      "priceRub": 6500,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "winter-3",
+      "title": "Горнолыжный уикенд: Фалаза х Грибановка",
+      "priceRub": 10000,
+      "durationType": "многодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "winter-4",
+      "title": "Хаски-поездка",
+      "priceRub": null,
+      "durationType": "однодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "winter-5",
+      "title": "Горнолыжный уикенд: АрсГора",
+      "priceRub": null,
+      "durationType": "многодневный",
+      "publicationStatus": "active"
+    }
+  ]
+}

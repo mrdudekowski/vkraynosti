@@ -1,14 +1,15 @@
 /**
- * Vkraynosti — экспорт расписания туров в JSON для календаря на сайте.
+ * Vkraynosti — Google Sheets: каталог туров и расписание.
  *
  * Установка (один раз):
  * 1. Google Таблица ← импорт шаблона xlsx или копия рабочей книги
- * 2. Расширения → Apps Script → вставить этот файл
+ * 2. Расширения → Apps Script → вставить Code.gs, Publish.gs и S3Upload.gs
  * 3. Проект → часовой пояс: Asia/Vladivostok
- * 4. Меню «Вкрайности» → «Настроить таблицу (всё)» (или Run installTourScheduleExport)
- * 5. Опубликовать → Web App (Execute as: Me, Access: Anyone) → VITE_TOUR_SCHEDULE_ENDPOINT_URL
+ * 4. Свойства скрипта: S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY
+ * 5. Меню «Вкрайности» → «Настроить таблицу (всё)»
+ * 6. Публикация на сайт: «Обновить туры» / «Обновить расписание» / «Обновить всё»
  *
- * SSOT статусов: scripts/lib/scheduleSheetLabels.mjs → STATUS_TO_EXPORT_CODE
+ * SSOT статусов: scripts/lib/scheduleSheetLabels.mjs
  * SSOT id туров на сайте: npm run generate:tour-schedule-gas-ids
  */
 
@@ -42,8 +43,6 @@ var STATUS_TO_EXPORT_CODE = {
   'завершился': 'completed',
 };
 
-var CACHE_KEY = 'tourScheduleJson';
-var CACHE_TTL_SEC = 21600;
 var TIMEZONE = 'Asia/Vladivostok';
 
 /** sync: scheduleSheetLabels.mjs SCHEDULE_MAX_DATA_ROWS */
@@ -192,87 +191,23 @@ function catalogPickArrayFormulaEn_() {
   );
 }
 
-/**
- * Web App entry — GET JSON для сайта.
- * @param {GoogleAppsScript.Events.DoGet} _e
- * @returns {GoogleAppsScript.Content.TextOutput}
- */
-function doGet(_e) {
-  var json = getCachedScheduleJson_();
-  if (!json) {
-    json = rebuildScheduleCache_();
-  } else {
-    json = mergeFreshPublicationStatusesIntoCachedJson_(json);
-  }
-  return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
-}
-
-/**
- * Кол. F каталога меняется чаще кэша выездов — всегда подмешиваем актуальные статусы в ответ API.
- * @param {string} cachedJson
- * @returns {string}
- */
-function mergeFreshPublicationStatusesIntoCachedJson_(cachedJson) {
-  try {
-    var payload = JSON.parse(cachedJson);
-    if (!payload || typeof payload !== 'object') return cachedJson;
-
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var freshStatuses = readCatalogPublicationStatuses_(ss);
-    payload.publicationStatuses = freshStatuses;
-    payload.events = filterEventsByPublicationStatuses_(payload.events || [], freshStatuses);
-    return JSON.stringify(payload);
-  } catch (err) {
-    Logger.log('mergeFreshPublicationStatusesIntoCachedJson_: ' + err);
-    return cachedJson;
-  }
-}
-
-/**
- * Installable onEdit — пересборка кэша при изменениях в расписании.
- * @param {GoogleAppsScript.Events.SheetsOnEdit} e
- */
-function onScheduleEdit(e) {
-  if (!e || !e.range) return;
-  var sheet = e.range.getSheet();
-  if (!sheet) return;
-  var name = sheet.getName();
-
-  if (CATALOG_SHEET_NAMES.indexOf(name) !== -1) {
-    if (e.range.getColumn() === CATALOG_PUBLICATION_STATUS_COLUMN) {
-      rebuildScheduleCache_(true);
-    } else {
-      rebuildCatalogPricesInCache_();
-    }
-    return;
-  }
-
-  if (SCHEDULE_SHEET_NAMES.indexOf(name) === -1) return;
-  rebuildScheduleCache_(true);
-}
-
 function installTourScheduleExport() {
-  installTourScheduleExportCore_();
-  Logger.log(
-    'installTourScheduleExport: OK. Триггер onScheduleEdit, автоматизации таблицы, кэш.\n' +
-      'Опубликуйте Web App (doGet) → VITE_TOUR_SCHEDULE_ENDPOINT_URL.'
-  );
+  installTourScheduleTableCore_();
+  Logger.log('installTourScheduleExport: OK. Таблица настроена. Публикация — меню «Вкрайности».');
 }
 
 function installTourScheduleExportForMenu() {
-  installTourScheduleExportCore_();
+  installTourScheduleTableCore_();
   SpreadsheetApp.getUi().alert(
-    'Готово: таблица настроена (каталог, списки туров, даты, формулы расписания, авто-JSON).\n\n' +
-      'Опубликуйте Web App (doGet) и укажите URL в VITE_TOUR_SCHEDULE_ENDPOINT_URL.'
+    'Готово: таблица настроена (каталог, списки туров, даты, формулы расписания).\n\n' +
+      'Для публикации на сайт: «Обновить туры» / «Обновить расписание» / «Обновить всё».'
   );
 }
 
-function installTourScheduleExportCore_() {
+function installTourScheduleTableCore_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   removeScheduleTriggers_();
   setupAllTableAutomationsCore_(ss);
-  ScriptApp.newTrigger('onScheduleEdit').forSpreadsheet(ss).onEdit().create();
-  rebuildScheduleCache_();
 }
 
 /** Меню: полная настройка без пересоздания триггера. */
@@ -301,7 +236,7 @@ function setupCatalogPublicationStatusValidationForMenu() {
   setupCatalogPublicationStatusValidationCore_(SpreadsheetApp.getActiveSpreadsheet());
   SpreadsheetApp.getUi().alert(
     'Готово: колонка F «Статус на сайте» на листах «Туры_*» — список активен / скрыт / в разработке.\n' +
-      'Пустая ячейка = активен.'
+      'Пустая ячейка = черновик (не публикуется на сайт).'
   );
 }
 
@@ -511,11 +446,6 @@ function dateFromParts_(parts) {
   return new Date(parts.y, parts.m - 1, parts.d);
 }
 
-function rebuildScheduleCacheManual() {
-  rebuildScheduleCache_(false);
-  SpreadsheetApp.getUi().alert('Кэш расписания обновлён.');
-}
-
 function runTableHealthCheckForMenu() {
   var report = runTableHealthCheckCore_();
   SpreadsheetApp.getUi().alert(report.summary, SpreadsheetApp.getUi().ButtonSet.OK);
@@ -543,7 +473,7 @@ function runTableHealthCheckCore_() {
     for (var r = 0; r < rows.length; r++) {
       var id = normalizeTourId_(rows[r][0], null);
       if (!id) continue;
-      var pubCode = publicationStatuses[id] || 'active';
+      var pubCode = publicationStatuses[id] || null;
       var statusRaw = String(rows[r][5] || '').trim();
       if (statusRaw) {
         var normalized = normalizePublicationStatusCode_(statusRaw);
@@ -553,7 +483,7 @@ function runTableHealthCheckCore_() {
           );
         }
       }
-      if (!siteSet[id] && pubCode !== 'hidden') {
+      if (!siteSet[id] && pubCode && pubCode !== 'hidden') {
         warnings.push(
           'Каталог «' + sheet.getName() + '» ' + id + ': статус «' + pubCode + '», но тура нет в toursData.ts'
         );
@@ -672,7 +602,7 @@ function applySheetUxCore_(ss) {
     3: 'Число в ₽ или пусто (по запросу).',
     4: 'однодневный или многодневный',
     5: 'Заполняется автоматически — не редактировать',
-    6: 'активен / в разработке / скрыт. Пусто = активен. Скрыт — без карточки и выездов в JSON.',
+    6: 'активен / в разработке / скрыт. Пусто = черновик. Публикация — меню «Обновить туры».',
   };
 
   for (var i = 0; i < CATALOG_SHEET_NAMES.length; i++) {
@@ -742,8 +672,8 @@ function ensureInstructionSheet_(ss) {
     ['   A = дата (календарь), C = тур из списка, G = места, H = статус'],
     ['   Колонки B, D, E, F не редактируйте'],
     [''],
-    ['3. JSON для сайта'],
-    ['   Меню «Вкрайности» → обновляется при правках; «Обновить JSON сейчас» — вручную'],
+    ['3. Публикация на сайт'],
+    ['   Меню «Вкрайности» → «Обновить туры» / «Обновить расписание» / «Обновить всё»'],
     [''],
     ['4. Если тур не в dropdown'],
     ['   Меню → «Настроить таблицу (всё)» или «Настроить списки туров»'],
@@ -757,228 +687,7 @@ function ensureInstructionSheet_(ss) {
 }
 
 /**
- * @returns {string|null}
- */
-function getCachedScheduleJson_() {
-  return CacheService.getScriptCache().get(CACHE_KEY);
-}
-
-function rebuildCatalogPricesInCache_() {
-  var lock = LockService.getScriptLock();
-  if (!lock.tryLock(30000)) {
-    Logger.log('rebuildCatalogPricesInCache_: lock busy, skip.');
-    return;
-  }
-
-  try {
-    SpreadsheetApp.flush();
-    var cached = getCachedScheduleJson_();
-    /** @type {{ events: Object[], prices: Object<string, number>, durationTypes: Object<string, string>, publicationStatuses: Object<string, string> }} */
-    var payload = cached
-      ? JSON.parse(cached)
-      : { events: [], prices: {}, durationTypes: {}, publicationStatuses: {} };
-    if (!payload.events) payload.events = [];
-
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    payload.prices = readCatalogPrices_(ss);
-    payload.durationTypes = readCatalogDurationTypes_(ss);
-    payload.publicationStatuses = readCatalogPublicationStatuses_(ss);
-    payload.events = filterEventsByPublicationStatuses_(payload.events, payload.publicationStatuses);
-    var json = JSON.stringify(payload);
-    CacheService.getScriptCache().put(CACHE_KEY, json, CACHE_TTL_SEC);
-    Logger.log(
-      'rebuildCatalogPricesInCache_: events=' +
-        payload.events.length +
-        ', prices=' +
-        Object.keys(payload.prices).length +
-        ', durationTypes=' +
-        Object.keys(payload.durationTypes).length +
-        ', publicationStatuses=' +
-        Object.keys(payload.publicationStatuses).length
-    );
-  } catch (err) {
-    Logger.log('rebuildCatalogPricesInCache_: ' + err);
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-/**
- * @param {boolean=} fromEdit
- * @returns {string}
- */
-function rebuildScheduleCache_(fromEdit) {
-  var lock = LockService.getScriptLock();
-  if (!lock.tryLock(30000)) {
-    Logger.log('rebuildScheduleCache_: другой запуск уже идёт, пропуск.');
-    var cached = getCachedScheduleJson_();
-    if (cached) return cached;
-    return JSON.stringify({ events: [], prices: {}, durationTypes: {}, publicationStatuses: {} });
-  }
-
-  try {
-    if (fromEdit) {
-      SpreadsheetApp.flush();
-      Utilities.sleep(800);
-    }
-
-    var events = [];
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var publicationStatuses = readCatalogPublicationStatuses_(ss);
-
-    for (var i = 0; i < SCHEDULE_SHEET_NAMES.length; i++) {
-      var sheetName = SCHEDULE_SHEET_NAMES[i];
-      var sheet = ss.getSheetByName(sheetName);
-      if (!sheet) continue;
-      events = events.concat(readScheduleSheet_(sheet, publicationStatuses));
-    }
-
-    events.sort(function (a, b) {
-      if (a.date === b.date) return a.tourId.localeCompare(b.tourId);
-      return a.date.localeCompare(b.date);
-    });
-
-    var prices = readCatalogPrices_(ss);
-    var durationTypes = readCatalogDurationTypes_(ss);
-    var payload = JSON.stringify({
-      events: events,
-      prices: prices,
-      durationTypes: durationTypes,
-      publicationStatuses: publicationStatuses,
-    });
-    CacheService.getScriptCache().put(CACHE_KEY, payload, CACHE_TTL_SEC);
-    Logger.log(
-      'rebuildScheduleCache_: events=' +
-        events.length +
-        ', prices=' +
-        Object.keys(prices).length +
-        ', durationTypes=' +
-        Object.keys(durationTypes).length
-    );
-    return payload;
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-/**
- * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
- * @param {Object<string, string>} publicationStatuses
- * @returns {Object[]}
- */
-function readScheduleSheet_(sheet, publicationStatuses) {
-  var lastRow = getScheduleLastDataRow_(sheet);
-  if (lastRow < 2) return [];
-
-  var numRows = lastRow - 1;
-  var rows = sheet.getRange(2, 1, numRows, 9).getValues();
-  /** @type {Object[]} */
-  var events = [];
-
-  for (var r = 0; r < rows.length; r++) {
-    var row = rows[r];
-    var dateRaw = row[0];
-    var tourId = normalizeTourId_(row[3], row[2]);
-    var durationType = String(row[4] || '').trim();
-    var priceRub = normalizeNumberOrNull_(row[5]);
-    var seats = normalizeNumberOrNull_(row[6]);
-    var statusRu = String(row[7] || '').trim().toLowerCase();
-    var commentRaw = row[8];
-    var comment =
-      commentRaw === null || commentRaw === undefined || commentRaw === ''
-        ? null
-        : String(commentRaw).trim();
-
-    if (!dateRaw && !tourId && !statusRu) continue;
-
-    var dateIso = formatDateIso_(dateRaw);
-    var statusCode = STATUS_TO_EXPORT_CODE[statusRu];
-
-    if (!dateIso || !tourId || !statusCode) continue;
-    if (durationType !== 'однодневный' && durationType !== 'многодневный') continue;
-    if (publicationStatuses[tourId] === 'hidden') continue;
-
-    events.push({
-      date: dateIso,
-      tourId: tourId,
-      durationType: durationType,
-      priceRub: priceRub,
-      seats: seats,
-      status: statusCode,
-      comment: comment,
-    });
-  }
-
-  return events;
-}
-
-/**
- * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
- * @returns {Object<string, number>}
- */
-function readCatalogPrices_(ss) {
-  /** @type {Object<string, number>} */
-  var prices = {};
-
-  for (var i = 0; i < CATALOG_SHEET_NAMES.length; i++) {
-    var sheet = ss.getSheetByName(CATALOG_SHEET_NAMES[i]);
-    if (!sheet) continue;
-
-    var rows = sheet
-      .getRange(CATALOG_FIRST_DATA_ROW, 1, CATALOG_MAX_DATA_ROW - CATALOG_FIRST_DATA_ROW + 1, 3)
-      .getValues();
-
-    for (var r = 0; r < rows.length; r++) {
-      var tourId = normalizeTourId_(rows[r][0], null);
-      if (!tourId) continue;
-
-      var priceRub = normalizeNumberOrNull_(rows[r][2]);
-      if (priceRub != null) prices[tourId] = priceRub;
-    }
-  }
-
-  return prices;
-}
-
-/**
- * Каталог Туры_*: кол. A (id), D (однодневный | многодневный). sync: scheduleSheetLabels.mjs CATALOG_HEADERS.
- * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
- * @returns {Object<string, string>}
- */
-function readCatalogDurationTypes_(ss) {
-  /** @type {Object<string, string>} */
-  var durationTypes = {};
-
-  for (var i = 0; i < CATALOG_SHEET_NAMES.length; i++) {
-    var sheet = ss.getSheetByName(CATALOG_SHEET_NAMES[i]);
-    if (!sheet) continue;
-
-    var rows = sheet
-      .getRange(CATALOG_FIRST_DATA_ROW, 1, CATALOG_MAX_DATA_ROW - CATALOG_FIRST_DATA_ROW + 1, 4)
-      .getValues();
-
-    for (var r = 0; r < rows.length; r++) {
-      var tourId = normalizeTourId_(rows[r][0], null);
-      if (!tourId) continue;
-
-      var durationType = String(rows[r][3] || '').trim();
-      if (durationType !== 'однодневный' && durationType !== 'многодневный') {
-        if (durationType) {
-          Logger.log(
-            'readCatalogDurationTypes_: skip invalid type for ' + tourId + ': ' + durationType
-          );
-        }
-        continue;
-      }
-      durationTypes[tourId] = durationType;
-    }
-  }
-
-  return durationTypes;
-}
-
-/**
- * Каталог Туры_*: кол. A (id), F (статус на сайте). sync: scheduleSheetLabels.mjs.
+ * Каталог Туры_*: кол. A (id), F (статус на сайте). Для проверки таблицы.
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  * @returns {Object<string, string>}
  */
@@ -1005,33 +714,12 @@ function readCatalogPublicationStatuses_(ss) {
 
       var statusRaw = String(rows[r][CATALOG_PUBLICATION_STATUS_COLUMN - 1] || '').trim();
       var code = normalizePublicationStatusCode_(statusRaw);
-      if (!code) {
-        Logger.log(
-          'readCatalogPublicationStatuses_: invalid status for ' +
-            tourId +
-            ' on ' +
-            sheet.getName() +
-            ': ' +
-            statusRaw
-        );
-        code = 'active';
-      }
+      if (!code) continue;
       publicationStatuses[tourId] = code;
     }
   }
 
   return publicationStatuses;
-}
-
-/**
- * @param {Object[]} events
- * @param {Object<string, string>} publicationStatuses
- * @returns {Object[]}
- */
-function filterEventsByPublicationStatuses_(events, publicationStatuses) {
-  return events.filter(function (ev) {
-    return publicationStatuses[ev.tourId] !== 'hidden';
-  });
 }
 
 /**
@@ -1042,7 +730,7 @@ function normalizePublicationStatusCode_(statusRaw) {
   var normalized = String(statusRaw || '')
     .trim()
     .toLowerCase();
-  if (!normalized) return 'active';
+  if (!normalized) return null;
   return PUBLICATION_STATUS_TO_EXPORT_CODE[normalized] || null;
 }
 
@@ -1126,16 +814,17 @@ function repairScheduleFormulasForMenu() {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Вкрайности')
-    .addItem('Настроить таблицу (всё)', 'setupAllTableAutomationsForMenu')
+    .addItem('Обновить туры', 'publishToursJsonForMenu')
+    .addItem('Обновить расписание', 'publishScheduleJsonForMenu')
+    .addItem('Обновить всё', 'publishAllJsonForMenu')
+    .addSeparator()
+    .addItem('Проверить таблицу', 'runTableHealthCheckForMenu')
     .addItem('Исправить формулы (#ERROR!)', 'repairScheduleFormulasForMenu')
     .addSeparator()
-    .addItem('Установить автообновление (onEdit)', 'installTourScheduleExportForMenu')
+    .addItem('Настроить таблицу (всё)', 'setupAllTableAutomationsForMenu')
     .addItem('Настроить списки туров (колонка C)', 'setupScheduleTourDropdownForMenu')
     .addItem('Настроить каталог (подписи E)', 'setupCatalogTourPickLabelsForMenu')
     .addItem('Настроить статус публикации (колонка F)', 'setupCatalogPublicationStatusValidationForMenu')
     .addItem('Настроить календарь дат (колонка A)', 'setupScheduleDateValidationForMenu')
-    .addSeparator()
-    .addItem('Проверить таблицу', 'runTableHealthCheckForMenu')
-    .addItem('Обновить JSON сейчас', 'rebuildScheduleCacheManual')
     .addToUi();
 }

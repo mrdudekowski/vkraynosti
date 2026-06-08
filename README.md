@@ -12,6 +12,8 @@
 | [TimeWebDoc/README.md](TimeWebDoc/README.md) | Миграция на TimeWeb App + S3: пайплайн по фазам, промпт агента |
 | [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Метрики производительности, **профилирование в Chrome (Profiler / Performance)**, эталоны |
 | [docs/MEDIA_OPTIMIZATION_PIPELINE.md](docs/MEDIA_OPTIMIZATION_PIPELINE.md) | Полный pipeline оптимизации видео/медиа до эталонного состояния |
+| [docs/TOUR_DATA_S3_MIGRATION_GUIDE.md](docs/TOUR_DATA_S3_MIGRATION_GUIDE.md) | Публикация туров/расписания: Sheets → S3 → сайт |
+| [docs/TOUR_DATA_MANAGER_GUIDE.md](docs/TOUR_DATA_MANAGER_GUIDE.md) | Краткая памятка для менеджеров таблицы |
 | [.cursor/rules/vkraynosti.mdc](.cursor/rules/vkraynosti.mdc) | Правила кода для агентов и разработчиков (SSOT по стилю и данным) |
 
 ## Требования
@@ -33,6 +35,13 @@
 | `npm run test:watch` | Vitest в режиме watch |
 | `npm run test:e2e` | Playwright (поднимает dev-сервер; см. `playwright.config.ts`) |
 | `npm run test:e2e:perf` | E2E-сценарий нагрузки страницы тура |
+| `npm run generate:tour-data-fixtures` | Локальные `public/data/tour-schedule/*.json` для dev/E2E |
+
+## Tour data publishing
+
+- **Таблица → S3:** `integrations/tour-schedule-gas/` (`Code.gs`, `Publish.gs`, `S3Upload.gs`)
+- **Сайт:** `src/services/tourData.ts` → `tour-schedule/tours_list.json` + `schedule.json` на S3/CDN
+- **Инструкция:** [docs/TOUR_DATA_S3_MIGRATION_GUIDE.md](docs/TOUR_DATA_S3_MIGRATION_GUIDE.md)
 
 ## Локальная разработка и базовый путь
 

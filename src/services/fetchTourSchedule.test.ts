@@ -1,12 +1,47 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchTourSchedule, TourScheduleFetchError } from './fetchTourSchedule';
 
-const ENDPOINT = 'https://example.com/tour-schedule';
+const BASE = 'https://example.com/data';
+
+const toursList = {
+  schemaVersion: 1,
+  generatedAt: '2026-06-08T00:00:00.000Z',
+  tours: [
+    {
+      id: 'spring-3',
+      title: 'Тур',
+      priceRub: 6000,
+      durationType: 'однодневный',
+      publicationStatus: 'active',
+    },
+    {
+      id: 'spring-1',
+      title: 'Другой',
+      priceRub: 6000,
+      durationType: 'однодневный',
+      publicationStatus: 'active',
+    },
+  ],
+};
+
+const schedule = {
+  schemaVersion: 1,
+  generatedAt: '2026-06-08T00:00:00.000Z',
+  events: [
+    {
+      date: '2026-05-09',
+      tourId: 'spring-3',
+      seats: 8,
+      status: 'open',
+      comment: null,
+    },
+  ],
+};
 
 describe('fetchTourSchedule', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
-    vi.stubEnv('VITE_TOUR_SCHEDULE_ENDPOINT_URL', ENDPOINT);
+    vi.stubEnv('VITE_PUBLIC_S3_BASE_URL', BASE);
   });
 
   afterEach(() => {
@@ -15,148 +50,33 @@ describe('fetchTourSchedule', () => {
     vi.restoreAllMocks();
   });
 
-  it('throws not-configured when endpoint env is missing', async () => {
-    vi.stubEnv('VITE_TOUR_SCHEDULE_ENDPOINT_URL', '');
-    await expect(fetchTourSchedule()).rejects.toMatchObject({
-      code: 'not-configured',
-    } satisfies Partial<TourScheduleFetchError>);
-  });
-
-  it('parses wrapped response with events and publicationStatuses', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        events: [
-          {
-            date: '2026-05-09',
-            tourId: 'spring-3',
-            durationType: 'однодневный',
-            priceRub: 6000,
-            seats: 8,
-            status: 'open',
-            comment: null,
-          },
-        ],
-        publicationStatuses: {
-          'spring-3': 'active',
-        },
-      }),
-    } as Response);
+  it('parses merged payload from tours_list and schedule', async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({ ok: true, json: async () => toursList } as Response)
+      .mockResolvedValueOnce({ ok: true, json: async () => schedule } as Response);
 
     const payload = await fetchTourSchedule();
     expect(payload.events).toHaveLength(1);
     expect(payload.events[0]?.tourId).toBe('spring-3');
-    expect(payload.catalogPrices).toEqual({ 'spring-3': 6000 });
-    expect(payload.catalogDurationTypes).toEqual({ 'spring-3': 'однодневный' });
-    expect(payload.catalogPublicationStatuses).toEqual({ 'spring-3': 'active' });
-  });
-
-  it('parses wrapped response with catalog prices', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        events: [
-          {
-            date: '2026-05-09',
-            tourId: 'spring-3',
-            durationType: 'однодневный',
-            priceRub: 6000,
-            seats: 8,
-            status: 'open',
-            comment: null,
-          },
-        ],
-        prices: {
-          'spring-3': 6500,
-          'spring-1': 6000,
-        },
-        publicationStatuses: {},
-      }),
-    } as Response);
-
-    const payload = await fetchTourSchedule();
-    expect(payload.events).toHaveLength(1);
-    expect(payload.catalogPrices).toEqual({
-      'spring-3': 6500,
-      'spring-1': 6000,
-    });
-  });
-
-  it('parses wrapped response with catalog duration types', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        events: [
-          {
-            date: '2026-05-09',
-            tourId: 'spring-3',
-            durationType: 'многодневный',
-            priceRub: 6000,
-            seats: 8,
-            status: 'open',
-            comment: null,
-          },
-        ],
-        durationTypes: {
-          'spring-3': 'однодневный',
-          'summer-7': 'многодневный',
-        },
-        publicationStatuses: {},
-      }),
-    } as Response);
-
-    const payload = await fetchTourSchedule();
+    expect(payload.catalogPrices).toEqual({ 'spring-3': 6000, 'spring-1': 6000 });
     expect(payload.catalogDurationTypes).toEqual({
       'spring-3': 'однодневный',
-      'summer-7': 'многодневный',
+      'spring-1': 'однодневный',
     });
-  });
-
-  it('parses wrapped response with publication statuses', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        events: [],
-        publicationStatuses: {
-          'summer-13': 'in_development',
-          'summer-18': 'hidden',
-        },
-      }),
-    } as Response);
-
-    const payload = await fetchTourSchedule();
     expect(payload.catalogPublicationStatuses).toEqual({
-      'summer-13': 'in_development',
-      'summer-18': 'hidden',
+      'spring-3': 'active',
+      'spring-1': 'active',
     });
   });
 
-  it('throws parse error on legacy array-only payload', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      json: async () => [
-        {
-          date: '2026-05-09',
-          tourId: 'spring-3',
-          durationType: 'однодневный',
-          priceRub: 6000,
-          seats: 8,
-          status: 'open',
-          comment: null,
-        },
-      ],
-    } as Response);
-
-    await expect(fetchTourSchedule()).rejects.toMatchObject({
-      code: 'parse',
-    } satisfies Partial<TourScheduleFetchError>);
-  });
-
-  it('throws parse error on invalid payload', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      json: async () => ({ invalid: true }),
-    } as Response);
+  it('throws parse error on invalid tours payload', async () => {
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('tours_list.json')) {
+        return { ok: true, json: async () => ({ invalid: true }) } as Response;
+      }
+      return { ok: true, json: async () => schedule } as Response;
+    });
 
     await expect(fetchTourSchedule()).rejects.toBeInstanceOf(TourScheduleFetchError);
   });

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { fetchTourSchedule } from '../services/fetchTourSchedule';
+import { loadTourSchedulePayload } from '../services/tourData';
+import { TourDataFetchError } from '../types/tourData';
 import type {
   EnrichedScheduleEvent,
   TourPublicationStatus,
@@ -31,7 +32,7 @@ const toPublicationStatusesMap = (
 ): ReadonlyMap<string, TourPublicationStatus> =>
   new Map(Object.entries(catalogPublicationStatuses));
 
-/** Повторный fetch после TTL — статусы публикации в таблице не должны «залипать» в SPA. */
+/** Периодический refetch статичных JSON с S3 (без сброса snapshot до успеха). */
 const SCHEDULE_CLIENT_CACHE_MAX_AGE_MS = 5 * 60 * 1000;
 
 let cachedSchedule: CachedSchedule | null = null;
@@ -43,32 +44,50 @@ const isClientScheduleCacheStale = (): boolean => {
   return Date.now() - cachedScheduleFetchedAt > SCHEDULE_CLIENT_CACHE_MAX_AGE_MS;
 };
 
+const buildCachedSchedule = ({
+  events: rawEvents,
+  catalogPrices,
+  catalogDurationTypes,
+  catalogPublicationStatuses,
+}: Awaited<ReturnType<typeof loadTourSchedulePayload>>): CachedSchedule => {
+  const publicationStatuses = toPublicationStatusesMap(catalogPublicationStatuses);
+  const visibleRawEvents = filterEventsByPublicationStatuses(rawEvents, publicationStatuses);
+  const events = enrichScheduleEvents(visibleRawEvents, publicationStatuses);
+  return {
+    events,
+    eventsByDate: groupEventsByIsoDate(events),
+    prices: mergeTourPrices(rawEvents, catalogPrices),
+    durationTypes: toDurationTypesMap(catalogDurationTypes),
+    publicationStatuses,
+  };
+};
+
+const isEmptyPublicationCatalog = (result: CachedSchedule): boolean =>
+  result.publicationStatuses.size === 0;
+
 const loadSchedule = async (force = false): Promise<CachedSchedule> => {
   if (cachedSchedule && !force && !isClientScheduleCacheStale()) return cachedSchedule;
-  if (force || isClientScheduleCacheStale()) {
-    cachedSchedule = null;
-    cachedScheduleFetchedAt = null;
-  }
   if (inflightPromise) return inflightPromise;
 
-  inflightPromise = fetchTourSchedule()
-    .then(({ events: rawEvents, catalogPrices, catalogDurationTypes, catalogPublicationStatuses }) => {
-      const publicationStatuses = toPublicationStatusesMap(catalogPublicationStatuses);
-      const visibleRawEvents = filterEventsByPublicationStatuses(
-        rawEvents,
-        publicationStatuses,
-      );
-      const events = enrichScheduleEvents(visibleRawEvents, publicationStatuses);
-      const result: CachedSchedule = {
-        events,
-        eventsByDate: groupEventsByIsoDate(events),
-        prices: mergeTourPrices(rawEvents, catalogPrices),
-        durationTypes: toDurationTypesMap(catalogDurationTypes),
-        publicationStatuses,
-      };
+  const previousSnapshot = cachedSchedule;
+
+  inflightPromise = loadTourSchedulePayload()
+    .then(payload => {
+      const result = buildCachedSchedule(payload);
+      if (isEmptyPublicationCatalog(result) && previousSnapshot) {
+        console.warn('[tourSchedule] Ignoring empty catalog response; keeping previous snapshot');
+        return previousSnapshot;
+      }
       cachedSchedule = result;
       cachedScheduleFetchedAt = Date.now();
       return result;
+    })
+    .catch(err => {
+      if (previousSnapshot) {
+        console.warn('[tourSchedule] Fetch failed; using stale snapshot', err);
+        return previousSnapshot;
+      }
+      throw err;
     })
     .finally(() => {
       inflightPromise = null;
@@ -77,8 +96,10 @@ const loadSchedule = async (force = false): Promise<CachedSchedule> => {
   return inflightPromise;
 };
 
-const scheduleError = (err: unknown): Error =>
-  err instanceof Error ? err : new Error('Unknown schedule error');
+const scheduleError = (err: unknown): Error => {
+  if (err instanceof TourDataFetchError) return err;
+  return err instanceof Error ? err : new Error('Unknown schedule error');
+};
 
 /** Не конкурировать с LCP: первый fetch после idle, не позже timeout (мс). */
 const SCHEDULE_LOAD_IDLE_TIMEOUT_MS = 2500;
@@ -135,7 +156,7 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
           if (!cancelled) applySchedule(result);
         })
         .catch(err => {
-          if (!cancelled) {
+          if (!cancelled && cachedSchedule == null) {
             setStatus('error');
             setError(scheduleError(err));
           }
@@ -156,8 +177,10 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
       void loadSchedule(true)
         .then(applySchedule)
         .catch(err => {
-          setStatus('error');
-          setError(scheduleError(err));
+          if (cachedSchedule == null) {
+            setStatus('error');
+            setError(scheduleError(err));
+          }
         });
     };
 

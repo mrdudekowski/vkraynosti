@@ -39,7 +39,8 @@
     "patch:tour-schedule-publication-status": "node scripts/patch-catalog-publication-status-column.mjs",
     "media:bootstrap-season": "node scripts/generate-isolated-season-media.mjs",
     "sync:s3": "node scripts/sync-public-to-s3.mjs",
-    "sync:s3:dry-run": "node scripts/sync-public-to-s3.mjs --dry-run"
+    "sync:s3:dry-run": "node scripts/sync-public-to-s3.mjs --dry-run",
+    "generate:tour-data-fixtures": "node scripts/generate-tour-data-fixtures.mjs"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^7.2.0",

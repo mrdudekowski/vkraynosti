@@ -19,7 +19,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
-      VITE_TOUR_SCHEDULE_ENDPOINT_URL: `${DEV_ORIGIN}data/tour-schedule.json`,
+      VITE_PUBLIC_S3_BASE_URL: `${DEV_ORIGIN}data`,
     },
   },
 });

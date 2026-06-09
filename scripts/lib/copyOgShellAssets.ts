@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { DEFAULT_OG_SHELL_BANNER_LOGICAL } from '../../src/constants/images.ts';
 import { resolveOgShellLogicalImagePath } from '../../src/constants/seo.ts';
+import { ensureTelegramFriendlyOgImage } from './ogShellTelegramImage.ts';
 
 export const OG_SHELL_ASSET_MANIFEST = '.og-shell-assets.json' as const;
 
@@ -57,14 +58,14 @@ async function materializeOgShellAsset(
 
   if (existsSync(localPath)) {
     await copyLocalAsset(localPath, targetPath, logical);
-    return logical;
+    return ensureTelegramFriendlyOgImage(distDir, logical);
   }
 
   const cdnUrl = buildCdnAssetUrl(logical);
   if (cdnUrl) {
     try {
       await fetchRemoteAsset(cdnUrl, targetPath, logical);
-      return logical;
+      return ensureTelegramFriendlyOgImage(distDir, logical);
     } catch (error) {
       if (logical === DEFAULT_OG_SHELL_BANNER_LOGICAL) {
         throw new Error(

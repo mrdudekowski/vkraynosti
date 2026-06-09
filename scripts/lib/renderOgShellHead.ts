@@ -4,6 +4,7 @@ import {
   getOgShellAbsoluteImageUrl,
 } from '../../src/constants/seo.ts';
 import type { OgShellMeta } from './resolveOgShellMeta.ts';
+import { isJpegOgImagePath } from './ogShellTelegramImage.ts';
 
 export const escapeHtml = (text: string): string =>
   text
@@ -21,6 +22,9 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
   const ogImage = escapeHtml(getOgShellAbsoluteImageUrl(meta.imagePathOrUrl));
   const siteName = escapeHtml(SEO_DEFAULTS.siteName);
   const twitterCard = escapeHtml(SEO_DEFAULTS.twitterCard);
+  const ogImageType = isJpegOgImagePath(meta.imagePathOrUrl)
+    ? '\n      <meta property="og:image:type" content="image/jpeg" />'
+    : '';
 
   return `
       <meta name="description" content="${description}" />
@@ -32,13 +36,26 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
       <meta property="og:url" content="${canonicalUrl}" />
       <meta property="og:site_name" content="${siteName}" />
       <meta property="og:locale" content="ru_RU" />
-      <meta property="og:image" content="${ogImage}" />
+      <meta property="og:image" content="${ogImage}" />${ogImageType}
       <meta property="og:image:alt" content="${title}" />
       <meta name="twitter:card" content="${twitterCard}" />
       <meta name="twitter:title" content="${title}" />
       <meta name="twitter:description" content="${description}" />
       <meta name="twitter:image" content="${ogImage}" />
       <meta name="twitter:url" content="${canonicalUrl}" />`;
+};
+
+const ensureOgHtmlPrefix = (html: string): string => {
+  if (/prefix=["']og:/i.test(html)) {
+    return html;
+  }
+  return html.replace(
+    /<html(\s[^>]*)?>/i,
+    (match, attrs = '') =>
+      attrs.includes('prefix=')
+        ? match
+        : `<html${attrs} prefix="og: https://ogp.me/ns#">`,
+  );
 };
 
 export const injectOgShellIntoHtml = (templateHtml: string, meta: OgShellMeta): string => {
@@ -48,9 +65,11 @@ export const injectOgShellIntoHtml = (templateHtml: string, meta: OgShellMeta): 
     `<title>${titleEscaped}</title>`,
   );
 
-  if (withTitle.includes('property="og:title"')) {
-    return withTitle;
+  const withPrefix = ensureOgHtmlPrefix(withTitle);
+
+  if (withPrefix.includes('property="og:title"')) {
+    return withPrefix;
   }
 
-  return withTitle.replace('</head>', `${renderOgShellHead(meta)}\n  </head>`);
+  return withPrefix.replace('</head>', `${renderOgShellHead(meta)}\n  </head>`);
 };

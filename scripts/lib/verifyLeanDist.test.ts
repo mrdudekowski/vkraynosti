@@ -38,4 +38,18 @@ describe('verifyLeanDistTours', () => {
       true,
     );
   });
+
+  it('passes when dist/tours contains allowlisted OG shell assets', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lean-dist-'));
+    const routeDir = path.join(tempDir, 'tours', 'summer', 'summer-10');
+    fs.mkdirSync(routeDir, { recursive: true });
+    fs.writeFileSync(path.join(routeDir, 'index.html'), '<html></html>', 'utf8');
+    fs.writeFileSync(path.join(routeDir, 'cover.webp'), '', 'utf8');
+    fs.writeFileSync(
+      path.join(tempDir, '.og-shell-assets.json'),
+      JSON.stringify({ allowedRelativePaths: ['tours/summer/summer-10/cover.webp'] }),
+      'utf8',
+    );
+    expect(verifyLeanDistTours(tempDir).ok).toBe(true);
+  });
 });

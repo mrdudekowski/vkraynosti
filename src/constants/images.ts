@@ -29,6 +29,9 @@ export const HOME_SEASON_BANNER_MEDIA_BASE: Record<Season, string> = {
   fall: `${MEDIA_ASSET_BASE}banners_fall`,
 } as const;
 
+/** Logical path under `public/` for default OG / 404 preview (copied to dist by og:shells). */
+export const DEFAULT_OG_SHELL_BANNER_LOGICAL = 'banners_summer/Summer.webp' as const;
+
 const TOUR_WINTER_1 = `${TOURS_ASSET_BASE}/winter-1`;
 export const TOUR_WINTER_1_COVER = `${TOUR_WINTER_1}/hero.webp` as const;
 

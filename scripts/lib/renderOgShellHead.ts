@@ -1,7 +1,7 @@
 import {
   SEO_DEFAULTS,
-  getAbsoluteOgImageUrl,
   getCanonicalUrl,
+  getOgShellAbsoluteImageUrl,
 } from '../../src/constants/seo.ts';
 import type { OgShellMeta } from './resolveOgShellMeta.ts';
 
@@ -18,7 +18,7 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
   const description = escapeHtml(meta.description);
   const robots = escapeHtml(meta.robots);
   const canonicalUrl = escapeHtml(getCanonicalUrl(meta.canonicalPath ?? meta.path));
-  const ogImage = escapeHtml(getAbsoluteOgImageUrl(meta.imagePathOrUrl));
+  const ogImage = escapeHtml(getOgShellAbsoluteImageUrl(meta.imagePathOrUrl));
   const siteName = escapeHtml(SEO_DEFAULTS.siteName);
   const twitterCard = escapeHtml(SEO_DEFAULTS.twitterCard);
 

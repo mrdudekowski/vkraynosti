@@ -40,6 +40,26 @@ describe('getAbsoluteOgImageUrl', () => {
   });
 });
 
+describe('getOgShellAbsoluteImageUrl', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('uses App origin even when CDN env is set', async () => {
+    vi.stubEnv('VITE_SITE_URL', 'https://app.example.com');
+    vi.stubEnv('VITE_BASE_PATH', '/');
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', 'https://cdn.example.com/');
+    vi.resetModules();
+    const { getOgShellAbsoluteImageUrl } = await import('./seo');
+    expect(getOgShellAbsoluteImageUrl('/tours/summer-1/cover.webp')).toBe(
+      'https://app.example.com/tours/summer-1/cover.webp',
+    );
+    expect(getOgShellAbsoluteImageUrl('https://cdn.example.com/tours/summer-1/cover.webp')).toBe(
+      'https://app.example.com/tours/summer-1/cover.webp',
+    );
+  });
+});
+
 describe('SEO_DEFAULTS.defaultOgImage', () => {
   afterEach(() => {
     vi.unstubAllEnvs();

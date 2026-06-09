@@ -72,6 +72,8 @@
 
 Порядок для prod: зелёный CI на `web-vkr` → (опционально) Sync public to S3 → Deploy в панели TimeWeb.
 
+**TimeWeb App (web-vkr):** команда сборки `npm run build:deploy` (платформа сама делает `npm install`; `npm ci` не нужен), директория `dist`. OG-теги и `og:image`-файлы вшиты в сборку — превью с домена App, медиа UI с CDN.
+
 При появлении уязвимостей уровня **high** и выше сборка остановится (часто помогает `npm audit fix`). Локально: **`npm run audit`**, затем `npm test` и `npm run build`.
 
 ## Стек (кратко)

@@ -1,7 +1,13 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { getIndexableRoutePaths, routePathToDistFile } from './seoRoutes.mjs';
-import { patch404OgShell } from './patch404OgShell.mjs';
+import {
+  collectOgShellImageLogicalPaths,
+  copyOgShellAssets,
+  resolveOgShellImageForMeta,
+  writeOgShellAssetManifest,
+} from './copyOgShellAssets.ts';
+import { patch404OgShell } from './patch404OgShell.ts';
 import { injectOgShellIntoHtml } from './renderOgShellHead.ts';
 import { resolveOgShellMeta } from './resolveOgShellMeta.ts';
 
@@ -18,11 +24,23 @@ export async function runGenerateOgShells(): Promise<void> {
   }
 
   const routes = await getIndexableRoutePaths(rootDir);
-  process.stdout.write(`OG shells: ${routes.length} routes\n`);
+  const routeMetas = routes.map((routePath) => ({
+    routePath,
+    meta: resolveOgShellMeta(routePath),
+  }));
 
-  for (const routePath of routes) {
-    const meta = resolveOgShellMeta(routePath);
-    const html = injectOgShellIntoHtml(templateHtml, meta);
+  const logicalPaths = collectOgShellImageLogicalPaths(
+    routeMetas.map(({ meta }) => meta.imagePathOrUrl),
+  );
+
+  process.stdout.write(`OG shells: ${routes.length} routes\n`);
+  const resolvedPathByRequested = await copyOgShellAssets(distDir, rootDir, logicalPaths);
+  const materializedPaths = [...new Set(resolvedPathByRequested.values())];
+  await writeOgShellAssetManifest(distDir, materializedPaths);
+
+  for (const { routePath, meta } of routeMetas) {
+    const imagePathOrUrl = resolveOgShellImageForMeta(meta.imagePathOrUrl, resolvedPathByRequested);
+    const html = injectOgShellIntoHtml(templateHtml, { ...meta, imagePathOrUrl });
     const filePath = routePathToDistFile(routePath, distDir);
     await mkdir(dirname(filePath), { recursive: true });
     await writeFile(filePath, html, 'utf8');

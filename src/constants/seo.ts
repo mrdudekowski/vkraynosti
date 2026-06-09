@@ -24,6 +24,28 @@ const TWITTER_CARD_TYPE = 'summary_large_image' as const;
 
 export const getCanonicalUrl = (path: string): string => `${SITE_URL}${path}`;
 
+/** Logical path under `public/` for OG shell assets (no CDN origin). */
+export const resolveOgShellLogicalImagePath = (pathOrUrl: string): string => {
+  let pathname: string;
+  if (/^https?:\/\//i.test(pathOrUrl)) {
+    pathname = new URL(pathOrUrl).pathname;
+  } else {
+    pathname = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
+  }
+  let logical = pathname.replace(/^\/+/, '');
+  if (logical.startsWith('vkraynosti/')) {
+    logical = logical.slice('vkraynosti/'.length);
+  }
+  return logical;
+};
+
+/** OG shell previews: App origin only — CDN objects carry X-Robots-Tag on TimeWeb. */
+export const getOgShellAbsoluteImageUrl = (pathOrUrl: string): string => {
+  const logical = resolveOgShellLogicalImagePath(pathOrUrl);
+  const origin = SITE_URL.replace(/\/+$/, '');
+  return `${origin}/${logical}`;
+};
+
 /** Absolute HTTPS URL for Open Graph / Twitter (social crawlers require full URL). */
 export const getAbsoluteOgImageUrl = (pathOrUrl: string): string => {
   if (/^https?:\/\//i.test(pathOrUrl)) {

@@ -1,16 +1,17 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { resolveSiteRoot } from './seoRoutes.mjs';
+import { DEFAULT_OG_SHELL_BANNER_LOGICAL } from '../../src/constants/images.ts';
+import { getOgShellAbsoluteImageUrl } from '../../src/constants/seo.ts';
 
-function normalizeBasePath(env = process.env) {
+function normalizeBasePath(env = process.env): string {
   const raw = (env.VITE_BASE_PATH || '/vkraynosti/').trim();
   if (!raw || raw === '/') return '/';
   return raw.endsWith('/') ? raw : `${raw}/`;
 }
 
-export async function patch404OgShell(distDir) {
+export async function patch404OgShell(distDir: string): Promise<void> {
   const filePath = resolve(distDir, '404.html');
-  let html;
+  let html: string;
   try {
     html = await readFile(filePath, 'utf8');
   } catch {
@@ -21,7 +22,6 @@ export async function patch404OgShell(distDir) {
     return;
   }
 
-  const siteRoot = resolveSiteRoot();
   const basePath = normalizeBasePath();
   const faviconLightHref =
     basePath === '/' ? '/flavicon-light.png' : `${basePath}flavicon-light.png`;
@@ -29,7 +29,7 @@ export async function patch404OgShell(distDir) {
     basePath === '/' ? '/flavicon-dark.png' : `${basePath}flavicon-dark.png`;
   const appleTouchIconHref =
     basePath === '/' ? '/apple-touch-icon.png' : `${basePath}apple-touch-icon.png`;
-  const ogImage = `${siteRoot}/banners_summer/Summer.webp`;
+  const ogImage = getOgShellAbsoluteImageUrl(DEFAULT_OG_SHELL_BANNER_LOGICAL);
   const ogTitle = 'Вкрайности — Поездки по Приморью из Владивостока';
   const ogDescription =
     'Авторские поездки по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.';

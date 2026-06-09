@@ -7,12 +7,29 @@ import {
   parseMediaOriginFromAssetBaseUrl,
 } from './src/constants/contentSecurityPolicy.ts'
 import { pruneDistForCdn as pruneDistForCdnFromLib } from './scripts/lib/pruneDistForCdn.ts'
+import { stripGithubPagesSpaRedirectScript } from './scripts/lib/stripGithubPagesScripts.ts'
 const mediaCdnOrigin = parseMediaOriginFromAssetBaseUrl(
   process.env.VITE_PUBLIC_ASSET_BASE_URL ?? ''
 )
 const contentSecurityPolicy = buildContentSecurityPolicy(
   mediaCdnOrigin != null ? [mediaCdnOrigin] : []
 )
+
+function stripGithubPagesScriptForTimewebPlugin(): Plugin {
+  const base = process.env.VITE_BASE_PATH?.trim() || '/vkraynosti/'
+  const isTimeweb = !base || base === '/'
+
+  return {
+    name: 'strip-github-pages-spa-script',
+    apply: 'build',
+    transformIndexHtml(html) {
+      if (!isTimeweb) {
+        return html
+      }
+      return stripGithubPagesSpaRedirectScript(html)
+    },
+  }
+}
 
 function pruneDistForCdnPlugin(): Plugin {
   return {
@@ -62,6 +79,7 @@ export default defineConfig({
   plugins: [
     react(),
     injectContentSecurityPolicyPlugin(contentSecurityPolicy),
+    stripGithubPagesScriptForTimewebPlugin(),
     pruneDistForCdnPlugin(),
   ],
   server: {

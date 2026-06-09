@@ -11,11 +11,12 @@ import {
 } from './lib/ogShellTelegramImage.ts';
 
 const OG_TEST_ROUTE = '/og-test';
+const TELEGRAM_OG_TEST_ROUTE = '/og-test-telegram-20260610';
 
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
 
-const DIMENSION_SAMPLE_ROUTES = ['/', '/tours/summer/summer-10', OG_TEST_ROUTE];
+const DIMENSION_SAMPLE_ROUTES = ['/', '/tours/summer/summer-10', OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
 
 const DEFAULT_SITE_URL = 'https://mrdudekowski.github.io/vkraynosti';
 
@@ -255,7 +256,7 @@ const assertRoute = async (
 
 const run = async (): Promise<void> => {
   const expectedOrigin = resolveExpectedSiteOrigin();
-  const routes = [...(await getIndexableRoutePaths(rootDir)), OG_TEST_ROUTE];
+  const routes = [...(await getIndexableRoutePaths(rootDir)), OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
 
   for (const routePath of routes) {
     const checkDimensions = DIMENSION_SAMPLE_ROUTES.includes(routePath);

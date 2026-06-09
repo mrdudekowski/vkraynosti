@@ -10,6 +10,10 @@ import {
   OG_SHELL_IMAGE_WIDTH,
   isJpegOgImagePath,
 } from './ogShellTelegramImage.ts';
+import {
+  isTimewebAppBuild,
+  stripGithubPagesSpaRedirectScript,
+} from './stripGithubPagesScripts.ts';
 
 export const escapeHtml = (text: string): string =>
   text
@@ -91,5 +95,8 @@ export const injectOgShellIntoHtml = (templateHtml: string, meta: OgShellMeta): 
   );
   html = ensureOgHtmlPrefix(html);
   html = stripOgShellMetaFromHead(html);
+  if (isTimewebAppBuild()) {
+    html = stripGithubPagesSpaRedirectScript(html);
+  }
   return html.replace('</head>', `${renderOgShellHead(normalizedMeta)}\n  </head>`);
 };

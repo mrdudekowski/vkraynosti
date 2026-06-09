@@ -23,7 +23,7 @@
     "verify:prerender": "node scripts/verify-prerender.mjs",
     "og:shells": "tsx scripts/generate-og-shells.ts",
     "verify:og-shells": "tsx scripts/verify-og-shells.ts",
-    "build:deploy": "npm run build && npm run og:shells",
+    "build:deploy": "npm run generate:sitemap && npm run generate:robots && npm run build && npm run og:shells",
     "generate:banner-loops": "node scripts/generate-home-season-banner-loop-videos.cjs --posters",
     "generate:spring-clips": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-spring-2-3-tour-videos.ps1",
     "generate:winter-3-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-3-grid-assets.ps1",

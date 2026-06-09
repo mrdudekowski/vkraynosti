@@ -1,5 +1,27 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+describe('getCanonicalUrl', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('adds trailing slash for tour pages', async () => {
+    vi.stubEnv('VITE_SITE_URL', 'https://example.com');
+    vi.resetModules();
+    const { getCanonicalUrl } = await import('./seo');
+    expect(getCanonicalUrl('/tours/summer/summer-10')).toBe(
+      'https://example.com/tours/summer/summer-10/',
+    );
+  });
+
+  it('keeps root canonical URL', async () => {
+    vi.stubEnv('VITE_SITE_URL', 'https://example.com');
+    vi.resetModules();
+    const { getCanonicalUrl } = await import('./seo');
+    expect(getCanonicalUrl('/')).toBe('https://example.com/');
+  });
+});
+
 describe('getAbsoluteOgImageUrl', () => {
   afterEach(() => {
     vi.unstubAllEnvs();

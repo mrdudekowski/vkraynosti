@@ -1,4 +1,5 @@
 import { CONTACTS, SITE_URL } from './contacts';
+import { buildCanonicalUrl } from './canonicalUrl';
 import { IMAGES } from './images';
 import { resolveMediaAssetUrl } from './publicAssetBase';
 import { ROUTES, buildTourDetailPath } from './routes';
@@ -22,7 +23,7 @@ export interface SeoEntry {
 const SITE_NAME = 'Вкрайности' as const;
 const TWITTER_CARD_TYPE = 'summary_large_image' as const;
 
-export const getCanonicalUrl = (path: string): string => `${SITE_URL}${path}`;
+export const getCanonicalUrl = (path: string): string => buildCanonicalUrl(SITE_URL, path);
 
 /** Logical path under `public/` for OG shell assets (no CDN origin). */
 export const resolveOgShellLogicalImagePath = (pathOrUrl: string): string => {

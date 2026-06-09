@@ -8,6 +8,7 @@ import {
   writeOgShellAssetManifest,
 } from './copyOgShellAssets.ts';
 import { patch404OgShell } from './patch404OgShell.ts';
+import { generateOgTestShell, OG_TEST_IMAGE_LOGICAL } from './generateOgTestShell.ts';
 import { injectOgShellIntoHtml } from './renderOgShellHead.ts';
 import { resolveOgShellMeta } from './resolveOgShellMeta.ts';
 
@@ -36,6 +37,8 @@ export async function runGenerateOgShells(): Promise<void> {
   process.stdout.write(`OG shells: ${routes.length} routes\n`);
   const resolvedPathByRequested = await copyOgShellAssets(distDir, rootDir, logicalPaths);
   const materializedPaths = [...new Set(resolvedPathByRequested.values())];
+  await generateOgTestShell(distDir, rootDir);
+  materializedPaths.push(OG_TEST_IMAGE_LOGICAL);
   await writeOgShellAssetManifest(distDir, materializedPaths);
 
   for (const { routePath, meta } of routeMetas) {

@@ -1,6 +1,7 @@
 import { getTourById } from '../../src/data/toursData.ts';
 import { IMAGES } from '../../src/constants/images.ts';
 import { ROUTES } from '../../src/constants/routes.ts';
+import { normalizeMetaContent } from '../../src/constants/metaContent.ts';
 import {
   SEO_DEFAULTS,
   getSeasonSeoEntry,
@@ -30,8 +31,8 @@ const TOUR_DETAIL_PATH_PATTERN = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)
 export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
   if (routePath === ROUTES.HOME) {
     return {
-      title: SEO_DEFAULTS.home.title,
-      description: SEO_DEFAULTS.home.description,
+      title: normalizeMetaContent(SEO_DEFAULTS.home.title),
+      description: normalizeMetaContent(SEO_DEFAULTS.home.description),
       path: SEO_DEFAULTS.home.path,
       robots: SEO_DEFAULTS.robots,
       imagePathOrUrl: IMAGES.seasonSection.summer,
@@ -40,8 +41,8 @@ export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
 
   if (routePath === ROUTES.SAFETY) {
     return {
-      title: SEO_DEFAULTS.safety.title,
-      description: SEO_DEFAULTS.safety.description,
+      title: normalizeMetaContent(SEO_DEFAULTS.safety.title),
+      description: normalizeMetaContent(SEO_DEFAULTS.safety.description),
       path: SEO_DEFAULTS.safety.path,
       robots: SEO_DEFAULTS.robots,
       imagePathOrUrl: IMAGES.seasonSection.summer,
@@ -50,8 +51,8 @@ export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
 
   if (routePath === ROUTES.PRIVACY) {
     return {
-      title: SEO_DEFAULTS.privacy.title,
-      description: SEO_DEFAULTS.privacy.description,
+      title: normalizeMetaContent(SEO_DEFAULTS.privacy.title),
+      description: normalizeMetaContent(SEO_DEFAULTS.privacy.description),
       path: SEO_DEFAULTS.privacy.path,
       robots: SEO_DEFAULTS.robots,
       imagePathOrUrl: IMAGES.seasonSection.summer,
@@ -62,8 +63,8 @@ export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
   if (seasonKey != null) {
     const seoEntry = getSeasonSeoEntry(seasonKey, routePath);
     return {
-      title: seoEntry.title,
-      description: seoEntry.description,
+      title: normalizeMetaContent(seoEntry.title),
+      description: normalizeMetaContent(seoEntry.description),
       path: seoEntry.path,
       robots: SEO_DEFAULTS.robots,
       imagePathOrUrl: IMAGES.seasonSection[seasonKey],
@@ -82,8 +83,8 @@ export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
     }
     const seoEntry = getTourSeoEntry(tour);
     return {
-      title: seoEntry.title,
-      description: seoEntry.description,
+      title: normalizeMetaContent(seoEntry.title),
+      description: normalizeMetaContent(seoEntry.description),
       path: seoEntry.path,
       robots: SEO_DEFAULTS.robots,
       imagePathOrUrl: tour.imageUrl,

@@ -22,7 +22,7 @@
     "prerender": "node scripts/prerender-dist.mjs",
     "verify:prerender": "node scripts/verify-prerender.mjs",
     "og:shells": "tsx scripts/generate-og-shells.ts",
-    "verify:og-shells": "node scripts/verify-og-shells.mjs",
+    "verify:og-shells": "tsx scripts/verify-og-shells.ts",
     "build:deploy": "npm run build && npm run og:shells",
     "generate:banner-loops": "node scripts/generate-home-season-banner-loop-videos.cjs --posters",
     "generate:spring-clips": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-spring-2-3-tour-videos.ps1",

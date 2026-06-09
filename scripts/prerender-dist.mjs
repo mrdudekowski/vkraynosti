@@ -46,14 +46,48 @@ async function waitForPreviewReady(url, timeoutMs = 60_000) {
   throw new Error(`Preview server not ready at ${url}`);
 }
 
+const PREVIEW_STOP_GRACE_MS = 3_000;
+
+/** SIGTERM → wait → SIGKILL so CI does not hang on open stdio pipes. */
+async function stopPreviewServer(child) {
+  if (!child || child.killed) return;
+
+  child.stdout?.destroy();
+  child.stderr?.destroy();
+
+  await new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+
+    const forceTimer = setTimeout(() => {
+      if (!child.killed) {
+        child.kill('SIGKILL');
+      }
+      finish();
+    }, PREVIEW_STOP_GRACE_MS);
+
+    child.once('exit', () => {
+      clearTimeout(forceTimer);
+      finish();
+    });
+
+    child.kill('SIGTERM');
+  });
+}
+
 function startPreviewServer() {
+  const viteBin = resolve(rootDir, 'node_modules/vite/bin/vite.js');
+
   return new Promise((resolvePromise, reject) => {
     const child = spawn(
-      'npm',
-      ['run', 'preview', '--', '--host', previewHost, '--port', String(previewPort), '--strictPort'],
+      process.execPath,
+      [viteBin, 'preview', '--host', previewHost, '--port', String(previewPort), '--strictPort'],
       {
         cwd: rootDir,
-        shell: true,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: { ...process.env },
       },
@@ -67,12 +101,7 @@ function startPreviewServer() {
       process.stdout.write(chunk);
     });
 
-    resolvePromise({
-      child,
-      stop: () => {
-        if (!child.killed) child.kill('SIGTERM');
-      },
-    });
+    resolvePromise({ child });
   });
 }
 
@@ -163,16 +192,14 @@ const run = async () => {
   const routes = [...allRoutes.filter((route) => route !== '/'), '/'];
   const previewBaseUrl = buildPreviewBaseUrl();
 
-  let child = null;
-  let stop = () => {};
+  let previewChild = null;
   try {
     try {
       await waitForPreviewReady(previewBaseUrl, 2_000);
       process.stdout.write(`Reusing preview server at ${previewBaseUrl}\n`);
     } catch {
       const server = await startPreviewServer();
-      child = server.child;
-      stop = server.stop;
+      previewChild = server.child;
       await waitForPreviewReady(previewBaseUrl);
     }
     process.stdout.write(`Prerender preview: ${previewBaseUrl} (${routes.length} routes)\n`);
@@ -203,9 +230,7 @@ const run = async () => {
     await patch404Shell();
     process.stdout.write(`Prerender complete: ${routes.length} routes\n`);
   } finally {
-    if (child) {
-      stop();
-    }
+    await stopPreviewServer(previewChild);
   }
 };
 

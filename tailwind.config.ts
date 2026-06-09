@@ -84,7 +84,11 @@ import {
 } from './src/constants/breakpoints'
 import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
 import { TOUR_CARD_SKELETON_SHIMMER_MS } from './src/constants/tourCardSkeletonShimmer'
-import { SAFETY_STATUS_CHECKBOX_GROW_MS, SAFETY_STATUS_STACK_EXPAND_MS } from './src/constants/safetyStatusRotation'
+import {
+  SAFETY_STATUS_CHECKBOX_GROW_MS,
+  SAFETY_STATUS_FADE_MS,
+  SAFETY_STATUS_STACK_EXPAND_MS,
+} from './src/constants/safetyStatusRotation'
 import {
   getSafetyStatusStackHeightRem,
   SAFETY_STATUS_STACK_LINE_COUNT_MAX,
@@ -165,9 +169,9 @@ const MOBILE_NAV_DURATION = '320ms' as const
 const KEYFRAME_FADE_UP_Y = '1.5rem' as const
 /** Согласовано с `spacing.keyframe-slide-in-x` и keyframes `slide-in`. */
 const KEYFRAME_SLIDE_IN_X = '-1.25rem' as const
-/** Въезд плашки #safety справа налево; синхронно с `SAFETY_STATUS_FADE_MS` (360ms). */
+/** Въезд плашки #safety справа налево; синхронно с `SAFETY_STATUS_FADE_MS`. */
 const KEYFRAME_SAFETY_PLAQUE_ENTER_X = '1.25rem' as const
-const SAFETY_STATUS_PLAQUE_ENTER_DURATION = '360ms' as const
+const SAFETY_STATUS_PLAQUE_ENTER_DURATION = `${SAFETY_STATUS_FADE_MS}ms` as const
 /** 6×`height.safety-status-plaque` + 5×`gap.safety-status-stack` — фикс. высота колонок #safety. */
 const SAFETY_STATUS_STACK_HEIGHT = getSafetyStatusStackHeightRem(
   SAFETY_STATUS_STACK_LINE_COUNT_MAX

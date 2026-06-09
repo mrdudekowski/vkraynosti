@@ -1,20 +1,23 @@
 /** Фаза opacity для fade-in новой плашки в стеке #safety. */
 export type SafetyStatusFadePhase = 'visible' | 'hidden';
 
-/** Интервал появления следующей плашки в стеке #safety, мс (было 4000). */
-export const SAFETY_STATUS_ROTATION_MS = 1000 as const;
+/** Полное раскрытие стека из 6 плашек, мс (5 интервалов × 400 ms). */
+export const SAFETY_STATUS_STACK_REVEAL_TOTAL_MS = 2000 as const;
+
+/** Интервал появления следующей плашки в стеке #safety, мс. */
+export const SAFETY_STATUS_ROTATION_MS = 400 as const;
 
 /** Длительность fade out / fade in при смене статуса, мс. */
-export const SAFETY_STATUS_FADE_MS = 360 as const;
+export const SAFETY_STATUS_FADE_MS = 150 as const;
 
 /** За сколько мс до следующей плашки начинается анимация «нажатия» чекбокса. */
-export const SAFETY_STATUS_CHECK_LEAD_MS = 700 as const;
+export const SAFETY_STATUS_CHECK_LEAD_MS = 280 as const;
 
 /** Интервал опроса фазы чекбокса активной плашки, мс. */
 export const SAFETY_STATUS_CHECKBOX_TICK_MS = 50 as const;
 
 /** Рост чекбокса `pulsing` → `committing`; синхронно с `transitionDuration.safety-checkbox-grow`. */
-export const SAFETY_STATUS_CHECKBOX_GROW_MS = 400 as const;
+export const SAFETY_STATUS_CHECKBOX_GROW_MS = 160 as const;
 
 /** Рост высоты стека на mobile; синхронно с въездом плашки (`SAFETY_STATUS_FADE_MS`). */
 export const SAFETY_STATUS_STACK_EXPAND_MS = SAFETY_STATUS_FADE_MS;

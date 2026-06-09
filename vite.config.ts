@@ -17,6 +17,7 @@ const contentSecurityPolicy = buildContentSecurityPolicy(
 function pruneDistForCdnPlugin(): Plugin {
   return {
     name: 'prune-dist-for-cdn',
+    apply: 'build',
     closeBundle() {
       const distDir = path.resolve(process.cwd(), 'dist')
       const { pruned } = pruneDistForCdnFromLib(distDir)

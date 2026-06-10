@@ -90,14 +90,20 @@ describe('slug validation', () => {
 });
 
 describe('sitemap and OG-shell route generation', () => {
-  it('includes slug path for summer-10 and excludes legacy id from public list', () => {
+  it('uses slug paths for all tours and excludes legacy id URLs', () => {
     const publicPaths = getTourPublicSeoPaths();
     expect(publicPaths).toContain('/tours/summer/robinzonada-v-rayone-tryokhi');
+    expect(publicPaths).toContain('/tours/spring/voskhozhdenie-na-lysovogo-deda');
+    expect(publicPaths).toContain('/tours/fall/osen-voskhozhdenie-na-pidan');
     expect(publicPaths).not.toContain('/tours/summer/summer-10');
-    expect(publicPaths).toContain('/tours/spring/spring-1');
+    expect(publicPaths).not.toContain('/tours/spring/spring-1');
+    expect(publicPaths).toHaveLength(TOURS.length);
   });
 
-  it('lists legacy redirect paths separately', () => {
-    expect(getTourLegacyRedirectPaths()).toEqual(['/tours/summer/summer-10']);
+  it('lists legacy redirect path for every tour with slug', () => {
+    const legacyPaths = getTourLegacyRedirectPaths();
+    expect(legacyPaths).toContain('/tours/summer/summer-10');
+    expect(legacyPaths).toContain('/tours/spring/spring-1');
+    expect(legacyPaths).toHaveLength(TOURS.length);
   });
 });

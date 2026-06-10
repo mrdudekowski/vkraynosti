@@ -25,53 +25,52 @@ export function extractStaticRoutes(routesSource) {
     .filter((path) => !path.includes(':'));
 }
 
-const TOUR_BLOCK_PATTERN =
-  /id:\s*'([^']+)'([\s\S]*?)season:\s*'(winter|spring|summer|fall)'/g;
+const TOUR_SLUG_ENTRY_PATTERN =
+  /^\s+'((?:winter|spring|summer|fall)-\d+)':\s*'([^']+)',?\s*$/gm;
 
-/** Public tour paths from toursData.ts (slug when present, otherwise id). */
-export function extractTourPublicUrlsFromCore(toursSource) {
-  const blocks = [...toursSource.matchAll(TOUR_BLOCK_PATTERN)];
-  return blocks.map(([, id, body, season]) => {
-    const slugMatch = /slug:\s*'([^']+)'/.exec(body);
-    return `/tours/${season}/${slugMatch?.[1] ?? id}`;
-  });
-}
-
-/** Legacy id paths for tours that define slug (redirect shells only). */
-export function extractLegacyTourRedirectUrls(toursSource) {
-  const blocks = [...toursSource.matchAll(TOUR_BLOCK_PATTERN)];
-  return blocks
-    .filter(([, , body]) => /slug:\s*'([^']+)'/.test(body))
-    .map(([, id, , season]) => `/tours/${season}/${id}`);
-}
-
-export function extractFallTourUrls(fallImagesSource) {
-  const arrayMatch = /const FALL_TOUR_IDS = \[([\s\S]*?)\] as const/.exec(fallImagesSource);
-  if (!arrayMatch) {
-    throw new Error('FALL_TOUR_IDS not found in fallTourImages.ts');
+/** tour.id → slug from `src/data/tourSlugs.ts` (SSOT for sitemap / OG shells). */
+export function parseTourSlugMap(tourSlugsSource) {
+  const map = new Map();
+  for (const [, tourId, slug] of tourSlugsSource.matchAll(TOUR_SLUG_ENTRY_PATTERN)) {
+    map.set(tourId, slug);
   }
-  const ids = [...arrayMatch[1].matchAll(/'(fall-\d+)'/g)].map((match) => match[1]);
-  return ids.map((id) => `/tours/fall/${id}`);
+  return map;
+}
+
+function seasonFromTourId(tourId) {
+  return tourId.split('-')[0];
+}
+
+/** Public tour paths from `tourSlugs.ts`. */
+export function extractTourPublicUrlsFromSlugMap(tourSlugsSource) {
+  const slugMap = parseTourSlugMap(tourSlugsSource);
+  return [...slugMap.entries()].map(
+    ([tourId, slug]) => `/tours/${seasonFromTourId(tourId)}/${slug}`,
+  );
+}
+
+/** Legacy id paths for tours with slug (redirect shells only). */
+export function extractLegacyTourRedirectUrls(tourSlugsSource) {
+  const slugMap = parseTourSlugMap(tourSlugsSource);
+  return [...slugMap.entries()].map(
+    ([tourId]) => `/tours/${seasonFromTourId(tourId)}/${tourId}`,
+  );
 }
 
 export async function loadSeoRouteSources(rootDir = process.cwd()) {
   const read = (filePath) => readFile(resolve(rootDir, filePath), 'utf8');
-  const [routesSource, toursSource, fallImagesSource] = await Promise.all([
+  const [routesSource, tourSlugsSource] = await Promise.all([
     read('src/constants/routes.ts'),
-    read('src/data/toursData.ts'),
-    read('src/constants/fallTourImages.ts'),
+    read('src/data/tourSlugs.ts'),
   ]);
-  return { routesSource, toursSource, fallImagesSource };
+  return { routesSource, tourSlugsSource };
 }
 
 /** Indexable SPA paths (same set as sitemap, excluding 404 wildcard). */
 export async function getIndexableRoutePaths(rootDir = process.cwd()) {
-  const { routesSource, toursSource, fallImagesSource } = await loadSeoRouteSources(rootDir);
+  const { routesSource, tourSlugsSource } = await loadSeoRouteSources(rootDir);
   const staticRoutes = extractStaticRoutes(routesSource);
-  const tourRoutes = [
-    ...extractTourPublicUrlsFromCore(toursSource),
-    ...extractFallTourUrls(fallImagesSource),
-  ];
+  const tourRoutes = extractTourPublicUrlsFromSlugMap(tourSlugsSource);
 
   return [
     ...new Set([
@@ -83,8 +82,8 @@ export async function getIndexableRoutePaths(rootDir = process.cwd()) {
 }
 
 export async function getTourLegacyRedirectPaths(rootDir = process.cwd()) {
-  const { toursSource } = await loadSeoRouteSources(rootDir);
-  return extractLegacyTourRedirectUrls(toursSource);
+  const { tourSlugsSource } = await loadSeoRouteSources(rootDir);
+  return extractLegacyTourRedirectUrls(tourSlugsSource);
 }
 
 export function routePathToDistFile(routePath, distDir) {

@@ -123,6 +123,7 @@ import { UI } from '../constants/ui';
 import { SUMMER_TOUR_DISPLAY_ORDER } from '../constants/summerTourDisplayOrder';
 import { sortToursByDisplayOrder } from '../utils/sortToursByDisplayOrder';
 import { buildFallToursFromSpring } from './createFallTourFromSpring';
+import { applyTourSlugs } from './tourSlugs';
 import { createSummerTourStub } from './createSummerTourStub';
 import { buildSummerToursFromSpring } from './createSummerTourFromSpring';
 
@@ -1273,7 +1274,6 @@ const TOURS_CORE: Tour[] = [
   },
   {
     id: 'summer-10',
-    slug: 'robinzonada-v-rayone-tryokhi',
     season: 'summer',
     title: 'Робинзонада в районе Трёхи',
     subtitle:
@@ -1548,7 +1548,7 @@ const TOURS_BEFORE_FALL: Tour[] = [
 
 const FALL_TOURS = buildFallToursFromSpring(springTours, FALL_TOUR_MEDIA_BY_ID);
 
-export const TOURS: Tour[] = [...TOURS_BEFORE_FALL, ...FALL_TOURS];
+export const TOURS: Tour[] = applyTourSlugs([...TOURS_BEFORE_FALL, ...FALL_TOURS]);
 
 export const getToursBySeason = (season: Tour['season']): Tour[] =>
   TOURS.filter(t => t.season === season);

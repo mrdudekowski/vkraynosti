@@ -49,7 +49,7 @@ export const SAFETY_STATUS_PLAQUE_SHELL_CLASS =
 export const SAFETY_SECTION_GRID_CLASS =
   'grid grid-cols-1 items-start gap-6 sm:grid-cols-2 sm:items-stretch' as const;
 
-/** Колонка hero: в DOM ниже стека (mobile); `sm:order-1` — слева на desktop (`max-sm:order` в теме не работает). */
+/** Колонка hero: в DOM первая (mobile — сверху); `sm:order-1` — слева на desktop. */
 export const SAFETY_SECTION_HERO_COLUMN_CLASS =
   'flex h-auto min-h-0 w-full flex-col items-center sm:order-1 sm:h-safety-status-stack sm:min-h-safety-status-stack sm:items-stretch' as const;
 
@@ -61,6 +61,6 @@ export const SAFETY_TEASER_HERO_OVERLAY_CLASS =
 export const SAFETY_TEASER_HERO_CARD_CLASS =
   'card-base relative block w-full max-w-tour-card mx-auto overflow-hidden text-center no-underline text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary sm:mx-0 sm:h-full sm:h-safety-status-stack sm:w-full sm:max-w-none' as const;
 
-/** Колонка плашек: в DOM первая (mobile); `sm:order-2` — справа на desktop. */
+/** Колонка плашек: в DOM вторая (mobile — снизу); `sm:order-2` — справа на desktop. */
 export const SAFETY_SECTION_STACK_COLUMN_CLASS =
   'flex h-auto min-h-0 w-full flex-col sm:order-2 sm:h-safety-status-stack sm:min-h-safety-status-stack' as const;

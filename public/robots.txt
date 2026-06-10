@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mrdudekowski-vkraynosti-61ea.twc1.net/sitemap.xml
+Sitemap: https://vkraynosti.ru/sitemap.xml

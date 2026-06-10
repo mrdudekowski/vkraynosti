@@ -1,5 +1,5 @@
-/** Default canonical origin (GitHub Pages) until VITE_SITE_URL is set for TimeWeb cutover. */
-export const DEFAULT_SITE_URL = 'https://mrdudekowski.github.io/vkraynosti' as const;
+/** Default canonical origin (prod) when VITE_SITE_URL is unset. */
+export const DEFAULT_SITE_URL = 'https://vkraynosti.ru' as const;
 
 /** Production/staging site origin for SEO, OG, sitemap (override via VITE_SITE_URL). */
 export const SITE_URL =

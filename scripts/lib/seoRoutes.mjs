@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-const DEFAULT_SITE_URL = 'https://mrdudekowski.github.io/vkraynosti';
+const DEFAULT_SITE_URL = 'https://vkraynosti.ru';
 
 /** Same rules as src/constants/siteUrl.ts + vite base for cutover. */
 export function resolveSiteRoot(env = process.env) {

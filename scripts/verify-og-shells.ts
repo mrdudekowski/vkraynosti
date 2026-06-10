@@ -18,7 +18,7 @@ const distDir = resolve(rootDir, 'dist');
 
 const DIMENSION_SAMPLE_ROUTES = ['/', '/tours/summer/summer-10', OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
 
-const DEFAULT_SITE_URL = 'https://mrdudekowski.github.io/vkraynosti';
+const DEFAULT_SITE_URL = 'https://vkraynosti.ru';
 
 const REQUIRED_SINGLE_TAGS = [
   'property="og:title"',

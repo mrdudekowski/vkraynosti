@@ -19,6 +19,10 @@ export interface Tour {
    * When omitted, public URL falls back to `id` until migrated.
    */
   slug?: string;
+  /**
+   * Stable SEO/OG description (≤120 chars). Overrides auto-generated text from subtitle.
+   */
+  seoDescription?: string;
   season: 'winter' | 'spring' | 'summer' | 'fall';
   title: string;
   subtitle: string;

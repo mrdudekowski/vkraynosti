@@ -4,6 +4,7 @@ import { IMAGES } from './images';
 import { resolveMediaAssetUrl } from './publicAssetBase';
 import { ROUTES } from './routes';
 import { getTourPublicPath } from './tourUrls';
+import { TOUR_SEO_DESCRIPTION_BY_ID } from '../data/tourSeoDescriptions';
 import type { Season, Tour } from '../types';
 import { UI } from './ui';
 import {
@@ -11,6 +12,7 @@ import {
   resolveTourDifficultyLabel,
 } from '../utils/tourDifficultyLabel';
 import type { TourPublicationStatus } from '../types/tourSchedule';
+import { finalizeMetaDescription } from './metaContent';
 
 export type RobotsDirective = 'index,follow' | 'noindex,nofollow' | 'noindex,follow';
 
@@ -23,6 +25,11 @@ export interface SeoEntry {
 
 const SITE_NAME = 'Вкрайности' as const;
 const TWITTER_CARD_TYPE = 'summary_large_image' as const;
+
+const finalizeSeoFields = (entry: Omit<SeoEntry, 'path'>): Omit<SeoEntry, 'path'> => ({
+  ...entry,
+  description: finalizeMetaDescription(entry.description),
+});
 
 export const getCanonicalUrl = (path: string): string => buildCanonicalUrl(SITE_URL, path);
 
@@ -59,7 +66,6 @@ export const getAbsoluteOgImageUrl = (pathOrUrl: string): string => {
   }
   const origin = SITE_URL.replace(/\/+$/, '');
   let assetPath = resolved.startsWith('/') ? resolved : `/${resolved}`;
-  // SITE_URL already ends with /vkraynosti; media paths include APP base — avoid doubling.
   if (assetPath.startsWith('/vkraynosti/') && origin.endsWith('/vkraynosti')) {
     assetPath = assetPath.slice('/vkraynosti'.length) || '/';
   }
@@ -67,26 +73,26 @@ export const getAbsoluteOgImageUrl = (pathOrUrl: string): string => {
 };
 
 const SEASON_META_BY_KEY: Record<Season, Omit<SeoEntry, 'path'>> = {
-  winter: {
+  winter: finalizeSeoFields({
     title: 'Зимние поездки Приморья — сопки и море | Вкрайности',
     description:
-      'Зима из Владивостока: снежные сопки, ледяное побережье и уютные выезды по Приморью. Маршруты для разного уровня подготовки с опытными гидами.',
-  },
-  spring: {
+      'Зимние выезды из Владивостока: сопки, ледяное море и маршруты разной сложности с гидами и снаряжением.',
+  }),
+  spring: finalizeSeoFields({
     title: 'Весенние поездки Приморья — Пидан, Сестра, Аскольд | Вкрайности',
     description:
-      'Весна из Владивостока: Лысый Дед, Пидан, Сестра, Аскольд, Шкота, Гамова и другие маршруты Приморья. От лёгких однодневных до многодневных походов.',
-  },
-  summer: {
+      'Весенние поездки из Владивостока: Пидан, Сестра, Аскольд, Шкота, Гамова и другие маршруты Приморья.',
+  }),
+  summer: finalizeSeoFields({
     title: 'Летние поездки Приморья — заповедное побережье | Вкрайности',
     description:
-      'Лето из Владивостока: Тачингоуза, Краббе, Пляж Трёх границ, Ежовая, Сестра, Неожиданный, Аскольд, Шкота, Гамова и другие маршруты Приморья.',
-  },
-  fall: {
+      'Летние поездки из Владивостока: заповедное побережье, бухты, острова и морские маршруты Приморья.',
+  }),
+  fall: finalizeSeoFields({
     title: 'Осенние поездки Приморья — те же маршруты, что весной | Вкрайности',
     description:
-      'Осень из Владивостока: Лысый Дед, Пидан, Сестра, Аскольд, Шкота, Гамова и другие весенние маршруты — в осеннем каталоге с отдельными обложками.',
-  },
+      'Осенние маршруты из Владивостока: весенние треки в осенних красках, с отдельными обложками туров.',
+  }),
 };
 
 export const SEO_DEFAULTS = {
@@ -94,25 +100,33 @@ export const SEO_DEFAULTS = {
   twitterCard: TWITTER_CARD_TYPE,
   robots: 'index,follow' as RobotsDirective,
   home: {
-    title: 'Вкрайности — Поездки по Приморью из Владивостока',
-    description:
-      'Авторские поездки по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.',
+    ...finalizeSeoFields({
+      title: 'Вкрайности — Поездки по Приморью из Владивостока',
+      description:
+        'Поездки по Приморью из Владивостока: сопки, море и заповедные маршруты. Четыре сезона выездов с гидами.',
+    }),
     path: ROUTES.HOME,
   } satisfies SeoEntry,
   safety: {
-    title: 'Безопасность в наших походах | Вкрайности',
-    description:
-      'Как мы обеспечиваем безопасность: профессиональное снаряжение, GPS-навигация, врач в каждой группе, спутниковая связь и план эвакуации.',
+    ...finalizeSeoFields({
+      title: 'Безопасность в наших походах | Вкрайности',
+      description:
+        'Безопасность в походах: снаряжение, GPS, связь, врач в группе и план эвакуации. «Вкрайности».',
+    }),
     path: ROUTES.SAFETY,
   } satisfies SeoEntry,
   privacy: {
-    title: UI.privacyPage.metaTitle,
-    description: UI.privacyPage.metaDescription,
+    ...finalizeSeoFields({
+      title: UI.privacyPage.metaTitle,
+      description: UI.privacyPage.metaDescription,
+    }),
     path: ROUTES.PRIVACY,
   } satisfies SeoEntry,
   notFound: {
-    title: UI.notFoundPage.metaTitle,
-    description: UI.notFoundPage.description,
+    ...finalizeSeoFields({
+      title: UI.notFoundPage.metaTitle,
+      description: UI.notFoundPage.description,
+    }),
     path: ROUTES.HOME,
     robots: 'noindex,nofollow' as RobotsDirective,
   } satisfies SeoEntry,
@@ -129,29 +143,41 @@ export interface TourSeoDurationOptions {
   publicationStatus?: TourPublicationStatus;
 }
 
-export const getTourSeoEntry = (
+const buildTourSeoDescriptionDraft = (
   tour: Tour,
-  options?: TourSeoDurationOptions
-): SeoEntry => {
-  const publicationStatus = options?.publicationStatus ?? 'active';
-  const metaSnippet =
-    publicationStatus === 'in_development'
-    ? UI.tourDetail.programInDevelopment
-    : tour.program
-        .slice(0, 3)
-        .map(step => step.description)
-        .join(', ');
+  publicationStatus: TourPublicationStatus,
+): string => {
+  const explicit =
+    tour.seoDescription?.trim() ?? TOUR_SEO_DESCRIPTION_BY_ID[tour.id]?.trim();
+  if (explicit != null && explicit.length > 0) {
+    return explicit;
+  }
+
+  if (publicationStatus === 'in_development') {
+    return UI.tourDetail.programInDevelopment;
+  }
 
   const seasonLabel = UI.seasons[tour.season].label;
-  const durationSnippet = options?.displayDuration?.trim();
-  const durationPart =
-    durationSnippet != null && durationSnippet.length > 0
-      ? `${durationSnippet}, `
-      : '';
+  const pricePart = tour.price.trim();
+  const core = pricePart.length > 0
+    ? `${seasonLabel}: ${tour.subtitle}. ${pricePart}.`
+    : `${seasonLabel}: ${tour.subtitle}.`;
+
+  return core;
+};
+
+export const getTourSeoEntry = (
+  tour: Tour,
+  options?: TourSeoDurationOptions,
+): SeoEntry => {
+  const publicationStatus = options?.publicationStatus ?? 'active';
+  const description = finalizeMetaDescription(
+    buildTourSeoDescriptionDraft(tour, publicationStatus),
+  );
 
   return {
-    title: `${tour.title} — ${seasonLabel} | ${SITE_NAME}`,
-    description: `${seasonLabel}: ${tour.subtitle}. ${durationPart}${tour.price}. ${metaSnippet}.`,
+    title: `${tour.title} — ${UI.seasons[tour.season].label} | ${SITE_NAME}`,
+    description,
     path: getTourPublicPath(tour),
   };
 };
@@ -206,7 +232,7 @@ export const getTourBreadcrumbSchema = (tour: Tour) => {
 
 export const getTourStructuredData = (
   tour: Tour,
-  options?: TourSeoDurationOptions
+  options?: TourSeoDurationOptions,
 ) => {
   const seoEntry = getTourSeoEntry(tour, options);
 

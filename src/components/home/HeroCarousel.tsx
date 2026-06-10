@@ -58,7 +58,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
     <>
       {tours.map((tour, idx) => {
         const isActive = idx === current;
-        const shouldLoadBackground = visitedSlideIndices.has(idx);
+        const shouldLoadBackground = isActive || visitedSlideIndices.has(idx);
         return (
           <CarouselSlide
             key={tour.id}

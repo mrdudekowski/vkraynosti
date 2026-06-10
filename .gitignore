@@ -76,6 +76,7 @@ public/safety/*
 # Markdown outside repo root (README.md at / is allowed)
 **/*.md
 !/*.md
+!TimeWebDoc/vkraynosti-ru-domain-cutover.md
 
 # Template / temporary project artifacts
 /pred-plan.md

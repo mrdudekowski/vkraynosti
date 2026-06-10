@@ -120,6 +120,8 @@ import {
 import { FALL_TOUR_MEDIA_BY_ID } from '../constants/generated/fallTourMedia.generated';
 import { SUMMER_PAIRED_TOUR_MEDIA_BY_ID } from '../constants/generated/summerPairedTourMedia.generated';
 import { UI } from '../constants/ui';
+import { SUMMER_TOUR_DISPLAY_ORDER } from '../constants/summerTourDisplayOrder';
+import { sortToursByDisplayOrder } from '../utils/sortToursByDisplayOrder';
 import { buildFallToursFromSpring } from './createFallTourFromSpring';
 import { createSummerTourStub } from './createSummerTourStub';
 import { buildSummerToursFromSpring } from './createSummerTourFromSpring';
@@ -1533,14 +1535,10 @@ const SUMMER_PAIRED_TOURS = buildSummerToursFromSpring(
   SUMMER_PAIRED_TOUR_MEDIA_BY_ID
 );
 
-function summerTourSortKey(tour: Tour): number {
-  return Number.parseInt(tour.id.replace('summer-', ''), 10);
-}
-
-const summerTours = [
-  ...TOURS_CORE.filter((tour) => tour.season === 'summer'),
-  ...SUMMER_PAIRED_TOURS,
-].sort((a, b) => summerTourSortKey(a) - summerTourSortKey(b));
+const summerTours = sortToursByDisplayOrder(
+  [...TOURS_CORE.filter((tour) => tour.season === 'summer'), ...SUMMER_PAIRED_TOURS],
+  SUMMER_TOUR_DISPLAY_ORDER,
+);
 
 const TOURS_BEFORE_FALL: Tour[] = [
   ...TOURS_CORE.filter((tour) => tour.season !== 'summer'),

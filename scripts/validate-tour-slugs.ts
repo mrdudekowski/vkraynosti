@@ -1,8 +1,9 @@
 import { setupOgShellBuildEnv } from './lib/ogShellEnv.ts';
-import { TOURS } from '../src/data/toursData.ts';
-import { validateTourSlugs } from '../src/constants/tourUrls.ts';
 
 setupOgShellBuildEnv();
+
+const { TOURS } = await import('../src/data/toursData.ts');
+const { validateTourSlugs } = await import('../src/constants/tourUrls.ts');
 
 try {
   validateTourSlugs(TOURS);

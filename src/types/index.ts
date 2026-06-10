@@ -14,6 +14,11 @@ export interface TourIncludedItem {
 
 export interface Tour {
   id: string;
+  /**
+   * Stable public URL segment (`/tours/{season}/{slug}/`). Explicit field — not derived from title.
+   * When omitted, public URL falls back to `id` until migrated.
+   */
+  slug?: string;
   season: 'winter' | 'spring' | 'summer' | 'fall';
   title: string;
   subtitle: string;

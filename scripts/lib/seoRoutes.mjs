@@ -25,9 +25,24 @@ export function extractStaticRoutes(routesSource) {
     .filter((path) => !path.includes(':'));
 }
 
-export function extractTourUrlsFromCore(toursSource) {
-  const matches = [...toursSource.matchAll(/id:\s*'([^']+)'.*?season:\s*'(winter|spring|summer)'/gs)];
-  return matches.map(([, id, season]) => `/tours/${season}/${id}`);
+const TOUR_BLOCK_PATTERN =
+  /id:\s*'([^']+)'([\s\S]*?)season:\s*'(winter|spring|summer|fall)'/g;
+
+/** Public tour paths from toursData.ts (slug when present, otherwise id). */
+export function extractTourPublicUrlsFromCore(toursSource) {
+  const blocks = [...toursSource.matchAll(TOUR_BLOCK_PATTERN)];
+  return blocks.map(([, id, body, season]) => {
+    const slugMatch = /slug:\s*'([^']+)'/.exec(body);
+    return `/tours/${season}/${slugMatch?.[1] ?? id}`;
+  });
+}
+
+/** Legacy id paths for tours that define slug (redirect shells only). */
+export function extractLegacyTourRedirectUrls(toursSource) {
+  const blocks = [...toursSource.matchAll(TOUR_BLOCK_PATTERN)];
+  return blocks
+    .filter(([, , body]) => /slug:\s*'([^']+)'/.test(body))
+    .map(([, id, , season]) => `/tours/${season}/${id}`);
 }
 
 export function extractFallTourUrls(fallImagesSource) {
@@ -54,9 +69,10 @@ export async function getIndexableRoutePaths(rootDir = process.cwd()) {
   const { routesSource, toursSource, fallImagesSource } = await loadSeoRouteSources(rootDir);
   const staticRoutes = extractStaticRoutes(routesSource);
   const tourRoutes = [
-    ...extractTourUrlsFromCore(toursSource),
+    ...extractTourPublicUrlsFromCore(toursSource),
     ...extractFallTourUrls(fallImagesSource),
   ];
+
   return [
     ...new Set([
       ...(staticRoutes.includes('/') ? [] : ['/']),
@@ -66,11 +82,16 @@ export async function getIndexableRoutePaths(rootDir = process.cwd()) {
   ];
 }
 
+export async function getTourLegacyRedirectPaths(rootDir = process.cwd()) {
+  const { toursSource } = await loadSeoRouteSources(rootDir);
+  return extractLegacyTourRedirectUrls(toursSource);
+}
+
 export function routePathToDistFile(routePath, distDir) {
   const normalized = routePath.startsWith('/') ? routePath : `/${routePath}`;
   if (normalized === '/') {
     return resolve(distDir, 'index.html');
   }
-  const segments = normalized.replace(/^\//, '').split('/');
+  const segments = normalized.replace(/^\//, '').replace(/\/+$/, '').split('/');
   return resolve(distDir, ...segments, 'index.html');
 }

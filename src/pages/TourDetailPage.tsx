@@ -1,9 +1,11 @@
 import { useParams, Link, Navigate } from "react-router-dom";
-import { getTourById } from "../data/toursData";
+import { findTourBySeasonAndSegment } from "../data/tourLookup";
 import {
   ROUTES,
   buildTourDetailPath,
+  getTourPublicPath,
 } from "../constants/routes";
+import { shouldRedirectLegacyTourUrl } from "../constants/tourUrls";
 import { SEO_DEFAULTS } from "../constants/seo";
 import { UI } from "../constants/ui";
 import PageMeta from "../components/shared/PageMeta";
@@ -19,11 +21,14 @@ import TourDetailPageFull from "./TourDetailPageFull";
 import TourDetailPageInDevelopment from "./TourDetailPageInDevelopment";
 
 const TourDetailPage = () => {
-  const { season = "", tourId = "" } = useParams<{
+  const { season = "", tourId: tourSegment = "" } = useParams<{
     season: string;
     tourId: string;
   }>();
-  const tour = getTourById(tourId);
+  const tour =
+    season.length > 0 && tourSegment.length > 0
+      ? findTourBySeasonAndSegment(season as Season, tourSegment)
+      : undefined;
   const { publicationStatuses, status: scheduleStatus, retry } = useTourSchedule();
   const scheduleLoaded = scheduleStatus === 'success';
   const publicationStatus =
@@ -37,13 +42,17 @@ const TourDetailPage = () => {
     enabled: tour != null && scheduleLoaded && !isHidden,
   });
 
+  if (tour && shouldRedirectLegacyTourUrl(tour, tourSegment)) {
+    return <Navigate replace to={getTourPublicPath(tour)} />;
+  }
+
   if (tour && scheduleStatus === 'loading') {
     return (
       <>
         <PageMeta
           title={`${SEO_DEFAULTS.siteName}`}
           description={UI.tourDetail.loadingPublicationCatalog}
-          path={buildTourDetailPath(tour.season, tour.id)}
+          path={getTourPublicPath(tour)}
           robots="noindex,nofollow"
         />
         <div
@@ -63,7 +72,7 @@ const TourDetailPage = () => {
         <PageMeta
           title={`${UI.tourDetail.notFound} | ${SEO_DEFAULTS.siteName}`}
           description={UI.tourDetail.scheduleLoadError}
-          path={buildTourDetailPath(tour.season, tour.id)}
+          path={getTourPublicPath(tour)}
           robots="noindex,nofollow"
         />
         <div className="min-h-screen flex items-center justify-center">
@@ -82,10 +91,10 @@ const TourDetailPage = () => {
   }
 
   if (!tour || isHidden) {
-    const notFoundBody = UI.tourDetail.notFoundWithId.replace("{id}", tourId);
+    const notFoundBody = UI.tourDetail.notFoundWithId.replace("{id}", tourSegment);
     const notFoundPath =
-      season.length > 0 && tourId.length > 0
-        ? buildTourDetailPath(season as Season, tourId)
+      season.length > 0 && tourSegment.length > 0
+        ? buildTourDetailPath(season as Season, tourSegment)
         : ROUTES.HOME;
 
     return (
@@ -112,7 +121,7 @@ const TourDetailPage = () => {
   }
 
   if (season !== tour.season) {
-    return <Navigate replace to={buildTourDetailPath(tour.season, tour.id)} />;
+    return <Navigate replace to={getTourPublicPath(tour)} />;
   }
 
   if (publicationStatus === 'in_development') {

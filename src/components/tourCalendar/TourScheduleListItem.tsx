@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { buildTourDetailPath } from '../../constants/routes';
+import { getTourPublicPath } from '../../constants/routes';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import type { Season } from '../../types';
@@ -36,7 +36,7 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
 
   return (
     <Link
-      to={buildTourDetailPath(season, tour.id)}
+      to={getTourPublicPath(tour)}
       className="group flex items-center gap-3 rounded-card border border-divider bg-surface-light/95 p-3 shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
       prefetch="intent"
     >

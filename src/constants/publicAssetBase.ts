@@ -1,17 +1,19 @@
 /** Legacy GitHub Pages deploy prefix — strip when resolving logical media paths. */
 const LEGACY_DEPLOY_PREFIX = '/vkraynosti/';
 
+import { readViteEnv } from './readViteEnv';
+
 export function normalizeAssetBase(base: string): string {
   return base.endsWith('/') ? base : `${base}/`;
 }
 
 function resolveAppAssetBase(): string {
-  const viteBase = import.meta.env.BASE_URL ?? '/';
+  const viteBase = readViteEnv('BASE_URL') ?? '/';
   return normalizeAssetBase(viteBase);
 }
 
 function resolveMediaAssetBase(appBase: string): string {
-  const external = import.meta.env.VITE_PUBLIC_ASSET_BASE_URL?.trim();
+  const external = readViteEnv('VITE_PUBLIC_ASSET_BASE_URL');
   if (external) {
     return normalizeAssetBase(external);
   }

@@ -1,7 +1,11 @@
-import { getTourById } from '../../src/data/toursData.ts';
+import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
 import { IMAGES } from '../../src/constants/images.ts';
 import { ROUTES } from '../../src/constants/routes.ts';
 import { normalizeMetaContent } from '../../src/constants/metaContent.ts';
+import {
+  getTourPublicPath,
+  isLegacyTourUrlSegment,
+} from '../../src/constants/tourUrls.ts';
 import {
   SEO_DEFAULTS,
   getSeasonSeoEntry,
@@ -73,19 +77,21 @@ export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
 
   const tourMatch = TOUR_DETAIL_PATH_PATTERN.exec(routePath);
   if (tourMatch != null) {
-    const [, season, tourId] = tourMatch;
-    const tour = getTourById(tourId);
+    const [, season, segment] = tourMatch;
+    const tour = findTourBySeasonAndSegment(season as Season, segment);
     if (tour == null) {
-      throw new Error(`Unknown tour id for OG shell: ${tourId} (${routePath})`);
+      throw new Error(`Unknown tour segment for OG shell: ${segment} (${routePath})`);
     }
     if (tour.season !== season) {
       throw new Error(`Tour season mismatch for OG shell: ${routePath}`);
     }
     const seoEntry = getTourSeoEntry(tour);
+    const publicPath = getTourPublicPath(tour);
     return {
       title: normalizeMetaContent(seoEntry.title),
       description: normalizeMetaContent(seoEntry.description),
       path: seoEntry.path,
+      canonicalPath: isLegacyTourUrlSegment(tour, segment) ? publicPath : undefined,
       robots: SEO_DEFAULTS.robots,
       imagePathOrUrl: tour.imageUrl,
     };

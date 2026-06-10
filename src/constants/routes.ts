@@ -1,4 +1,13 @@
 import type { Season } from '../types';
+import { normalizeCanonicalPath } from './canonicalUrl';
+import type { TourUrlSource } from './tourUrls';
+import { getTourPublicPath } from './tourUrls';
+
+export {
+  getLegacyTourPath,
+  getTourCanonicalUrl,
+  getTourPublicPath,
+} from './tourUrls';
 
 /** Должен совпадать с `id` секции «Команда» на главной (`TeamHeroSection`). */
 export const HOME_SECTION_TEAM = 'team' as const;
@@ -30,5 +39,13 @@ export const SEASON_TO_LIST_ROUTE: Record<Season, string> = {
   fall:   ROUTES.FALL,
 };
 
-export const buildTourDetailPath = (season: string, tourId: string): string =>
-  `/tours/${season}/${tourId}`;
+/**
+ * Build a tour page path from season + URL segment (slug or id).
+ * Prefer {@link getTourPublicPath} with a tour object for public links.
+ */
+export const buildTourDetailPath = (season: string, segment: string): string =>
+  normalizeCanonicalPath(`/tours/${season}/${segment}`);
+
+/** Public tour page path from catalog entry. */
+export const buildTourPublicPath = (tour: TourUrlSource): string =>
+  getTourPublicPath(tour);

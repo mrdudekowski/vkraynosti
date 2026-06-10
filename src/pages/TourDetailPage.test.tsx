@@ -1,13 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import { HelmetProvider } from 'react-helmet-async';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import TourDetailPage from './TourDetailPage';
 import { ModalProvider } from '../context/ModalContext';
 import { TourScheduleContext } from '../context/tour-schedule-context-definition';
 import { getTourById } from '../data/toursData';
 import { UI } from '../constants/ui';
-import { buildTourDetailPath } from '../constants/routes';
+import {
+  getLegacyTourPath,
+  getTourPublicPath,
+} from '../constants/tourUrls';
+
+const LocationDisplay = () => {
+  const { pathname } = useLocation();
+  return <div data-testid="location">{pathname}</div>;
+};
 
 const scheduleContextValue = {
   status: 'success' as const,
@@ -17,30 +25,50 @@ const scheduleContextValue = {
   durationTypes: new Map(),
   publicationStatuses: new Map([
     ['spring-1', 'active' as const],
+    ['summer-10', 'active' as const],
     ['summer-13', 'in_development' as const],
   ]),
   error: null,
   retry: vi.fn(),
 };
 
-const renderTourDetailPage = (tourId: string) => {
-  const tour = getTourById(tourId);
-  if (!tour) throw new Error(`tour ${tourId} missing`);
-
-  return render(
+const renderTourDetailAtPath = (initialPath: string) =>
+  render(
     <HelmetProvider>
       <TourScheduleContext.Provider value={scheduleContextValue}>
         <ModalProvider>
-          <MemoryRouter initialEntries={[buildTourDetailPath(tour.season, tour.id)]}>
+          <MemoryRouter initialEntries={[initialPath]}>
+            <LocationDisplay />
             <Routes>
               <Route path="/tours/:season/:tourId" element={<TourDetailPage />} />
             </Routes>
           </MemoryRouter>
         </ModalProvider>
       </TourScheduleContext.Provider>
-    </HelmetProvider>
+    </HelmetProvider>,
   );
+
+const renderTourDetailPage = (tourId: string) => {
+  const tour = getTourById(tourId);
+  if (!tour) throw new Error(`tour ${tourId} missing`);
+  return renderTourDetailAtPath(getTourPublicPath(tour));
 };
+
+describe('TourDetailPage slug routing', () => {
+  it('opens summer-10 by slug URL', () => {
+    renderTourDetailAtPath('/tours/summer/robinzonada-v-rayone-tryokhi/');
+    expect(screen.getByTestId('tour-detail-main')).toBeInTheDocument();
+  });
+
+  it('redirects legacy id URL to slug URL', () => {
+    const tour = getTourById('summer-10');
+    if (!tour) throw new Error('summer-10 missing');
+
+    renderTourDetailAtPath(getLegacyTourPath(tour));
+
+    expect(screen.getByTestId('location')).toHaveTextContent(getTourPublicPath(tour));
+  });
+});
 
 describe('TourDetailPage hidden', () => {
   it('shows not found for hidden tour after schedule loaded', () => {
@@ -57,7 +85,7 @@ describe('TourDetailPage hidden', () => {
           }}
         >
           <ModalProvider>
-            <MemoryRouter initialEntries={[buildTourDetailPath(tour.season, tour.id)]}>
+            <MemoryRouter initialEntries={[getTourPublicPath(tour)]}>
               <Routes>
                 <Route path="/tours/:season/:tourId" element={<TourDetailPage />} />
               </Routes>

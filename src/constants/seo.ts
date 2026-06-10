@@ -2,7 +2,8 @@ import { CONTACTS, SITE_URL } from './contacts';
 import { buildCanonicalUrl } from './canonicalUrl';
 import { IMAGES } from './images';
 import { resolveMediaAssetUrl } from './publicAssetBase';
-import { ROUTES, buildTourDetailPath } from './routes';
+import { ROUTES } from './routes';
+import { getTourPublicPath } from './tourUrls';
 import type { Season, Tour } from '../types';
 import { UI } from './ui';
 import {
@@ -151,7 +152,7 @@ export const getTourSeoEntry = (
   return {
     title: `${tour.title} — ${seasonLabel} | ${SITE_NAME}`,
     description: `${seasonLabel}: ${tour.subtitle}. ${durationPart}${tour.price}. ${metaSnippet}.`,
-    path: buildTourDetailPath(tour.season, tour.id),
+    path: getTourPublicPath(tour),
   };
 };
 
@@ -175,7 +176,7 @@ export const WEBSITE_SCHEMA = {
 export const getTourBreadcrumbSchema = (tour: Tour) => {
   const season = UI.seasons[tour.season];
   const seasonPath = `/tours/${tour.season}`;
-  const tourPath = buildTourDetailPath(tour.season, tour.id);
+  const tourPath = getTourPublicPath(tour);
 
   return {
     '@context': 'https://schema.org',

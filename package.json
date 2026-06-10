@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && tsx scripts/validate-tour-slugs.ts && vite build",
     "lint": "eslint .",
     "audit": "npm audit",
     "audit:tailwind-safelist": "node scripts/audit-tailwind-safelist.mjs",
@@ -17,7 +17,7 @@
     "preview": "vite preview",
     "seo:baseline": "node scripts/seo-baseline-audit.mjs",
     "seo:check": "node scripts/seo-check.mjs",
-    "generate:sitemap": "node scripts/generate-sitemap.mjs",
+    "generate:sitemap": "tsx scripts/generate-sitemap.ts",
     "generate:robots": "node scripts/generate-robots.mjs",
     "prerender": "node scripts/prerender-dist.mjs",
     "verify:prerender": "node scripts/verify-prerender.mjs",

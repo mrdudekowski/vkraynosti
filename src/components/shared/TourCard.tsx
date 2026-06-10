@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { KeyboardEvent } from 'react';
 import type { Tour } from '../../types';
-import { buildTourDetailPath } from '../../constants/routes';
+import { getTourPublicPath } from '../../constants/routes';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import { UI } from '../../constants/ui';
 import { resolveTourDifficultyLabel } from '../../utils/tourDifficultyLabel';
@@ -141,7 +141,7 @@ const TourCardComponent = ({ tour, onClick, compact = false, priorityImage = fal
   if (!onClick) {
     return (
       <Link
-        to={buildTourDetailPath(tour.season, tour.id)}
+        to={getTourPublicPath(tour)}
         className="card-base flex h-full w-full max-h-tour-card max-w-tour-card flex-col justify-self-center cursor-pointer no-underline text-inherit"
         prefetch="intent"
       >

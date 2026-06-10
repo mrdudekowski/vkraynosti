@@ -1273,6 +1273,7 @@ const TOURS_CORE: Tour[] = [
   },
   {
     id: 'summer-10',
+    slug: 'robinzonada-v-rayone-tryokhi',
     season: 'summer',
     title: 'Робинзонада в районе Трёхи',
     subtitle:

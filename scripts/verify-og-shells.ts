@@ -1,9 +1,13 @@
+import { setupOgShellBuildEnv } from './lib/ogShellEnv.ts';
+
+setupOgShellBuildEnv();
+
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { isNormalizedMetaContent } from '../src/constants/metaContent.ts';
 import { normalizeCanonicalPath } from '../src/constants/canonicalUrl.ts';
-import { getIndexableRoutePaths, routePathToDistFile } from './lib/seoRoutes.mjs';
+import { getIndexableRoutePaths, getTourLegacyRedirectPaths, routePathToDistFile } from './lib/seoRoutes.mjs';
 import {
   OG_SHELL_IMAGE_HEIGHT,
   OG_SHELL_IMAGE_WIDTH,
@@ -16,7 +20,12 @@ const TELEGRAM_OG_TEST_ROUTE = '/og-test-telegram-20260610';
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
 
-const DIMENSION_SAMPLE_ROUTES = ['/', '/tours/summer/summer-10', OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
+const DIMENSION_SAMPLE_ROUTES = [
+  '/',
+  '/tours/summer/robinzonada-v-rayone-tryokhi',
+  OG_TEST_ROUTE,
+  TELEGRAM_OG_TEST_ROUTE,
+];
 
 const DEFAULT_SITE_URL = 'https://vkraynosti.ru';
 
@@ -254,6 +263,40 @@ const assertRoute = async (
   }
 };
 
+const assertLegacyRedirectShell = async (
+  legacyPath: string,
+  expectedCanonicalPath: string,
+  expectedOrigin: string,
+): Promise<void> => {
+  const html = await readHtml(legacyPath);
+  const errors: string[] = [];
+  const canonical = extractCanonicalHref(html);
+
+  if (canonical == null) {
+    errors.push('missing canonical');
+  } else {
+    const canonicalPath = normalizeCanonicalPath(new URL(canonical).pathname);
+    if (canonicalPath !== normalizeCanonicalPath(expectedCanonicalPath)) {
+      errors.push(`canonical mismatch: expected ${expectedCanonicalPath}, got ${canonicalPath}`);
+    }
+    if (new URL(canonical).origin !== expectedOrigin) {
+      errors.push(`canonical origin mismatch: ${canonical}`);
+    }
+  }
+
+  if (/<meta\s+property="og:url"/i.test(html)) {
+    errors.push('legacy shell must not include og:url');
+  }
+
+  if (!/<meta\s+http-equiv="refresh"/i.test(html)) {
+    errors.push('missing meta refresh redirect');
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`${legacyPath}: ${errors.join(', ')}`);
+  }
+};
+
 const run = async (): Promise<void> => {
   const expectedOrigin = resolveExpectedSiteOrigin();
   const routes = [...(await getIndexableRoutePaths(rootDir)), OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
@@ -264,7 +307,29 @@ const run = async (): Promise<void> => {
     process.stdout.write(`[PASS] og-shell meta ${routePath}\n`);
   }
 
-  process.stdout.write(`OG shell verification passed (${routes.length} routes).\n`);
+  for (const legacyPath of await getTourLegacyRedirectPaths(rootDir)) {
+    const match = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)$/.exec(legacyPath);
+    if (match == null) {
+      throw new Error(`Invalid legacy path: ${legacyPath}`);
+    }
+    const [, season, segment] = match;
+    const { findTourBySeasonAndSegment } = await import('../src/data/tourLookup.ts');
+    const { getTourPublicPath } = await import('../src/constants/tourUrls.ts');
+    const tour = findTourBySeasonAndSegment(
+      season as 'winter' | 'spring' | 'summer' | 'fall',
+      segment,
+    );
+    if (tour == null) {
+      throw new Error(`Tour not found for legacy path: ${legacyPath}`);
+    }
+    await assertLegacyRedirectShell(legacyPath, getTourPublicPath(tour), expectedOrigin);
+    process.stdout.write(`[PASS] legacy redirect shell ${legacyPath}\n`);
+  }
+
+  const legacyCount = (await getTourLegacyRedirectPaths(rootDir)).length;
+  process.stdout.write(
+    `OG shell verification passed (${routes.length} public + ${legacyCount} legacy routes).\n`,
+  );
 };
 
 run().catch((error) => {

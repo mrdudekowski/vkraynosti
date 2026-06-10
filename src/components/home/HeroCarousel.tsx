@@ -8,7 +8,7 @@ import { useScrollScrubFade } from '../../hooks/useScrollScrubFade';
 import CarouselSlide from '../shared/CarouselSlide';
 import { UI } from '../../constants/ui';
 import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
-import { buildTourDetailPath } from '../../constants/routes';
+import { getTourPublicPath } from '../../constants/routes';
 import { BREAKPOINT_LG_PX } from '../../constants/reveal';
 import { resolveContentSourceTourId } from '../../data/seasonTourRegistry';
 import { resolveTourHeroCoverBackgroundPosition } from '../../constants/tourCoverCropByCanonicalId';
@@ -80,7 +80,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
           >
             <div className="flex w-full max-w-home-hero-phrase mx-auto justify-center px-12 pb-24 sm:px-8 md:px-6 lg:px-home-hero-carousel-text-gutter-x">
               <Link
-                to={buildTourDetailPath(tour.season, tour.id)}
+                to={getTourPublicPath(tour)}
                 className="text-center group flex min-w-0 w-full max-w-full flex-col items-center gap-hero-phrase-cta-gap"
                 tabIndex={idx === current ? 0 : -1}
                 aria-label={`${tour.title}. ${UI.hero.viewTour}`}

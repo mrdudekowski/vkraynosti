@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom';
+import LegalPdfLink from '../legal/LegalPdfLink';
 import { COOKIE_BANNER_ICON } from '../../constants/images';
-import { ROUTES } from '../../constants/routes';
 import { UI } from '../../constants/ui';
 import { useCookieConsent } from '../../context/useCookieConsent';
 
@@ -41,13 +40,12 @@ const CookieConsentBanner = () => {
               >
                 {copy.essentialOnlyLabel}
               </button>
-              <Link
-                to={ROUTES.PRIVACY}
+              <LegalPdfLink
+                documentId="personal-data-policy"
                 className="text-sm text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover underline-offset-2 hover:underline"
-                prefetch="intent"
               >
                 {copy.privacyLinkLabel}
-              </Link>
+              </LegalPdfLink>
             </div>
           </div>
         </div>

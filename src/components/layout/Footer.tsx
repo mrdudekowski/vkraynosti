@@ -11,7 +11,9 @@ import {
   FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS,
 } from '../../constants/footerContact';
 import { LEGAL_ENTITY } from '../../constants/legalEntity';
+import { LEGAL_DOCUMENTS_FOOTER } from '../../constants/legalDocuments';
 import { ROUTES } from '../../constants/routes';
+import LegalPdfLink from '../legal/LegalPdfLink';
 import { useCookieConsent } from '../../context/useCookieConsent';
 import { toSafeExternalHttpHref, toSafeMailtoHref, toSafePhoneHref } from '../../utils/safeHref';
 import type { Season } from '../../types';
@@ -54,6 +56,29 @@ const Footer = () => {
             </p>
             <p>{LEGAL_ENTITY.legalAddress}</p>
           </div>
+          <h4 className="font-normal text-text-inverse mt-6 mb-3">{UI.footer.documentsHeading}</h4>
+          <ul className="flex flex-col gap-2">
+            {LEGAL_DOCUMENTS_FOOTER.map((doc) => (
+              <li key={doc.id}>
+                {doc.id === 'offer-and-safety' ? (
+                  <Link
+                    to={ROUTES.SAFETY}
+                    className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
+                    prefetch="intent"
+                  >
+                    {doc.title}
+                  </Link>
+                ) : (
+                  <LegalPdfLink
+                    documentId={doc.id}
+                    className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm underline-offset-2 hover:underline"
+                  >
+                    {doc.title}
+                  </LegalPdfLink>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Quick links */}
@@ -149,13 +174,6 @@ const Footer = () => {
           >
             {UI.footer.cookieSettings}
           </button>
-          <Link
-            to={ROUTES.PRIVACY}
-            className="text-text-inverse/40 hover:text-text-inverse text-sm transition-colors duration-hover"
-            prefetch="intent"
-          >
-            {UI.footer.privacy}
-          </Link>
         </div>
       </div>
     </div>

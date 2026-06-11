@@ -2,14 +2,13 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { createPortal } from 'react-dom';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
+import LegalPdfLink from '../legal/LegalPdfLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner';
 import { faTimes } from '@fortawesome/free-solid-svg-icons/faTimes';
 import type { Season, TourRequestModalPayload } from '../../types';
 import { useModal } from '../../context/useModal';
 import { UI } from '../../constants/ui';
-import { ROUTES } from '../../constants/routes';
 import {
   TOUR_REQUEST_MODAL_PANEL_ENTER_CLASS,
   TOUR_REQUEST_MODAL_STEP_ACTIVE_CLASS,
@@ -539,15 +538,21 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                           *
                         </span>{' '}
                         {UI.tourRequestModal.privacyPrefix}
-                        <Link
-                          to={ROUTES.PRIVACY}
+                        <LegalPdfLink
+                          documentId="personal-data-policy"
                           className="text-brand-primary underline underline-offset-2 hover:brightness-110 transition-all duration-hover"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={e => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          {UI.tourRequestModal.privacyLink}
-                        </Link>
+                          {UI.tourRequestModal.privacyPolicyLink}
+                        </LegalPdfLink>
+                        {UI.tourRequestModal.privacyMiddle}
+                        <LegalPdfLink
+                          documentId="personal-data-consent"
+                          className="text-brand-primary underline underline-offset-2 hover:brightness-110 transition-all duration-hover"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {UI.tourRequestModal.privacyConsentLink}
+                        </LegalPdfLink>
                         {UI.tourRequestModal.privacySuffix}
                       </label>
                     </div>

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && tsx scripts/validate-tour-slugs.ts && vite build",
+    "build:safety-offer-content": "node scripts/build-safety-offer-content.mjs",
     "lint": "eslint .",
     "audit": "npm audit",
     "audit:tailwind-safelist": "node scripts/audit-tailwind-safelist.mjs",

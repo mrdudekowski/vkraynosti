@@ -8,6 +8,7 @@ interface TourRequestLeadPayload extends TourRequestFormValues {
   tourId: string;
   tourTitle?: string;
   season?: string;
+  tourDuration?: string;
   sourceUrl: string;
   submittedAt: string;
   userAgent: string;
@@ -73,9 +74,7 @@ const createIdempotencyKey = () => {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 };
 
-const getTourTitle = (tour: TourRequestModalPayload) => {
-  return [tour.title, tour.subtitle].filter(Boolean).join(' — ');
-};
+const getTourTitle = (tour: TourRequestModalPayload) => tour.title.trim();
 
 /** Канонический URL страницы тура (slug), не legacy id и не query/hash текущей вкладки. */
 const resolveLeadSourceUrl = (tour: TourRequestModalPayload): string => {
@@ -104,6 +103,7 @@ const buildLeadPayload = (
     tourId: tour.tourId,
     tourTitle: getTourTitle(tour),
     season: tour.season,
+    ...(tour.tourDuration != null ? { tourDuration: tour.tourDuration } : {}),
     sourceUrl: resolveLeadSourceUrl(tour),
     submittedAt: new Date().toISOString(),
     userAgent: navigator.userAgent,

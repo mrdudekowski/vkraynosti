@@ -27,7 +27,9 @@ const BentoBlockRenderer = ({
 }: BentoBlockRendererProps) => {
   const placements = BENTO_SLOT_PLACEMENTS[block.type];
   const gridClassName =
-    block.type === 'bento-single' ? BENTO_SINGLE_BLOCK_GRID_CLASS : BENTO_BLOCK_GRID_CLASS;
+    block.type === 'bento-single' || block.type === 'bento-wide-square'
+      ? BENTO_SINGLE_BLOCK_GRID_CLASS
+      : BENTO_BLOCK_GRID_CLASS;
 
   return (
     <div className={gridClassName}>

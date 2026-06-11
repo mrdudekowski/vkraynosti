@@ -69,7 +69,7 @@ describe('sendTourRequestLead', () => {
       ...values,
       idempotencyKey: 'lead-idempotency-key',
       tourId: tour.tourId,
-      tourTitle: 'Мараловая ферма — Парк Драконов',
+      tourTitle: 'Мараловая ферма',
       season: tour.season,
       sourceUrl: 'https://vkraynosti.ru/tours/spring/maraly-i-drakony/',
       userAgent: 'vitest-user-agent',

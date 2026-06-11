@@ -10,6 +10,7 @@ export const BENTO_BLOCK_TYPES = [
   'bento-center-bottom',
   'bento-four',
   'bento-single',
+  'bento-wide-square',
   'bento-vert',
 ] as const;
 
@@ -22,6 +23,7 @@ const BENTO_BLOCK_SLOT_COUNTS: Record<BentoBlockType, number> = {
   'bento-center-bottom': 3,
   'bento-four': 4,
   'bento-single': 1,
+  'bento-wide-square': 1,
   'bento-vert': 2,
 };
 

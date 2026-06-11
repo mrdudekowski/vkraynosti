@@ -67,6 +67,13 @@ describe('BENTO_SLOT_PLACEMENTS snapshot', () => {
     );
   });
 
+  it('bento-wide-square — legacy full-width square', () => {
+    expectSameTailwindTokens(
+      getBentoSlotTileClassName(BENTO_SLOT_PLACEMENTS['bento-wide-square'][0]),
+      BENTO_LEGACY_TILE_CLASS_ALIASES.fullWidthSquare
+    );
+  });
+
   it('bento-center-top — wide 2×1 + два квадрата снизу', () => {
     const placements = BENTO_SLOT_PLACEMENTS['bento-center-top'];
     const wideTopTokens = tailwindTokenSet(getBentoSlotTileClassName(placements[0]));
@@ -121,6 +128,9 @@ describe('BENTO_SLOT_PLACEMENTS snapshot', () => {
         "bento-vert": [
           "col-start-1 row-span-2 row-start-1 h-full min-h-0 w-full aspect-gallery-bento-tall",
           "col-start-2 row-span-2 row-start-1 h-full min-h-0 w-full aspect-gallery-bento-tall",
+        ],
+        "bento-wide-square": [
+          "col-span-2 w-full min-w-0 aspect-square",
         ],
       }
     `);

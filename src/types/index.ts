@@ -1,5 +1,6 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import type { TourBentoGalleryLayout } from './tourBento';
+import type { TourScheduleDurationType } from './tourSchedule';
 
 export interface TourProgramStep {
   timeLabel: string;
@@ -108,7 +109,7 @@ export interface SafetyItem {
 
 export type Season = 'winter' | 'spring' | 'summer' | 'fall';
 
-export type { TourDepartureDateIso } from './tourSchedule';
+export type { TourDepartureDateIso, TourScheduleDurationType } from './tourSchedule';
 
 /** Данные тура для формы заявки (без полного объекта Tour). */
 export interface TourRequestModalPayload {
@@ -116,6 +117,8 @@ export interface TourRequestModalPayload {
   title: string;
   subtitle?: string;
   season?: Season;
+  /** Каталог расписания: однодневный / многодневный (для Telegram-заявки). */
+  tourDuration?: TourScheduleDurationType;
   /** Уже выбранная дата выезда (страница тура / повторное открытие). */
   preferredDepartureDateIso?: string;
 }

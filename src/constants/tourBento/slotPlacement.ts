@@ -6,6 +6,7 @@ import {
   GALLERY_GRID_BENTO_RIGHT_TOP_SQUARE,
   GALLERY_GRID_BENTO_TALL_LEFT,
   GALLERY_GRID_BENTO_TALL_RIGHT,
+  GALLERY_GRID_FULL_WIDTH_SQUARE,
   GALLERY_GRID_FULL_WIDTH_TILE_2X1,
   GALLERY_GRID_FULL_WIDTH_TILE_2X2,
   GALLERY_GRID_SQUARE_TILE,
@@ -56,6 +57,12 @@ const fullBlock: BentoSlotPlacement = {
   aspectClass: 'aspect-gallery-tile-2x2',
 };
 
+/** Одна плитка на всю ширину 2 col, квадрат 1:1 (legacy `GALLERY_GRID_FULL_WIDTH_SQUARE`). */
+const wideSquareBlock: BentoSlotPlacement = {
+  gridClass: 'col-span-2 w-full min-w-0',
+  aspectClass: 'aspect-square',
+};
+
 /** SSOT: тип блока → размещение слотов 1…n (порядок как на схемах в docs). */
 export const BENTO_SLOT_PLACEMENTS: Record<
   BentoBlockType,
@@ -84,6 +91,7 @@ export const BENTO_SLOT_PLACEMENTS: Record<
     square('col-start-2 row-start-2 w-full min-h-0'),
   ],
   'bento-single': [fullBlock],
+  'bento-wide-square': [wideSquareBlock],
   'bento-vert': [tallLeft, tallRight],
 };
 
@@ -106,4 +114,5 @@ export const BENTO_LEGACY_TILE_CLASS_ALIASES = {
   square: GALLERY_GRID_SQUARE_TILE,
   wide2x1: GALLERY_GRID_FULL_WIDTH_TILE_2X1,
   wide2x2: GALLERY_GRID_FULL_WIDTH_TILE_2X2,
+  fullWidthSquare: GALLERY_GRID_FULL_WIDTH_SQUARE,
 } as const;

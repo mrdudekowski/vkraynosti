@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   TOUR_SPRING_4_GALLERY_GRID,
+  TOUR_SPRING_5_GALLERY_GRID,
+  TOUR_SPRING_6_GALLERY_GRID,
   TOUR_SPRING_11_GALLERY_GRID,
   TOUR_SPRING_12_GALLERY_GRID,
   TOUR_SPRING_13_GALLERY_GRID,
@@ -11,6 +13,8 @@ import {
 } from '../../constants/images';
 import {
   buildSpring4SestraBentoLayout,
+  buildSpring5ChitindzuBentoLayout,
+  buildSpring6MaralyDrakonyBentoLayout,
   buildSpring11ShkotaBentoLayout,
   buildSpring12TobizinaBentoLayout,
   buildSpring13GamovaBentoLayout,
@@ -123,6 +127,46 @@ describe('flattenBentoSlotsToUrls', () => {
     ]);
     expect(flat).toHaveLength(12);
   });
+
+  it('обходит blocks → slots в порядке схемы spring-5 (Читинза)', () => {
+    const gridImages = TOUR_SPRING_5_GALLERY_GRID.slice(2);
+    const layout = buildSpring5ChitindzuBentoLayout([...gridImages]);
+    const flat = flattenBentoSlotsToUrls(layout);
+    expect(flat).toEqual([
+      gridImages[0],
+      gridImages[4],
+      gridImages[5],
+      gridImages[2],
+      gridImages[3],
+      gridImages[4],
+      gridImages[6],
+      gridImages[1],
+      gridImages[7],
+      gridImages[8],
+      gridImages[9],
+    ]);
+    expect(flat).toHaveLength(11);
+  });
+
+  it('обходит blocks → slots в порядке схемы spring-6 (Маралы х Драконы)', () => {
+    const gridImages = TOUR_SPRING_6_GALLERY_GRID.slice(2);
+    const layout = buildSpring6MaralyDrakonyBentoLayout([...gridImages]);
+    const flat = flattenBentoSlotsToUrls(layout);
+    expect(flat).toEqual([
+      gridImages[6],
+      gridImages[5],
+      gridImages[7],
+      gridImages[1],
+      gridImages[2],
+      gridImages[3],
+      gridImages[4],
+      gridImages[0],
+      gridImages[8],
+      gridImages[9],
+      gridImages[10],
+    ]);
+    expect(flat).toHaveLength(11);
+  });
 });
 
 describe('resolveTourBentoLayout', () => {
@@ -144,6 +188,64 @@ describe('resolveTourBentoLayout', () => {
     expect(flattenBentoSlotsToUrls(fallLayout!)).toHaveLength(11);
     expect(fallLayout!.blocks.map(b => b.type)).toEqual(
       springLayout!.blocks.map(b => b.type)
+    );
+  });
+
+  it('spring-5 и fall-5 (contentSource) получают layout', () => {
+    const spring = getTourById('spring-5');
+    const fall = getTourById('fall-5');
+    expect(spring).toBeDefined();
+    expect(fall).toBeDefined();
+
+    const springGrid = spring!.galleryGridUrls!.slice(2);
+    const fallGrid = fall!.galleryGridUrls!.slice(2);
+
+    const springLayout = resolveTourBentoLayout(spring!, springGrid);
+    const fallLayout = resolveTourBentoLayout(fall!, fallGrid);
+
+    expect(springLayout).toBeDefined();
+    expect(fallLayout).toBeDefined();
+    expect(flattenBentoSlotsToUrls(springLayout!)).toHaveLength(11);
+    expect(flattenBentoSlotsToUrls(fallLayout!)).toHaveLength(11);
+    expect(fallLayout!.blocks.map((b) => b.type)).toEqual(
+      springLayout!.blocks.map((b) => b.type)
+    );
+    expect(fallGrid.every((url) => url.includes('/tours/fall-5/'))).toBe(true);
+  });
+
+  it('spring-6 и fall-6 (contentSource) получают layout', () => {
+    const spring = getTourById('spring-6');
+    const fall = getTourById('fall-6');
+    expect(spring).toBeDefined();
+    expect(fall).toBeDefined();
+
+    const springGrid = spring!.galleryGridUrls!.slice(2);
+    const fallGrid = fall!.galleryGridUrls!.slice(2);
+
+    const springLayout = resolveTourBentoLayout(spring!, springGrid);
+    const fallLayout = resolveTourBentoLayout(fall!, fallGrid);
+
+    expect(springLayout).toBeDefined();
+    expect(fallLayout).toBeDefined();
+    expect(flattenBentoSlotsToUrls(springLayout!)).toHaveLength(11);
+    expect(flattenBentoSlotsToUrls(fallLayout!)).toHaveLength(11);
+    expect(fallLayout!.blocks.map((b) => b.type)).toEqual(
+      springLayout!.blocks.map((b) => b.type)
+    );
+    expect(fallGrid.every((url) => url.includes('/tours/fall-6/'))).toBe(true);
+  });
+
+  it('buildSpring5ChitindzuBentoLayout отклоняет неверное число кадров', () => {
+    const gridImages = TOUR_SPRING_5_GALLERY_GRID.slice(2);
+    expect(() => buildSpring5ChitindzuBentoLayout(gridImages.slice(0, 9))).toThrow(
+      /expected 10 grid images/
+    );
+  });
+
+  it('buildSpring6MaralyDrakonyBentoLayout отклоняет неверное число кадров', () => {
+    const gridImages = TOUR_SPRING_6_GALLERY_GRID.slice(2);
+    expect(() => buildSpring6MaralyDrakonyBentoLayout(gridImages.slice(0, 10))).toThrow(
+      /expected 11 grid images/
     );
   });
 

@@ -10,6 +10,8 @@
  * - `shkota` (spring-11) → `buildSpring11ShkotaBentoLayout` (left + right + single + center-bottom + vert)
  * - `gamova` (spring-13) → `buildSpring13GamovaBentoLayout` (single + left×2 + vert + left)
  * - `tobizina` (spring-12) → `buildSpring12TobizinaBentoLayout` (left + center-top + left)
+ * - `chitinza` (spring-5 / fall-5) → `buildSpring5ChitindzuBentoLayout` (single + vert + left + wide-square×3 + vert)
+ * - `chitinza` (spring-6 / fall-6) → `buildSpring6MaralyDrakonyBentoLayout` (single + vert + left + wide-square×3 + vert)
  *
  * @see docs/TOUR_BENTO_GRID_SYSTEM_AGENT_PROMPT.md
  */
@@ -460,8 +462,120 @@ export function buildSpring12TobizinaBentoLayout(
   return layout;
 }
 
+const CHITINDZU_GRID_IMAGE_COUNT = 10;
+
+/**
+ * «Читинза» (spring-5 / fall-5): эквивалент ветки `chitinza` в `TourDetailGallery`.
+ * `gridImages` — массив после `galleryGridUrls.slice(2)` (10 кадров).
+ */
+export function buildSpring5ChitindzuBentoLayout(
+  gridImages: string[]
+): TourBentoGalleryLayout {
+  if (gridImages.length !== CHITINDZU_GRID_IMAGE_COUNT) {
+    throw new Error(
+      `buildSpring5ChitindzuBentoLayout: expected ${CHITINDZU_GRID_IMAGE_COUNT} grid images, got ${gridImages.length}`
+    );
+  }
+
+  const layout = validateTourBentoGalleryLayout({
+    blocks: [
+      {
+        type: 'bento-single',
+        slots: [slot(gridImages[0])],
+      },
+      {
+        type: 'bento-vert',
+        slots: [slot(gridImages[4]), slot(gridImages[5])],
+      },
+      {
+        type: 'bento-left',
+        slots: [
+          slot(gridImages[2]),
+          slot(gridImages[3]),
+          slot(gridImages[4]),
+        ],
+      },
+      {
+        type: 'bento-wide-square',
+        slots: [slot(gridImages[6])],
+      },
+      {
+        type: 'bento-wide-square',
+        slots: [slot(gridImages[1])],
+      },
+      {
+        type: 'bento-wide-square',
+        slots: [slot(gridImages[7])],
+      },
+      {
+        type: 'bento-vert',
+        slots: [slot(gridImages[8]), slot(gridImages[9])],
+      },
+    ],
+  });
+
+  return layout;
+}
+
+const MARALY_DRAKONY_GRID_IMAGE_COUNT = 11;
+
+/**
+ * «Маралы х Драконы» (spring-6 / fall-6): эквивалент ветки `chitinza` в `TourDetailGallery`.
+ * `gridImages` — массив после `galleryGridUrls.slice(2)` (11 кадров).
+ */
+export function buildSpring6MaralyDrakonyBentoLayout(
+  gridImages: string[]
+): TourBentoGalleryLayout {
+  if (gridImages.length !== MARALY_DRAKONY_GRID_IMAGE_COUNT) {
+    throw new Error(
+      `buildSpring6MaralyDrakonyBentoLayout: expected ${MARALY_DRAKONY_GRID_IMAGE_COUNT} grid images, got ${gridImages.length}`
+    );
+  }
+
+  const layout = validateTourBentoGalleryLayout({
+    blocks: [
+      {
+        type: 'bento-single',
+        slots: [slot(gridImages[6])],
+      },
+      {
+        type: 'bento-vert',
+        slots: [slot(gridImages[5]), slot(gridImages[7])],
+      },
+      {
+        type: 'bento-left',
+        slots: [
+          slot(gridImages[1]),
+          slot(gridImages[2]),
+          slot(gridImages[3]),
+        ],
+      },
+      {
+        type: 'bento-wide-square',
+        slots: [slot(gridImages[4])],
+      },
+      {
+        type: 'bento-wide-square',
+        slots: [slot(gridImages[0])],
+      },
+      {
+        type: 'bento-wide-square',
+        slots: [slot(gridImages[8])],
+      },
+      {
+        type: 'bento-vert',
+        slots: [slot(gridImages[9]), slot(gridImages[10])],
+      },
+    ],
+  });
+
+  return layout;
+}
+
 export const TOUR_BENTO_LAYOUT_BUILDER_IDS = [
   'spring-4',
+  'spring-5',
+  'spring-6',
   'spring-11',
   'spring-12',
   'spring-13',
@@ -478,6 +592,8 @@ const tourBentoLayoutBuilders: Record<
   (gridImages: string[]) => TourBentoGalleryLayout
 > = {
   'spring-4': buildSpring4SestraBentoLayout,
+  'spring-5': buildSpring5ChitindzuBentoLayout,
+  'spring-6': buildSpring6MaralyDrakonyBentoLayout,
   'spring-11': buildSpring11ShkotaBentoLayout,
   'spring-12': buildSpring12TobizinaBentoLayout,
   'spring-13': buildSpring13GamovaBentoLayout,

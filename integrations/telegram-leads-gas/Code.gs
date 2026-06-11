@@ -8,7 +8,11 @@
  *    TELEGRAM_CHAT_ID   — id группы (число; супергруппа со знаком «-»).
  * 3) Опционально запустите installDefaultSettings(), чтобы задать TTL идемпотентности.
  * 4) Запустите функцию sendTestLead().
- * 5) Если тест пришёл в Telegram — Deploy → New deployment → Web app.
+ * 5) Если тест пришёл в Telegram — Deploy → Manage deployments → Edit → Version: New version → Deploy.
+ *
+ * Важно: sendTestLead() запускает код из редактора, а сайт шлёт POST на URL /exec
+ * (опубликованный Web App). Пока деплой не обновлён, редактор и прод расходятся.
+ * Проверка: GET /exec должен вернуть buildId "no-webhook-secret-v1" (см. doGet).
  *
  * --- Script Properties (Project Settings → Script properties) ---
  * TELEGRAM_BOT_TOKEN  — токен от @BotFather (не коммитить в git).
@@ -47,6 +51,8 @@
 var TELEGRAM_TEXT_LIMIT = 4096;
 var SAFE_CHUNK = 4000;
 var DEFAULT_IDEMPOTENCY_TTL_SECONDS = '21600';
+/** Маркер версии в doGet — убедитесь, что GET /exec возвращает его после деплоя. */
+var WEBHOOK_BUILD_ID = 'lead-message-v2';
 
 /**
  * Запустите один раз из Apps Script.
@@ -80,17 +86,18 @@ function sendTestLead() {
 
   var testPayload = {
     idempotencyKey: 'gas-test-' + new Date().toISOString(),
-    tourId: 'winter-1',
-    tourTitle: 'Тестовый тур',
-    season: 'winter',
+    tourId: 'summer-3',
+    tourTitle: 'Путешествие на остров Аскольд',
+    season: 'summer',
+    tourDuration: 'однодневный',
     name: 'Тестовая заявка',
     phone: '+79001234567',
     email: 'test@example.com',
     preferredMessenger: 'telegram',
     question: 'Проверка отправки заявки из Google Apps Script.',
     privacyAccepted: true,
-    preferredDepartureDate: '2026-06-14',
-    sourceUrl: 'https://vkraynosti.ru/tours/winter/voskhozhdenie-na-izyubrinuyu/',
+    preferredDepartureDate: '2026-06-20',
+    sourceUrl: 'https://vkraynosti.ru/tours/summer/leto-ostrov-askold/',
     submittedAt: new Date().toISOString(),
     userAgent: 'Apps Script test',
   };
@@ -126,7 +133,11 @@ function doPost(e) {
  * @return {GoogleAppsScript.Content.TextOutput}
  */
 function doGet() {
-  return jsonOut_({ ok: true, service: 'vkraynosti-telegram-lead-webhook' });
+  return jsonOut_({
+    ok: true,
+    service: 'vkraynosti-telegram-lead-webhook',
+    buildId: WEBHOOK_BUILD_ID,
+  });
 }
 
 /**
@@ -221,6 +232,15 @@ function validatePayload_(body) {
   if (body.season != null && typeof body.season !== 'string') {
     return 'season must be a string when provided';
   }
+  if (body.tourDuration != null) {
+    if (typeof body.tourDuration !== 'string') {
+      return 'tourDuration must be a string when provided';
+    }
+    var duration = String(body.tourDuration).trim();
+    if (duration !== 'однодневный' && duration !== 'многодневный') {
+      return 'tourDuration must be однодневный or многодневный';
+    }
+  }
   if (!body.name || typeof body.name !== 'string' || !String(body.name).trim()) {
     return 'name is required';
   }
@@ -243,43 +263,68 @@ function validatePayload_(body) {
  */
 function buildLeadMessage_(body) {
   var tourId = escapeHtml_(String(body.tourId).trim());
-  var tourTitle = body.tourTitle ? escapeHtml_(String(body.tourTitle).trim()) : 'Без названия';
+  var tourTitleRaw = body.tourTitle ? String(body.tourTitle).trim() : 'Без названия';
+  var sourceUrlRaw = body.sourceUrl ? String(body.sourceUrl).trim() : '';
   var season = body.season ? escapeHtml_(seasonLabel_(String(body.season))) : '—';
   var email = body.email != null && String(body.email).trim() ? escapeHtml_(String(body.email).trim()) : '—';
   var question = body.question != null && String(body.question).trim() ? escapeHtml_(String(body.question).trim()) : '—';
-  var sourceUrl = body.sourceUrl ? escapeHtml_(String(body.sourceUrl)) : '—';
+  var sourceUrl = sourceUrlRaw ? escapeHtml_(sourceUrlRaw) : '—';
   var submittedAt = body.submittedAt ? escapeHtml_(String(body.submittedAt)) : '—';
-  var userAgent = body.userAgent ? escapeHtml_(String(body.userAgent)) : '—';
-  var idempotencyKey = body.idempotencyKey ? escapeHtml_(String(body.idempotencyKey)) : '—';
   var privacyAccepted = body.privacyAccepted === true ? 'Да' : 'Нет';
-
+  var tourTitleLine = buildTourTitleHtml_(tourTitleRaw, sourceUrlRaw);
+  var duration = formatTourDuration_(body.tourDuration);
   var departureDate = formatDepartureDate_(body.preferredDepartureDate);
 
   var lines = [
-    '<b>Новая заявка с сайта</b>',
-    '<b>Тур:</b> ' + tourTitle + ' (id: ' + tourId + ')',
-    '<b>Сезон:</b> ' + season,
-    '<b>Дата выезда:</b> ' + departureDate,
+    'Новая заявка с сайта!',
+    'Сезон: ' + season,
+    'Тур: ' + tourTitleLine,
+    'URL: ' + sourceUrl,
+    'Длительность: ' + duration,
+    'ID Тура - ' + tourId,
+    'Дата выезда: ' + departureDate,
     '',
-    '<b>Имя:</b> ' + escapeHtml_(String(body.name).trim()),
-    '<b>Телефон:</b> <code>' + escapeHtml_(String(body.phone).trim()) + '</code>',
-    '<b>Email:</b> ' + email,
-    '<b>Мессенджер:</b> ' + escapeHtml_(messengerLabel_(body.preferredMessenger)),
-    '<b>Вопрос:</b>',
+    'Имя: ' + escapeHtml_(String(body.name).trim()),
+    'Телефон: ' + escapeHtml_(String(body.phone).trim()),
+    'Email: ' + email,
+    'Мессенджер: ' + escapeHtml_(messengerLabel_(body.preferredMessenger)),
+    'Вопрос:',
     question,
     '',
-    '<b>Согласие с политикой:</b> ' + privacyAccepted,
-    '<b>Отправлено:</b> ' + submittedAt,
-    '<b>Idempotency key:</b> <code>' + idempotencyKey + '</code>',
-    '',
-    '<b>Ссылка на страницу с которой была оставлена заявка:</b>',
-    sourceUrl,
-    '',
-    '<b>User-Agent:</b>',
-    userAgent,
+    'Согласие с политикой: ' + privacyAccepted,
+    'Отправлено: ' + submittedAt,
   ];
 
   return lines.join('\n');
+}
+
+/**
+ * Название тура со ссылкой (Telegram HTML parse_mode).
+ * @param {string} title
+ * @param {string} sourceUrl
+ * @return {string}
+ */
+function buildTourTitleHtml_(title, sourceUrl) {
+  var safeTitle = escapeHtml_(title);
+  if (sourceUrl && /^https?:\/\//i.test(sourceUrl)) {
+    return '<a href="' + escapeHtml_(sourceUrl) + '">' + safeTitle + '</a>';
+  }
+  return safeTitle;
+}
+
+/**
+ * @param {string|undefined} raw
+ * @return {string}
+ */
+function formatTourDuration_(raw) {
+  if (raw == null || typeof raw !== 'string') {
+    return '—';
+  }
+  var trimmed = String(raw).trim();
+  if (trimmed === 'однодневный' || trimmed === 'многодневный') {
+    return escapeHtml_(trimmed);
+  }
+  return '—';
 }
 
 /**

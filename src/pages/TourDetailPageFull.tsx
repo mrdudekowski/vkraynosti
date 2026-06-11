@@ -116,6 +116,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
       title: tour.title,
       subtitle: tour.subtitle,
       season: tour.season,
+      ...(durationType != null ? { tourDuration: durationType } : {}),
     });
   };
 
@@ -123,7 +124,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     tour.description,
     tour.descriptionAside
   );
-  const { displayDuration } = useTourDisplayDuration(tour);
+  const { displayDuration, durationType } = useTourDisplayDuration(tour);
   const seasonVisualStyle = SEASON_STYLE[tour.season];
   const seasonButtonGradientClass = {
     winter: 'bg-gradient-to-r from-season-winter/30 to-season-winter/15',

@@ -26,7 +26,7 @@ type TourDetailPageInDevelopmentProps = {
 const TourDetailPageInDevelopment = ({ tour }: TourDetailPageInDevelopmentProps) => {
   const { openTourRequestModal } = useModal();
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
-  const { displayDuration } = useTourDisplayDuration(tour);
+  const { displayDuration, durationType } = useTourDisplayDuration(tour);
   const gridGalleryUrls = getTourGalleryGridUrls(tour);
   const heroImageUrl = resolveTourHeroImageUrl({
     tour,
@@ -40,6 +40,7 @@ const TourDetailPageInDevelopment = ({ tour }: TourDetailPageInDevelopmentProps)
       title: tour.title,
       subtitle: tour.subtitle,
       season: tour.season,
+      ...(durationType != null ? { tourDuration: durationType } : {}),
     });
   };
 

@@ -7,7 +7,7 @@ const calendarNavLabel =
 
 test.describe('Navbar: календарь', () => {
   test('desktop: клик «Календарь» ведёт на /#kalendar', async ({ page }) => {
-    await page.setViewportSize({ width: 950, height: 900 });
+    await page.setViewportSize({ width: 1160, height: 900 });
     await page.goto('./');
     await page.locator('nav').getByRole('link', { name: calendarNavLabel }).click();
     await expect(page).toHaveURL(/#kalendar$/);

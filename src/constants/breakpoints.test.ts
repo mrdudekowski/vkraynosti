@@ -43,8 +43,8 @@ describe('breakpoints', () => {
     expect(BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX).toBe(640);
   });
 
-  it('uses nav-desktop threshold at 950px', () => {
-    expect(BREAKPOINT_NAV_DESKTOP_PX).toBe(950);
+  it('uses nav-desktop threshold at 1160px', () => {
+    expect(BREAKPOINT_NAV_DESKTOP_PX).toBe(1160);
   });
 });
 

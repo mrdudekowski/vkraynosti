@@ -64,7 +64,7 @@ test.describe('Home funnel: H1 gate → hero', () => {
   test.setTimeout(60_000);
 
   test('desktop: стрелка ворот ведёт к #home-hero', async ({ page }) => {
-    await page.setViewportSize({ width: 950, height: 900 });
+    await page.setViewportSize({ width: 1160, height: 900 });
     await gotoHome(page);
 
     const scrollHint = page.getByTestId('home-gate-scroll-to-hero');
@@ -90,7 +90,7 @@ test.describe('Home funnel: якоря nav → team / contact', () => {
   test.setTimeout(60_000);
 
   test('desktop: ссылки «Команда» и «Контакты» скроллят к секциям', async ({ page }) => {
-    await page.setViewportSize({ width: 950, height: 900 });
+    await page.setViewportSize({ width: 1160, height: 900 });
     await gotoHome(page);
 
     await clickNavbarHomeLink(page, 'Команда');
@@ -120,7 +120,7 @@ test.describe('Home funnel: H3 tours anchor', () => {
   test.setTimeout(60_000);
 
   test('desktop: nav «Направления» открывает #tours', async ({ page }) => {
-    await page.setViewportSize({ width: 950, height: 900 });
+    await page.setViewportSize({ width: 1160, height: 900 });
     await gotoHome(page);
 
     await clickNavbarHomeLink(page, UI.nav.links[0].label);

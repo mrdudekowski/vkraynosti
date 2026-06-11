@@ -24,7 +24,7 @@ async function openFirstTourFromHomeGrid(page: Page): Promise<string> {
 
 test.describe('Home → Tour detail: клик по TourCard', () => {
   test('desktop: карточка в #tours открывает страницу тура', async ({ page }) => {
-    await page.setViewportSize({ width: 950, height: 900 });
+    await page.setViewportSize({ width: 1160, height: 900 });
     await openFirstTourFromHomeGrid(page);
 
     await expect(page).toHaveURL(TOUR_DETAIL_PATH_RE);

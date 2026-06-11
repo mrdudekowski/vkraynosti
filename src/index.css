@@ -67,7 +67,7 @@
   }
 
   /**
-   * Mobile/tablet (`screens.below-nav-desktop`, <950px): полоса документа скрыта, прокрутка сохраняется.
+   * Mobile/tablet (`screens.below-nav-desktop`, <1160px): полоса документа скрыта, прокрутка сохраняется.
    * Иначе при `body { overflow: hidden }` (бургер) исчезает gutter и контент сдвигается.
    */
   @screen below-nav-desktop {

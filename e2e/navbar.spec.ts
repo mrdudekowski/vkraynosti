@@ -50,9 +50,9 @@ test.describe('SeasonNavDock', () => {
   });
 });
 
-test.describe('Navbar: критические пороги viewport (950 / 768 / 500)', () => {
-  test('950px: десктопные ссылки в `<nav>`, бургер скрыт', async ({ page }) => {
-    await page.setViewportSize({ width: 950, height: 800 });
+test.describe('Navbar: критические пороги viewport (1160 / 768 / 500)', () => {
+  test('1160px: десктопные ссылки в `<nav>`, бургер скрыт', async ({ page }) => {
+    await page.setViewportSize({ width: 1160, height: 800 });
     await page.goto('.');
     await expect(page.getByTestId('burger-menu')).toBeHidden();
     await expect(page.locator('nav').getByRole('link', { name: firstNavLinkLabel })).toBeVisible();

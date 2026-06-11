@@ -6,13 +6,13 @@
  * | X-Small     | —      | <576px    |
  * | Small       | sm     | ≥576px    |
  * | Medium      | md     | ≥768px    |
- * | Nav desktop | nav-desktop | ≥950px (бургер ниже) |
+ * | Nav desktop | nav-desktop | ≥1160px (бургер ниже) |
  * | Large       | lg     | ≥992px    |
  * | Extra large | xl     | ≥1200px   |
  * | XXL         | 2xl    | ≥1400px   |
  *
  * Tablet UX (намеренные зоны, не баг):
- * - 500–949: season switcher в navbar + burger, без desktop links (`season-md` / `nav-desktop`).
+ * - 500–1159: season switcher в navbar + burger, без desktop links (`season-md` / `nav-desktop`).
  */
 export const BREAKPOINT_SM_PX = 576 as const;
 export const BREAKPOINT_MD_PX = 768 as const;
@@ -33,7 +33,7 @@ export const BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX = 640 as const;
  * Min width для `nav-desktop:` (Navbar без бургера). Ниже — mobile/tablet navbar + скрытая полоса документа.
  * Синхронно `screens.nav-desktop` в `tailwind.config.ts`.
  */
-export const BREAKPOINT_NAV_DESKTOP_PX = 950 as const;
+export const BREAKPOINT_NAV_DESKTOP_PX = 1160 as const;
 
 /**
  * Обложки spring-3 / spring-6: переход tight → wide (`object-position`).

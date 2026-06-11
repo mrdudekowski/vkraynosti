@@ -22,21 +22,34 @@ const BrandWordmark = ({
 }: BrandWordmarkProps) => {
   const { firstLetter, rest } = splitBrandWordmark(wordmark);
   const sizeClass = size === 'nav' ? 'text-brand-wordmark-nav' : '';
-  const firstLetterHoverClass = interactive
-    ? ' group-hover:!bg-none group-hover:!text-brand-secondary'
-    : '';
+  const hoverFadeClass =
+    'transition-opacity duration-hover motion-reduce:transition-none';
   const restHoverClass = interactive
-    ? ' transition-colors duration-hover group-hover:text-brand-secondary'
-    : '';
+    ? `text-text-inverse transition-colors duration-hover group-hover:text-brand-secondary`
+    : 'text-text-inverse';
 
-  return (
-    <span className={['font-brand-wordmark', sizeClass, className].filter(Boolean).join(' ')}>
+  const firstLetterNode = interactive ? (
+    <span className="relative inline-block align-baseline">
+      <span className={`opacity-100 group-hover:opacity-0 ${hoverFadeClass} ${SEASON_TEXT_CLASS[season]}`}>
+        {firstLetter}
+      </span>
       <span
-        className={`transition-all duration-season-change ${SEASON_TEXT_CLASS[season]}${firstLetterHoverClass}`}
+        aria-hidden
+        className={`pointer-events-none absolute inset-0 text-brand-secondary opacity-0 group-hover:opacity-100 ${hoverFadeClass}`}
       >
         {firstLetter}
       </span>
-      <span className={`text-text-inverse${restHoverClass}`}>{rest}</span>
+    </span>
+  ) : (
+    <span className={`transition-all duration-season-change ${SEASON_TEXT_CLASS[season]}`}>
+      {firstLetter}
+    </span>
+  );
+
+  return (
+    <span className={['font-brand-wordmark', sizeClass, className].filter(Boolean).join(' ')}>
+      {firstLetterNode}
+      <span className={restHoverClass}>{rest}</span>
     </span>
   );
 };

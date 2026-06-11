@@ -25,9 +25,13 @@ describe('BrandWordmark', () => {
       </span>
     );
 
-    const firstLetter = screen.getByText('В');
+    const firstLetter = screen.getAllByText('В')[0];
     expect(firstLetter.closest('.font-brand-wordmark')).toHaveClass('text-brand-wordmark-nav');
-    expect(firstLetter).toHaveClass('group-hover:!text-brand-secondary');
+    expect(firstLetter).toHaveClass('group-hover:opacity-0');
+    expect(firstLetter.parentElement?.querySelector('[aria-hidden]')).toHaveClass(
+      'group-hover:opacity-100',
+      'text-brand-secondary'
+    );
     expect(screen.getByText('Крайности')).toHaveClass('group-hover:text-brand-secondary');
   });
 });

@@ -22,6 +22,65 @@ export function getTourProgramStepRevealClassName(isVisible: boolean): string {
   ].join(' ');
 }
 
+export function isTourProgramStepExitPhase(
+  mountedStepCount: number,
+  revealedCount: number
+): boolean {
+  return mountedStepCount > revealedCount;
+}
+
+export function isTourProgramFooterExitPhase(
+  mountedFooter: boolean,
+  showProgramFooter: boolean
+): boolean {
+  return mountedFooter && !showProgramFooter;
+}
+
+/** Индекс пункта программы для ref track: во время fade-out — первый скрываемый. */
+export function getTourProgramActiveStepRefIndex(options: {
+  revealedCount: number;
+  mountedStepCount: number;
+  showProgramFooter: boolean;
+  mountedFooter: boolean;
+  programRevealEnabled: boolean;
+}): number | null {
+  const {
+    revealedCount,
+    mountedStepCount,
+    showProgramFooter,
+    mountedFooter,
+    programRevealEnabled,
+  } = options;
+
+  if (!programRevealEnabled || revealedCount <= 0) {
+    return null;
+  }
+
+  if (showProgramFooter || isTourProgramFooterExitPhase(mountedFooter, showProgramFooter)) {
+    return null;
+  }
+
+  if (isTourProgramStepExitPhase(mountedStepCount, revealedCount)) {
+    return revealedCount;
+  }
+
+  return revealedCount - 1;
+}
+
+export function shouldAttachTourProgramFooterRef(options: {
+  mountedFooter: boolean;
+  showProgramFooter: boolean;
+  programRevealEnabled: boolean;
+}): boolean {
+  const { mountedFooter, showProgramFooter, programRevealEnabled } = options;
+
+  if (!programRevealEnabled || !mountedFooter) {
+    return false;
+  }
+
+  return showProgramFooter || isTourProgramFooterExitPhase(mountedFooter, showProgramFooter);
+}
+
 function clampUnit(value: number): number {
   if (value <= 0) return 0;
   if (value >= 1) return 1;

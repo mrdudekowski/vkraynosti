@@ -860,6 +860,7 @@
   .reveal-program-step-hidden {
     @apply pointer-events-none opacity-0 translate-y-reveal-y;
     filter: brightness(0.7);
+    animation: none !important;
   }
   .reveal-program-step-visible {
     @apply pointer-events-auto opacity-100 translate-y-0;

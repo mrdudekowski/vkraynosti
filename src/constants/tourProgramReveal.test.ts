@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   computeTourProgramRevealedItemCount,
+  getTourProgramActiveStepRefIndex,
+  isTourProgramFooterExitPhase,
+  isTourProgramStepExitPhase,
+  shouldAttachTourProgramFooterRef,
   TOUR_PROGRAM_REVEAL_END_SHARE,
   TOUR_PROGRAM_REVEAL_MIN_RANGE_PX,
 } from './tourProgramReveal';
@@ -71,5 +75,62 @@ describe('computeTourProgramRevealedItemCount', () => {
   ])('reaches full reveal for $steps program steps', ({ items }) => {
     const revealEndDoc = columnTopDoc + columnHeight * TOUR_PROGRAM_REVEAL_END_SHARE;
     expect(countAtScrollY(revealEndDoc - vh, items)).toBe(items);
+  });
+});
+
+describe('tour program reveal ref helpers', () => {
+  it('detects step exit phase when mounted count exceeds revealed count', () => {
+    expect(isTourProgramStepExitPhase(4, 3)).toBe(true);
+    expect(isTourProgramStepExitPhase(3, 3)).toBe(false);
+  });
+
+  it('detects footer exit phase while footer stays mounted', () => {
+    expect(isTourProgramFooterExitPhase(true, false)).toBe(true);
+    expect(isTourProgramFooterExitPhase(true, true)).toBe(false);
+    expect(isTourProgramFooterExitPhase(false, false)).toBe(false);
+  });
+
+  it('anchors track on last visible step during normal reveal', () => {
+    expect(
+      getTourProgramActiveStepRefIndex({
+        revealedCount: 3,
+        mountedStepCount: 3,
+        showProgramFooter: false,
+        mountedFooter: false,
+        programRevealEnabled: true,
+      })
+    ).toBe(2);
+  });
+
+  it('anchors track on first exiting step during fade-out', () => {
+    expect(
+      getTourProgramActiveStepRefIndex({
+        revealedCount: 2,
+        mountedStepCount: 4,
+        showProgramFooter: false,
+        mountedFooter: false,
+        programRevealEnabled: true,
+      })
+    ).toBe(2);
+  });
+
+  it('prefers footer ref while footer is shown or exiting', () => {
+    expect(
+      getTourProgramActiveStepRefIndex({
+        revealedCount: 3,
+        mountedStepCount: 3,
+        showProgramFooter: true,
+        mountedFooter: true,
+        programRevealEnabled: true,
+      })
+    ).toBeNull();
+
+    expect(
+      shouldAttachTourProgramFooterRef({
+        mountedFooter: true,
+        showProgramFooter: false,
+        programRevealEnabled: true,
+      })
+    ).toBe(true);
   });
 });

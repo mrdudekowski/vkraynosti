@@ -35,7 +35,11 @@ import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { useTourProgramScrollReveal } from "../hooks/useTourProgramScrollReveal";
 import { useTourProgramRevealPresence } from "../hooks/useTourProgramRevealPresence";
 import { useTourProgramViewportTrack } from "../hooks/useTourProgramViewportTrack";
-import { getTourProgramStepRevealClassName } from "../constants/tourProgramReveal";
+import {
+  getTourProgramActiveStepRefIndex,
+  getTourProgramStepRevealClassName,
+  shouldAttachTourProgramFooterRef,
+} from "../constants/tourProgramReveal";
 import { useModal } from "../context/useModal";
 import { useTourDisplayDuration } from "../hooks/useTourDisplayDuration";
 import {
@@ -84,6 +88,18 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     updateKey: `${mountedStepCount}-${mountedFooter ? 'footer' : 'steps'}-${revealedCount}-${showProgramFooter ? 'footer-on' : 'footer-off'}`,
   });
   const mountedProgramSteps = tour.program.slice(0, mountedStepCount);
+  const activeProgramStepRefIndex = getTourProgramActiveStepRefIndex({
+    revealedCount,
+    mountedStepCount,
+    showProgramFooter,
+    mountedFooter,
+    programRevealEnabled,
+  });
+  const attachProgramFooterRef = shouldAttachTourProgramFooterRef({
+    mountedFooter,
+    showProgramFooter,
+    programRevealEnabled,
+  });
   const programCardClassName = programRevealEnabled
     ? "tour-detail-program-card tour-detail-program-card-reveal"
     : "tour-detail-program-card";
@@ -434,7 +450,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                         <li
                           key={`${step.timeLabel}-${idx}`}
                           ref={
-                            !showProgramFooter && idx === revealedCount - 1
+                            activeProgramStepRefIndex === idx
                               ? (node) => {
                                   activeProgramItemRef.current = node;
                                 }
@@ -463,11 +479,13 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                     </ol>
                     {mountedFooter && (
                       <div
-                        ref={(node) => {
-                          if (showProgramFooter) {
-                            activeProgramItemRef.current = node;
-                          }
-                        }}
+                        ref={
+                          attachProgramFooterRef
+                            ? (node) => {
+                                activeProgramItemRef.current = node;
+                              }
+                            : undefined
+                        }
                         className={[
                           'reveal-program-footer',
                           getTourProgramStepRevealClassName(showProgramFooter),

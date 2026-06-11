@@ -35,8 +35,8 @@ function getThemeScreens(config: Config): Record<string, ScreenValue> {
 }
 
 describe('breakpoints', () => {
-  it('uses team-hero desktop layout threshold at 650px', () => {
-    expect(BREAKPOINT_TEAM_HERO_DESKTOP_PX).toBe(650);
+  it('uses team-hero desktop layout threshold at 768px (md)', () => {
+    expect(BREAKPOINT_TEAM_HERO_DESKTOP_PX).toBe(768);
   });
 
   it('uses mobile nav drawer compact threshold at 640px', () => {

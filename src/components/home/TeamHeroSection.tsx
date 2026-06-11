@@ -1,24 +1,34 @@
-import { forwardRef } from 'react';
-import { TEAM } from '../../data/teamData';
-import { TEAM_HERO_MEMBER_ID_DESKTOP_TEXT_ALIGN_END } from '../../constants/teamHeroPortraitLayout';
+import { forwardRef, useLayoutEffect, useRef } from 'react';
+import { useLenis } from 'lenis/react';
 import { HOME_SECTION_TEAM } from '../../constants/routes';
 import { TEAM_SECTION_DIVIDER_CLASS } from '../../constants/seasonTheme';
+import { scrollHomeTeamTopImmediate } from '../../constants/smoothScroll';
 import { UI } from '../../constants/ui';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { useTeamHeroPage } from '../../hooks/useTeamHeroPage';
 import { useSeason } from '../../context/useSeason';
 import { isTeamSectionDebugOpaqueBg } from '../../utils/teamBackdropDebug';
 import RevealBox from '../shared/RevealBox';
 import BrandWordmark from '../shared/BrandWordmark';
 import TeamMemberHeroSlide from './TeamMemberHeroSlide';
+import TeamHeroPageNextButton from './TeamHeroPageNextButton';
 
 const TEAM_MEMBER_LAYOUT_VARIANTS = ['photo-start', 'photo-end'] as const;
 
-/** Порядок на странице: Элина → Ярослав (массив `TEAM` в data — канон id/контента). */
-const TEAM_SECTION_DISPLAY_ORDER = [TEAM[1], TEAM[0]] as const;
-
 const TeamHeroSection = forwardRef<HTMLElement>(function TeamHeroSection(_, ref) {
+  const lenis = useLenis();
   const { activeSeason } = useSeason();
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { pageIndex, goToNextPage, currentPair } = useTeamHeroPage();
+  const isInitialMountRef = useRef(true);
+
+  useLayoutEffect(() => {
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
+    }
+    scrollHomeTeamTopImmediate(lenis);
+  }, [pageIndex, lenis]);
 
   return (
     <section
@@ -51,23 +61,30 @@ const TeamHeroSection = forwardRef<HTMLElement>(function TeamHeroSection(_, ref)
           </div>
         </RevealBox>
 
-        <div className="relative overflow-visible flex flex-col gap-team-hero-members-stack-mobile team-hero-desktop:gap-team-hero-members lg:gap-team-hero-members-lg">
-          {TEAM_SECTION_DISPLAY_ORDER.map((member, index) => (
-            <TeamMemberHeroSlide
-              key={member.id}
-              member={member}
-              layoutVariant={TEAM_MEMBER_LAYOUT_VARIANTS[index] ?? 'photo-start'}
-              prefersReducedMotion={prefersReducedMotion}
-              articleClassName={
-                index === 0
-                  ? 'team-hero-desktop:pb-team-hero-first-member-bottom-sm md:pb-team-hero-first-member-bottom-md lg:pb-team-hero-first-member-bottom-lg'
-                  : undefined
-              }
-              desktopTextAlign={
-                member.id === TEAM_HERO_MEMBER_ID_DESKTOP_TEXT_ALIGN_END ? 'end' : undefined
-              }
-            />
-          ))}
+        <div
+          id={UI.team.membersContainerId}
+          key={pageIndex}
+          className="relative overflow-visible flex flex-col gap-team-hero-members-stack-mobile team-hero-desktop:gap-team-hero-members lg:gap-team-hero-members-lg"
+        >
+          {currentPair.map((member, index) => {
+            const layoutVariant = TEAM_MEMBER_LAYOUT_VARIANTS[index] ?? 'photo-start';
+
+            return (
+              <TeamMemberHeroSlide
+                key={member.id}
+                member={member}
+                layoutVariant={layoutVariant}
+                prefersReducedMotion={prefersReducedMotion}
+                articleClassName={
+                  index === 0
+                    ? 'md:pb-team-hero-first-member-bottom-md lg:pb-team-hero-first-member-bottom-lg'
+                    : undefined
+                }
+                desktopTextAlign={layoutVariant === 'photo-end' ? 'end' : undefined}
+              />
+            );
+          })}
+          <TeamHeroPageNextButton onNext={goToNextPage} />
         </div>
       </div>
     </section>

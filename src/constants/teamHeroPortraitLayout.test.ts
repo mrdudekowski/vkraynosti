@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   TEAM_HERO_DESKTOP_COLUMN_GAP,
-  TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
   TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_MD,
   TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_LG,
   TEAM_HERO_MEMBERS_STACK_GAP,
@@ -14,7 +13,6 @@ import {
   TEAM_HERO_SLIDE_MOBILE_ROW_GAP,
   TEAM_HERO_STAIRCASE_OFFSET_LG,
   TEAM_HERO_STAIRCASE_OFFSET_MD,
-  TEAM_HERO_STAIRCASE_OFFSET_SM,
   TEAM_HERO_BIO_LINE_HEIGHT,
   TEAM_HERO_MEMBER_ID_DESKTOP_TEXT_ALIGN_END,
 } from './teamHeroPortraitLayout';
@@ -32,7 +30,7 @@ describe('teamHeroPortraitLayout', () => {
     expect(TEAM_HERO_DESKTOP_COLUMN_GAP).toBe('1.5rem');
   });
 
-  it('uses slide max-width for sm+ centering', () => {
+  it('uses slide max-width for desktop centering', () => {
     expect(TEAM_HERO_SLIDE_MAX_WIDTH).toBe('min(100%, 56rem)');
   });
 
@@ -48,13 +46,7 @@ describe('teamHeroPortraitLayout', () => {
     expect(TEAM_HERO_MEMBERS_STACK_GAP_LG).toBe('4rem');
   });
 
-  it('uses first member bottom padding for staircase compensation on sm+', () => {
-    expect(TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM).toBe('2rem');
-    expect(TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM).toBe(TEAM_HERO_MOBILE_VERTICAL_GAP);
-  });
-
   it('uses staircase offset tokens for photo-end lift', () => {
-    expect(TEAM_HERO_STAIRCASE_OFFSET_SM).toBe('clamp(2rem, 10vw, 3rem)');
     expect(TEAM_HERO_STAIRCASE_OFFSET_MD).toBe('clamp(6rem, 16vw, 10rem)');
     expect(TEAM_HERO_STAIRCASE_OFFSET_LG).toBe('clamp(7rem, 14vw, 12rem)');
   });

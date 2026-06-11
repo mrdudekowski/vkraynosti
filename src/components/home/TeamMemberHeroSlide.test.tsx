@@ -203,7 +203,7 @@ describe('TeamMemberHeroSlide', () => {
     const portraitFrame = container.querySelector('.rounded-card');
     const photoColumn = portraitFrame?.parentElement;
     expect(photoColumn?.className).toContain('team-hero-desktop:col-start-2');
-    expect(photoColumn?.className).toContain('team-hero-desktop:-mt-team-hero-staircase-offset-sm');
+    expect(photoColumn?.className).toContain('md:-mt-team-hero-staircase-offset-md');
     expect(photoColumn?.className).toContain('team-hero-desktop:z-10');
     expect(photoColumn?.className).not.toContain('team-hero-desktop:absolute');
 
@@ -222,7 +222,7 @@ describe('TeamMemberHeroSlide', () => {
     const portraitFrame = container.querySelector('.rounded-card');
     const photoColumn = portraitFrame?.parentElement;
     expect(photoColumn?.className).not.toContain('team-hero-desktop:absolute');
-    expect(photoColumn?.className).not.toContain('team-hero-desktop:-mt-team-hero-staircase-offset-sm');
+    expect(photoColumn?.className).not.toContain('md:-mt-team-hero-staircase-offset-md');
   });
 
   it('keeps Yaroslav portrait in document flow on photo-end', () => {

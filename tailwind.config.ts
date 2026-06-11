@@ -124,7 +124,6 @@ import {
 } from './src/constants/tourSummer11CoverCrop'
 import {
   TEAM_HERO_DESKTOP_COLUMN_GAP,
-  TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
   TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_MD,
   TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_LG,
   TEAM_HERO_MEMBERS_STACK_GAP,
@@ -136,7 +135,6 @@ import {
   TEAM_HERO_SLIDE_MOBILE_ROW_GAP,
   TEAM_HERO_STAIRCASE_OFFSET_LG,
   TEAM_HERO_STAIRCASE_OFFSET_MD,
-  TEAM_HERO_STAIRCASE_OFFSET_SM,
   TEAM_HERO_BIO_LINE_HEIGHT,
 } from './src/constants/teamHeroPortraitLayout'
 import {
@@ -934,15 +932,12 @@ const config: Config = {
         'team-hero-members-stack-mobile': TEAM_HERO_MEMBERS_STACK_GAP_MOBILE,
         /** Gap между блоками команды на lg+. */
         'team-hero-members-stack-lg': TEAM_HERO_MEMBERS_STACK_GAP_LG,
-        /** Нижний padding первого блока на sm+ (компенсация «лесенки»). */
-        'team-hero-first-member-bottom-sm': TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_SM,
+        /** Нижний padding первого блока на md+ (компенсация «лесенки»). */
         'team-hero-first-member-bottom-md': TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_MD,
         'team-hero-first-member-bottom-lg': TEAM_HERO_FIRST_MEMBER_BOTTOM_PADDING_LG,
-        /** Подъём фото второго блока («лесенка») на sm. */
-        'team-hero-staircase-offset-sm': TEAM_HERO_STAIRCASE_OFFSET_SM,
         /** Между фото и текстом в карточке члена команды на mobile. */
         'team-hero-slide-mobile-row-gap': TEAM_HERO_SLIDE_MOBILE_ROW_GAP,
-        /** Подъём фото второго блока на md. */
+        /** Подъём фото второго блока («лесенка») на md. */
         'team-hero-staircase-offset-md': TEAM_HERO_STAIRCASE_OFFSET_MD,
         /** Подъём фото второго блока на lg+. */
         'team-hero-staircase-offset-lg': TEAM_HERO_STAIRCASE_OFFSET_LG,
@@ -1570,7 +1565,7 @@ const config: Config = {
         'below-nav-desktop': { max: `${BREAKPOINT_BELOW_NAV_DESKTOP_MAX_PX}px` },
         /** Уже drawer бургер-меню (`breakpoints.ts`, 640px). */
         'mobile-nav-drawer-compact': `${BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX}px`,
-        /** Секция «Команда»: mobile ≤649px, desktop grid с 650px (`breakpoints.ts`). */
+        /** Секция «Команда»: mobile ≤767px, desktop grid с 768px (`breakpoints.ts`). */
         'team-hero-below-desktop': { max: `${BREAKPOINT_TEAM_HERO_BELOW_DESKTOP_MAX_PX}px` },
         'team-hero-desktop': `${BREAKPOINT_TEAM_HERO_DESKTOP_PX}px`,
       },

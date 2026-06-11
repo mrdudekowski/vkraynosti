@@ -1,12 +1,26 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import TeamHeroSection from './TeamHeroSection';
-import { TEAM } from '../../data/teamData';
+import { TEAM, TEAM_HERO_PAGES } from '../../data/teamData';
 import { TEAM_HERO_TEXT_STAGGER_CLASS } from '../../constants/teamHeroAnimation';
+import { scrollHomeTeamTopImmediate } from '../../constants/smoothScroll';
 import { UI } from '../../constants/ui';
 import { splitTeamBioParagraphs } from '../../utils/team/splitTeamBioParagraphs';
 import { SeasonProvider } from '../../context/SeasonContext';
+
+vi.mock('lenis/react', () => ({
+  useLenis: () => undefined,
+}));
+
+vi.mock('../../constants/smoothScroll', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../constants/smoothScroll')>();
+  return {
+    ...actual,
+    scrollHomeTeamTopImmediate: vi.fn(),
+  };
+});
 
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root: Element | Document | null = null;
@@ -45,6 +59,7 @@ function renderTeamHeroSection() {
 describe('TeamHeroSection', () => {
   beforeEach(() => {
     vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+    vi.mocked(scrollHomeTeamTopImmediate).mockClear();
   });
 
   afterEach(() => {
@@ -68,13 +83,17 @@ describe('TeamHeroSection', () => {
     expect(screen.getByText(UI.sections.teamSub)).toBeInTheDocument();
   });
 
-  it('renders all bio paragraphs for both team members', () => {
+  it('renders bio paragraphs for the visible core team page only', () => {
     renderTeamHeroSection();
 
-    for (const member of TEAM) {
+    for (const member of TEAM_HERO_PAGES[0]) {
       for (const paragraph of splitTeamBioParagraphs(member.bio)) {
         expect(screen.getByText(paragraph)).toBeInTheDocument();
       }
+    }
+
+    for (const paragraph of splitTeamBioParagraphs(TEAM[2].bio)) {
+      expect(screen.queryByText(paragraph)).not.toBeInTheDocument();
     }
   });
 
@@ -99,8 +118,7 @@ describe('TeamHeroSection', () => {
   it('uses overflow-visible stack wrapper with tokenized member gap', () => {
     renderTeamHeroSection();
 
-    const stack = screen.getByRole('heading', { level: 3, name: 'Элина' }).closest('section')
-      ?.querySelector('.gap-team-hero-members-stack-mobile');
+    const stack = document.getElementById(UI.team.membersContainerId);
 
     expect(stack).toHaveClass('relative');
     expect(stack).toHaveClass('overflow-visible');
@@ -124,16 +142,16 @@ describe('TeamHeroSection', () => {
     expect(elinaSlide?.className).not.toContain('team-hero-desktop:items-end');
   });
 
-  it('applies bottom padding on first member article from team-hero-desktop for staircase gap', () => {
+  it('applies bottom padding on first member article from md for staircase gap', () => {
     renderTeamHeroSection();
 
     const elinaArticle = screen.getByRole('heading', { level: 3, name: 'Элина' }).closest('article');
     const yaroslavArticle = screen.getByRole('heading', { level: 3, name: 'Ярослав' }).closest('article');
 
-    expect(elinaArticle).toHaveClass('team-hero-desktop:pb-team-hero-first-member-bottom-sm');
     expect(elinaArticle).toHaveClass('md:pb-team-hero-first-member-bottom-md');
     expect(elinaArticle).toHaveClass('lg:pb-team-hero-first-member-bottom-lg');
-    expect(yaroslavArticle).not.toHaveClass('team-hero-desktop:pb-team-hero-first-member-bottom-sm');
+    expect(elinaArticle).not.toHaveClass('team-hero-desktop:pb-team-hero-first-member-bottom-sm');
+    expect(yaroslavArticle).not.toHaveClass('md:pb-team-hero-first-member-bottom-md');
   });
 
   it('applies text stagger after scroll reveal', () => {
@@ -148,14 +166,51 @@ describe('TeamHeroSection', () => {
     expect(elinaName.style.animationDelay).toBe('0ms');
   });
 
-  it('renders each member in an article with aria-labelledby on name', () => {
+  it('renders each visible member in an article with aria-labelledby on name', () => {
     renderTeamHeroSection();
 
-    for (const member of TEAM) {
+    for (const member of TEAM_HERO_PAGES[0]) {
       const nameHeading = screen.getByRole('heading', { level: 3, name: member.name });
       const article = nameHeading.closest('article');
       expect(article).toHaveAttribute('aria-labelledby', `${member.id}-name`);
       expect(nameHeading).toHaveAttribute('id', `${member.id}-name`);
     }
+  });
+
+  it('renders next page button with loop aria-label on core team page', () => {
+    renderTeamHeroSection();
+
+    const nextButton = screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel });
+    expect(nextButton).toHaveAttribute('aria-controls', UI.team.membersContainerId);
+    expect(nextButton).not.toHaveAttribute('aria-expanded');
+  });
+
+  it('advances to Elena and Pavel on next click without changing aria-label', async () => {
+    const user = userEvent.setup();
+    renderTeamHeroSection();
+
+    await user.click(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel }));
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Елена' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Павел' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 3, name: 'Ярослав' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 3, name: 'Элина' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel })).toBeInTheDocument();
+    expect(scrollHomeTeamTopImmediate).toHaveBeenCalledTimes(1);
+  });
+
+  it('loops back to core team on second next click', async () => {
+    const user = userEvent.setup();
+    renderTeamHeroSection();
+
+    const nextButton = screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel });
+    await user.click(nextButton);
+    await user.click(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel }));
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Элина' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Ярослав' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 3, name: 'Елена' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel })).toBeInTheDocument();
+    expect(scrollHomeTeamTopImmediate).toHaveBeenCalledTimes(2);
   });
 });

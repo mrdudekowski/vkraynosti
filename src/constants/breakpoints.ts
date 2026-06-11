@@ -13,7 +13,6 @@
  *
  * Tablet UX (намеренные зоны, не баг):
  * - 500–949: season switcher в navbar + burger, без desktop links (`season-md` / `nav-desktop`).
- * - 650–767: desktop team (`team-hero-desktop`), gate в DOM с `md` (768).
  */
 export const BREAKPOINT_SM_PX = 576 as const;
 export const BREAKPOINT_MD_PX = 768 as const;
@@ -21,12 +20,12 @@ export const BREAKPOINT_LG_PX = 992 as const;
 export const BREAKPOINT_XL_PX = 1200 as const;
 export const BREAKPOINT_2XL_PX = 1400 as const;
 
-/** Секция «Команда»: desktop layout (grid + лесенка) с этой ширины (≤649px — mobile). */
-export const BREAKPOINT_TEAM_HERO_DESKTOP_PX = 650 as const;
+/** Секция «Команда»: desktop layout (grid + лесенка) с md; mobile — ≤767px. */
+export const BREAKPOINT_TEAM_HERO_DESKTOP_PX = BREAKPOINT_MD_PX;
 
 /**
  * Burger drawer: уже max-width с этой ширины viewport (~640, не sm 576).
- * Между sm и md — типичные планшеты в портрете; отдельно от team-hero (650).
+ * Между sm и md — типичные планшеты в портрете.
  */
 export const BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX = 640 as const;
 

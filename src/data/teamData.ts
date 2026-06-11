@@ -22,4 +22,32 @@ export const TEAM: TeamMember[] = [
     showExperienceLine: false,
     imageUrl: getTeamPortraitUrl('team-2'),
   },
+  {
+    id: 'team-3',
+    name: 'Елена',
+    role: 'Координатор маршрутов и поездок',
+    bio:
+      '«Вкрайности» — это люди, в которых я верю. Я убеждена: однажды отправившись с нами, вы ощутите такое исключительное доверие, что не сможете найти нам равных.',
+    experience: 'на тропах Приморья',
+    showExperienceLine: false,
+    imageUrl: getTeamPortraitUrl('team-3'),
+  },
+  {
+    id: 'team-4',
+    name: 'Павел',
+    role: 'специалист по обеспечению экспедиции',
+    bio:
+      'Для меня «ВКРАЙНОСТИ» — это сообщество людей, объединённых любовью к путешествиям. Мы создаём поездки, чтобы открывать наш край, показывать его скрытые жемчужины и делиться энергией природы. Но главное — это новые знакомства, истории и эмоции, которые остаются с нами надолго. Мы верим, что путешествия объединяют.',
+    experience: 'на горных и лесных тропах',
+    showExperienceLine: false,
+    imageUrl: getTeamPortraitUrl('team-4'),
+  },
+];
+
+const [yaroslav, elina, elena, pavel] = TEAM;
+
+/** Страницы секции #team: каждая — пара участников [верх, низ]. */
+export const TEAM_HERO_PAGES: readonly (readonly [TeamMember, TeamMember])[] = [
+  [elina, yaroslav],
+  [elena, pavel],
 ];

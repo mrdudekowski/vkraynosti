@@ -55,7 +55,7 @@ const TeamMemberHeroSlide = ({
     isPhotoEnd
       ? [
           'team-hero-desktop:col-start-2 team-hero-desktop:row-start-1 team-hero-desktop:relative team-hero-desktop:z-10',
-          'team-hero-desktop:-mt-team-hero-staircase-offset-sm md:-mt-team-hero-staircase-offset-md lg:-mt-team-hero-staircase-offset-lg',
+          'md:-mt-team-hero-staircase-offset-md lg:-mt-team-hero-staircase-offset-lg',
         ].join(' ')
       : 'team-hero-desktop:col-start-1 team-hero-desktop:row-start-1',
   ].join(' ');

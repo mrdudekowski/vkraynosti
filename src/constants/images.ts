@@ -778,6 +778,9 @@ export const TOUR_SPRING_11_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SPRING_11_CLIP3_GRID_WEBM]: `${TOUR_SPRING_11_ASSET_BASE}/shk.clip3.poster.webp`,
 };
 
+/** Шкота: `wow.webp` в широкой плитке bento-center-bottom (`theme.objectPosition`). */
+export const TOUR_SPRING_11_GALLERY_WOW_OBJECT_CLASS = 'object-gallery-shkota-wow' as const;
+
 /**
  * «Мыс Тобизина» (spring-12).
  * Cover: `content/HERO/Весна/tobizina.webp` -> `public/tours/spring-12/cover.webp`.

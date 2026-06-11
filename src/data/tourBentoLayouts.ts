@@ -16,6 +16,7 @@
 
 import type { BentoMediaSlot, TourBentoGalleryLayout } from '../types/tourBento';
 import {
+  TOUR_SPRING_11_GALLERY_WOW_OBJECT_CLASS,
   TOUR_SPRING_13_GALLERY_PINES_OBJECT_CLASS,
   TOUR_SPRING_13_GALLERY_ROCKS_OBJECT_CLASS,
   TOUR_SPRING_13_GALLERY_VIEW7_OBJECT_CLASS,
@@ -332,7 +333,9 @@ export function buildSpring11ShkotaBentoLayout(
         slots: [
           slot(gridImages[7]),
           slot(gridImages[8]),
-          slot(gridImages[9]),
+          slot(gridImages[9], {
+            objectPosition: TOUR_SPRING_11_GALLERY_WOW_OBJECT_CLASS,
+          }),
         ],
       },
       {

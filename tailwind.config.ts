@@ -855,6 +855,8 @@ const config: Config = {
           TOUR_SUMMER_11_COVER_OBJECT_POSITION_LG,
         /** summer-11: view (clip2) в широком bento-center-top. */
         'gallery-summer-11-clip2-wide': TOUR_SUMMER_11_CLIP2_WIDE_OBJECT_POSITION,
+        /** Шкота (spring-11 / summer-4): `wow.webp` в широкой плитке — якорь ниже центра. */
+        'gallery-shkota-wow': 'center 72%',
         /**
          * Главная, баннер весны: только колонка буквы «н» — правый край кадра loop-видео/постера при `object-cover`.
          */

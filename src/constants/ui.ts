@@ -31,7 +31,7 @@ export const UI = {
   team: {
     experienceSuffix: 'опыта',
     membersContainerId: 'team-hero-members',
-    nextTeamPageAriaLabel: 'Следующие участники команды',
+    nextTeamPageLabel: 'Узнайте нас поближе',
   },
   privacyPage: {
     metaTitle:   'Политика конфиденциальности | Вкрайности',

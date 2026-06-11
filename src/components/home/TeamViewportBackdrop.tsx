@@ -25,7 +25,7 @@ export default function TeamViewportBackdrop() {
     <>
       <div
         ref={backdropRef}
-        className="pointer-events-none fixed inset-0 z-home-team-backdrop bg-home-gate-start-screen"
+        className="pointer-events-none fixed inset-0 z-home-team-backdrop bg-home-gate-start-screen transition-none will-change-opacity"
         aria-hidden
       />
       <TeamBackdropDebugOverlay />

@@ -180,7 +180,7 @@ describe('TeamHeroSection', () => {
   it('renders next page button with loop aria-label on core team page', () => {
     renderTeamHeroSection();
 
-    const nextButton = screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel });
+    const nextButton = screen.getByRole('button', { name: UI.team.nextTeamPageLabel });
     expect(nextButton).toHaveAttribute('aria-controls', UI.team.membersContainerId);
     expect(nextButton).not.toHaveAttribute('aria-expanded');
   });
@@ -189,13 +189,13 @@ describe('TeamHeroSection', () => {
     const user = userEvent.setup();
     renderTeamHeroSection();
 
-    await user.click(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel }));
+    await user.click(screen.getByRole('button', { name: UI.team.nextTeamPageLabel }));
 
     expect(screen.getByRole('heading', { level: 3, name: 'Елена' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Павел' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 3, name: 'Ярослав' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 3, name: 'Элина' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: UI.team.nextTeamPageLabel })).toBeInTheDocument();
     expect(scrollHomeTeamTopImmediate).toHaveBeenCalledTimes(1);
   });
 
@@ -203,14 +203,14 @@ describe('TeamHeroSection', () => {
     const user = userEvent.setup();
     renderTeamHeroSection();
 
-    const nextButton = screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel });
+    const nextButton = screen.getByRole('button', { name: UI.team.nextTeamPageLabel });
     await user.click(nextButton);
-    await user.click(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel }));
+    await user.click(screen.getByRole('button', { name: UI.team.nextTeamPageLabel }));
 
     expect(screen.getByRole('heading', { level: 3, name: 'Элина' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Ярослав' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 3, name: 'Елена' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: UI.team.nextTeamPageAriaLabel })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: UI.team.nextTeamPageLabel })).toBeInTheDocument();
     expect(scrollHomeTeamTopImmediate).toHaveBeenCalledTimes(2);
   });
 });

@@ -19,6 +19,7 @@ import {
   getHomeContactSectionElement,
   getHomeTeamContactBridgeElement,
   getHomeTeamSectionElement,
+  getTeamZoneViewportHeightPx,
   quantizeTeamZoneScrollPx,
   TEAM_ZONE_REDUCED_MOTION_THRESHOLD,
 } from '../constants/teamZoneScroll';
@@ -79,7 +80,7 @@ export function useTeamZoneViewportBackdrop({
       return;
     }
 
-    const vh = window.innerHeight;
+    const vh = getTeamZoneViewportHeightPx();
     const teamEl = getHomeTeamSectionElement();
     const bridgeEl = getHomeTeamContactBridgeElement();
     const contactEl = getHomeContactSectionElement();
@@ -172,25 +173,59 @@ export function useTeamZoneViewportBackdrop({
   useEffect(() => {
     if (!enabled) return;
 
+    const observedSections = new Set<Element>();
+    const resizeObserver = new ResizeObserver(() => {
+      schedule();
+    });
+
+    const observeTeamZoneSections = () => {
+      for (const el of [
+        getHomeTeamSectionElement(),
+        getHomeTeamContactBridgeElement(),
+        getHomeContactSectionElement(),
+      ]) {
+        if (el != null && !observedSections.has(el)) {
+          observedSections.add(el);
+          resizeObserver.observe(el);
+        }
+      }
+    };
+
     const onResize = () => {
+      observeTeamZoneSections();
       schedule();
     };
     window.addEventListener('resize', onResize, { passive: true });
 
-    let unsubLenis: (() => void) | undefined;
-    if (lenis) {
-      unsubLenis = lenis.on('scroll', schedule);
-    } else {
-      window.addEventListener('scroll', schedule, { passive: true });
+    const visualViewport = window.visualViewport;
+    if (visualViewport) {
+      visualViewport.addEventListener('resize', onResize);
+      visualViewport.addEventListener('scroll', onResize);
     }
 
+    const onScroll = () => {
+      observeTeamZoneSections();
+      schedule();
+    };
+
+    let unsubLenis: (() => void) | undefined;
+    if (lenis) {
+      unsubLenis = lenis.on('scroll', onScroll);
+    } else {
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    observeTeamZoneSections();
     schedule();
 
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener('resize', onResize);
+      visualViewport?.removeEventListener('resize', onResize);
+      visualViewport?.removeEventListener('scroll', onResize);
       unsubLenis?.();
       if (!lenis) {
-        window.removeEventListener('scroll', schedule);
+        window.removeEventListener('scroll', onScroll);
       }
       if (rafIdRef.current != null) {
         cancelAnimationFrame(rafIdRef.current);

@@ -30,6 +30,15 @@ export function quantizeTeamZoneScrollPx(value: number): number {
   return q > 0 ? Math.round(value / q) * q : value;
 }
 
+/**
+ * Высота viewport для расчёта progress: `visualViewport.height` (Android Chrome toolbar),
+ * иначе `innerHeight` — как у соседних scroll-scrub хуков на главной.
+ */
+export function getTeamZoneViewportHeightPx(): number {
+  if (typeof window === 'undefined') return 0;
+  return window.visualViewport?.height ?? window.innerHeight;
+}
+
 function clampUnitProgress(value: number): number {
   if (value <= 0) return 0;
   if (value >= 1) return 1;

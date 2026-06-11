@@ -3,6 +3,7 @@ import {
   computeTeamZoneBackdropProgress,
   computeTeamZoneFadeInProgress,
   computeTeamZoneFadeOutProgress,
+  getTeamZoneViewportHeightPx,
   TEAM_ZONE_FADE_IN_END_SHARE,
   TEAM_ZONE_FADE_IN_START_SHARE,
   TEAM_ZONE_FADE_OUT_BRIDGE_END_SHARE,
@@ -10,6 +11,25 @@ import {
   TEAM_ZONE_FADE_OUT_END_SHARE,
   TEAM_ZONE_FADE_OUT_START_SHARE,
 } from './teamZoneScroll';
+
+describe('getTeamZoneViewportHeightPx', () => {
+  it('prefers visualViewport.height when available', () => {
+    const original = window.visualViewport;
+    Object.defineProperty(window, 'visualViewport', {
+      configurable: true,
+      value: { height: 812 },
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 900,
+    });
+    expect(getTeamZoneViewportHeightPx()).toBe(812);
+    Object.defineProperty(window, 'visualViewport', {
+      configurable: true,
+      value: original,
+    });
+  });
+});
 
 describe('computeTeamZoneFadeInProgress', () => {
   const vh = 1000;

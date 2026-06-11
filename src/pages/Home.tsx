@@ -54,6 +54,7 @@ import {
   HOME_TOURS_PROMO_VIDEO_SWITCH_MS,
 } from '../constants/homeToursGrid';
 import HomeTeamContactBrandBridge from '../components/home/HomeTeamContactBrandBridge';
+import TeamHeroSection from '../components/home/TeamHeroSection';
 import TeamViewportBackdrop from '../components/home/TeamViewportBackdrop';
 import TourCardHeightGhost from '../components/shared/TourCardHeightGhost';
 import { getHomeLcpPreloadImageUrl } from '../utils/getHomeLcpPreloadImageUrl';
@@ -62,7 +63,6 @@ const TourCalendarSectionLazy = lazy(
   () => import('../components/tourCalendar/TourCalendarSection')
 );
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
-const TeamHeroSectionLazy = lazy(() => import('../components/home/TeamHeroSection'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
 const GRID_FADE_OUT_DURATION_MS = 260;
 const GRID_REVEAL_DURATION_MS = 500;
@@ -473,9 +473,9 @@ const Home = () => {
             <ScrollScrubFade className="relative w-full">
               <SafetySectionLazy />
             </ScrollScrubFade>
-
-            <TeamHeroSectionLazy />
           </Suspense>
+
+          <TeamHeroSection />
 
           <HomeTeamContactBrandBridge />
 

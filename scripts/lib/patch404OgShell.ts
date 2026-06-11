@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { DOCUMENT_COLOR_SCHEME } from '../../src/constants/documentColorScheme.ts';
 import { DEFAULT_OG_SHELL_BANNER_LOGICAL } from '../../src/constants/images.ts';
 import { SEO_DEFAULTS } from '../../src/constants/seo.ts';
 import { renderOgShellHead, stripOgShellMetaFromHead } from './renderOgShellHead.ts';
@@ -52,6 +53,7 @@ export async function patch404OgShell(distDir: string): Promise<void> {
   }
 
   const faviconBlock = `
+    <meta name="color-scheme" content="${DOCUMENT_COLOR_SCHEME}" />
     <link rel="icon" type="image/png" href="${faviconLightHref}" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/png" href="${faviconDarkHref}" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/png" href="${faviconLightHref}" />

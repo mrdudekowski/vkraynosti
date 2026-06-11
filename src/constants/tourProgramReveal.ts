@@ -14,6 +14,14 @@ export const TOUR_PROGRAM_REVEAL_END_SHARE = 0.4 as const;
 /** Длительность появления пункта программы и сдвига track (только program-reveal, не глобальный reveal). */
 export const TOUR_PROGRAM_REVEAL_ITEM_MS = 320 as const;
 
+/** Классы fade in/out для пункта программы и связанного текста секции. */
+export function getTourProgramStepRevealClassName(isVisible: boolean): string {
+  return [
+    'reveal-program-step-base',
+    isVisible ? 'reveal-program-step-visible' : 'reveal-program-step-hidden',
+  ].join(' ');
+}
+
 function clampUnit(value: number): number {
   if (value <= 0) return 0;
   if (value >= 1) return 1;

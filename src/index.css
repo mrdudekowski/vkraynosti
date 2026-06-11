@@ -14,6 +14,8 @@
    * получает такой же кастомный бегунок и визуально «двойной» скролл.
    */
   html {
+    /** SSOT значения: `documentColorScheme.ts` — opt-out из forced dark mode браузера. */
+    color-scheme: light only;
     --safe-area-top: env(safe-area-inset-top, 0px);
     --navbar-chrome-height: calc(theme('spacing.navbar') + var(--safe-area-top));
     --scrollbar-thumb: theme('colors.season.spring');
@@ -851,22 +853,22 @@
     }
   }
 
-  /** Этапы программы тура монтируются по мере scroll-reveal, поэтому скрытые шаги не занимают layout. */
+  /** Этапы программы тура: fade in/out при scroll-reveal (lg+). */
   .reveal-program-step-base {
-    @apply transition-[opacity,transform,filter] duration-reveal ease-reveal-out;
+    @apply transition-[opacity,transform,filter] duration-reveal-program ease-reveal-out;
   }
   .reveal-program-step-hidden {
-    @apply opacity-0 translate-y-reveal-y;
+    @apply pointer-events-none opacity-0 translate-y-reveal-y;
     filter: brightness(0.7);
   }
   .reveal-program-step-visible {
-    @apply opacity-100 translate-y-0;
+    @apply pointer-events-auto opacity-100 translate-y-0;
     animation: reveal-program-item-in theme('transitionDuration.reveal-program') theme('transitionTimingFunction.reveal-out') both;
     filter: brightness(1);
   }
 
   .reveal-program-footer {
-    animation: reveal-program-item-in theme('transitionDuration.reveal-program') theme('transitionTimingFunction.reveal-out') both;
+    @apply transition-[opacity,transform,filter] duration-reveal-program ease-reveal-out;
   }
 
   @keyframes reveal-program-item-in {

@@ -33,7 +33,9 @@ import { BREAKPOINT_LG_PX } from "../constants/reveal";
 import { useMatchMinWidth } from "../hooks/useMatchMinWidth";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { useTourProgramScrollReveal } from "../hooks/useTourProgramScrollReveal";
+import { useTourProgramRevealPresence } from "../hooks/useTourProgramRevealPresence";
 import { useTourProgramViewportTrack } from "../hooks/useTourProgramViewportTrack";
+import { getTourProgramStepRevealClassName } from "../constants/tourProgramReveal";
 import { useModal } from "../context/useModal";
 import { useTourDisplayDuration } from "../hooks/useTourDisplayDuration";
 import {
@@ -69,14 +71,19 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     enabled: programRevealEnabled,
     mainColumnRef,
   });
+  const { mountedStepCount, mountedFooter } = useTourProgramRevealPresence({
+    revealedCount,
+    showProgramFooter,
+    enabled: programRevealEnabled,
+  });
   const { trackOffsetY } = useTourProgramViewportTrack({
     enabled: programRevealEnabled,
     viewportRef: programViewportRef,
     trackRef: programTrackRef,
     activeItemRef: activeProgramItemRef,
-    updateKey: `${revealedCount}-${showProgramFooter ? 'footer' : 'steps'}`,
+    updateKey: `${mountedStepCount}-${mountedFooter ? 'footer' : 'steps'}-${revealedCount}-${showProgramFooter ? 'footer-on' : 'footer-off'}`,
   });
-  const visibleProgramSteps = tour.program.slice(0, revealedCount);
+  const mountedProgramSteps = tour.program.slice(0, mountedStepCount);
   const programCardClassName = programRevealEnabled
     ? "tour-detail-program-card tour-detail-program-card-reveal"
     : "tour-detail-program-card";
@@ -407,7 +414,14 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                   title={UI.tourDetail.programHeading}
                   season={tour.season}
                   size="program"
-                  className="mb-4"
+                  className={[
+                    'mb-4',
+                    programRevealEnabled
+                      ? getTourProgramStepRevealClassName(revealedCount > 0)
+                      : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                 />
                 <div ref={programViewportRef} className="tour-detail-program-viewport">
                   <div
@@ -416,17 +430,20 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                     style={programTrackStyle}
                   >
                     <ol className="border-l border-divider pl-4 ml-2 space-y-6">
-                      {visibleProgramSteps.map((step, idx) => (
+                      {mountedProgramSteps.map((step, idx) => (
                         <li
                           key={`${step.timeLabel}-${idx}`}
                           ref={
-                            !showProgramFooter && idx === visibleProgramSteps.length - 1
+                            !showProgramFooter && idx === revealedCount - 1
                               ? (node) => {
                                   activeProgramItemRef.current = node;
                                 }
                               : undefined
                           }
-                          className="flex gap-3 reveal-program-step-base reveal-program-step-visible"
+                          className={[
+                            'flex gap-3',
+                            getTourProgramStepRevealClassName(idx < revealedCount),
+                          ].join(' ')}
                         >
                           <FontAwesomeIcon
                             icon={faClock}
@@ -444,12 +461,17 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                         </li>
                       ))}
                     </ol>
-                    {showProgramFooter && (
+                    {mountedFooter && (
                       <div
                         ref={(node) => {
-                          activeProgramItemRef.current = node;
+                          if (showProgramFooter) {
+                            activeProgramItemRef.current = node;
+                          }
                         }}
-                        className="reveal-program-footer"
+                        className={[
+                          'reveal-program-footer',
+                          getTourProgramStepRevealClassName(showProgramFooter),
+                        ].join(' ')}
                       >
                         <p className="text-tooltip text-text-muted mt-8 lg:mt-10 leading-relaxed">
                           {UI.tourDetail.programTimeDisclaimer}

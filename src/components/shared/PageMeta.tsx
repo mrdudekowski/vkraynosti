@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import type { HomeSeasonBannerVideoPreloadLink } from '../../constants/homeSeasonBannerVideoPreload';
+import { DOCUMENT_COLOR_SCHEME } from '../../constants/documentColorScheme';
 import {
   SEO_DEFAULTS,
   getAbsoluteOgImageUrl,
@@ -54,6 +55,7 @@ const PageMeta = ({
         <link key={href} rel="preload" as="video" href={href} fetchPriority={fetchPriority} />
       ))}
       <title>{title}</title>
+      <meta name="color-scheme" content={DOCUMENT_COLOR_SCHEME} />
       <meta name="description" content={description} />
       <meta name="robots" content={robots} />
       <link rel="canonical" href={canonicalUrl} />

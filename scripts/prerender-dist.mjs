@@ -139,6 +139,7 @@ async function patch404Shell() {
     'Авторские поездки по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.';
 
   const headInjection = `
+    <meta name="color-scheme" content="light only" />
     <link rel="icon" type="image/png" href="${faviconLightHref}" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/png" href="${faviconDarkHref}" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/png" href="${faviconLightHref}" />

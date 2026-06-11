@@ -1516,6 +1516,8 @@ export const IMAGES = {
     portraits: {
       'team-1': `${TEAM_ASSET_BASE}/team-1.webp`,
       'team-2': `${TEAM_ASSET_BASE}/team-2.webp`,
+      'team-3': `${TEAM_ASSET_BASE}/team-3.webp`,
+      'team-4': `${TEAM_ASSET_BASE}/team-4.webp`,
     },
   },
   tours: {

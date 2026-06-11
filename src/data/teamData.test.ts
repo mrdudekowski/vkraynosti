@@ -2,14 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { TEAM, TEAM_HERO_PAGES } from './teamData';
 
 describe('teamData portraits', () => {
-  it('uses local public team portrait URLs for uploaded portraits', () => {
+  it('uses local public team portrait URLs for all members', () => {
     expect(TEAM[0].imageUrl).toMatch(/\/team\/team-1\.webp$/);
     expect(TEAM[1].imageUrl).toMatch(/\/team\/team-2\.webp$/);
-  });
-
-  it('falls back to placeholder for team-3 and team-4 until files are added', () => {
-    expect(TEAM[2].imageUrl).toContain('placehold.co');
-    expect(TEAM[3].imageUrl).toContain('placehold.co');
+    expect(TEAM[2].imageUrl).toMatch(/\/team\/team-3\.webp$/);
+    expect(TEAM[3].imageUrl).toMatch(/\/team\/team-4\.webp$/);
   });
 });
 

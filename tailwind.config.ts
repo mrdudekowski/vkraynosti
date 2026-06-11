@@ -17,6 +17,7 @@ import {
 import {
   fontFamilyBodyStack,
   fontFamilyBrandWordmarkStack,
+  fontFamilyDolotoStack,
   fontFamilyHeadingStack,
   fontFamilyHeroHeadingStack,
   fontFamilyHeroPhraseStack,
@@ -574,6 +575,7 @@ const config: Config = {
         heading:               [...fontFamilyHeadingStack],
         'hero-heading':        [...fontFamilyHeroHeadingStack],
         'brand-wordmark':      [...fontFamilyBrandWordmarkStack],
+        doloto:                [...fontFamilyDolotoStack],
         'home-season-banner':  [...fontFamilyHomeSeasonBannerStack],
         body:                  [...fontFamilyBodyStack],
         mono:                  [...fontFamilyMonoStack],
@@ -596,6 +598,8 @@ const config: Config = {
         'tooltip': ['0.875rem', { lineHeight: '1.25' }],
         /** Словесное лого navbar: `text-xl` (1.25rem) +15%. */
         'brand-wordmark-nav': ['1.4375rem', { lineHeight: '2.0125rem' }],
+        /** SILA в подписи footer: 2× `text-lg` (1.125rem). */
+        'footer-studio-credit-name': ['2.25rem', { lineHeight: '1' }],
         /** Заголовки секций «О туре» / «Что включено» на странице тура. */
         'tour-detail-section': ['1.875rem', { lineHeight: '1.25' }],
         /** Основной текст этих блоков (абзац и пункты списка). */

@@ -17,6 +17,7 @@ import LegalPdfLink from '../legal/LegalPdfLink';
 import { useCookieConsent } from '../../context/useCookieConsent';
 import { toSafeExternalHttpHref, toSafeMailtoHref, toSafePhoneHref } from '../../utils/safeHref';
 import type { Season } from '../../types';
+import FooterStudioCreditLink from './FooterStudioCreditLink';
 
 const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] = [
   { season: 'winter', to: ROUTES.WINTER, hoverClass: 'hover:text-season-winter' },
@@ -170,7 +171,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-text-inverse/40 text-sm">{UI.footer.rights}</p>
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
           <button
@@ -181,6 +182,11 @@ const Footer = () => {
             {UI.footer.cookieSettings}
           </button>
         </div>
+      </div>
+
+      <div className="border-t border-white/10 mt-6 pt-6 flex flex-col items-center gap-1 text-center">
+        <p className="text-text-inverse/40 text-sm">{UI.footer.studioCreditPrefix}</p>
+        <FooterStudioCreditLink />
       </div>
     </div>
   </footer>

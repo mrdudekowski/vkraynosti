@@ -8,6 +8,7 @@ import {
 
 const VK_FONTS_ATTR = 'data-vk-fonts';
 const STROGO_FONT_URL = new URL('../fonts/Strogo-Regular.ttf', import.meta.url).href;
+const DOLOTO_FONT_URL = new URL('../fonts/Doloto-Regular.ttf', import.meta.url).href;
 
 /**
  * Nord `@font-face` вставляется из JS с полными URL (`BASE_URL`), без `url(var(...))` — иначе минификатор CSS ломает синтаксис.
@@ -87,6 +88,24 @@ function injectStrogoFontFace(): void {
   document.head.prepend(style);
 }
 
+function injectDolotoFontFace(): void {
+  if (typeof document === 'undefined') return;
+  if (document.head.querySelector('style[data-vk-doloto-font-face]')) return;
+
+  const style = document.createElement('style');
+  style.setAttribute('data-vk-doloto-font-face', '');
+  style.textContent = `
+@font-face {
+  font-family: 'Doloto';
+  src: url('${DOLOTO_FONT_URL}') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+`.trim();
+  document.head.prepend(style);
+}
+
 /**
  * Подключает Google Fonts из `constants/fonts.ts` до основного CSS (без второго @import в bundle).
  * Preload критичного Nord Regular — быстрее первый текст в `font-heading`.
@@ -95,6 +114,7 @@ if (typeof document !== 'undefined') {
   injectNordFontFaces();
   injectSatyrBannerFontFace();
   injectStrogoFontFace();
+  injectDolotoFontFace();
 
   if (!document.head.querySelector(`link[${VK_FONTS_ATTR}]`)) {
     const head = document.head;

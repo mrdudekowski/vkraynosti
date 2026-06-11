@@ -31,7 +31,7 @@ const Footer = () => {
   return (
   <footer className="bg-home-season-banner-stage text-text-inverse">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12">
         {/* Brand */}
         <div>
           <Link
@@ -46,39 +46,45 @@ const Footer = () => {
           </p>
         </div>
 
-        {/* Legal */}
-        <div>
-          <h4 className="font-normal text-text-inverse mb-4">{UI.footer.legalHeading}</h4>
-          <div className="flex flex-col gap-2 text-text-inverse/60 text-sm leading-relaxed">
-            <p>{LEGAL_ENTITY.fullName}</p>
-            <p>
-              {UI.footer.innLabel} {LEGAL_ENTITY.inn}
-            </p>
-            <p>{LEGAL_ENTITY.legalAddress}</p>
+        {/* Legal + documents */}
+        <div className="flex flex-col gap-4">
+          <div>
+            <h4 className="font-normal text-text-inverse mb-4">{UI.footer.legalHeading}</h4>
+            <div className="flex flex-col gap-2 text-text-inverse/60 text-sm leading-relaxed">
+              <p>{LEGAL_ENTITY.fullName}</p>
+              <p>
+                {UI.footer.innLabel} {LEGAL_ENTITY.inn}
+              </p>
+              <p>{LEGAL_ENTITY.legalAddress}</p>
+            </div>
           </div>
-          <h4 className="font-normal text-text-inverse mt-6 mb-3">{UI.footer.documentsHeading}</h4>
-          <ul className="flex flex-col gap-2">
-            {LEGAL_DOCUMENTS_FOOTER.map((doc) => (
-              <li key={doc.id}>
-                {doc.id === 'offer-and-safety' ? (
-                  <Link
-                    to={ROUTES.SAFETY}
-                    className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
-                    prefetch="intent"
-                  >
-                    {doc.title}
-                  </Link>
-                ) : (
-                  <LegalPdfLink
-                    documentId={doc.id}
-                    className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm underline-offset-2 hover:underline"
-                  >
-                    {doc.title}
-                  </LegalPdfLink>
-                )}
-              </li>
-            ))}
-          </ul>
+          <nav
+            aria-label={UI.footer.documentsHeading}
+            className="pt-4 border-t border-white/10"
+          >
+            <ul className="flex flex-col gap-2">
+              {LEGAL_DOCUMENTS_FOOTER.map((doc) => (
+                <li key={doc.id}>
+                  {doc.id === 'offer-and-safety' ? (
+                    <Link
+                      to={ROUTES.SAFETY}
+                      className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
+                      prefetch="intent"
+                    >
+                      {doc.title}
+                    </Link>
+                  ) : (
+                    <LegalPdfLink
+                      documentId={doc.id}
+                      className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm underline-offset-2 hover:underline"
+                    >
+                      {doc.title}
+                    </LegalPdfLink>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
         {/* Quick links */}

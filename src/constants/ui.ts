@@ -162,6 +162,7 @@ export const UI = {
   footer: {
     tagline:        'Открываем дикую природу Приморья',
     legalHeading:   'Юридическая информация',
+    /** Только `aria-label` списка документов в футере (без видимого заголовка). */
     documentsHeading: 'Документы',
     innLabel:       'ИНН',
     cookieSettings: 'Настройки cookies',

@@ -87,7 +87,7 @@ const SeasonNavDock = () => {
     setOpen(false);
   };
 
-  const dockTop = homeChrome.mainUsesNavbarTopPadding ? 'top-16' : 'top-0';
+  const dockTop = homeChrome.mainUsesNavbarTopPadding ? 'top-navbar-chrome' : 'top-0';
   const slideTransition = reducedMotion
     ? 'duration-0'
     : 'transition-[max-height,transform] duration-season-dock-slide ease-out';

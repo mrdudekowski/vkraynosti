@@ -194,7 +194,7 @@ const Navbar = () => {
   const navShellTransition = homeNavbarChromeOpacityShellClass(
     homeChrome.disableTopChromeTransition
   );
-  const mobileOverlayTop = homeChrome.mainUsesNavbarTopPadding ? 'top-16' : 'top-0';
+  const mobileOverlayTop = homeChrome.mainUsesNavbarTopPadding ? 'top-navbar-chrome' : 'top-0';
 
   const isHomePath = location.pathname === ROUTES.HOME;
   const navHeroOpacity = isHomePath ? homeChrome.topChromeOpacity : 1;
@@ -206,8 +206,19 @@ const Navbar = () => {
     homeChrome.disableTopChromeTransition
   );
 
+  const navChromeBgOpacity = isHomePath ? navEffectiveOpacity : 1;
+
   return (
     <nav data-layout-navbar className="fixed top-0 left-0 right-0 z-navbar">
+      <div
+        aria-hidden
+        className={[
+          'pointer-events-none absolute inset-x-0 top-0 h-navbar-chrome bg-home-gate-start-screen',
+          navShellTransition,
+          navTeamHideShellTransition,
+        ].join(' ')}
+        style={{ opacity: navChromeBgOpacity }}
+      />
       <div
         className={`relative ${navShellTransition}`.trim()}
         style={{ opacity: navHeroOpacity }}
@@ -216,11 +227,7 @@ const Navbar = () => {
           className={`relative ${navTeamHideShellTransition} ${navShellPointerEvents}`.trim()}
           style={{ opacity: navTeamHideOpacity }}
         >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-navbar-chrome bg-home-gate-start-screen"
-        />
-        <div className="relative z-10">
+        <div className="relative z-10 pt-safe-top">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
 

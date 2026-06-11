@@ -5,7 +5,7 @@ import {
   buildTourDetailPath,
   getTourPublicPath,
 } from "../constants/routes";
-import { shouldRedirectLegacyTourUrl } from "../constants/tourUrls";
+import { resolveTourPublicUrlSegment } from "../constants/tourUrls";
 import { SEO_DEFAULTS } from "../constants/seo";
 import { UI } from "../constants/ui";
 import PageMeta from "../components/shared/PageMeta";
@@ -42,7 +42,7 @@ const TourDetailPage = () => {
     enabled: tour != null && scheduleLoaded && !isHidden,
   });
 
-  if (tour && shouldRedirectLegacyTourUrl(tour, tourSegment)) {
+  if (tour && resolveTourPublicUrlSegment(tour) !== tourSegment) {
     return <Navigate replace to={getTourPublicPath(tour)} />;
   }
 

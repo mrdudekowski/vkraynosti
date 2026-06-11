@@ -32,7 +32,7 @@ export const TOUR_SLUG_BY_ID = {
   'summer-7': 'severnoe-primorye-tainy-poberezhya',
   'summer-8': 'poluostrov-krabbe',
   'summer-9': 'vodopad-neozhidannyy',
-  'summer-10': 'robinzonada-v-rayone-tryokhi',
+  'summer-10': 'robinzonada-primorskoe-bali',
   'summer-11': 'relaks-v-buhte-ezhovoy',
   'summer-12': 'plyazh-trekh-granits',
   'summer-13': 'odin-den-v-ta-chingouze',
@@ -57,6 +57,11 @@ export const TOUR_SLUG_BY_ID = {
 } as const satisfies Record<string, string>;
 
 export type TourSlugId = keyof typeof TOUR_SLUG_BY_ID;
+
+/** Former public slugs → tour.id (301 to current slug in TourDetailPage). */
+export const TOUR_SLUG_ALIAS_TO_TOUR_ID = {
+  'robinzonada-v-rayone-tryokhi': 'summer-10',
+} as const satisfies Record<string, TourSlugId>;
 
 export function resolveTourSlugById(tourId: string): string | undefined {
   return TOUR_SLUG_BY_ID[tourId as TourSlugId];

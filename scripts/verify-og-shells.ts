@@ -22,7 +22,7 @@ const distDir = resolve(rootDir, 'dist');
 
 const DIMENSION_SAMPLE_ROUTES = [
   '/',
-  '/tours/summer/robinzonada-v-rayone-tryokhi',
+  '/tours/summer/robinzonada-primorskoe-bali',
   OG_TEST_ROUTE,
   TELEGRAM_OG_TEST_ROUTE,
 ];

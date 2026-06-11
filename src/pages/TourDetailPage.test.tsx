@@ -56,7 +56,7 @@ const renderTourDetailPage = (tourId: string) => {
 
 describe('TourDetailPage slug routing', () => {
   it('opens summer-10 by slug URL', () => {
-    renderTourDetailAtPath('/tours/summer/robinzonada-v-rayone-tryokhi/');
+    renderTourDetailAtPath('/tours/summer/robinzonada-primorskoe-bali/');
     expect(screen.getByTestId('tour-detail-main')).toBeInTheDocument();
   });
 
@@ -65,6 +65,15 @@ describe('TourDetailPage slug routing', () => {
     if (!tour) throw new Error('summer-10 missing');
 
     renderTourDetailAtPath(getLegacyTourPath(tour));
+
+    expect(screen.getByTestId('location')).toHaveTextContent(getTourPublicPath(tour));
+  });
+
+  it('redirects former slug URL to current slug URL', () => {
+    const tour = getTourById('summer-10');
+    if (!tour) throw new Error('summer-10 missing');
+
+    renderTourDetailAtPath('/tours/summer/robinzonada-v-rayone-tryokhi/');
 
     expect(screen.getByTestId('location')).toHaveTextContent(getTourPublicPath(tour));
   });

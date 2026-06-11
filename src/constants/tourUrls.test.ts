@@ -21,7 +21,7 @@ if (summer10 == null) {
 
 describe('getTourPublicPath', () => {
   it('returns slug URL for summer-10 pilot', () => {
-    expect(getTourPublicPath(summer10)).toBe('/tours/summer/robinzonada-v-rayone-tryokhi/');
+    expect(getTourPublicPath(summer10)).toBe('/tours/summer/robinzonada-primorskoe-bali/');
   });
 
   it('falls back to id when slug is absent', () => {
@@ -50,6 +50,11 @@ describe('getTourCanonicalUrl', () => {
 
 describe('findTourBySeasonAndSegment', () => {
   it('finds summer-10 by slug', () => {
+    const tour = findTourBySeasonAndSegment('summer', 'robinzonada-primorskoe-bali');
+    expect(tour?.id).toBe('summer-10');
+  });
+
+  it('finds summer-10 by former slug alias', () => {
     const tour = findTourBySeasonAndSegment('summer', 'robinzonada-v-rayone-tryokhi');
     expect(tour?.id).toBe('summer-10');
   });
@@ -62,6 +67,10 @@ describe('findTourBySeasonAndSegment', () => {
 
 describe('getTourBySlug', () => {
   it('returns summer-10 for pilot slug', () => {
+    expect(getTourBySlug('robinzonada-primorskoe-bali')?.id).toBe('summer-10');
+  });
+
+  it('returns summer-10 for former slug alias', () => {
     expect(getTourBySlug('robinzonada-v-rayone-tryokhi')?.id).toBe('summer-10');
   });
 });
@@ -70,7 +79,7 @@ describe('legacy redirect mapping', () => {
   it('detects legacy id segment when slug exists', () => {
     expect(isLegacyTourUrlSegment(summer10, 'summer-10')).toBe(true);
     expect(shouldRedirectLegacyTourUrl(summer10, 'summer-10')).toBe(true);
-    expect(isLegacyTourUrlSegment(summer10, 'robinzonada-v-rayone-tryokhi')).toBe(false);
+    expect(isLegacyTourUrlSegment(summer10, 'robinzonada-primorskoe-bali')).toBe(false);
   });
 });
 
@@ -92,7 +101,7 @@ describe('slug validation', () => {
 describe('sitemap and OG-shell route generation', () => {
   it('uses slug paths for all tours and excludes legacy id URLs', () => {
     const publicPaths = getTourPublicSeoPaths();
-    expect(publicPaths).toContain('/tours/summer/robinzonada-v-rayone-tryokhi');
+    expect(publicPaths).toContain('/tours/summer/robinzonada-primorskoe-bali');
     expect(publicPaths).toContain('/tours/spring/voskhozhdenie-na-lysovogo-deda');
     expect(publicPaths).toContain('/tours/fall/osen-voskhozhdenie-na-pidan');
     expect(publicPaths).not.toContain('/tours/summer/summer-10');

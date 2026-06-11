@@ -6,7 +6,7 @@
  * - summer-8 (Краббе) → `buildSummer8CrabbeBentoLayout` (center-top + vert×2)
  * - summer-9 (Неожиданный) → `buildSummer9NeozhidannyBentoLayout` (center-top + single + left)
  * - summer-11 (Ежовая/Спокойная) → `buildSummer11RelaxBentoLayout` (center-top + single + left)
- * - summer-10 (Робинзонада в районе Трёхи) → `buildSummer10EzhSestraBentoLayout` (9 блоков, 19 слотов)
+ * - summer-10 (Робинзонада - Приморское Бали) → `buildSummer10EzhSestraBentoLayout` (9 блоков, 19 слотов)
  * - `shkota` (spring-11) → `buildSpring11ShkotaBentoLayout` (left + right + single + center-bottom + vert)
  * - `gamova` (spring-13) → `buildSpring13GamovaBentoLayout` (single + left×2 + vert + left)
  * - `tobizina` (spring-12) → `buildSpring12TobizinaBentoLayout` (left + center-top + left)
@@ -169,7 +169,7 @@ export function buildSummer9NeozhidannyBentoLayout(
 const SUMMER_10_GRID_IMAGE_COUNT = 19;
 
 /**
- * «Робинзонада в районе Трёхи» (summer-10).
+ * «Робинзонада - Приморское Бали» (summer-10).
  * Sestra first (four + single), then sea blocks по мотивам summer-11 + ночёвка + финал.
  */
 export function buildSummer10EzhSestraBentoLayout(

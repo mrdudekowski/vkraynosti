@@ -1142,7 +1142,7 @@ export const TOUR_SUMMER_9_GALLERY_VIEWER = [
 export const TOUR_SUMMER_9_GALLERY_GRID = TOUR_SUMMER_9_GALLERY_VIEWER;
 
 /**
- * «Робинзонада в районе Трёхи» (summer-10).
+ * «Робинзонада - Приморское Бали» (summer-10).
  * Медиа: `public/tours/summer-10/`.
  */
 export const TOUR_SUMMER_10_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-10` as const;

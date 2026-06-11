@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-08T09:45:59.288Z",
+  "generatedAt": "2026-06-11T14:27:47.616Z",
   "tours": [
     {
       "id": "fall-1",
@@ -193,7 +193,7 @@
     },
     {
       "id": "summer-10",
-      "title": "Робинзонада в районе Трёхи",
+      "title": "Робинзонада - Приморское Бали",
       "priceRub": null,
       "durationType": "многодневный",
       "publicationStatus": "active"

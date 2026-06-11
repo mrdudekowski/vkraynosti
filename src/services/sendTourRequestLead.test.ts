@@ -28,6 +28,7 @@ const importService = async () => {
 
 describe('sendTourRequestLead', () => {
   beforeEach(() => {
+    vi.stubEnv('VITE_SITE_URL', 'https://vkraynosti.ru');
     vi.stubEnv('VITE_TOUR_REQUEST_ENDPOINT_URL', endpointUrl);
     vi.stubGlobal('fetch', vi.fn());
     vi.stubGlobal('crypto', {
@@ -70,6 +71,7 @@ describe('sendTourRequestLead', () => {
       tourId: tour.tourId,
       tourTitle: 'Мараловая ферма — Парк Драконов',
       season: tour.season,
+      sourceUrl: 'https://vkraynosti.ru/tours/spring/maraly-i-drakony/',
       userAgent: 'vitest-user-agent',
     });
     expect(payload).not.toHaveProperty(legacySecretPayloadKey);
@@ -79,9 +81,22 @@ describe('sendTourRequestLead', () => {
   it('throws TourRequestLeadError when response is not ok', async () => {
     vi.mocked(fetch).mockResolvedValue(new Response('fail', { status: 500 }));
 
-    const { sendTourRequestLead, TourRequestLeadError } = await importService();
+    const { sendTourRequestLead } = await importService();
 
-    await expect(sendTourRequestLead(tour, values)).rejects.toThrow(TourRequestLeadError);
+    await expect(sendTourRequestLead(tour, values)).rejects.toMatchObject({
+      code: 'rejected',
+    });
+  });
+
+  it('throws when GAS returns HTTP 200 with ok:false (e.g. outdated WEBHOOK_SECRET deploy)', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ ok: false, error: 'Forbidden', code: 'FORBIDDEN' }), {
+        status: 200,
+      })
+    );
+
+    const { sendTourRequestLead } = await importService();
+
     await expect(sendTourRequestLead(tour, values)).rejects.toMatchObject({
       code: 'rejected',
     });

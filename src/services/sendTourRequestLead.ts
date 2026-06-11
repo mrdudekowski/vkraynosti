@@ -1,3 +1,5 @@
+import { getTourCanonicalUrl } from '../constants/tourUrls';
+import { resolveTourSlugById } from '../data/tourSlugs';
 import type { TourRequestModalPayload } from '../types';
 import type { TourRequestFormValues } from '../validation/tourRequestSchema';
 
@@ -28,6 +30,41 @@ const tourRequestEndpointUrl = import.meta.env.VITE_TOUR_REQUEST_ENDPOINT_URL;
 
 const LEAD_CONTENT_TYPE = 'text/plain;charset=utf-8' as const;
 
+interface GasLeadResponse {
+  ok?: boolean;
+  error?: string;
+  code?: string;
+}
+
+/** GAS Web App отдаёт HTTP 200 даже при ok:false — проверяем тело JSON. */
+async function assertLeadAccepted(response: Response): Promise<void> {
+  if (!response.ok) {
+    throw new TourRequestLeadError(
+      'rejected',
+      `Tour request rejected: ${response.status}`
+    );
+  }
+
+  const text = await response.text();
+  if (!text.trim()) {
+    return;
+  }
+
+  let json: GasLeadResponse;
+  try {
+    json = JSON.parse(text) as GasLeadResponse;
+  } catch {
+    return;
+  }
+
+  if (json.ok === false) {
+    throw new TourRequestLeadError(
+      'rejected',
+      json.error ?? 'Tour request rejected'
+    );
+  }
+}
+
 const createIdempotencyKey = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID();
@@ -38,6 +75,18 @@ const createIdempotencyKey = () => {
 
 const getTourTitle = (tour: TourRequestModalPayload) => {
   return [tour.title, tour.subtitle].filter(Boolean).join(' — ');
+};
+
+/** Канонический URL страницы тура (slug), не legacy id и не query/hash текущей вкладки. */
+const resolveLeadSourceUrl = (tour: TourRequestModalPayload): string => {
+  if (tour.season == null) {
+    return window.location.href;
+  }
+  const slug = resolveTourSlugById(tour.tourId);
+  if (slug == null) {
+    return window.location.href;
+  }
+  return getTourCanonicalUrl({ id: tour.tourId, season: tour.season, slug });
 };
 
 const buildLeadPayload = (
@@ -55,7 +104,7 @@ const buildLeadPayload = (
     tourId: tour.tourId,
     tourTitle: getTourTitle(tour),
     season: tour.season,
-    sourceUrl: window.location.href,
+    sourceUrl: resolveLeadSourceUrl(tour),
     submittedAt: new Date().toISOString(),
     userAgent: navigator.userAgent,
     ...(departure != null && departure.length > 0
@@ -89,10 +138,5 @@ export const sendTourRequestLead = async (
     throw new TourRequestLeadError('network', 'Failed to send tour request');
   }
 
-  if (!response.ok) {
-    throw new TourRequestLeadError(
-      'rejected',
-      `Tour request rejected: ${response.status}`
-    );
-  }
+  await assertLeadAccepted(response);
 };

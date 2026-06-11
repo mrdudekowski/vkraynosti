@@ -29,7 +29,7 @@
  * --- Пример curl (подставьте URL деплоя /exec) ---
  * curl -sS -X POST 'https://script.google.com/macros/s/AKfycb.../exec' \
  *   -H 'Content-Type: application/json' \
- *   -d '{"tourId":"spring-6","tourTitle":"Мараловая ферма и Парк Драконов","season":"spring","name":"Иван","phone":"+79001234567","email":"","preferredMessenger":"telegram","question":"Вопрос","privacyAccepted":true,"sourceUrl":"https://…","submittedAt":"2026-05-11T12:00:00.000Z","userAgent":"curl"}'
+ *   -d '{"tourId":"spring-6","tourTitle":"Мараловая ферма и Парк Драконов","season":"spring","name":"Иван","phone":"+79001234567","email":"","preferredMessenger":"telegram","question":"Вопрос","privacyAccepted":true,"sourceUrl":"https://vkraynosti.ru/tours/spring/maraly-i-drakony/","submittedAt":"2026-05-11T12:00:00.000Z","userAgent":"curl"}'
  *
  * --- Чеклист ---
  * [ ] Бот создан, TELEGRAM_BOT_TOKEN в свойствах.
@@ -90,7 +90,7 @@ function sendTestLead() {
     question: 'Проверка отправки заявки из Google Apps Script.',
     privacyAccepted: true,
     preferredDepartureDate: '2026-06-14',
-    sourceUrl: 'https://vkraynosti.ru/tours/winter-1',
+    sourceUrl: 'https://vkraynosti.ru/tours/winter/voskhozhdenie-na-izyubrinuyu/',
     submittedAt: new Date().toISOString(),
     userAgent: 'Apps Script test',
   };

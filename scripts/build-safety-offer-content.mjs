@@ -123,6 +123,16 @@ flushParagraph();
 flushBulletBuffer();
 finalizeSection();
 
+const renumberedSections = sections.map((section, index) => {
+  const displayNum = index + 1;
+  const titleWithoutNum = section.title.replace(/^\d+\.\s+/, '');
+  return {
+    ...section,
+    id: `section-${displayNum}`,
+    title: `${displayNum}. ${titleWithoutNum}`,
+  };
+});
+
 const file = `/**
  * SSOT: текст «Оферта + безопасность» для /safety (без блока 1 — реквизиты, без блока 21 — форма).
  * Источник: content/legal/offer-extract.txt → npm run build:safety-offer-content
@@ -142,8 +152,8 @@ export const SAFETY_OFFER_HEADER = {
   subtitle: ${JSON.stringify(headerSubtitle)},
 } as const;
 
-export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = ${JSON.stringify(sections, null, 2)};
+export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = ${JSON.stringify(renumberedSections, null, 2)};
 `;
 
 fs.writeFileSync(outPath, file, 'utf8');
-console.log(`Wrote ${sections.length} sections → ${outPath}`);
+console.log(`Wrote ${renumberedSections.length} sections → ${outPath}`);

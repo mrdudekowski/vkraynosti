@@ -19,8 +19,8 @@ export const SAFETY_OFFER_HEADER = {
 
 export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
   {
-    "id": "section-2",
-    "title": "2. Общие положения",
+    "id": "section-1",
+    "title": "1. Общие положения",
     "blocks": [
       {
         "type": "p",
@@ -45,8 +45,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-3",
-    "title": "3. Характер активной программы и принятие рисков",
+    "id": "section-2",
+    "title": "2. Характер активной программы и принятие рисков",
     "blocks": [
       {
         "type": "p",
@@ -89,8 +89,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-4",
-    "title": "4. Обязанности Заказчика и Участника",
+    "id": "section-3",
+    "title": "3. Обязанности Заказчика и Участника",
     "blocks": [
       {
         "type": "p",
@@ -147,8 +147,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-5",
-    "title": "5. Состояние здоровья и физическая готовность",
+    "id": "section-4",
+    "title": "4. Состояние здоровья и физическая готовность",
     "blocks": [
       {
         "type": "p",
@@ -173,8 +173,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-6",
-    "title": "6. Правила поведения на маршруте",
+    "id": "section-5",
+    "title": "5. Правила поведения на маршруте",
     "blocks": [
       {
         "type": "ul",
@@ -231,8 +231,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-7",
-    "title": "7. Правила поведения в транспорте",
+    "id": "section-6",
+    "title": "6. Правила поведения в транспорте",
     "blocks": [
       {
         "type": "ul",
@@ -271,8 +271,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-8",
-    "title": "8. Алкоголь, запрещенные вещества и агрессивное поведение",
+    "id": "section-7",
+    "title": "7. Алкоголь, запрещенные вещества и агрессивное поведение",
     "blocks": [
       {
         "type": "p",
@@ -297,8 +297,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-9",
-    "title": "9. Одежда, обувь и личное снаряжение",
+    "id": "section-8",
+    "title": "8. Одежда, обувь и личное снаряжение",
     "blocks": [
       {
         "type": "p",
@@ -323,8 +323,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-10",
-    "title": "10. Водные активности, SUP-доски и нахождение у воды",
+    "id": "section-9",
+    "title": "9. Водные активности, SUP-доски и нахождение у воды",
     "blocks": [
       {
         "type": "p",
@@ -366,8 +366,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-11",
-    "title": "11. Палаточный лагерь, костры, баня и питание",
+    "id": "section-10",
+    "title": "10. Палаточный лагерь, костры, баня и питание",
     "blocks": [
       {
         "type": "ul",
@@ -411,8 +411,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-12",
-    "title": "12. Особо охраняемые территории, пограничные зоны и",
+    "id": "section-11",
+    "title": "11. Особо охраняемые территории, пограничные зоны и",
     "blocks": [
       {
         "type": "p",
@@ -437,8 +437,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-13",
-    "title": "13. Право Исполнителя изменить программу",
+    "id": "section-12",
+    "title": "12. Право Исполнителя изменить программу",
     "blocks": [
       {
         "type": "p",
@@ -459,8 +459,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-14",
-    "title": "14. Основания для отказа в участии или прекращения участия",
+    "id": "section-13",
+    "title": "13. Основания для отказа в участии или прекращения участия",
     "blocks": [
       {
         "type": "p",
@@ -521,8 +521,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-15",
-    "title": "15. Последствия нарушения Правил и ответственность",
+    "id": "section-14",
+    "title": "14. Последствия нарушения Правил и ответственность",
     "blocks": [
       {
         "type": "p",
@@ -559,8 +559,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-16",
-    "title": "16. Ответственность Исполнителя",
+    "id": "section-15",
+    "title": "15. Ответственность Исполнителя",
     "blocks": [
       {
         "type": "p",
@@ -585,8 +585,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-17",
-    "title": "17. Несовершеннолетние участники",
+    "id": "section-16",
+    "title": "16. Несовершеннолетние участники",
     "blocks": [
       {
         "type": "p",
@@ -607,8 +607,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-18",
-    "title": "18. Персональные вещи и имущество",
+    "id": "section-17",
+    "title": "17. Персональные вещи и имущество",
     "blocks": [
       {
         "type": "ul",
@@ -644,8 +644,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-19",
-    "title": "19. Экстренные ситуации и медицинская помощь",
+    "id": "section-18",
+    "title": "18. Экстренные ситуации и медицинская помощь",
     "blocks": [
       {
         "type": "p",
@@ -666,8 +666,8 @@ export const SAFETY_OFFER_SECTIONS: SafetyOfferSection[] = [
     ]
   },
   {
-    "id": "section-20",
-    "title": "20. Подтверждение ознакомления",
+    "id": "section-19",
+    "title": "19. Подтверждение ознакомления",
     "blocks": [
       {
         "type": "p",

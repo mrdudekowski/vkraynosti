@@ -15,23 +15,38 @@ export const SUMMER_PAIRED_TOUR_MEDIA_BY_ID = {
   "imageUrl": "/tours/summer-2/cover.webp",
   "galleryImages": [
     "/tours/summer-2/cover.webp",
-    "https://placehold.co/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря",
-    "https://placehold.co/900x900/7BA7BC/ffffff?text=Тропа+к+мысу",
-    "https://placehold.co/900x900/1A3C2E/ffffff?text=Каменное+плато",
-    "https://placehold.co/900x900/C8A96E/1A3C2E?text=Скалы",
-    "https://placehold.co/1200x800/7BA7BC/ffffff?text=Бухта+Карпинского",
-    "https://placehold.co/900x900/E8A838/1A3C2E?text=Обед+на+берегу"
+    "/tours/summer-2/preface.webp",
+    "/tours/summer-2/tob.clip1.poster.webp",
+    "/tours/summer-2/1.webp",
+    "/tours/summer-2/tob.clip2.poster.webp",
+    "/tours/summer-2/2.webp",
+    "/tours/summer-2/tob.clip3.poster.webp",
+    "/tours/summer-2/3.webp",
+    "/tours/summer-2/tob.clip4.poster.webp",
+    "/tours/summer-2/4.webp",
+    "/tours/summer-2/tob.clip5.poster.webp"
   ],
   "galleryGridUrls": [
     "/tours/summer-2/cover.webp",
-    "https://placehold.co/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря",
-    "https://placehold.co/900x900/7BA7BC/ffffff?text=Тропа+к+мысу",
-    "https://placehold.co/900x900/1A3C2E/ffffff?text=Каменное+плато",
-    "https://placehold.co/900x900/C8A96E/1A3C2E?text=Скалы",
-    "https://placehold.co/1200x800/7BA7BC/ffffff?text=Бухта+Карпинского",
-    "https://placehold.co/900x900/E8A838/1A3C2E?text=Обед+на+берегу"
+    "/tours/summer-2/preface.webp",
+    "/tours/summer-2/tob.clip1.grid.webm",
+    "/tours/summer-2/1.webp",
+    "/tours/summer-2/tob.clip2.grid.webm",
+    "/tours/summer-2/2.webp",
+    "/tours/summer-2/tob.clip3.grid.webm",
+    "/tours/summer-2/3.webp",
+    "/tours/summer-2/tob.clip4.grid.webm",
+    "/tours/summer-2/4.webp",
+    "/tours/summer-2/tob.clip5.grid.webm"
   ],
-  "prefaceBackgroundImageUrl": "https://placehold.co/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря"
+  "prefaceBackgroundImageUrl": "/tours/summer-2/preface.webp",
+  "gridVideoPosters": {
+    "/tours/summer-2/tob.clip1.grid.webm": "/tours/summer-2/tob.clip1.poster.webp",
+    "/tours/summer-2/tob.clip2.grid.webm": "/tours/summer-2/tob.clip2.poster.webp",
+    "/tours/summer-2/tob.clip3.grid.webm": "/tours/summer-2/tob.clip3.poster.webp",
+    "/tours/summer-2/tob.clip4.grid.webm": "/tours/summer-2/tob.clip4.poster.webp",
+    "/tours/summer-2/tob.clip5.grid.webm": "/tours/summer-2/tob.clip5.poster.webp"
+  }
 },
   'summer-3': {
   "imageUrl": "/tours/summer-3/hero.webp",

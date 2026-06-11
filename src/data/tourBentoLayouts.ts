@@ -9,6 +9,7 @@
  * - summer-10 (Робинзонада в районе Трёхи) → `buildSummer10EzhSestraBentoLayout` (9 блоков, 19 слотов)
  * - `shkota` (spring-11) → `buildSpring11ShkotaBentoLayout` (left + right + single + center-bottom + vert)
  * - `gamova` (spring-13) → `buildSpring13GamovaBentoLayout` (single + left×2 + vert + left)
+ * - `tobizina` (spring-12) → `buildSpring12TobizinaBentoLayout` (left + center-top + left)
  *
  * @see docs/TOUR_BENTO_GRID_SYSTEM_AGENT_PROMPT.md
  */
@@ -409,9 +410,57 @@ export function buildSpring13GamovaBentoLayout(
   return layout;
 }
 
+const SPRING_12_GRID_IMAGE_COUNT = 9;
+
+/**
+ * «Мыс Тобизина» (spring-12).
+ * `gridImages` после `slice(2)`: clip1, p1, clip2, p2, clip3, p3, clip4, p4, clip5.
+ */
+export function buildSpring12TobizinaBentoLayout(
+  gridImages: string[]
+): TourBentoGalleryLayout {
+  if (gridImages.length !== SPRING_12_GRID_IMAGE_COUNT) {
+    throw new Error(
+      `buildSpring12TobizinaBentoLayout: expected ${SPRING_12_GRID_IMAGE_COUNT} grid images, got ${gridImages.length}`
+    );
+  }
+
+  const layout = validateTourBentoGalleryLayout({
+    blocks: [
+      {
+        type: 'bento-left',
+        slots: [
+          slot(gridImages[0]),
+          slot(gridImages[1]),
+          slot(gridImages[2]),
+        ],
+      },
+      {
+        type: 'bento-center-top',
+        slots: [
+          slot(gridImages[3]),
+          slot(gridImages[4]),
+          slot(gridImages[5]),
+        ],
+      },
+      {
+        type: 'bento-left',
+        slots: [
+          slot(gridImages[6]),
+          slot(gridImages[7]),
+          slot(gridImages[8]),
+        ],
+      },
+    ],
+  });
+
+  return layout;
+}
+
 export const TOUR_BENTO_LAYOUT_BUILDER_IDS = [
   'spring-4',
   'spring-11',
+  'spring-12',
   'spring-13',
   'summer-8',
   'summer-9',
@@ -427,6 +476,7 @@ const tourBentoLayoutBuilders: Record<
 > = {
   'spring-4': buildSpring4SestraBentoLayout,
   'spring-11': buildSpring11ShkotaBentoLayout,
+  'spring-12': buildSpring12TobizinaBentoLayout,
   'spring-13': buildSpring13GamovaBentoLayout,
   'summer-8': buildSummer8CrabbeBentoLayout,
   'summer-9': buildSummer9NeozhidannyBentoLayout,

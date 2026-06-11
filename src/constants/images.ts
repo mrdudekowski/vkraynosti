@@ -779,24 +779,68 @@ export const TOUR_SPRING_11_GRID_VIDEO_POSTERS: Record<string, string> = {
 /**
  * «Мыс Тобизина» (spring-12).
  * Cover: `content/HERO/Весна/tobizina.webp` -> `public/tours/spring-12/cover.webp`.
- * Остальные кадры пока placeholder до добавления материалов тура.
+ * Bento/grid: `scripts/encode-spring-12-tobizina-media.ps1` -> `content/Весна/Тобизина/`.
  */
 export const TOUR_SPRING_12_COVER_GRID =
   `${TOUR_SPRING_12_ASSET_BASE}/cover.webp` as const;
 export const TOUR_SPRING_12_PREFACE_BACKGROUND =
-  `${BASE}/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря` as const;
+  `${TOUR_SPRING_12_ASSET_BASE}/preface.webp` as const;
+
+export const TOUR_SPRING_12_PHOTO_1 =
+  `${TOUR_SPRING_12_ASSET_BASE}/1.webp` as const;
+export const TOUR_SPRING_12_PHOTO_2 =
+  `${TOUR_SPRING_12_ASSET_BASE}/2.webp` as const;
+export const TOUR_SPRING_12_PHOTO_3 =
+  `${TOUR_SPRING_12_ASSET_BASE}/3.webp` as const;
+export const TOUR_SPRING_12_PHOTO_4 =
+  `${TOUR_SPRING_12_ASSET_BASE}/4.webp` as const;
+
+export const TOUR_SPRING_12_CLIP1_GRID_WEBM =
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip1.grid.webm` as const;
+export const TOUR_SPRING_12_CLIP2_GRID_WEBM =
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip2.grid.webm` as const;
+export const TOUR_SPRING_12_CLIP3_GRID_WEBM =
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip3.grid.webm` as const;
+export const TOUR_SPRING_12_CLIP4_GRID_WEBM =
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip4.grid.webm` as const;
+export const TOUR_SPRING_12_CLIP5_GRID_WEBM =
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip5.grid.webm` as const;
 
 export const TOUR_SPRING_12_GALLERY_VIEWER = [
   TOUR_SPRING_12_COVER_GRID,
   TOUR_SPRING_12_PREFACE_BACKGROUND,
-  `${BASE}/900x900/7BA7BC/ffffff?text=Тропа+к+мысу`,
-  `${BASE}/900x900/1A3C2E/ffffff?text=Каменное+плато`,
-  `${BASE}/900x900/C8A96E/1A3C2E?text=Скалы`,
-  `${BASE}/1200x800/7BA7BC/ffffff?text=Бухта+Карпинского`,
-  `${BASE}/900x900/E8A838/1A3C2E?text=Обед+на+берегу`,
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip1.poster.webp`,
+  TOUR_SPRING_12_PHOTO_1,
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip2.poster.webp`,
+  TOUR_SPRING_12_PHOTO_2,
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip3.poster.webp`,
+  TOUR_SPRING_12_PHOTO_3,
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip4.poster.webp`,
+  TOUR_SPRING_12_PHOTO_4,
+  `${TOUR_SPRING_12_ASSET_BASE}/tob.clip5.poster.webp`,
 ] as const;
 
-export const TOUR_SPRING_12_GALLERY_GRID = TOUR_SPRING_12_GALLERY_VIEWER;
+export const TOUR_SPRING_12_GALLERY_GRID = [
+  TOUR_SPRING_12_COVER_GRID,
+  TOUR_SPRING_12_PREFACE_BACKGROUND,
+  TOUR_SPRING_12_CLIP1_GRID_WEBM,
+  TOUR_SPRING_12_PHOTO_1,
+  TOUR_SPRING_12_CLIP2_GRID_WEBM,
+  TOUR_SPRING_12_PHOTO_2,
+  TOUR_SPRING_12_CLIP3_GRID_WEBM,
+  TOUR_SPRING_12_PHOTO_3,
+  TOUR_SPRING_12_CLIP4_GRID_WEBM,
+  TOUR_SPRING_12_PHOTO_4,
+  TOUR_SPRING_12_CLIP5_GRID_WEBM,
+] as const;
+
+export const TOUR_SPRING_12_GRID_VIDEO_POSTERS: Record<string, string> = {
+  [TOUR_SPRING_12_CLIP1_GRID_WEBM]: `${TOUR_SPRING_12_ASSET_BASE}/tob.clip1.poster.webp`,
+  [TOUR_SPRING_12_CLIP2_GRID_WEBM]: `${TOUR_SPRING_12_ASSET_BASE}/tob.clip2.poster.webp`,
+  [TOUR_SPRING_12_CLIP3_GRID_WEBM]: `${TOUR_SPRING_12_ASSET_BASE}/tob.clip3.poster.webp`,
+  [TOUR_SPRING_12_CLIP4_GRID_WEBM]: `${TOUR_SPRING_12_ASSET_BASE}/tob.clip4.poster.webp`,
+  [TOUR_SPRING_12_CLIP5_GRID_WEBM]: `${TOUR_SPRING_12_ASSET_BASE}/tob.clip5.poster.webp`,
+};
 
 /** «Полуостров Гамова» (spring-13). Исходники: `content/Весна/Гамова 1 д/`. Полный прогон фото+видео — `encode-spring-13-gamova-media.ps1`; только `gam.clip5`/`gam.clip6` — `encode-spring-13-gamova-two-clips.ps1`. */
 export const TOUR_SPRING_13_COVER_GRID =

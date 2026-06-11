@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   TOUR_SPRING_4_GALLERY_GRID,
   TOUR_SPRING_11_GALLERY_GRID,
+  TOUR_SPRING_12_GALLERY_GRID,
   TOUR_SPRING_13_GALLERY_GRID,
   TOUR_SUMMER_8_GALLERY_GRID,
   TOUR_SUMMER_9_GALLERY_GRID,
@@ -11,6 +12,7 @@ import {
 import {
   buildSpring4SestraBentoLayout,
   buildSpring11ShkotaBentoLayout,
+  buildSpring12TobizinaBentoLayout,
   buildSpring13GamovaBentoLayout,
   buildSummer8CrabbeBentoLayout,
   buildSummer9NeozhidannyBentoLayout,
@@ -328,6 +330,41 @@ describe('resolveTourBentoLayout', () => {
     const gridImages = TOUR_SPRING_13_GALLERY_GRID.slice(2);
     expect(() => buildSpring13GamovaBentoLayout(gridImages.slice(0, 9))).toThrow(
       /expected 10 grid images/
+    );
+  });
+
+  it('spring-12 получает left + center-top + left (Тобизина)', () => {
+    const tour = getTourById('spring-12');
+    expect(tour).toBeDefined();
+
+    const grid = tour!.galleryGridUrls!.slice(2);
+    const layout = resolveTourBentoLayout(tour!, grid);
+
+    expect(layout).toBeDefined();
+    expect(layout!.blocks.map((b) => b.type)).toEqual([
+      'bento-left',
+      'bento-center-top',
+      'bento-left',
+    ]);
+    expect(flattenBentoSlotsToUrls(layout!)).toEqual([...grid]);
+  });
+
+  it('summer-2 использует bento-layout spring-12 с путями summer-2', () => {
+    const tour = getTourById('summer-2');
+    expect(tour).toBeDefined();
+
+    const grid = tour!.galleryGridUrls!.slice(2);
+    const layout = resolveTourBentoLayout(tour!, grid);
+
+    expect(layout).toBeDefined();
+    expect(flattenBentoSlotsToUrls(layout!)).toEqual([...grid]);
+    expect(grid.every((url) => url.includes('/tours/summer-2/'))).toBe(true);
+  });
+
+  it('buildSpring12TobizinaBentoLayout отклоняет неверное число кадров', () => {
+    const gridImages = TOUR_SPRING_12_GALLERY_GRID.slice(2);
+    expect(() => buildSpring12TobizinaBentoLayout(gridImages.slice(0, 8))).toThrow(
+      /expected 9 grid images/
     );
   });
 });

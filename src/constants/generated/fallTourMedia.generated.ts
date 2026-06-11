@@ -404,23 +404,38 @@ export const FALL_TOUR_MEDIA_BY_ID = {
   "imageUrl": "/tours/fall-12/cover.webp",
   "galleryImages": [
     "/tours/fall-12/cover.webp",
-    "https://placehold.co/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря",
-    "https://placehold.co/900x900/7BA7BC/ffffff?text=Тропа+к+мысу",
-    "https://placehold.co/900x900/1A3C2E/ffffff?text=Каменное+плато",
-    "https://placehold.co/900x900/C8A96E/1A3C2E?text=Скалы",
-    "https://placehold.co/1200x800/7BA7BC/ffffff?text=Бухта+Карпинского",
-    "https://placehold.co/900x900/E8A838/1A3C2E?text=Обед+на+берегу"
+    "/tours/fall-12/preface.webp",
+    "/tours/fall-12/tob.clip1.poster.webp",
+    "/tours/fall-12/1.webp",
+    "/tours/fall-12/tob.clip2.poster.webp",
+    "/tours/fall-12/2.webp",
+    "/tours/fall-12/tob.clip3.poster.webp",
+    "/tours/fall-12/3.webp",
+    "/tours/fall-12/tob.clip4.poster.webp",
+    "/tours/fall-12/4.webp",
+    "/tours/fall-12/tob.clip5.poster.webp"
   ],
   "galleryGridUrls": [
     "/tours/fall-12/cover.webp",
-    "https://placehold.co/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря",
-    "https://placehold.co/900x900/7BA7BC/ffffff?text=Тропа+к+мысу",
-    "https://placehold.co/900x900/1A3C2E/ffffff?text=Каменное+плато",
-    "https://placehold.co/900x900/C8A96E/1A3C2E?text=Скалы",
-    "https://placehold.co/1200x800/7BA7BC/ffffff?text=Бухта+Карпинского",
-    "https://placehold.co/900x900/E8A838/1A3C2E?text=Обед+на+берегу"
+    "/tours/fall-12/preface.webp",
+    "/tours/fall-12/tob.clip1.grid.webm",
+    "/tours/fall-12/1.webp",
+    "/tours/fall-12/tob.clip2.grid.webm",
+    "/tours/fall-12/2.webp",
+    "/tours/fall-12/tob.clip3.grid.webm",
+    "/tours/fall-12/3.webp",
+    "/tours/fall-12/tob.clip4.grid.webm",
+    "/tours/fall-12/4.webp",
+    "/tours/fall-12/tob.clip5.grid.webm"
   ],
-  "prefaceBackgroundImageUrl": "https://placehold.co/1200x800/1A3C2E/ffffff?text=Тобизина+·+край+моря"
+  "prefaceBackgroundImageUrl": "/tours/fall-12/preface.webp",
+  "gridVideoPosters": {
+    "/tours/fall-12/tob.clip1.grid.webm": "/tours/fall-12/tob.clip1.poster.webp",
+    "/tours/fall-12/tob.clip2.grid.webm": "/tours/fall-12/tob.clip2.poster.webp",
+    "/tours/fall-12/tob.clip3.grid.webm": "/tours/fall-12/tob.clip3.poster.webp",
+    "/tours/fall-12/tob.clip4.grid.webm": "/tours/fall-12/tob.clip4.poster.webp",
+    "/tours/fall-12/tob.clip5.grid.webm": "/tours/fall-12/tob.clip5.poster.webp"
+  }
 },
   'fall-13': {
   "imageUrl": "/tours/fall-13/cover.webp",

@@ -565,7 +565,7 @@
 
   .tour-detail-program-card-reveal .tour-detail-program-track {
     transform: translateY(var(--tour-program-track-offset-y, 0px));
-    transition: transform theme('transitionDuration.reveal') theme('transitionTimingFunction.reveal-out');
+    transition: transform theme('transitionDuration.reveal-program') theme('transitionTimingFunction.reveal-out');
     will-change: transform;
   }
 
@@ -861,12 +861,12 @@
   }
   .reveal-program-step-visible {
     @apply opacity-100 translate-y-0;
-    animation: reveal-program-item-in theme('transitionDuration.reveal') theme('transitionTimingFunction.reveal-out') both;
+    animation: reveal-program-item-in theme('transitionDuration.reveal-program') theme('transitionTimingFunction.reveal-out') both;
     filter: brightness(1);
   }
 
   .reveal-program-footer {
-    animation: reveal-program-item-in theme('transitionDuration.reveal') theme('transitionTimingFunction.reveal-out') both;
+    animation: reveal-program-item-in theme('transitionDuration.reveal-program') theme('transitionTimingFunction.reveal-out') both;
   }
 
   @keyframes reveal-program-item-in {

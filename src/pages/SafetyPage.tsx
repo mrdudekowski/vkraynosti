@@ -31,18 +31,17 @@ const SafetyPage = () => {
         path={SEO_DEFAULTS.safety.path}
       />
       <div className="relative overflow-hidden py-20 px-4 text-center">
-        <PlaceholderImage
-          src={SAFETY_PAGE_HERO_BACKGROUND}
-          alt={UI.safetyPage.heroImageAlt}
-          className="absolute inset-0 h-full w-full"
-          imgClassName="h-full w-full object-cover object-bottom"
-          loading="eager"
-          fetchPriority="high"
-        />
-        <div
-          className="absolute inset-0 bg-brand-primary/65 pointer-events-none"
-          aria-hidden
-        />
+        <div className="absolute inset-0" aria-hidden>
+          <PlaceholderImage
+            src={SAFETY_PAGE_HERO_BACKGROUND}
+            alt={UI.safetyPage.heroImageAlt}
+            className="h-full w-full"
+            imgClassName="h-full w-full object-cover object-bottom"
+            loading="eager"
+            fetchPriority="high"
+          />
+          <div className="absolute inset-0 bg-brand-primary/65 pointer-events-none" />
+        </div>
         <div className="relative z-10">
           <ScrollScrubFade as="h1" className="section-title text-text-inverse mb-3">
             {SAFETY_OFFER_HEADER.title}

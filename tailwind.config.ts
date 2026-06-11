@@ -47,6 +47,7 @@ import {
 } from './src/constants/homeContactMessengerGlow'
 import { HOME_GATE_SCROLL_HINT_FADE_MS } from './src/constants/homeGateScroll'
 import { TOUR_REQUEST_STEP_CROSSFADE_MS } from './src/constants/tourRequestModalMotion'
+import { TOUR_PROGRAM_REVEAL_ITEM_MS } from './src/constants/tourProgramReveal'
 import {
   HOME_CONTACT_SECTION_BG_HEX,
   HOME_CONTACT_SECTION_BUTTON_SIZE,
@@ -1248,6 +1249,8 @@ const config: Config = {
         'season-change': '600ms',
         /** Scroll-reveal: opacity + transform. */
         'reveal':        '500ms',
+        /** Программа тура (lg+): появление пункта и сдвиг track; `TOUR_PROGRAM_REVEAL_ITEM_MS`. */
+        'reveal-program': `${TOUR_PROGRAM_REVEAL_ITEM_MS}ms`,
         /** Панель SeasonNavDock: слайд сверху вниз. */
         'season-dock-slide': '320ms',
         /** Мобильное меню навбара: выезд панели справа. */

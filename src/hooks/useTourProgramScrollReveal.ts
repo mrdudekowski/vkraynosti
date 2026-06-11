@@ -7,29 +7,23 @@ import {
   type RefObject,
 } from 'react';
 import { useLenis } from 'lenis/react';
-import { TOUR_PROGRAM_REVEAL_MIN_RANGE_PX } from '../constants/tourProgramReveal';
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
+import { computeTourProgramRevealedItemCount } from '../constants/tourProgramReveal';
 
 function computeRevealedItemCount(
   mainColumnEl: HTMLElement,
   itemCount: number,
   scrollY: number
 ): number {
-  if (itemCount <= 0) return 0;
   const rect = mainColumnEl.getBoundingClientRect();
-  const startTop = rect.top + scrollY;
-  const endBottom = rect.bottom + scrollY;
-  const range = endBottom - startTop;
-  if (range < TOUR_PROGRAM_REVEAL_MIN_RANGE_PX) {
-    return itemCount;
-  }
-  const viewportHeight = window.innerHeight;
-  const progress = (scrollY + viewportHeight - startTop) / range;
-  const clamped = clamp(progress, 0, 1);
-  return Math.min(itemCount, Math.ceil(clamped * itemCount));
+  return computeTourProgramRevealedItemCount(
+    {
+      columnTopViewportPx: rect.top,
+      columnHeightPx: rect.height,
+      scrollY,
+      viewportHeightPx: window.innerHeight,
+    },
+    itemCount
+  );
 }
 
 export interface UseTourProgramScrollRevealOptions {

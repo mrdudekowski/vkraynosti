@@ -24,7 +24,6 @@ type StackAction =
   | { type: 'add_plaque'; maxCount: number; now: number }
   | { type: 'fade_visible' }
   | { type: 'tick_checkbox'; maxCount: number; now: number }
-  | { type: 'reset_from_pause'; now: number }
   | { type: 'clamp_visible'; max: number }
   | { type: 'set_cycle_start'; now: number };
 
@@ -61,13 +60,6 @@ function stackReducer(state: StackState, action: StackAction): StackState {
       }
       return { ...state, checkboxPhase: phase };
     }
-    case 'reset_from_pause':
-      return {
-        visibleCount: 1,
-        enteringFadePhase: 'visible',
-        checkboxPhase: 'pulsing',
-        cycleStartMs: action.now,
-      };
     case 'clamp_visible':
       return {
         ...state,
@@ -106,7 +98,8 @@ function resolveCheckboxPhase(
 
 /**
  * Накопительный стек плашек 1…lineCount; fade-in только у последней добавленной.
- * На lineCount ротация останавливается; после outOfView → inView при полном стеке — сброс до 1.
+ * На lineCount ротация останавливается. Пауза (вне viewport) не сбрасывает прогресс —
+ * сброс только при перезагрузке страницы или новом монтировании главной.
  */
 export function useSafetyStatusStack({
   lineCount,
@@ -120,7 +113,6 @@ export function useSafetyStatusStack({
 } {
   const safeLineCount = Math.max(1, lineCount);
   const [state, dispatch] = useReducer(stackReducer, undefined, initialStackState);
-  const prevPausedRef = useRef(paused);
   const enterVisibleGenerationRef = useRef(0);
 
   /** После commit `hidden`: два rAF — `visible`, чтобы CSS-transition успел стартовать. */
@@ -152,20 +144,13 @@ export function useSafetyStatusStack({
 
   useLayoutEffect(() => {
     if (!enabled) {
-      prevPausedRef.current = paused;
       return;
     }
 
-    const wasPaused = prevPausedRef.current;
-    prevPausedRef.current = paused;
-
-    if (wasPaused && !paused && state.visibleCount >= safeLineCount) {
-      dispatch({ type: 'reset_from_pause', now: Date.now() });
-    }
     if (state.visibleCount > safeLineCount) {
       dispatch({ type: 'clamp_visible', max: safeLineCount });
     }
-  }, [enabled, paused, state.visibleCount, safeLineCount]);
+  }, [enabled, state.visibleCount, safeLineCount]);
 
   useEffect(() => {
     if (!enabled || paused || state.cycleStartMs !== 0) {

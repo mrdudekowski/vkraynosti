@@ -17,7 +17,7 @@ export const CDN_DIST_RELATIVE_DIRS = [
 ] as const;
 
 /** Single files under dist/ served from S3 (not whole `safety/` — icons stay in App). */
-export const CDN_DIST_RELATIVE_FILES = ['safety/safety.webp'] as const;
+export const CDN_DIST_RELATIVE_FILES = ['safety/safety.webp', 'safety/safetyback.webp'] as const;
 
 export function shouldPruneDistForCdn(
   env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,

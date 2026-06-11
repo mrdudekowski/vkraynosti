@@ -144,6 +144,8 @@ export const HOME_SAFETY_SECTION_HERO_IMAGE = TOUR_WINTER_3_GALLERY_GRID[8];
 
 /** Главная: левая колонка teaser #safety — `public/safety/safety.webp`. */
 export const HOME_SAFETY_TEASER_HERO_IMAGE = `${MEDIA_ASSET_BASE}safety/safety.webp`;
+/** Страница `/safety`: hero-фон — `content/safety/safetyback.webp` → `public/safety/safetyback.webp`. */
+export const SAFETY_PAGE_HERO_BACKGROUND = `${MEDIA_ASSET_BASE}safety/safetyback.webp`;
 export const TOUR_WINTER_3_CLIP1_VIDEO = TOUR_WINTER_3_GALLERY_GRID[3];
 export const TOUR_WINTER_3_CLIP2_VIDEO = TOUR_WINTER_3_GALLERY_GRID[6];
 export const TOUR_WINTER_3_CLIP3_VIDEO = TOUR_WINTER_3_GALLERY_GRID[9];

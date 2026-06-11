@@ -6,7 +6,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
-import { scrollHomeHeroTopImmediate, scrollHomeHeroTopSmooth } from '../../constants/smoothScroll';
+import {
+  scrollHomeHeroTopImmediate,
+  scrollHomeHeroTopSmooth,
+  scrollHomeToursTopImmediate,
+  scrollHomeToursTopSmooth,
+} from '../../constants/smoothScroll';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { SEASON_ICON, SEASON_STYLE, SEASON_TEXT_CLASS } from '../../constants/seasonNavbarAppearance';
 import { homeNavbarChromeTeamHideShellClass } from '../../constants/homeNavbarBridgeChrome';
@@ -169,10 +174,26 @@ const Navbar = () => {
     toggleSeasonMenu();
   };
 
-  const handleCtaClick = () => {
+  const handleCtaClick = useCallback(() => {
     closeMenu();
-    navigate({ pathname: ROUTES.HOME, hash: 'tours' });
-  };
+    const sectionId = UI.sections.homeToursSectionElementId;
+    const toursHash = `#${sectionId}`;
+
+    if (location.pathname !== ROUTES.HOME) {
+      navigate({ pathname: ROUTES.HOME, hash: sectionId });
+      return;
+    }
+
+    if (prefersReducedMotion) {
+      scrollHomeToursTopImmediate(lenis);
+    } else {
+      scrollHomeToursTopSmooth(lenis);
+    }
+
+    if (location.hash !== toursHash) {
+      navigate({ pathname: ROUTES.HOME, hash: sectionId }, { replace: true });
+    }
+  }, [closeMenu, lenis, location.hash, location.pathname, navigate, prefersReducedMotion]);
 
   const navLinkClass =
     'text-text-inverse/80 hover:text-brand-secondary transition-colors duration-hover text-sm font-medium';

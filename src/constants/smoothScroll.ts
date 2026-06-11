@@ -1,7 +1,7 @@
 import type { default as Lenis, LenisOptions } from 'lenis';
 import { BREAKPOINT_MD_PX } from './breakpoints';
 import { HOME_HERO_SECTION_ELEMENT_ID } from './homeHeroSnap';
-import { HOME_SECTION_TEAM } from './routes';
+import { HOME_SECTION_TEAM, HOME_SECTION_TOURS } from './routes';
 import { NAVBAR_CONTENT_HEIGHT_PX } from './layoutChrome';
 
 // Скролл: Lenis в `SmoothScrollProvider`; chrome главной — `useHomeNavbarChromeScroll` + контекст.
@@ -122,6 +122,25 @@ export function scrollHomeTeamTopSmooth(lenis: Lenis | undefined): void {
 
 export function scrollHomeTeamTopImmediate(lenis: Lenis | undefined): void {
   const section = document.getElementById(HOME_SECTION_TEAM);
+  if (lenis && section) {
+    lenis.scrollTo(section, { offset: getNavbarScrollOffsetPx(), immediate: true });
+  } else if (section) {
+    section.scrollIntoView({ block: 'start' });
+  }
+}
+
+/** Главная: к секции `#tours`, верх под навбаром. */
+export function scrollHomeToursTopSmooth(lenis: Lenis | undefined): void {
+  const section = document.getElementById(HOME_SECTION_TOURS);
+  if (lenis && section) {
+    lenis.scrollTo(section, { offset: getNavbarScrollOffsetPx() });
+  } else if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+export function scrollHomeToursTopImmediate(lenis: Lenis | undefined): void {
+  const section = document.getElementById(HOME_SECTION_TOURS);
   if (lenis && section) {
     lenis.scrollTo(section, { offset: getNavbarScrollOffsetPx(), immediate: true });
   } else if (section) {

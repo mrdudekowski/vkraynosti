@@ -156,6 +156,7 @@ export const UI = {
     privacyLinkLabel: 'Подробнее',
   },
   safetyPage: {
+    heroImageAlt: 'Горный пейзаж Приморья на фоне страницы правил безопасности',
     downloadPdfLabel: 'Скачать оферту и правила (PDF)',
     downloadPdfAriaLabel: 'Скачать оферту и правила безопасности в формате PDF',
   },

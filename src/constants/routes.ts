@@ -15,6 +15,9 @@ export const HOME_SECTION_TEAM = 'team' as const;
 /** Должен совпадать с `id` секции контактов на главной (`ContactSection`). */
 export const HOME_SECTION_CONTACT = 'contact' as const;
 
+/** Должен совпадать с `UI.sections.homeToursSectionElementId` и секцией туров на главной. */
+export const HOME_SECTION_TOURS = 'tours' as const;
+
 export const ROUTES = {
   HOME:        '/',
   WINTER:      '/tours/winter',

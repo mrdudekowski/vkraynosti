@@ -129,4 +129,22 @@ test.describe('Home funnel: H3 tours anchor', () => {
     );
     await expectHomeSectionAnchored(page, UI.sections.homeToursSectionElementId);
   });
+
+  test('desktop: повторный клик CTA с #tours скроллит к секции туров', async ({ page }) => {
+    await page.setViewportSize({ width: 1160, height: 900 });
+    await gotoHome(page);
+
+    await clickNavbarHomeLink(page, UI.nav.links[0].label);
+    await expectHomeSectionAnchored(page, UI.sections.homeToursSectionElementId);
+
+    await page.evaluate(() => window.scrollBy(0, 600));
+    await expect(page).toHaveURL(
+      new RegExp(`#${UI.sections.homeToursSectionElementId}$`)
+    );
+
+    const cta = page.getByRole('button', { name: UI.nav.cta });
+    await expect(cta).toBeVisible();
+    await cta.click();
+    await expectHomeSectionAnchored(page, UI.sections.homeToursSectionElementId);
+  });
 });

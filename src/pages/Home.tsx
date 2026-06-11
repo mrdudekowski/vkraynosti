@@ -8,7 +8,6 @@ import HomeHeroContactRail from '../components/home/HomeHeroContactRail';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import HomeBelowFoldSuspenseFallback from '../components/home/HomeBelowFoldSuspenseFallback';
 import PageMeta from '../components/shared/PageMeta';
-import RevealBox from '../components/shared/RevealBox';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 import SeasonSwitcher from '../components/shared/SeasonSwitcher';
 import TourCard from '../components/shared/TourCard';
@@ -382,7 +381,10 @@ const Home = () => {
                     {toursSectionTitle}
                   </ScrollScrubFade>
                 </div>
-                <RevealBox as="div" className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <ScrollScrubFade
+                  as="div"
+                  className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                >
                   {visibleTours.map((tour, index) => (
                     <div
                       key={tour.id}
@@ -451,8 +453,8 @@ const Home = () => {
                       </button>
                     </div>
                   ) : null}
-                </RevealBox>
-                <RevealBox
+                </ScrollScrubFade>
+                <ScrollScrubFade
                   as="div"
                   className="mx-auto mt-home-stack-gap flex w-full max-w-7xl flex-col items-center gap-home-season-banner-foot-gap"
                 >
@@ -460,7 +462,7 @@ const Home = () => {
                     {UI.sections.switchSeason}
                   </p>
                   <SeasonSwitcher variant="section" />
-                </RevealBox>
+                </ScrollScrubFade>
               </div>
             </ScrollScrubFade>
           </section>

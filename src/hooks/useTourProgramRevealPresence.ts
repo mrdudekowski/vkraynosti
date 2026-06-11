@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { TOUR_PROGRAM_REVEAL_ITEM_MS } from '../constants/tourProgramReveal';
 
 export interface UseTourProgramRevealPresenceOptions {
@@ -12,6 +12,48 @@ export interface UseTourProgramRevealPresenceResult {
   mountedFooter: boolean;
 }
 
+type PresenceState = {
+  peakStepCount: number;
+  peakFooterVisible: boolean;
+};
+
+type PresenceAction =
+  | {
+      type: 'sync-props';
+      revealedCount: number;
+      showProgramFooter: boolean;
+      enabled: boolean;
+    }
+  | { type: 'commit-step-decrease'; revealedCount: number }
+  | { type: 'commit-footer-hide' };
+
+function presenceReducer(
+  state: PresenceState,
+  action: PresenceAction
+): PresenceState {
+  switch (action.type) {
+    case 'sync-props': {
+      if (!action.enabled) {
+        return {
+          peakStepCount: action.revealedCount,
+          peakFooterVisible: action.showProgramFooter,
+        };
+      }
+
+      return {
+        peakStepCount: Math.max(state.peakStepCount, action.revealedCount),
+        peakFooterVisible: action.showProgramFooter || state.peakFooterVisible,
+      };
+    }
+    case 'commit-step-decrease':
+      return { ...state, peakStepCount: action.revealedCount };
+    case 'commit-footer-hide':
+      return { ...state, peakFooterVisible: false };
+    default:
+      return state;
+  }
+}
+
 /**
  * Держит пункты программы и footer в DOM на время fade-out перед unmount.
  */
@@ -20,46 +62,65 @@ export function useTourProgramRevealPresence({
   showProgramFooter,
   enabled,
 }: UseTourProgramRevealPresenceOptions): UseTourProgramRevealPresenceResult {
-  const [mountedStepCount, setMountedStepCount] = useState(revealedCount);
-  const [mountedFooter, setMountedFooter] = useState(showProgramFooter);
+  const [state, dispatch] = useReducer(presenceReducer, {
+    peakStepCount: revealedCount,
+    peakFooterVisible: showProgramFooter,
+  });
+  const [prevProps, setPrevProps] = useState({
+    revealedCount,
+    showProgramFooter,
+    enabled,
+  });
+
+  if (
+    prevProps.revealedCount !== revealedCount ||
+    prevProps.showProgramFooter !== showProgramFooter ||
+    prevProps.enabled !== enabled
+  ) {
+    setPrevProps({ revealedCount, showProgramFooter, enabled });
+    dispatch({
+      type: 'sync-props',
+      revealedCount,
+      showProgramFooter,
+      enabled,
+    });
+  }
 
   useEffect(() => {
-    if (!enabled) {
-      setMountedStepCount(revealedCount);
-      return;
-    }
-
-    if (revealedCount >= mountedStepCount) {
-      setMountedStepCount(revealedCount);
+    if (!enabled || revealedCount >= state.peakStepCount) {
       return;
     }
 
     const timeoutId = window.setTimeout(
-      () => setMountedStepCount(revealedCount),
+      () => dispatch({ type: 'commit-step-decrease', revealedCount }),
       TOUR_PROGRAM_REVEAL_ITEM_MS
     );
+
     return () => window.clearTimeout(timeoutId);
-  }, [enabled, mountedStepCount, revealedCount]);
+  }, [enabled, revealedCount, state.peakStepCount]);
 
   useEffect(() => {
-    if (!enabled) {
-      setMountedFooter(showProgramFooter);
+    if (!enabled || showProgramFooter || !state.peakFooterVisible) {
       return;
     }
-
-    if (showProgramFooter) {
-      setMountedFooter(true);
-      return;
-    }
-
-    if (!mountedFooter) return;
 
     const timeoutId = window.setTimeout(
-      () => setMountedFooter(false),
+      () => dispatch({ type: 'commit-footer-hide' }),
       TOUR_PROGRAM_REVEAL_ITEM_MS
     );
-    return () => window.clearTimeout(timeoutId);
-  }, [enabled, mountedFooter, showProgramFooter]);
 
-  return { mountedStepCount, mountedFooter };
+    return () => window.clearTimeout(timeoutId);
+  }, [enabled, showProgramFooter, state.peakFooterVisible]);
+
+  if (!enabled) {
+    return {
+      mountedStepCount: revealedCount,
+      mountedFooter: showProgramFooter,
+    };
+  }
+
+  return {
+    mountedStepCount: Math.max(revealedCount, state.peakStepCount),
+    mountedFooter: showProgramFooter || state.peakFooterVisible,
+  };
 }

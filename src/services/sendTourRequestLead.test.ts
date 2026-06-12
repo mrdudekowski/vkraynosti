@@ -17,6 +17,8 @@ const values: TourRequestFormValues = {
   phone: '+79991234567',
   email: '',
   preferredMessenger: 'telegram',
+  partySize: 2,
+  withChildren: false,
   question: 'Хочу узнать детали',
   privacyAccepted: true,
 };

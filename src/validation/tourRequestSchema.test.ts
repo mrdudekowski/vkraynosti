@@ -8,6 +8,8 @@ describe('tourRequestFormSchema', () => {
       preferredMessenger: '',
       email: '',
       phone: '',
+      partySize: '',
+      withChildren: false,
       question: '',
       privacyAccepted: false,
     });
@@ -20,10 +22,16 @@ describe('tourRequestFormSchema', () => {
       preferredMessenger: 'telegram',
       email: '',
       phone: '+7 900 000-00-00',
+      partySize: '3',
+      withChildren: true,
       question: 'Когда старт?',
       privacyAccepted: true,
     });
     expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.partySize).toBe(3);
+      expect(r.data.withChildren).toBe(true);
+    }
   });
 
   it('rejects invalid email when provided', () => {
@@ -32,6 +40,8 @@ describe('tourRequestFormSchema', () => {
       preferredMessenger: 'whatsapp',
       email: 'not-an-email',
       phone: '+1',
+      partySize: '2',
+      withChildren: false,
       question: 'Вопрос',
       privacyAccepted: true,
     });

@@ -97,6 +97,7 @@ const buildLeadPayload = (
       ? values.preferredDepartureDate
       : tour.preferredDepartureDateIso;
 
+  // idempotencyKey и userAgent — для GAS (дедуп и Logger.log), не для Telegram-чата менеджерам.
   return {
     ...values,
     idempotencyKey: createIdempotencyKey(),

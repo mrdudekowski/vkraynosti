@@ -193,6 +193,8 @@ export const UI = {
     phoneLabel: 'Телефон',
     /** Плейсхолдер-маска без привязки к коду страны. */
     phonePlaceholder: '+7 (___) ___-__-__',
+    partySizeLabel: 'Количество человек',
+    withChildrenLabel: 'С детьми',
     tourLabel: 'Выбранная поездка',
     questionLabel: 'Ваш вопрос',
     questionHint: 'С каким вопросом мы можем вам помочь?',
@@ -214,6 +216,8 @@ export const UI = {
       nameRequired: 'Укажите имя',
       emailInvalid: 'Некорректный email',
       phoneRequired: 'Укажите телефон',
+      partySizeRequired: 'Укажите количество человек',
+      partySizeInvalid: 'Укажите число от 1 до 99',
       questionRequired: 'Напишите вопрос',
       questionTooLong: 'Вопрос слишком длинный (максимум 1200 символов)',
       messengerRequired: 'Выберите мессенджер',

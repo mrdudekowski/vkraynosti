@@ -38,9 +38,11 @@
  * --- Чеклист ---
  * [ ] Бот создан, TELEGRAM_BOT_TOKEN в свойствах.
  * [ ] Бот добавлен в группу, может писать сообщения.
- * [ ] TELEGRAM_CHAT_ID верный (для супергруппы отрицательный id).
+ * [ ] TELEGRAM_CHAT_ID верный (для супергруппы отрицательный id, напр. -1003910809370).
+ *     При апгрейде группы → супергруппа Telegram вернёт migrate_to_chat_id; скрипт обновит id сам.
  * [ ] Web App задеплоен, URL с /exec скопирован в VITE_TOUR_REQUEST_ENDPOINT_URL.
  * [ ] CORS: прямой POST из браузера на script.google.com остается opaque; сайт не читает JSON-статус.
+ * [ ] idempotencyKey и userAgent — в payload и логах GAS; в Telegram менеджерам не уходят.
  *
  * --- HTTP-статусы ---
  * У Web App ответ через ContentService обычно отдаётся с кодом 200 даже при ошибке.
@@ -52,7 +54,8 @@ var TELEGRAM_TEXT_LIMIT = 4096;
 var SAFE_CHUNK = 4000;
 var DEFAULT_IDEMPOTENCY_TTL_SECONDS = '21600';
 /** Маркер версии в doGet — убедитесь, что GET /exec возвращает его после деплоя. */
-var WEBHOOK_BUILD_ID = 'lead-message-v2';
+var WEBHOOK_BUILD_ID = 'lead-message-v4-party-size';
+var TOUR_REQUEST_MAX_PARTY_SIZE = 99;
 
 /**
  * Запустите один раз из Apps Script.
@@ -94,6 +97,8 @@ function sendTestLead() {
     phone: '+79001234567',
     email: 'test@example.com',
     preferredMessenger: 'telegram',
+    partySize: 4,
+    withChildren: true,
     question: 'Проверка отправки заявки из Google Apps Script.',
     privacyAccepted: true,
     preferredDepartureDate: '2026-06-20',
@@ -171,6 +176,8 @@ function handleLeadPost_(e) {
     return { ok: false, error: 'Invalid JSON', code: 'BAD_REQUEST' };
   }
 
+  logLeadDiagnostics_(body);
+
   var props = PropertiesService.getScriptProperties();
   var idemKey = typeof body.idempotencyKey === 'string' ? body.idempotencyKey.trim() : '';
   if (idemKey) {
@@ -178,6 +185,7 @@ function handleLeadPost_(e) {
     var cache = CacheService.getScriptCache();
     var cacheKey = 'lead_' + Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, idemKey, Utilities.Charset.UTF_8)).slice(0, 200);
     if (cache.get(cacheKey)) {
+      Logger.log('Lead deduplicated (idempotencyKey already processed)');
       return { ok: true, deduplicated: true };
     }
     var err = validatePayload_(body);
@@ -247,6 +255,16 @@ function validatePayload_(body) {
   if (!body.phone || typeof body.phone !== 'string' || !String(body.phone).trim()) {
     return 'phone is required';
   }
+  if (body.partySize == null || body.partySize === '') {
+    return 'partySize is required';
+  }
+  var partySize = parseInt(String(body.partySize), 10);
+  if (isNaN(partySize) || partySize < 1 || partySize > TOUR_REQUEST_MAX_PARTY_SIZE) {
+    return 'partySize must be an integer from 1 to ' + TOUR_REQUEST_MAX_PARTY_SIZE;
+  }
+  if (body.withChildren != null && typeof body.withChildren !== 'boolean') {
+    return 'withChildren must be a boolean when provided';
+  }
   if (body.privacyAccepted !== true) {
     return 'privacyAccepted must be true';
   }
@@ -258,6 +276,30 @@ function validatePayload_(body) {
 }
 
 /**
+ * Технические поля payload (idempotencyKey, userAgent) — только лог GAS и идемпотентность;
+ * в Telegram менеджерам не передаются (см. logLeadDiagnostics_).
+ * @param {Object} body
+ */
+function logLeadDiagnostics_(body) {
+  var tourId = body.tourId ? String(body.tourId).trim() : '—';
+  var idem =
+    typeof body.idempotencyKey === 'string' && body.idempotencyKey.trim()
+      ? body.idempotencyKey.trim()
+      : '—';
+  var ua =
+    typeof body.userAgent === 'string' && body.userAgent.trim() ? body.userAgent.trim() : '—';
+  Logger.log(
+    'Lead diagnostics (not sent to Telegram): tourId=' +
+      tourId +
+      ', idempotencyKey=' +
+      idem +
+      ', userAgent=' +
+      ua
+  );
+}
+
+/**
+ * Текст заявки для менеджеров в Telegram. Только бизнес-поля — без idempotencyKey и userAgent.
  * @param {Object} body
  * @return {string}
  */
@@ -274,6 +316,8 @@ function buildLeadMessage_(body) {
   var tourTitleLine = buildTourTitleHtml_(tourTitleRaw, sourceUrlRaw);
   var duration = formatTourDuration_(body.tourDuration);
   var departureDate = formatDepartureDate_(body.preferredDepartureDate);
+  var partySize = escapeHtml_(String(parseInt(String(body.partySize), 10)));
+  var withChildren = body.withChildren === true ? 'Да' : 'Нет';
 
   var lines = [
     'Новая заявка с сайта!',
@@ -286,6 +330,8 @@ function buildLeadMessage_(body) {
     '',
     'Имя: ' + escapeHtml_(String(body.name).trim()),
     'Телефон: ' + escapeHtml_(String(body.phone).trim()),
+    'Количество человек: ' + partySize,
+    'С детьми: ' + withChildren,
     'Email: ' + email,
     'Мессенджер: ' + escapeHtml_(messengerLabel_(body.preferredMessenger)),
     'Вопрос:',
@@ -413,10 +459,8 @@ function sendTelegramHtmlChunks_(props, fullText) {
     return { ok: false, error: 'Telegram not configured', code: 'INTERNAL', detail: 'missing token or chat id' };
   }
 
-  var chatId = Number(chatRaw);
-  if (isNaN(chatId)) {
-    chatId = chatRaw;
-  }
+  /** Строка: супергруппы с префиксом -100… не теряют точность (в отличие от Number). */
+  var chatId = String(chatRaw).trim();
 
   var chunks = splitMessageChunks_(fullText, SAFE_CHUNK);
   var total = chunks.length;
@@ -460,12 +504,34 @@ function splitMessageChunks_(text, maxLen) {
 }
 
 /**
+ * Telegram при апгрейде группы в супергруппу отдаёт parameters.migrate_to_chat_id.
+ * @param {string} raw
+ * @return {string|null}
+ */
+function parseTelegramMigrateChatId_(raw) {
+  try {
+    var json = JSON.parse(raw);
+    if (json.parameters && json.parameters.migrate_to_chat_id != null) {
+      return String(json.parameters.migrate_to_chat_id);
+    }
+  } catch (parseErr) {
+    return null;
+  }
+  return null;
+}
+
+/**
  * @param {string} token
- * @param {number|string} chatId
+ * @param {string} chatId
  * @param {string} text
+ * @param {boolean=} allowMigrateRetry
  * @return {{ok:boolean,error?:string,code?:string,detail?:string}}
  */
-function telegramSendMessage_(token, chatId, text) {
+function telegramSendMessage_(token, chatId, text, allowMigrateRetry) {
+  if (allowMigrateRetry === undefined) {
+    allowMigrateRetry = true;
+  }
+
   var url = 'https://api.telegram.org/bot' + token + '/sendMessage';
   var payload = {
     chat_id: chatId,
@@ -491,6 +557,16 @@ function telegramSendMessage_(token, chatId, text) {
 
   var code = response.getResponseCode();
   var raw = response.getContentText();
+
+  if (allowMigrateRetry) {
+    var migratedChatId = parseTelegramMigrateChatId_(raw);
+    if (migratedChatId) {
+      PropertiesService.getScriptProperties().setProperty('TELEGRAM_CHAT_ID', migratedChatId);
+      Logger.log('TELEGRAM_CHAT_ID auto-migrated to ' + migratedChatId);
+      return telegramSendMessage_(token, migratedChatId, text, false);
+    }
+  }
+
   if (code < 200 || code >= 300) {
     Logger.log('Telegram HTTP ' + code + ': ' + raw);
     return { ok: false, error: 'Telegram HTTP error', code: 'UPSTREAM', detail: raw };

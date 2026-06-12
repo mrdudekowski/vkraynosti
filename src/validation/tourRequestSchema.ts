@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TOUR_REQUEST_MAX_PARTY_SIZE } from '../data/tourRequestFormFields';
 import { UI } from '../constants/ui';
 
 const e = UI.tourRequestModal.errors;
@@ -41,6 +42,20 @@ export const tourRequestFormSchema = z.object({
     .min(1, { message: e.phoneRequired })
     .max(24, { message: e.phoneRequired })
     .refine(value => phonePattern.test(value), { message: e.phoneRequired }),
+  partySize: z
+    .string()
+    .trim()
+    .min(1, { message: e.partySizeRequired })
+    .refine(
+      value => {
+        if (!/^[1-9]\d*$/.test(value)) return false;
+        const n = parseInt(value, 10);
+        return n >= 1 && n <= TOUR_REQUEST_MAX_PARTY_SIZE;
+      },
+      { message: e.partySizeInvalid }
+    )
+    .transform(value => parseInt(value, 10)),
+  withChildren: z.boolean(),
   question: z
     .string()
     .transform(s => s.trim())
@@ -73,6 +88,8 @@ export const defaultTourRequestFormValues: TourRequestFormInput = {
   preferredMessenger: '',
   email: '',
   phone: '',
+  partySize: '',
+  withChildren: false,
   question: '',
   privacyAccepted: false,
   preferredDepartureDate: '',

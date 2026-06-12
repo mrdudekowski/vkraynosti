@@ -202,9 +202,13 @@ describe('TourRequestModal', () => {
 
     await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`)), 'Иван');
     await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.phoneLabel}`)), '+79991234567');
+    await user.type(
+      screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.partySizeLabel}`)),
+      '4'
+    );
     await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.questionLabel}`)), 'Вопрос по поездке');
     await user.click(screen.getByRole('radio', { name: UI.tourRequestModal.messengerTelegramAria }));
-    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('checkbox', { name: new RegExp(UI.tourRequestModal.privacyPolicyLink) }));
     await user.click(screen.getByRole('button', { name: UI.tourRequestModal.submit }));
 
     await waitFor(
@@ -214,6 +218,8 @@ describe('TourRequestModal', () => {
           expect.objectContaining({
             name: 'Иван',
             phone: '+79991234567',
+            partySize: 4,
+            withChildren: false,
             question: 'Вопрос по поездке',
             preferredMessenger: 'telegram',
             privacyAccepted: true,
@@ -234,8 +240,12 @@ describe('TourRequestModal', () => {
 
     await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.nameLabel}`)), 'Иван');
     await user.type(screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.phoneLabel}`)), '+79991234567');
+    await user.type(
+      screen.getByLabelText(new RegExp(`^${UI.tourRequestModal.partySizeLabel}`)),
+      '2'
+    );
     await user.click(screen.getByRole('radio', { name: UI.tourRequestModal.messengerTelegramAria }));
-    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('checkbox', { name: new RegExp(UI.tourRequestModal.privacyPolicyLink) }));
     await user.click(screen.getByRole('button', { name: UI.tourRequestModal.submit }));
 
     await waitFor(
@@ -245,6 +255,8 @@ describe('TourRequestModal', () => {
           expect.objectContaining({
             name: 'Иван',
             phone: '+79991234567',
+            partySize: 2,
+            withChildren: false,
             question: '',
             preferredMessenger: 'telegram',
             privacyAccepted: true,

@@ -45,6 +45,7 @@ import { sendTourRequestLead } from '../../services/sendTourRequestLead';
 import { buildTourDepartureCalendarModel } from '../../utils/tourSchedule/buildTourDepartureCalendarModel';
 import { buildTourDepartureEventsByDate } from '../../utils/tourSchedule/buildTourDepartureEventsByDate';
 import { parseIsoDate } from '../../utils/tourSchedule/parseIsoDate';
+import { TOUR_REQUEST_MAX_PARTY_SIZE } from '../../data/tourRequestFormFields';
 import {
   createTourRequestFormSchema,
   defaultTourRequestFormValues,
@@ -406,6 +407,45 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                       aria-describedby={fieldErrors.phone ? 'tour-request-phone-error' : undefined}
                     />
                   </FormField>
+
+                  <FormField
+                    id="tour-request-party-size"
+                    label={UI.tourRequestModal.partySizeLabel}
+                    required
+                    error={fieldErrors.partySize}
+                  >
+                    <TextInput
+                      id="tour-request-party-size"
+                      type="number"
+                      name="partySize"
+                      inputMode="numeric"
+                      min={1}
+                      max={TOUR_REQUEST_MAX_PARTY_SIZE}
+                      step={1}
+                      value={values.partySize}
+                      onChange={e => updateField('partySize', e.target.value)}
+                      hasError={!!fieldErrors.partySize}
+                      aria-invalid={!!fieldErrors.partySize}
+                      aria-describedby={
+                        fieldErrors.partySize ? 'tour-request-party-size-error' : undefined
+                      }
+                    />
+                  </FormField>
+
+                  <div className="flex items-start gap-3">
+                    <FormCheckbox
+                      id="tour-request-with-children"
+                      className="mt-0.5"
+                      checked={values.withChildren}
+                      onChange={e => updateField('withChildren', e.target.checked)}
+                    />
+                    <label
+                      htmlFor="tour-request-with-children"
+                      className="text-sm text-text-primary leading-relaxed cursor-pointer"
+                    >
+                      {UI.tourRequestModal.withChildrenLabel}
+                    </label>
+                  </div>
 
                   <FormField
                     id="tour-request-question"

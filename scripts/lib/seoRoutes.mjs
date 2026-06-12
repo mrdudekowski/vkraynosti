@@ -66,10 +66,15 @@ export async function loadSeoRouteSources(rootDir = process.cwd()) {
   return { routesSource, tourSlugsSource };
 }
 
+/** Routes with noindex at runtime — excluded from sitemap and indexable OG shells. */
+export const NON_INDEXABLE_ROUTE_PATHS = new Set(['/privacy']);
+
 /** Indexable SPA paths (same set as sitemap, excluding 404 wildcard). */
 export async function getIndexableRoutePaths(rootDir = process.cwd()) {
   const { routesSource, tourSlugsSource } = await loadSeoRouteSources(rootDir);
-  const staticRoutes = extractStaticRoutes(routesSource);
+  const staticRoutes = extractStaticRoutes(routesSource).filter(
+    (path) => !NON_INDEXABLE_ROUTE_PATHS.has(path),
+  );
   const tourRoutes = extractTourPublicUrlsFromSlugMap(tourSlugsSource);
 
   return [

@@ -133,3 +133,64 @@ describe('TourDetailPage full layout', () => {
     expect(screen.getByText(UI.tourDetail.includedHeading)).toBeInTheDocument();
   });
 });
+
+describe('TourDetailPage indexing meta', () => {
+  it('keeps indexable robots while schedule is loading', async () => {
+    const tour = getTourById('summer-10');
+    if (!tour) throw new Error('summer-10 missing');
+
+    render(
+      <HelmetProvider>
+        <TourScheduleContext.Provider
+          value={{
+            ...scheduleContextValue,
+            status: 'loading',
+          }}
+        >
+          <ModalProvider>
+            <MemoryRouter initialEntries={[getTourPublicPath(tour)]}>
+              <Routes>
+                <Route path="/tours/:season/:tourId" element={<TourDetailPage />} />
+              </Routes>
+            </MemoryRouter>
+          </ModalProvider>
+        </TourScheduleContext.Provider>
+      </HelmetProvider>,
+    );
+
+    await vi.waitFor(() => {
+      const robots = document.head.querySelector('meta[name="robots"]');
+      expect(robots?.getAttribute('content')).toBe('index,follow');
+    });
+  });
+
+  it('keeps indexable robots when schedule fetch fails for a known tour', async () => {
+    const tour = getTourById('summer-10');
+    if (!tour) throw new Error('summer-10 missing');
+
+    render(
+      <HelmetProvider>
+        <TourScheduleContext.Provider
+          value={{
+            ...scheduleContextValue,
+            status: 'error',
+            error: new Error('network'),
+          }}
+        >
+          <ModalProvider>
+            <MemoryRouter initialEntries={[getTourPublicPath(tour)]}>
+              <Routes>
+                <Route path="/tours/:season/:tourId" element={<TourDetailPage />} />
+              </Routes>
+            </MemoryRouter>
+          </ModalProvider>
+        </TourScheduleContext.Provider>
+      </HelmetProvider>,
+    );
+
+    await vi.waitFor(() => {
+      const robots = document.head.querySelector('meta[name="robots"]');
+      expect(robots?.getAttribute('content')).toBe('index,follow');
+    });
+  });
+});

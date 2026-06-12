@@ -18,6 +18,7 @@
     "preview": "vite preview",
     "seo:baseline": "node scripts/seo-baseline-audit.mjs",
     "seo:check": "node scripts/seo-check.mjs",
+    "check:seo": "node scripts/check-seo-indexing.mjs",
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
     "generate:robots": "node scripts/generate-robots.mjs",
     "prerender": "node scripts/prerender-dist.mjs",

@@ -1,14 +1,17 @@
 import { useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import { getSeasonSeoEntry } from '../../constants/seo';
 import { UI } from '../../constants/ui';
+import type { Season } from '../../types';
+import PageMeta from './PageMeta';
 import TourCardSkeleton from '../tours/TourCardSkeleton';
 
-const SEASON_TOUR_ROUTES = new Set<string>([
-  ROUTES.WINTER,
-  ROUTES.SPRING,
-  ROUTES.SUMMER,
-  ROUTES.FALL,
-]);
+const SEASON_ROUTE_META: Readonly<Record<string, { season: Season; path: string }>> = {
+  [ROUTES.WINTER]: { season: 'winter', path: ROUTES.WINTER },
+  [ROUTES.SPRING]: { season: 'spring', path: ROUTES.SPRING },
+  [ROUTES.SUMMER]: { season: 'summer', path: ROUTES.SUMMER },
+  [ROUTES.FALL]: { season: 'fall', path: ROUTES.FALL },
+};
 
 const SeasonToursRouteFallback = () => (
   <section
@@ -39,9 +42,20 @@ const SeasonToursRouteFallback = () => (
  */
 const RouteFallback = () => {
   const { pathname } = useLocation();
+  const seasonRouteMeta = SEASON_ROUTE_META[pathname];
 
-  if (SEASON_TOUR_ROUTES.has(pathname)) {
-    return <SeasonToursRouteFallback />;
+  if (seasonRouteMeta != null) {
+    const seoEntry = getSeasonSeoEntry(seasonRouteMeta.season, seasonRouteMeta.path);
+    return (
+      <>
+        <PageMeta
+          title={seoEntry.title}
+          description={seoEntry.description}
+          path={seoEntry.path}
+        />
+        <SeasonToursRouteFallback />
+      </>
+    );
   }
 
   return (

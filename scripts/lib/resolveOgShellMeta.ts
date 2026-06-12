@@ -58,7 +58,7 @@ export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
       title: normalizeMetaContent(SEO_DEFAULTS.privacy.title),
       description: normalizeMetaContent(SEO_DEFAULTS.privacy.description),
       path: SEO_DEFAULTS.privacy.path,
-      robots: SEO_DEFAULTS.robots,
+      robots: SEO_DEFAULTS.privacy.robots!,
       imagePathOrUrl: IMAGES.seasonSection.summer,
     };
   }

@@ -6,7 +6,7 @@ import {
   getTourPublicPath,
 } from "../constants/routes";
 import { resolveTourPublicUrlSegment } from "../constants/tourUrls";
-import { SEO_DEFAULTS } from "../constants/seo";
+import { getTourSeoEntry, SEO_DEFAULTS } from "../constants/seo";
 import { UI } from "../constants/ui";
 import PageMeta from "../components/shared/PageMeta";
 import type { Season } from "../types";
@@ -47,13 +47,14 @@ const TourDetailPage = () => {
   }
 
   if (tour && scheduleStatus === 'loading') {
+    const seoEntry = getTourSeoEntry(tour);
     return (
       <>
         <PageMeta
-          title={`${SEO_DEFAULTS.siteName}`}
-          description={UI.tourDetail.loadingPublicationCatalog}
-          path={getTourPublicPath(tour)}
-          robots="noindex,nofollow"
+          title={seoEntry.title}
+          description={seoEntry.description}
+          imageUrl={tour.imageUrl}
+          path={seoEntry.path}
         />
         <div
           className="min-h-screen flex items-center justify-center"
@@ -67,13 +68,14 @@ const TourDetailPage = () => {
   }
 
   if (tour && scheduleStatus === 'error') {
+    const seoEntry = getTourSeoEntry(tour);
     return (
       <>
         <PageMeta
-          title={`${UI.tourDetail.notFound} | ${SEO_DEFAULTS.siteName}`}
-          description={UI.tourDetail.scheduleLoadError}
-          path={getTourPublicPath(tour)}
-          robots="noindex,nofollow"
+          title={seoEntry.title}
+          description={seoEntry.description}
+          imageUrl={tour.imageUrl}
+          path={seoEntry.path}
         />
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">

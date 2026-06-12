@@ -121,6 +121,7 @@ export const SEO_DEFAULTS = {
       description: UI.privacyPage.metaDescription,
     }),
     path: ROUTES.PRIVACY,
+    robots: 'noindex,nofollow' as RobotsDirective,
   } satisfies SeoEntry,
   notFound: {
     ...finalizeSeoFields({

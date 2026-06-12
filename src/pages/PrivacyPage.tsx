@@ -16,7 +16,7 @@ const PrivacyPage = () => {
       title={SEO_DEFAULTS.privacy.title}
       description={SEO_DEFAULTS.privacy.description}
       path={SEO_DEFAULTS.privacy.path}
-      robots="noindex,nofollow"
+      robots={SEO_DEFAULTS.privacy.robots}
     />
   );
 };

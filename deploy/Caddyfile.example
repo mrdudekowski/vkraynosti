@@ -1,0 +1,27 @@
+# Example Caddy config for vkraynosti.ru (TimeWeb App + static dist/).
+# Copy to server and adjust `root` path.
+#
+# Goals:
+# - serve prebuilt OG shells from dist/**/index.html
+# - unknown paths → dist/404.html with HTTP 404 and noindex shell
+# - trailing slash canonicalization
+
+vkraynosti.ru {
+	encode gzip zstd
+
+	root * /var/www/vkraynosti/dist
+
+	@canonicalized path_regexp trailingSlash ^(.+[^/])$
+	redir @canonicalized {path}/ 308
+
+	@file file {path} {path}/index.html
+	handle @file {
+		file_server
+	}
+
+	handle {
+		rewrite * /404.html
+		file_server
+		header Status 404
+	}
+}

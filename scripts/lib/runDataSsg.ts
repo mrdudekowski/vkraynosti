@@ -2,9 +2,11 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { TOURS } from '../../src/data/toursData.ts';
 import { validateTourSlugs } from '../../src/constants/tourUrls.ts';
+import { serializeJsonForScriptTag } from '../../src/utils/tourSchedule/tourScheduleBootstrap.ts';
 import { getRenderableRoutePaths, getTourStatusByPublicPath, routePathToDistFile } from './seoRoutes.mjs';
 import { injectDataSsgIntoHtml } from './injectDataSsgIntoHtml.ts';
 import { loadTourScheduleSnapshot } from './loadTourScheduleSnapshot.ts';
+import { loadTourScheduleBootstrapPayload } from './loadTourScheduleBootstrapPayload.ts';
 import { resolveDataSsgForRoute } from './renderDataSsgBody.ts';
 
 const rootDir = process.cwd();
@@ -22,6 +24,8 @@ export async function runDataSsg(): Promise<void> {
   }
 
   const snapshot = await loadTourScheduleSnapshot(rootDir);
+  const bootstrapPayload = await loadTourScheduleBootstrapPayload(rootDir);
+  const tourScheduleBootstrapJson = serializeJsonForScriptTag(bootstrapPayload);
   const routes = await getRenderableRoutePaths(rootDir);
   const statusByPath = await getTourStatusByPublicPath(rootDir);
 
@@ -33,7 +37,11 @@ export async function runDataSsg(): Promise<void> {
       snapshot,
       statusByPath.get(routePath),
     );
-    const html = injectDataSsgIntoHtml(templateHtml, { bodyHtml, structuredData });
+    const html = injectDataSsgIntoHtml(templateHtml, {
+      bodyHtml,
+      structuredData,
+      tourScheduleBootstrapJson,
+    });
     const filePath = routePathToDistFile(routePath, distDir);
     await mkdir(dirname(filePath), { recursive: true });
     await writeFile(filePath, html, 'utf8');

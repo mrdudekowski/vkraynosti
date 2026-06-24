@@ -4,9 +4,11 @@ export function injectDataSsgIntoHtml(
   {
     bodyHtml,
     structuredData,
+    tourScheduleBootstrapJson,
   }: {
     bodyHtml: string;
     structuredData: ReadonlyArray<Record<string, unknown>>;
+    tourScheduleBootstrapJson?: string;
   },
 ): string {
   const withBody = templateHtml.replace(
@@ -19,13 +21,22 @@ export function injectDataSsgIntoHtml(
     '',
   );
 
-  if (structuredData.length === 0) {
+  const bootstrapBlock =
+    tourScheduleBootstrapJson != null && tourScheduleBootstrapJson.length > 0
+      ? `<script type="application/json" id="tour-schedule-bootstrap">${tourScheduleBootstrapJson}</script>\n      `
+      : '';
+
+  const jsonLdBlock =
+    structuredData.length === 0
+      ? ''
+      : structuredData
+          .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`)
+          .join('\n      ');
+
+  const headInjection = `${bootstrapBlock}${jsonLdBlock}`;
+  if (headInjection.length === 0) {
     return withoutJsonLd;
   }
 
-  const jsonLdBlock = structuredData
-    .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`)
-    .join('\n      ');
-
-  return withoutJsonLd.replace('</head>', `${jsonLdBlock}\n  </head>`);
+  return withoutJsonLd.replace('</head>', `${headInjection}\n  </head>`);
 }

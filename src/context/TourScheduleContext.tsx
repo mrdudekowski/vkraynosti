@@ -8,64 +8,33 @@ import type {
   TourScheduleDurationType,
   TourScheduleLoadStatus,
 } from '../types/tourSchedule';
-import { enrichScheduleEvents } from '../utils/tourSchedule/enrichScheduleEvents';
-import { filterEventsByPublicationStatuses } from '../utils/tourSchedule/filterEventsByPublicationStatuses';
-import { groupEventsByIsoDate } from '../utils/tourSchedule/groupEventsByIsoDate';
-import { mergeTourPrices } from '../utils/tourSchedule/mergeTourPrices';
+import {
+  buildCachedSchedule,
+  isEmptyPublicationCatalog,
+  type CachedTourSchedule,
+} from '../utils/tourSchedule/buildCachedSchedule';
+import { readTourScheduleBootstrapPayload } from '../utils/tourSchedule/tourScheduleBootstrap';
 import { TourScheduleContext } from './tour-schedule-context-definition';
-
-interface CachedSchedule {
-  events: EnrichedScheduleEvent[];
-  eventsByDate: Map<string, EnrichedScheduleEvent[]>;
-  prices: ReadonlyMap<string, number>;
-  durationTypes: ReadonlyMap<string, TourScheduleDurationType>;
-  publicationStatuses: ReadonlyMap<string, TourPublicationStatus>;
-}
-
-const toDurationTypesMap = (
-  catalogDurationTypes: Record<string, TourScheduleDurationType>
-): ReadonlyMap<string, TourScheduleDurationType> =>
-  new Map(Object.entries(catalogDurationTypes));
-
-const toPublicationStatusesMap = (
-  catalogPublicationStatuses: Record<string, TourPublicationStatus>
-): ReadonlyMap<string, TourPublicationStatus> =>
-  new Map(Object.entries(catalogPublicationStatuses));
 
 /** Периодический refetch статичных JSON с S3 (без сброса snapshot до успеха). */
 const SCHEDULE_CLIENT_CACHE_MAX_AGE_MS = 5 * 60 * 1000;
 
-let cachedSchedule: CachedSchedule | null = null;
+let cachedSchedule: CachedTourSchedule | null = null;
 let cachedScheduleFetchedAt: number | null = null;
-let inflightPromise: Promise<CachedSchedule> | null = null;
+let inflightPromise: Promise<CachedTourSchedule> | null = null;
+
+const bootstrapPayload = readTourScheduleBootstrapPayload();
+if (bootstrapPayload != null && cachedSchedule == null) {
+  cachedSchedule = buildCachedSchedule(bootstrapPayload);
+  cachedScheduleFetchedAt = Date.now();
+}
 
 const isClientScheduleCacheStale = (): boolean => {
   if (cachedScheduleFetchedAt == null) return true;
   return Date.now() - cachedScheduleFetchedAt > SCHEDULE_CLIENT_CACHE_MAX_AGE_MS;
 };
 
-const buildCachedSchedule = ({
-  events: rawEvents,
-  catalogPrices,
-  catalogDurationTypes,
-  catalogPublicationStatuses,
-}: Awaited<ReturnType<typeof loadTourSchedulePayload>>): CachedSchedule => {
-  const publicationStatuses = toPublicationStatusesMap(catalogPublicationStatuses);
-  const visibleRawEvents = filterEventsByPublicationStatuses(rawEvents, publicationStatuses);
-  const events = enrichScheduleEvents(visibleRawEvents, publicationStatuses);
-  return {
-    events,
-    eventsByDate: groupEventsByIsoDate(events),
-    prices: mergeTourPrices(rawEvents, catalogPrices),
-    durationTypes: toDurationTypesMap(catalogDurationTypes),
-    publicationStatuses,
-  };
-};
-
-const isEmptyPublicationCatalog = (result: CachedSchedule): boolean =>
-  result.publicationStatuses.size === 0;
-
-const loadSchedule = async (force = false): Promise<CachedSchedule> => {
+const loadSchedule = async (force = false): Promise<CachedTourSchedule> => {
   if (cachedSchedule && !force && !isClientScheduleCacheStale()) return cachedSchedule;
   if (inflightPromise) return inflightPromise;
 
@@ -133,7 +102,7 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<Error | null>(null);
   const retryNonce = useRef(0);
 
-  const applySchedule = useCallback((result: CachedSchedule) => {
+  const applySchedule = useCallback((result: CachedTourSchedule) => {
     setEvents(result.events);
     setEventsByDate(result.eventsByDate);
     setPrices(result.prices);

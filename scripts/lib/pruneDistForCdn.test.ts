@@ -50,7 +50,9 @@ describe('pruneDistForCdn', () => {
       fs.mkdirSync(path.join(distDir, dir), { recursive: true });
     }
     fs.mkdirSync(path.join(distDir, 'safety'), { recursive: true });
-    fs.writeFileSync(path.join(distDir, 'safety', 'safety.webp'), 'webp');
+    for (const relativeFile of CDN_DIST_RELATIVE_FILES) {
+      fs.writeFileSync(path.join(distDir, relativeFile), 'webp');
+    }
     fs.mkdirSync(path.join(distDir, 'fonts'), { recursive: true });
 
     const result = pruneDistForCdn(distDir, {

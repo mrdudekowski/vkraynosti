@@ -22,8 +22,8 @@ export function getVisibleToursBySeason(
 
   return getToursBySeason(season).filter(tour => {
     const fromCatalog = publicationStatuses.get(tour.id);
-    if (fromCatalog === 'hidden') return false;
-    if (fromCatalog === 'active' || fromCatalog === 'in_development') return true;
-    return false;
+    // Same rule as calendar/table: only `active` tours are listed publicly.
+    // `in_development` pages stay reachable by URL (noindex); `hidden` → not-found.
+    return fromCatalog === 'active';
   });
 }

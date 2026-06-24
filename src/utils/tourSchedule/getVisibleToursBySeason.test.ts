@@ -3,17 +3,18 @@ import type { TourPublicationStatus } from '../../types/tourSchedule';
 import { getVisibleToursBySeason } from './getVisibleToursBySeason';
 
 describe('getVisibleToursBySeason', () => {
-  it('filters hidden tours using publicationStatuses map', () => {
+  it('lists only active tours (in_development and hidden are excluded from grids)', () => {
     const statuses = new Map<string, TourPublicationStatus>([
       ['summer-13', 'in_development'],
       ['summer-14', 'hidden'],
+      ['summer-1', 'active'],
     ]);
 
     const visibleIds = getVisibleToursBySeason('summer', statuses, { scheduleLoaded: true })
-      .filter((item) => item.id === 'summer-13' || item.id === 'summer-14')
+      .filter((item) => ['summer-13', 'summer-14', 'summer-1'].includes(item.id))
       .map((item) => item.id);
 
-    expect(visibleIds).toEqual(['summer-13']);
+    expect(visibleIds).toEqual(['summer-1']);
   });
 
   it('returns empty list while schedule is not loaded', () => {

@@ -26,7 +26,8 @@ let inflightPromise: Promise<CachedTourSchedule> | null = null;
 const bootstrapPayload = readTourScheduleBootstrapPayload();
 if (bootstrapPayload != null && cachedSchedule == null) {
   cachedSchedule = buildCachedSchedule(bootstrapPayload);
-  cachedScheduleFetchedAt = Date.now();
+  // ponytail: bootstrap is build-time snapshot for crawlers/first paint only — always refetch live CDN on mount
+  cachedScheduleFetchedAt = null;
 }
 
 const isClientScheduleCacheStale = (): boolean => {

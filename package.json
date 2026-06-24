@@ -19,13 +19,14 @@
     "seo:baseline": "node scripts/seo-baseline-audit.mjs",
     "seo:check": "node scripts/seo-check.mjs",
     "check:seo": "node scripts/check-seo-indexing.mjs",
+    "sync:catalog": "node scripts/sync-catalog-from-cdn.mjs",
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
     "generate:robots": "node scripts/generate-robots.mjs",
     "prerender": "node scripts/prerender-dist.mjs",
     "verify:prerender": "node scripts/verify-prerender.mjs",
     "og:shells": "tsx scripts/generate-og-shells.ts",
     "verify:og-shells": "tsx scripts/verify-og-shells.ts",
-    "build:deploy": "npm run generate:sitemap && npm run generate:robots && npm run build && npm run og:shells",
+    "build:deploy": "npm run generate:sitemap && npm run generate:robots && npm run build && npm run prerender && npm run og:shells",
     "generate:banner-loops": "node scripts/generate-home-season-banner-loop-videos.cjs --posters",
     "generate:spring-clips": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-spring-2-3-tour-videos.ps1",
     "generate:winter-3-grid": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-winter-3-grid-assets.ps1",
@@ -45,7 +46,8 @@
     "media:bootstrap-season": "node scripts/generate-isolated-season-media.mjs",
     "sync:s3": "node scripts/sync-public-to-s3.mjs",
     "sync:s3:dry-run": "node scripts/sync-public-to-s3.mjs --dry-run",
-    "generate:tour-data-fixtures": "node scripts/generate-tour-data-fixtures.mjs"
+    "generate:tour-data-fixtures": "node scripts/generate-tour-data-fixtures.mjs",
+    "generate:manager-guide-pdf": "node scripts/generate-manager-guide-pdf.mjs"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^7.2.0",

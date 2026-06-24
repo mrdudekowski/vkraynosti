@@ -65,6 +65,80 @@ function publishAllJsonForMenu() {
 }
 
 /**
+ * Публикует tours_list.json + schedule.json в S3 и сразу запускает пересборку сайта
+ * (GitHub Actions), чтобы статичное SEO — sitemap/robots/prerender — отразило новые
+ * статусы публикации через несколько минут. Это «мгновенная публикация».
+ */
+function publishAllJsonAndRebuildForMenu() {
+  try {
+    withPublishLock_(function () {
+      var toursResult = publishToursCore_();
+      var scheduleResult = publishScheduleCore_();
+      triggerSiteRebuild_();
+      SpreadsheetApp.getUi().alert(
+        formatAllPublishSuccessMessage_(toursResult, scheduleResult) +
+          '\n\nПересборка сайта запущена — SEO обновится через несколько минут.'
+      );
+    });
+  } catch (err) {
+    SpreadsheetApp.getUi().alert('Ошибка публикации/пересборки:\n\n' + String(err.message || err));
+  }
+}
+
+/** Запустить только пересборку сайта (без повторной публикации JSON). */
+function rebuildSiteForMenu() {
+  try {
+    triggerSiteRebuild_();
+    SpreadsheetApp.getUi().alert(
+      'Пересборка сайта запущена. SEO обновится через несколько минут.'
+    );
+  } catch (err) {
+    SpreadsheetApp.getUi().alert('Ошибка запуска пересборки:\n\n' + String(err.message || err));
+  }
+}
+
+/**
+ * Триггерит workflow деплоя через GitHub repository_dispatch.
+ * Свойства скрипта (Проект → Настройки → Свойства скрипта):
+ *   GITHUB_TOKEN — обязателен, PAT с правом `repo` (и `workflow`);
+ *   GITHUB_OWNER — опц., по умолчанию 'mrdudekowski';
+ *   GITHUB_REPO  — опц., по умолчанию 'vkraynosti';
+ *   GITHUB_EVENT_TYPE — опц., по умолчанию 'catalog-published'.
+ */
+function triggerSiteRebuild_() {
+  var props = PropertiesService.getScriptProperties();
+  var token = props.getProperty('GITHUB_TOKEN');
+  if (!token) {
+    throw new Error(
+      'Не задано свойство скрипта GITHUB_TOKEN (PAT с правами repo + workflow).'
+    );
+  }
+  var owner = props.getProperty('GITHUB_OWNER') || 'mrdudekowski';
+  var repo = props.getProperty('GITHUB_REPO') || 'vkraynosti';
+  var eventType = props.getProperty('GITHUB_EVENT_TYPE') || 'catalog-published';
+
+  var response = UrlFetchApp.fetch(
+    'https://api.github.com/repos/' + owner + '/' + repo + '/dispatches',
+    {
+      method: 'post',
+      contentType: 'application/json',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      payload: JSON.stringify({ event_type: eventType }),
+      muteHttpExceptions: true,
+    }
+  );
+
+  var code = response.getResponseCode();
+  if (code !== 204) {
+    throw new Error('GitHub dispatch вернул ' + code + ': ' + response.getContentText());
+  }
+}
+
+/**
  * @returns {Object}
  */
 function publishToursCore_() {

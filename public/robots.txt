@@ -1,4 +1,45 @@
+# Все краулеры: полный доступ
 User-agent: *
 Allow: /
+
+# ИИ-ассистенты и answer-боты — явно приветствуем (видимость в ChatGPT/Claude/Perplexity и т.п.)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# Яндекс: канонический хост + свёртка трекинговых параметров в один URL
+User-agent: Yandex
+Allow: /
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid&ymclid&_openstat
+Host: vkraynosti.ru
 
 Sitemap: https://vkraynosti.ru/sitemap.xml

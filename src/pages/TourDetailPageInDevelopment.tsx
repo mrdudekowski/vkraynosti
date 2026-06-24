@@ -62,6 +62,7 @@ const TourDetailPageInDevelopment = ({ tour }: TourDetailPageInDevelopmentProps)
         description={seoEntry.description}
         imageUrl={heroImageUrl}
         path={seoEntry.path}
+        robots={seoEntry.robots}
         structuredData={[tourStructuredData, breadcrumbStructuredData]}
       />
       <TourDetailHero

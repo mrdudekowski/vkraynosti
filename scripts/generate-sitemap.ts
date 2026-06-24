@@ -5,19 +5,22 @@ setupOgShellBuildEnv();
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { normalizeCanonicalPath } from '../src/constants/canonicalUrl.ts';
-import { getIndexableRoutePaths, resolveSiteRoot } from './lib/seoRoutes.mjs';
+import { getSitemapRoutePaths, resolveSiteRoot } from './lib/seoRoutes.mjs';
 
 const rootDir = process.cwd();
 const siteRoot = resolveSiteRoot();
 
+// No <lastmod>: a build-date stamp on every URL is fake freshness and trains crawlers to
+// ignore the signal. Omitting it is honest. ponytail: add real per-URL lastmod only when the
+// catalog exposes a per-tour modification timestamp (currently it doesn't).
 const createUrlNode = (routePath: string): string => {
   const normalizedPath = normalizeCanonicalPath(routePath);
   const loc = `${siteRoot}${normalizedPath === '/' ? '/' : normalizedPath}`;
-  return `  <url><loc>${loc}</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>`;
+  return `  <url><loc>${loc}</loc></url>`;
 };
 
 const run = async (): Promise<void> => {
-  const allRoutes = await getIndexableRoutePaths(rootDir);
+  const allRoutes = await getSitemapRoutePaths(rootDir);
   const xmlLines = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

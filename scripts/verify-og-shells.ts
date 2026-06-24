@@ -7,7 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { isNormalizedMetaContent } from '../src/constants/metaContent.ts';
 import { normalizeCanonicalPath } from '../src/constants/canonicalUrl.ts';
-import { getIndexableRoutePaths, getTourLegacyRedirectPaths, routePathToDistFile } from './lib/seoRoutes.mjs';
+import { getRenderableRoutePaths, getTourLegacyRedirectPaths, routePathToDistFile } from './lib/seoRoutes.mjs';
 import {
   OG_SHELL_IMAGE_HEIGHT,
   OG_SHELL_IMAGE_WIDTH,
@@ -226,10 +226,29 @@ const assertOgImage = (
   }
 };
 
+/**
+ * Bots / AI crawlers must receive rendered content, not an empty SPA shell.
+ * After `prerender → og:shells`, an indexable route's `<body>` carries the app
+ * markup (Navbar/`<main>`/Footer). An un-prerendered shell has only an empty
+ * `<div id="root"></div>`, which this guard rejects.
+ */
+const assertRenderedBody = (html: string, errors: string[]): void => {
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  const body = bodyMatch?.[1] ?? '';
+  if (/<div\s+id="root">\s*<\/div>/i.test(body)) {
+    errors.push('empty app root — route was not prerendered (no body content)');
+    return;
+  }
+  if (!/<main[\s>]/i.test(body)) {
+    errors.push('missing <main> landmark in rendered body');
+  }
+};
+
 const assertRoute = async (
   routePath: string,
   expectedOrigin: string,
   checkDimensions: boolean,
+  requireRenderedBody: boolean,
 ): Promise<void> => {
   const html = await readHtml(routePath);
   const errors: string[] = [];
@@ -238,6 +257,9 @@ const assertRoute = async (
   assertTrailingSlashUrls(html, routePath, errors);
   assertNormalizedText(html, errors);
   assertOgImage(html, routePath, expectedOrigin, errors, false);
+  if (requireRenderedBody) {
+    assertRenderedBody(html, errors);
+  }
 
   if (checkDimensions) {
     const ogImage = extractMetaContent(html, 'property="og:image"');
@@ -299,11 +321,14 @@ const assertLegacyRedirectShell = async (
 
 const run = async (): Promise<void> => {
   const expectedOrigin = resolveExpectedSiteOrigin();
-  const routes = [...(await getIndexableRoutePaths(rootDir)), OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
+  const renderableRoutes = await getRenderableRoutePaths(rootDir);
+  const ogTestRoutes = [OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
+  const routes = [...renderableRoutes, ...ogTestRoutes];
 
   for (const routePath of routes) {
     const checkDimensions = DIMENSION_SAMPLE_ROUTES.includes(routePath);
-    await assertRoute(routePath, expectedOrigin, checkDimensions);
+    const requireRenderedBody = !ogTestRoutes.includes(routePath);
+    await assertRoute(routePath, expectedOrigin, checkDimensions, requireRenderedBody);
     process.stdout.write(`[PASS] og-shell meta ${routePath}\n`);
   }
 

@@ -67,22 +67,86 @@ export async function loadSeoRouteSources(rootDir = process.cwd()) {
 }
 
 /** Routes with noindex at runtime — excluded from sitemap and indexable OG shells. */
-export const NON_INDEXABLE_ROUTE_PATHS = new Set(['/privacy']);
+export const NON_INDEXABLE_ROUTE_PATHS = new Set(['/privacy', '/safety']);
 
-/** Indexable SPA paths (same set as sitemap, excluding 404 wildcard). */
-export async function getIndexableRoutePaths(rootDir = process.cwd()) {
-  const { routesSource, tourSlugsSource } = await loadSeoRouteSources(rootDir);
+/** Static indexable SPA paths (no tour detail pages), always including `/`. */
+export function getStaticIndexableRoutePaths(routesSource) {
   const staticRoutes = extractStaticRoutes(routesSource).filter(
     (path) => !NON_INDEXABLE_ROUTE_PATHS.has(path),
   );
-  const tourRoutes = extractTourPublicUrlsFromSlugMap(tourSlugsSource);
+  return [...new Set([...(staticRoutes.includes('/') ? [] : ['/']), ...staticRoutes])];
+}
 
+/**
+ * Published tour catalog (`public/data/tour-schedule/tours_list.json`): tour id →
+ * publication status. Only `active` + `in_development` are present; `hidden` tours
+ * are dropped by `generate-tour-data-fixtures.mjs`, so they are simply absent here.
+ */
+async function loadPublishedTourStatusById(rootDir) {
+  const catalogPath = resolve(rootDir, 'public/data/tour-schedule/tours_list.json');
+  let parsed;
+  try {
+    parsed = JSON.parse(await readFile(catalogPath, 'utf8'));
+  } catch (cause) {
+    throw new Error(
+      `Tour catalog not found/readable at ${catalogPath} — run \`npm run generate:tour-data-fixtures\` first`,
+      { cause },
+    );
+  }
+  const statusById = new Map();
+  for (const tour of parsed.tours ?? []) {
+    if (tour?.id && tour.publicationStatus) {
+      statusById.set(tour.id, tour.publicationStatus);
+    }
+  }
+  return statusById;
+}
+
+/**
+ * routePath → publication status (`active` | `in_development`) for tours that have a
+ * public slug AND appear in the catalog. Hidden tours (absent from catalog) are omitted,
+ * so they never reach sitemap, prerender or OG shells.
+ */
+export async function getTourStatusByPublicPath(rootDir = process.cwd()) {
+  const { tourSlugsSource } = await loadSeoRouteSources(rootDir);
+  const slugMap = parseTourSlugMap(tourSlugsSource);
+  const statusById = await loadPublishedTourStatusById(rootDir);
+
+  const statusByPath = new Map();
+  for (const [tourId, slug] of slugMap) {
+    const status = statusById.get(tourId);
+    if (status) {
+      statusByPath.set(`/tours/${seasonFromTourId(tourId)}/${slug}`, status);
+    }
+  }
+  return statusByPath;
+}
+
+/**
+ * Sitemap = index-eligible URLs: static indexable routes + ONLY `active` tours.
+ * `in_development` (noindex) and `hidden` tours are excluded.
+ */
+export async function getSitemapRoutePaths(rootDir = process.cwd()) {
+  const { routesSource } = await loadSeoRouteSources(rootDir);
+  const statusByPath = await getTourStatusByPublicPath(rootDir);
+  const activeTourPaths = [...statusByPath.entries()]
+    .filter(([, status]) => status === 'active')
+    .map(([path]) => path);
+
+  return [...new Set([...getStaticIndexableRoutePaths(routesSource), ...activeTourPaths])];
+}
+
+/**
+ * Rendered public routes for prerender / OG shells / verify: static indexable routes +
+ * `active` + `in_development` tours (both render real content with `tour-detail-main`).
+ * Hidden tours are excluded — they render not-found at runtime and would time out the
+ * prerender content gate.
+ */
+export async function getRenderableRoutePaths(rootDir = process.cwd()) {
+  const { routesSource } = await loadSeoRouteSources(rootDir);
+  const statusByPath = await getTourStatusByPublicPath(rootDir);
   return [
-    ...new Set([
-      ...(staticRoutes.includes('/') ? [] : ['/']),
-      ...staticRoutes,
-      ...tourRoutes,
-    ]),
+    ...new Set([...getStaticIndexableRoutePaths(routesSource), ...statusByPath.keys()]),
   ];
 }
 

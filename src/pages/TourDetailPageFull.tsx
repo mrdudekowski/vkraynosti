@@ -211,6 +211,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
         description={seoEntry.description}
         imageUrl={heroImageUrl}
         path={seoEntry.path}
+        robots={seoEntry.robots}
         structuredData={[tourStructuredData, breadcrumbStructuredData]}
       />
       <TourDetailHero

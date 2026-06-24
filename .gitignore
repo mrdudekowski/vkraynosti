@@ -38,6 +38,9 @@ dist-ssr
 # TimeWeb media inventory dumps (regenerate: npm run media:inventory)
 TimeWebDoc/audit-*.json
 
+# PDF generator preview (regenerate: npm run generate:manager-guide-pdf)
+docs/.tmp-manager-guide-preview.html
+
 # Windows folder metadata (never deploy)
 **/desktop.ini
 **/Thumbs.db

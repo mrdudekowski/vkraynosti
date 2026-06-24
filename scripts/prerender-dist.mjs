@@ -3,7 +3,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { chromium } from '@playwright/test';
 import {
-  getIndexableRoutePaths,
+  getRenderableRoutePaths,
   resolveSiteRoot,
   routePathToDistFile,
 } from './lib/seoRoutes.mjs';
@@ -165,32 +165,77 @@ async function patch404Shell() {
   process.stdout.write('Patched dist/404.html with default OG shell\n');
 }
 
+const TOUR_DETAIL_ROUTE_PATTERN = /^\/tours\/(winter|spring|summer|fall)\/[^/]+$/;
+
 async function prerenderRoute(page, routePath, basePath, previewBaseUrl) {
   const targetUrl = routeToAbsoluteUrl(routePath, previewBaseUrl);
   await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-  await page.waitForLoadState('networkidle', { timeout: 20_000 }).catch(() => {});
+  // Short settle; the content-commit waitForFunction below is the real gate.
+  await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
 
   await page.waitForFunction(
-    (path) => {
-      const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') ?? '';
+    ({ path, requireTourMain }) => {
+      // Lazy route chunks and lazy children make the Suspense boundary flip back to
+      // RouteFallback while content streams in; capturing during that window yields an
+      // empty pulse placeholder with a stale (lingering) og:title. Wait until no
+      // RouteFallback is mounted, i.e. the real route content has committed.
+      if (document.querySelector('[data-route-fallback]') != null) return false;
       const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? '';
-      if (!ogTitle.trim() || !canonical) return false;
+      if (!canonical) return false;
+      if (requireTourMain) {
+        // Tour pages gate content behind the runtime schedule. The transient
+        // loading/not-found states also carry an og:title with '|', so wait for the
+        // committed tour view marker (set by both the full and in-development pages).
+        return (
+          document.querySelector('[data-testid="tour-detail-main"]') != null &&
+          canonical.includes(path)
+        );
+      }
+      const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') ?? '';
+      if (!ogTitle.trim()) return false;
       if (path === '/') {
         return ogTitle.includes('Вкрайности') && !ogTitle.includes('|');
       }
       return ogTitle.includes('|') && canonical.includes(path);
     },
-    routePath,
+    { path: routePath, requireTourMain: TOUR_DETAIL_ROUTE_PATTERN.test(routePath) },
     { timeout: 60_000 },
   );
+
+  // Tour detail pages swap from a loading shell to the full view once the schedule
+  // loads; react-helmet-async flushes JSON-LD in a deferred effect after the body
+  // commits. Wait for the JSON-LD to land so prerendered HTML carries structured
+  // data. Best-effort (catch): pages without JSON-LD (seasons, in-development tours)
+  // simply proceed after the timeout.
+  const expectsJsonLd =
+    routePath === '/' || /^\/tours\/(winter|spring|summer|fall)\/[^/]+$/.test(routePath);
+  if (expectsJsonLd) {
+    await page
+      .waitForFunction(() => document.querySelector('script[type="application/ld+json"]') != null, {
+        timeout: 10_000,
+      })
+      .catch(() => {});
+  }
+
   const html = await page.content();
   await writePrerenderedHtml(routePath, html);
 }
 
 const run = async () => {
-  const allRoutes = await getIndexableRoutePaths(rootDir);
+  let allRoutes = await getRenderableRoutePaths(rootDir);
+  // Local iteration: PRERENDER_ONLY="/,/tours/winter/winter-1" limits the route set.
+  const only = (process.env.PRERENDER_ONLY || '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (only.length > 0) {
+    allRoutes = allRoutes.filter((route) => only.includes(route));
+  }
   // Prerender `/` last so index.html stays a pristine SPA shell for ?p= deep links.
-  const routes = [...allRoutes.filter((route) => route !== '/'), '/'];
+  const routes = [
+    ...allRoutes.filter((route) => route !== '/'),
+    ...(allRoutes.includes('/') ? ['/'] : []),
+  ];
   const previewBaseUrl = buildPreviewBaseUrl();
 
   let previewChild = null;
@@ -207,7 +252,29 @@ const run = async () => {
 
     const browser = await chromium.launch();
     try {
-      const context = await browser.newContext();
+      const context = await browser.newContext({ bypassCSP: true });
+
+      // Serve the bundled schedule catalog from dist. The built app fetches it from the
+      // CDN (CORS-restricted from the preview origin) or a base path; routing it to the
+      // local files keeps prerender hermetic and lets tour pages reach their committed,
+      // schedule-resolved state (full or in-development) instead of the error/not-found
+      // shell. ponytail: relies on the dist fixture catalog — if it drifts from the live
+      // CDN catalog, refresh public/data before building (upgrade path: pull live catalog in CI).
+      await context.route('**/tour-schedule/*.json', async (route) => {
+        const requestUrl = route.request().url();
+        const fileName = requestUrl.includes('tours_list.json') ? 'tours_list.json' : 'schedule.json';
+        try {
+          const body = await readFile(resolve(distDir, 'data/tour-schedule', fileName), 'utf8');
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            headers: { 'access-control-allow-origin': '*' },
+            body,
+          });
+        } catch {
+          await route.continue();
+        }
+      });
 
       const basePath = normalizeBasePath();
       for (const routePath of routes) {

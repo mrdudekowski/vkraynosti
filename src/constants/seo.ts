@@ -114,6 +114,7 @@ export const SEO_DEFAULTS = {
         'Правила безопасности «ВКрайности»: риски маршрута, обязанности участника и ответственность.',
     }),
     path: ROUTES.SAFETY,
+    robots: 'noindex,nofollow' as RobotsDirective,
   } satisfies SeoEntry,
   privacy: {
     ...finalizeSeoFields({
@@ -167,6 +168,17 @@ const buildTourSeoDescriptionDraft = (
   return core;
 };
 
+/**
+ * Publication status drives index eligibility. Only `active` tours are indexable;
+ * `in_development` pages are reachable but kept out of the index (and the sitemap),
+ * `hidden` tours render not-found. This is the single source for the tour `robots` rule.
+ */
+const TOUR_ROBOTS_BY_STATUS: Record<TourPublicationStatus, RobotsDirective> = {
+  active: 'index,follow',
+  in_development: 'noindex,follow',
+  hidden: 'noindex,nofollow',
+};
+
 export const getTourSeoEntry = (
   tour: Tour,
   options?: TourSeoDurationOptions,
@@ -180,6 +192,7 @@ export const getTourSeoEntry = (
     title: `${tour.title} — ${UI.seasons[tour.season].label} | ${SITE_NAME}`,
     description,
     path: getTourPublicPath(tour),
+    robots: TOUR_ROBOTS_BY_STATUS[publicationStatus],
   };
 };
 

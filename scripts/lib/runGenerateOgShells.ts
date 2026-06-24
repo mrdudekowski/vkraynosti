@@ -4,7 +4,7 @@ import { TOURS } from '../../src/data/toursData.ts';
 import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
 import { getTourCanonicalUrl, validateTourSlugs } from '../../src/constants/tourUrls.ts';
 import { getTourLegacyRedirectPaths } from '../../src/constants/tourSeoRoutes.ts';
-import { getIndexableRoutePaths } from './seoRoutes.mjs';
+import { getRenderableRoutePaths, getTourStatusByPublicPath } from './seoRoutes.mjs';
 import {
   collectOgShellImageLogicalPaths,
   copyOgShellAssets,
@@ -34,10 +34,11 @@ export async function runGenerateOgShells(): Promise<void> {
     throw new Error('dist/index.html not found — run `npm run build` first');
   }
 
-  const routes = await getIndexableRoutePaths(rootDir);
+  const routes = await getRenderableRoutePaths(rootDir);
+  const statusByPath = await getTourStatusByPublicPath(rootDir);
   const routeMetas = routes.map((routePath) => ({
     routePath,
-    meta: resolveOgShellMeta(routePath),
+    meta: resolveOgShellMeta(routePath, statusByPath.get(routePath)),
   }));
 
   const logicalPaths = collectOgShellImageLogicalPaths(
@@ -54,8 +55,12 @@ export async function runGenerateOgShells(): Promise<void> {
 
   for (const { routePath, meta } of routeMetas) {
     const imagePathOrUrl = resolveOgShellImageForMeta(meta.imagePathOrUrl, resolvedPathByRequested);
-    const html = injectOgShellIntoHtml(templateHtml, { ...meta, imagePathOrUrl });
     const filePath = routePathToDistFile(routePath, distDir);
+    // Overlay meta onto the route's own prerendered HTML when present: keeps the rendered
+    // <body> and JSON-LD from prerender, replaces only head meta with the Telegram-optimized
+    // OG block. Falls back to the SPA shell template when prerender did not run for this route.
+    const routeTemplate = await readFile(filePath, 'utf8').catch(() => templateHtml);
+    const html = injectOgShellIntoHtml(routeTemplate, { ...meta, imagePathOrUrl });
     await mkdir(dirname(filePath), { recursive: true });
     await writeFile(filePath, html, 'utf8');
     process.stdout.write(`[og-shell] ${routePath}\n`);

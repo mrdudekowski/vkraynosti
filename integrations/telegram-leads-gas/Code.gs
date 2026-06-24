@@ -12,7 +12,9 @@
  *
  * Важно: sendTestLead() запускает код из редактора, а сайт шлёт POST на URL /exec
  * (опубликованный Web App). Пока деплой не обновлён, редактор и прод расходятся.
- * Проверка: GET /exec должен вернуть buildId "no-webhook-secret-v1" (см. doGet).
+ * Проверка деплоя: GET /exec должен вернуть buildId "lead-message-v5-tour-link-only" (см. doGet).
+ * Если buildId старый (напр. no-webhook-secret-v1) — сайт бьёт в устаревший Web App:
+ * в Telegram не будет «Количество человек» / «С детьми», зато уйдут idempotencyKey и userAgent.
  *
  * --- Script Properties (Project Settings → Script properties) ---
  * TELEGRAM_BOT_TOKEN  — токен от @BotFather (не коммитить в git).
@@ -54,7 +56,7 @@ var TELEGRAM_TEXT_LIMIT = 4096;
 var SAFE_CHUNK = 4000;
 var DEFAULT_IDEMPOTENCY_TTL_SECONDS = '21600';
 /** Маркер версии в doGet — убедитесь, что GET /exec возвращает его после деплоя. */
-var WEBHOOK_BUILD_ID = 'lead-message-v4-party-size';
+var WEBHOOK_BUILD_ID = 'lead-message-v5-tour-link-only';
 var TOUR_REQUEST_MAX_PARTY_SIZE = 99;
 
 /**
@@ -115,6 +117,7 @@ function sendTestLead() {
     parameter: {},
   };
 
+  Logger.log('Telegram preview:\n' + buildLeadMessage_(testPayload));
   var result = handleLeadPost_(fakePostEvent);
   Logger.log(JSON.stringify(result));
 }
@@ -142,6 +145,23 @@ function doGet() {
     ok: true,
     service: 'vkraynosti-telegram-lead-webhook',
     buildId: WEBHOOK_BUILD_ID,
+    telegramFields: [
+      'season',
+      'tourTitle',
+      'tourDuration',
+      'tourId',
+      'preferredDepartureDate',
+      'name',
+      'phone',
+      'partySize',
+      'withChildren',
+      'email',
+      'preferredMessenger',
+      'question',
+      'privacyAccepted',
+      'submittedAt',
+    ],
+    telegramDiagnosticsOnly: ['idempotencyKey', 'userAgent'],
   });
 }
 
@@ -310,7 +330,6 @@ function buildLeadMessage_(body) {
   var season = body.season ? escapeHtml_(seasonLabel_(String(body.season))) : '—';
   var email = body.email != null && String(body.email).trim() ? escapeHtml_(String(body.email).trim()) : '—';
   var question = body.question != null && String(body.question).trim() ? escapeHtml_(String(body.question).trim()) : '—';
-  var sourceUrl = sourceUrlRaw ? escapeHtml_(sourceUrlRaw) : '—';
   var submittedAt = body.submittedAt ? escapeHtml_(String(body.submittedAt)) : '—';
   var privacyAccepted = body.privacyAccepted === true ? 'Да' : 'Нет';
   var tourTitleLine = buildTourTitleHtml_(tourTitleRaw, sourceUrlRaw);
@@ -323,7 +342,6 @@ function buildLeadMessage_(body) {
     'Новая заявка с сайта!',
     'Сезон: ' + season,
     'Тур: ' + tourTitleLine,
-    'URL: ' + sourceUrl,
     'Длительность: ' + duration,
     'ID Тура - ' + tourId,
     'Дата выезда: ' + departureDate,

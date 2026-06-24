@@ -29,6 +29,7 @@ const SafetyPage = () => {
         title={SEO_DEFAULTS.safety.title}
         description={SEO_DEFAULTS.safety.description}
         path={SEO_DEFAULTS.safety.path}
+        robots={SEO_DEFAULTS.safety.robots}
       />
       <div className="relative overflow-hidden py-20 px-4 text-center">
         <div className="absolute inset-0" aria-hidden>

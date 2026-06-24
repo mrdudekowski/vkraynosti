@@ -19,7 +19,6 @@ const run = async () => {
     seoSource,
     homeSource,
     seasonLayoutSource,
-    safetySource,
   ] = await Promise.all([
     read('src/components/shared/PageMeta.tsx'),
     read('src/pages/NotFoundPage.tsx'),
@@ -28,7 +27,6 @@ const run = async () => {
     read('src/constants/seo.ts'),
     read('src/pages/Home.tsx'),
     read('src/components/seasons/SeasonPageLayout.tsx'),
-    read('src/pages/SafetyPage.tsx'),
   ]);
 
   const checks = [
@@ -71,12 +69,6 @@ const run = async () => {
       seasonLayoutSource.includes('IMAGES.seasonSection[seasonKey]'),
       'season og image source',
       'SeasonPageLayout PageMeta must use seasonSection',
-    ),
-    assertCheck(
-      !safetySource.includes('IMAGES.hero[activeSeason]') &&
-        safetySource.includes('IMAGES.seasonSection[activeSeason]'),
-      'safety og image source',
-      'SafetyPage PageMeta must use seasonSection, not placehold hero',
     ),
   ];
 

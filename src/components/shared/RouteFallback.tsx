@@ -19,6 +19,7 @@ const SeasonToursRouteFallback = () => (
     role="status"
     aria-live="polite"
     aria-busy="true"
+    data-route-fallback="true"
   >
     <span className="sr-only">{UI.tourCard.loadingLabel}</span>
     <div className="tour-card-skeleton-media h-72 w-full" aria-hidden />
@@ -62,6 +63,7 @@ const RouteFallback = () => {
     <div
       className="min-h-route-fallback w-full animate-pulse bg-surface-light/80"
       aria-hidden
+      data-route-fallback="true"
     />
   );
 };

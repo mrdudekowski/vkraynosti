@@ -13,7 +13,7 @@
 | [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Метрики производительности, **профилирование в Chrome (Profiler / Performance)**, эталоны |
 | [docs/MEDIA_OPTIMIZATION_PIPELINE.md](docs/MEDIA_OPTIMIZATION_PIPELINE.md) | Полный pipeline оптимизации видео/медиа до эталонного состояния |
 | [docs/TOUR_DATA_S3_MIGRATION_GUIDE.md](docs/TOUR_DATA_S3_MIGRATION_GUIDE.md) | Публикация туров/расписания: Sheets → S3 → сайт |
-| [docs/TOUR_DATA_MANAGER_GUIDE.md](docs/TOUR_DATA_MANAGER_GUIDE.md) | Краткая памятка для менеджеров таблицы |
+| [docs/TOUR_DATA_MANAGER_GUIDE.md](docs/TOUR_DATA_MANAGER_GUIDE.md) | Инструкция для менеджеров таблицы туров и расписания |
 | [.cursor/rules/vkraynosti.mdc](.cursor/rules/vkraynosti.mdc) | Правила кода для агентов и разработчиков (SSOT по стилю и данным) |
 
 ## Требования

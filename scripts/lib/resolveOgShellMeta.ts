@@ -13,6 +13,7 @@ import {
   type RobotsDirective,
 } from '../../src/constants/seo.ts';
 import type { Season } from '../../src/types';
+import type { TourPublicationStatus } from '../../src/types/tourSchedule';
 
 export interface OgShellMeta {
   title: string;
@@ -32,7 +33,10 @@ const SEASON_BY_LIST_PATH: Record<string, Season> = {
 
 const TOUR_DETAIL_PATH_PATTERN = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)$/;
 
-export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
+export const resolveOgShellMeta = (
+  routePath: string,
+  tourPublicationStatus?: TourPublicationStatus,
+): OgShellMeta => {
   if (routePath === ROUTES.HOME) {
     return {
       title: normalizeMetaContent(SEO_DEFAULTS.home.title),
@@ -85,14 +89,19 @@ export const resolveOgShellMeta = (routePath: string): OgShellMeta => {
     if (tour.season !== season) {
       throw new Error(`Tour season mismatch for OG shell: ${routePath}`);
     }
-    const seoEntry = getTourSeoEntry(tour);
+    const seoEntry = getTourSeoEntry(
+      tour,
+      tourPublicationStatus ? { publicationStatus: tourPublicationStatus } : undefined,
+    );
     const publicPath = getTourPublicPath(tour);
     return {
       title: normalizeMetaContent(seoEntry.title),
       description: normalizeMetaContent(seoEntry.description),
       path: seoEntry.path,
       canonicalPath: isLegacyTourUrlSegment(tour, segment) ? publicPath : undefined,
-      robots: SEO_DEFAULTS.robots,
+      // Publication status drives index eligibility; keep the prerendered noindex for
+      // in_development tours instead of overwriting it with the index,follow default.
+      robots: seoEntry.robots ?? SEO_DEFAULTS.robots,
       imagePathOrUrl: tour.imageUrl,
     };
   }

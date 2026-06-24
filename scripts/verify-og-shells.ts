@@ -228,15 +228,15 @@ const assertOgImage = (
 
 /**
  * Bots / AI crawlers must receive rendered content, not an empty SPA shell.
- * After `prerender → og:shells`, an indexable route's `<body>` carries the app
- * markup (Navbar/`<main>`/Footer). An un-prerendered shell has only an empty
+ * After `data-ssg → og:shells`, an indexable route's `<body>` carries semantic
+ * markup (`<main>`, tour content, nav links). An un-processed SPA shell has only an empty
  * `<div id="root"></div>`, which this guard rejects.
  */
 const assertRenderedBody = (html: string, errors: string[]): void => {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   const body = bodyMatch?.[1] ?? '';
   if (/<div\s+id="root">\s*<\/div>/i.test(body)) {
-    errors.push('empty app root — route was not prerendered (no body content)');
+    errors.push('empty app root — route was not data-SSG rendered (no body content)');
     return;
   }
   if (!/<main[\s>]/i.test(body)) {

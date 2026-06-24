@@ -56,9 +56,9 @@ export async function runGenerateOgShells(): Promise<void> {
   for (const { routePath, meta } of routeMetas) {
     const imagePathOrUrl = resolveOgShellImageForMeta(meta.imagePathOrUrl, resolvedPathByRequested);
     const filePath = routePathToDistFile(routePath, distDir);
-    // Overlay meta onto the route's own prerendered HTML when present: keeps the rendered
-    // <body> and JSON-LD from prerender, replaces only head meta with the Telegram-optimized
-    // OG block. Falls back to the SPA shell template when prerender did not run for this route.
+    // Overlay meta onto the route's data-SSG HTML when present: keeps rendered
+    // <body> and JSON-LD from data-SSG, replaces only head meta with the Telegram-optimized
+    // OG block. Falls back to the SPA shell template when data-SSG did not run for this route.
     const routeTemplate = await readFile(filePath, 'utf8').catch(() => templateHtml);
     const html = injectOgShellIntoHtml(routeTemplate, { ...meta, imagePathOrUrl });
     await mkdir(dirname(filePath), { recursive: true });

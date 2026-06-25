@@ -4,7 +4,6 @@ import { TELEGRAM_TOUR_DESCRIPTION_MAX_LENGTH } from '../constants/telegramMiniA
 import { parseIsoDate } from './tourSchedule/parseIsoDate';
 
 import type { Tour } from '../types';
-import { resolveTourGridVideoPoster } from '../constants/tourGridVideoPosterResolver';
 import { getTourGalleryGridUrls } from './tourGalleryUrls';
 import { isVideoAssetUrl } from './isVideoAssetUrl';
 
@@ -26,7 +25,7 @@ export const truncateTelegramTourDescription = (
   return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
 };
 
-/** Галерея Mini App: только still-кадры; видео заменяются poster.webp или пропускаются. */
+/** Галерея Mini App: только фото; видео-слоты из сетки полностью пропускаются. */
 export const getTelegramTourGalleryImageUrls = (
   tour: Pick<Tour, 'id' | 'galleryGridUrls' | 'galleryImages'>,
 ): string[] => {
@@ -34,21 +33,14 @@ export const getTelegramTourGalleryImageUrls = (
   const imageUrls: string[] = [];
 
   for (const url of getTourGalleryGridUrls(tour)) {
-    let imageUrl = url;
     if (isVideoAssetUrl(url)) {
-      const poster =
-        resolveTourGridVideoPoster(tour.id, url, false) ??
-        resolveTourGridVideoPoster(tour.id, url, true);
-      if (poster == null) {
-        continue;
-      }
-      imageUrl = poster;
-    }
-    if (seen.has(imageUrl)) {
       continue;
     }
-    seen.add(imageUrl);
-    imageUrls.push(imageUrl);
+    if (seen.has(url)) {
+      continue;
+    }
+    seen.add(url);
+    imageUrls.push(url);
   }
 
   return imageUrls;

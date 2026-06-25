@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { dirname } from 'node:path';
 import { ROUTES } from '../../src/constants/routes.ts';
 import { injectDataSsgIntoHtml } from './injectDataSsgIntoHtml.ts';
 import { resolveSiteRoot } from './seoRoutes.mjs';

@@ -25,6 +25,8 @@ import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByC
 import TelegramMiniAppHeader from '../../components/telegram/TelegramMiniAppHeader';
 import TelegramMiniAppShell from '../../components/telegram/TelegramMiniAppShell';
 import PlaceholderImage from '../../components/shared/PlaceholderImage';
+import FormCheckbox from '../../components/form/FormCheckbox';
+import LegalPdfLink from '../../components/legal/LegalPdfLink';
 import { useTourDisplayDuration } from '../../hooks/useTourDisplayDuration';
 import { useTourRequestModalSteps } from '../../hooks/useTourRequestModalSteps';
 import { useTourSchedule } from '../../hooks/useTourSchedule';
@@ -67,7 +69,7 @@ const buildInitialFormValues = (
   partySize: '2',
   withChildren: false,
   question: '',
-  privacyAccepted: true,
+  privacyAccepted: false,
   preferredDepartureDate: initialDepartureDateIso,
 });
 
@@ -362,6 +364,55 @@ const TelegramRequestPage = () => {
                 onChange={event => updateField('question', event.target.value)}
               />
             </label>
+
+            <div className="rounded-card border border-divider bg-white p-4 shadow-tourIncludedPanel">
+              <div className="flex items-start gap-3">
+                <FormCheckbox
+                  id="telegram-request-privacy"
+                  className="mt-0.5"
+                  checked={formValues.privacyAccepted}
+                  onChange={event => updateField('privacyAccepted', event.target.checked)}
+                  aria-invalid={fieldErrors.privacyAccepted != null}
+                  aria-describedby={
+                    fieldErrors.privacyAccepted != null ? 'telegram-request-privacy-error' : undefined
+                  }
+                />
+                <label
+                  htmlFor="telegram-request-privacy"
+                  className="cursor-pointer font-body text-sm leading-relaxed text-text-muted"
+                >
+                  <span className="text-difficulty-hard-fg" aria-hidden>
+                    *
+                  </span>{' '}
+                  {UI.tourRequestModal.privacyPrefix}
+                  <LegalPdfLink
+                    documentId="personal-data-policy"
+                    className="text-brand-primary underline underline-offset-2 transition-all duration-hover hover:brightness-110"
+                    onClick={event => event.stopPropagation()}
+                  >
+                    {UI.tourRequestModal.privacyPolicyLink}
+                  </LegalPdfLink>
+                  {UI.tourRequestModal.privacyMiddle}
+                  <LegalPdfLink
+                    documentId="personal-data-consent"
+                    className="text-brand-primary underline underline-offset-2 transition-all duration-hover hover:brightness-110"
+                    onClick={event => event.stopPropagation()}
+                  >
+                    {UI.tourRequestModal.privacyConsentLink}
+                  </LegalPdfLink>
+                  {UI.tourRequestModal.privacySuffix}
+                </label>
+              </div>
+              {fieldErrors.privacyAccepted != null && (
+                <p
+                  id="telegram-request-privacy-error"
+                  role="alert"
+                  className="mt-2 text-sm text-difficulty-hard-fg"
+                >
+                  {fieldErrors.privacyAccepted}
+                </p>
+              )}
+            </div>
           </div>
         </section>
 
@@ -373,7 +424,7 @@ const TelegramRequestPage = () => {
           <button
             type="submit"
             className="btn-primary w-full justify-center disabled:opacity-50"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !formValues.privacyAccepted}
           >
             {isSubmitting ? (
               <>

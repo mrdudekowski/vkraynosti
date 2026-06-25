@@ -26,9 +26,9 @@ import { resolveTourDifficultyLabel } from '../../utils/tourDifficultyLabel';
 import { buildTourDepartureCalendarModel } from '../../utils/tourSchedule/buildTourDepartureCalendarModel';
 import {
   formatTourDepartureLabel,
+  getTelegramTourGalleryImageUrls,
   truncateTelegramTourDescription,
 } from '../../utils/telegramMiniApp';
-import { getTourGalleryGridUrls } from '../../utils/tourGalleryUrls';
 
 const parseSeasonParam = (value: string | undefined): Season | null => {
   if (value === 'winter' || value === 'spring' || value === 'summer' || value === 'fall') {
@@ -53,7 +53,7 @@ const TelegramTourPage = () => {
   );
 
   const galleryUrls = useMemo(
-    () => (tour != null ? getTourGalleryGridUrls(tour).slice(0, 6) : []),
+    () => (tour != null ? getTelegramTourGalleryImageUrls(tour) : []),
     [tour],
   );
 

@@ -1,7 +1,7 @@
 import PlaceholderImage from '../shared/PlaceholderImage';
 import BrandWordmark from '../shared/BrandWordmark';
 import { UI } from '../../constants/ui';
-import { TELEGRAM_MINI_APP_HERO_IMAGE } from '../../constants/telegramMiniApp';
+import { getTelegramMiniAppHeroImage } from '../../constants/telegramMiniApp';
 import type { Season } from '../../types';
 
 interface TelegramCatalogHeroProps {
@@ -11,7 +11,8 @@ interface TelegramCatalogHeroProps {
 const TelegramCatalogHero = ({ season }: TelegramCatalogHeroProps) => (
   <section className="relative overflow-hidden">
     <PlaceholderImage
-      src={TELEGRAM_MINI_APP_HERO_IMAGE}
+      key={season}
+      src={getTelegramMiniAppHeroImage(season)}
       alt=""
       className="h-44 w-full"
       imgClassName="object-cover"

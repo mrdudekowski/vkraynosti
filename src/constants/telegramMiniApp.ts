@@ -1,9 +1,15 @@
 import type { Season, Tour } from '../types';
-import { TOUR_SUMMER_8_COVER } from './images';
+import { IMAGES } from './images';
 import { ROUTES } from './routes';
 
-/** Фон hero каталога — существующее медиа сайта, не дублируем ассеты. */
-export const TELEGRAM_MINI_APP_HERO_IMAGE = TOUR_SUMMER_8_COVER;
+/** Hero каталога Mini App — сезонные баннеры главной (`IMAGES.seasonSection`). */
+export const TELEGRAM_MINI_APP_HERO_BY_SEASON = IMAGES.seasonSection satisfies Record<
+  Season,
+  string
+>;
+
+export const getTelegramMiniAppHeroImage = (season: Season): string =>
+  TELEGRAM_MINI_APP_HERO_BY_SEASON[season];
 
 export const TELEGRAM_MINI_APP_SOURCE = 'telegram-mini-app' as const;
 

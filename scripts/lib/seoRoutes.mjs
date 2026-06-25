@@ -69,10 +69,17 @@ export async function loadSeoRouteSources(rootDir = process.cwd()) {
 /** Routes with noindex at runtime — excluded from sitemap and indexable OG shells. */
 export const NON_INDEXABLE_ROUTE_PATHS = new Set(['/privacy', '/safety']);
 
+/** Telegram Mini App — CSR-only; no data-SSG, OG shells, or sitemap. */
+export const NON_SEO_ROUTE_PREFIX = '/telegram';
+
+export function isSeoRoutePath(routePath) {
+  return !routePath.startsWith(NON_SEO_ROUTE_PREFIX);
+}
+
 /** Static indexable SPA paths (no tour detail pages), always including `/`. */
 export function getStaticIndexableRoutePaths(routesSource) {
   const staticRoutes = extractStaticRoutes(routesSource).filter(
-    (path) => !NON_INDEXABLE_ROUTE_PATHS.has(path),
+    (path) => !NON_INDEXABLE_ROUTE_PATHS.has(path) && isSeoRoutePath(path),
   );
   return [...new Set([...(staticRoutes.includes('/') ? [] : ['/']), ...staticRoutes])];
 }

@@ -59,4 +59,13 @@ describe('catalog-aware SEO route sets', () => {
       expect(['active', 'in_development']).toContain(statusByPath.get(path));
     }
   });
+
+  it('excludes Telegram Mini App routes from sitemap and data-SSG', async () => {
+    const sitemap = await getSitemapRoutePaths(rootDir);
+    const renderable = await getRenderableRoutePaths(rootDir);
+
+    for (const path of [...sitemap, ...renderable]) {
+      expect(path.startsWith('/telegram'), `non-SEO route leaked: ${path}`).toBe(false);
+    }
+  });
 });

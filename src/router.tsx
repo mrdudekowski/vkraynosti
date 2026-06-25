@@ -45,9 +45,9 @@ export const router = createBrowserRouter(
         { path: ROUTES.TOUR_DETAIL, element: <TourDetailPage /> },
         { path: ROUTES.SAFETY,      element: <SafetyPage /> },
         { path: ROUTES.PRIVACY,     element: <PrivacyPage /> },
-        { path: '*',                element: <NotFoundPage /> },
       ],
     },
+    { path: '*', element: <NotFoundPage /> },
   ],
   { basename: import.meta.env.BASE_URL }
 );

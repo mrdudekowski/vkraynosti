@@ -63,17 +63,18 @@ function injectContentSecurityPolicyPlugin(csp: string): Plugin {
   };
 }
 
+// https://vite.dev/config/
+const appBasePath = process.env.VITE_BASE_PATH?.trim() || '/vkraynosti/'
+const isTimewebAppBuild = !appBasePath || appBasePath === '/'
+
 const securityHeaders = {
   'Content-Security-Policy': contentSecurityPolicy,
   'Referrer-Policy': 'no-referrer',
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
+  ...(isTimewebAppBuild ? {} : { 'X-Frame-Options': 'DENY' as const }),
   'Permissions-Policy':
     'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), clipboard-read=(), clipboard-write=()',
 } as const;
-
-// https://vite.dev/config/
-const appBasePath = process.env.VITE_BASE_PATH?.trim() || '/vkraynosti/'
 
 export default defineConfig({
   plugins: [

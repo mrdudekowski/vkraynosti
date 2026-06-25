@@ -14,6 +14,12 @@ vkraynosti.ru {
 	@canonicalized path_regexp trailingSlash ^(.+[^/])$
 	redir @canonicalized {path}/ 308
 
+	@telegram path /telegram /telegram/*
+	handle @telegram {
+		try_files {path} {path}/ /telegram/index.html
+		file_server
+	}
+
 	@file file {path} {path}/index.html
 	handle @file {
 		file_server

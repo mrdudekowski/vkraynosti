@@ -8,6 +8,7 @@ import { injectDataSsgIntoHtml } from './injectDataSsgIntoHtml.ts';
 import { loadTourScheduleSnapshot } from './loadTourScheduleSnapshot.ts';
 import { loadTourScheduleBootstrapPayload } from './loadTourScheduleBootstrapPayload.ts';
 import { resolveDataSsgForRoute } from './renderDataSsgBody.ts';
+import { runTelegramSpaShells } from './runTelegramSpaShells.ts';
 
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
@@ -47,6 +48,8 @@ export async function runDataSsg(): Promise<void> {
     await writeFile(filePath, html, 'utf8');
     process.stdout.write(`[data-ssg] ${routePath}\n`);
   }
+
+  await runTelegramSpaShells(distDir, templateHtml, tourScheduleBootstrapJson);
 
   process.stdout.write(`Data-SSG complete: ${routes.length} routes\n`);
 }

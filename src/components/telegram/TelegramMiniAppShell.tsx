@@ -15,6 +15,10 @@ const TelegramMiniAppShell = ({
 }: TelegramMiniAppShellProps) => {
   useEffect(() => {
     initTelegramWebApp();
+    const root = document.getElementById('root');
+    if (root?.querySelector('main')) {
+      root.replaceChildren();
+    }
   }, []);
 
   return (

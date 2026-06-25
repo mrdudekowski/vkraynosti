@@ -3,6 +3,20 @@
  * CDN/S3 media origin is injected at build time from VITE_PUBLIC_ASSET_BASE_URL.
  */
 
+const SCRIPT_SRC_BASE = [
+  "'self'",
+  "'unsafe-inline'",
+  'https://mc.yandex.ru',
+  'https://telegram.org',
+] as const;
+
+/** Telegram Web client embeds Mini App in iframe — meta CSP is ignored; keep in sync with Caddy headers. */
+const FRAME_ANCESTORS = [
+  "'self'",
+  'https://web.telegram.org',
+  'https://*.telegram.org',
+] as const;
+
 const IMG_SRC_BASE = [
   "'self'",
   'data:',
@@ -69,8 +83,8 @@ export function buildContentSecurityPolicy(extraMediaOrigins: string[] = []): st
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",
-    "frame-ancestors 'none'",
-    "script-src 'self' 'unsafe-inline' https://mc.yandex.ru",
+    `frame-ancestors ${FRAME_ANCESTORS.join(' ')}`,
+    `script-src ${SCRIPT_SRC_BASE.join(' ')}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     `img-src ${imgSrc}`,
     "font-src 'self' https://fonts.gstatic.com data:",

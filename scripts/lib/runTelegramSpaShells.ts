@@ -2,14 +2,33 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { ROUTES } from '../../src/constants/routes.ts';
 import { injectDataSsgIntoHtml } from './injectDataSsgIntoHtml.ts';
-import { resolveSiteRoot } from './seoRoutes.mjs';
-import { routePathToDistFile } from './seoRoutes.mjs';
+import { getTourStatusByPublicPath, resolveSiteRoot, routePathToDistFile } from './seoRoutes.mjs';
 
-/** CSR-only Mini App routes: empty #root shell, no data-SSG body, no home OG meta. */
-export const TELEGRAM_CSR_SHELL_ROUTE_PATHS = [
+const TOUR_PUBLIC_PATH_PATTERN = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)$/;
+
+/** Статические CSR-маршруты Mini App (без query). */
+export const TELEGRAM_CSR_STATIC_ROUTE_PATHS = [
   ROUTES.TELEGRAM,
   ROUTES.TELEGRAM_SUCCESS,
 ] as const;
+
+/** Все пути Mini App для dist (index.html на каждый URL), без правки Caddy try_files. */
+export async function collectTelegramCsrShellRoutePaths(
+  rootDir: string = process.cwd(),
+): Promise<string[]> {
+  const statusByPath = await getTourStatusByPublicPath(rootDir);
+  const tourPaths = [...statusByPath.keys()].flatMap(publicPath => {
+    const match = TOUR_PUBLIC_PATH_PATTERN.exec(publicPath);
+    if (match == null) {
+      return [];
+    }
+    const [, season, slug] = match;
+    const tourBase = `${ROUTES.TELEGRAM}/tour/${season}/${slug}`;
+    return [tourBase, `${tourBase}/request`];
+  });
+
+  return [...new Set([...TELEGRAM_CSR_STATIC_ROUTE_PATHS, ...tourPaths])];
+}
 
 const stripIndexableHeadMeta = (html: string): string =>
   html
@@ -37,8 +56,12 @@ export async function runTelegramSpaShells(
   distDir: string,
   spaShellTemplate: string,
   tourScheduleBootstrapJson: string,
+  rootDir: string = process.cwd(),
 ): Promise<void> {
-  for (const routePath of TELEGRAM_CSR_SHELL_ROUTE_PATHS) {
+  const routePaths = await collectTelegramCsrShellRoutePaths(rootDir);
+  process.stdout.write(`Telegram CSR shells: ${routePaths.length} routes\n`);
+
+  for (const routePath of routePaths) {
     const html = patchTelegramMiniAppShellHead(
       injectDataSsgIntoHtml(spaShellTemplate, {
         bodyHtml: '',

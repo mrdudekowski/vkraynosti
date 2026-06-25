@@ -1,6 +1,7 @@
-# Example Caddy config for vkraynosti.ru (TimeWeb App + static dist/).
-# Copy to server and adjust `root` path.
-#
+# Example Caddy config for vkraynosti.ru (VPS / self-hosted Caddy + static dist/).
+# TimeWeb App Platform обычно не даёт править Caddy — для Mini App достаточно
+# статических dist/telegram/**/index.html из `npm run data:ssg` (см. runTelegramSpaShells.ts).
+# Copy to server (e.g. /etc/caddy/Caddyfile) and adjust `root` path.#
 # Goals:
 # - serve prebuilt OG shells from dist/**/index.html
 # - unknown paths → dist/404.html with HTTP 404 and noindex shell

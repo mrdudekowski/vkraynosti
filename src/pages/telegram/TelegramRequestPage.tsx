@@ -193,7 +193,7 @@ const TelegramRequestPage = () => {
         },
         parsed.data,
         {
-          telegramUser,
+          telegramUser: getTelegramUser() ?? telegramUser,
           source: TELEGRAM_MINI_APP_SOURCE,
         },
       );

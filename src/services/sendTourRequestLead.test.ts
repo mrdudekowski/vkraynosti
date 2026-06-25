@@ -145,6 +145,46 @@ describe('sendTourRequestLead', () => {
     expect(payload.preferredDepartureDate).toBe('2026-07-11');
   });
 
+  it('includes telegram mini-app source and user fields in the lead payload', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(new Response('ok', { status: 200 }));
+
+    const { sendTourRequestLead } = await importService();
+    await sendTourRequestLead(tour, values, {
+      source: 'telegram-mini-app',
+      telegramUser: {
+        telegramId: 424242,
+        telegramUsername: 'nikita_test',
+        telegramFirstName: 'Никита',
+      },
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const payload = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(payload).toMatchObject({
+      source: 'telegram-mini-app',
+      telegramId: 424242,
+      telegramUsername: 'nikita_test',
+      telegramFirstName: 'Никита',
+    });
+  });
+
+  it('sends mini-app source even when telegram user is unavailable', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(new Response('ok', { status: 200 }));
+
+    const { sendTourRequestLead } = await importService();
+    await sendTourRequestLead(tour, values, {
+      source: 'telegram-mini-app',
+      telegramUser: null,
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const payload = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(payload.source).toBe('telegram-mini-app');
+    expect(payload).not.toHaveProperty('telegramId');
+  });
+
   it('fails fast when the public endpoint is not configured', async () => {
     vi.stubEnv('VITE_TOUR_REQUEST_ENDPOINT_URL', '');
 

@@ -12,7 +12,8 @@
  *
  * Важно: sendTestLead() запускает код из редактора, а сайт шлёт POST на URL /exec
  * (опубликованный Web App). Пока деплой не обновлён, редактор и прод расходятся.
- * Проверка деплоя: GET /exec должен вернуть buildId "lead-message-v5-tour-link-only" (см. doGet).
+ * Проверка деплоя: GET /exec должен вернуть buildId "lead-message-v6-telegram-mini-app" (см. doGet).
+ * Если в Telegram «Новая заявка с сайта!» без Telegram ID — прод ещё на v5: Deploy → New version → Deploy.
  * Если buildId старый (напр. no-webhook-secret-v1) — сайт бьёт в устаревший Web App:
  * в Telegram не будет «Количество человек» / «С детьми», зато уйдут idempotencyKey и userAgent.
  *
@@ -56,7 +57,7 @@ var TELEGRAM_TEXT_LIMIT = 4096;
 var SAFE_CHUNK = 4000;
 var DEFAULT_IDEMPOTENCY_TTL_SECONDS = '21600';
 /** Маркер версии в doGet — убедитесь, что GET /exec возвращает его после деплоя. */
-var WEBHOOK_BUILD_ID = 'lead-message-v5-tour-link-only';
+var WEBHOOK_BUILD_ID = 'lead-message-v6-telegram-mini-app';
 var TOUR_REQUEST_MAX_PARTY_SIZE = 99;
 
 /**
@@ -118,6 +119,60 @@ function sendTestLead() {
   };
 
   Logger.log('Telegram preview:\n' + buildLeadMessage_(testPayload));
+  var result = handleLeadPost_(fakePostEvent);
+  Logger.log(JSON.stringify(result));
+}
+
+/**
+ * Тест заявки из Telegram Mini App (заголовок + поля telegramId / @username).
+ * Запустите после sendTestLead(), если нужно проверить mini-app формат.
+ */
+function sendTestMiniAppLead() {
+  var props = PropertiesService.getScriptProperties();
+
+  if (!props.getProperty('TELEGRAM_BOT_TOKEN')) {
+    Logger.log('Не найден TELEGRAM_BOT_TOKEN. Добавьте токен бота в Script Properties.');
+    return;
+  }
+  if (!props.getProperty('TELEGRAM_CHAT_ID')) {
+    Logger.log('Не найден TELEGRAM_CHAT_ID. Добавьте id группы в Script Properties.');
+    return;
+  }
+
+  var testPayload = {
+    idempotencyKey: 'gas-mini-app-test-' + new Date().toISOString(),
+    source: 'telegram-mini-app',
+    telegramId: 123456789,
+    telegramUsername: 'test_user',
+    telegramFirstName: 'Тест',
+    telegramLastName: 'Mini App',
+    tourId: 'summer-3',
+    tourTitle: 'Путешествие на остров Аскольд',
+    season: 'summer',
+    tourDuration: 'однодневный',
+    name: 'Тестовая заявка Mini App',
+    phone: '+79001234567',
+    email: '',
+    preferredMessenger: 'telegram',
+    partySize: 2,
+    withChildren: false,
+    question: 'Проверка mini-app формата из Google Apps Script.',
+    privacyAccepted: true,
+    preferredDepartureDate: '2026-06-28',
+    sourceUrl: 'https://vkraynosti.ru/tours/summer/leto-ostrov-askold/',
+    submittedAt: new Date().toISOString(),
+    userAgent: 'Apps Script mini-app test',
+  };
+
+  var fakePostEvent = {
+    postData: {
+      contents: JSON.stringify(testPayload),
+      type: 'application/json',
+    },
+    parameter: {},
+  };
+
+  Logger.log('Telegram mini-app preview:\n' + buildLeadMessage_(testPayload));
   var result = handleLeadPost_(fakePostEvent);
   Logger.log(JSON.stringify(result));
 }
@@ -314,9 +369,13 @@ function logLeadDiagnostics_(body) {
       : '—';
   var ua =
     typeof body.userAgent === 'string' && body.userAgent.trim() ? body.userAgent.trim() : '—';
+  var source =
+    typeof body.source === 'string' && body.source.trim() ? body.source.trim() : '—';
   Logger.log(
     'Lead diagnostics (not sent to Telegram): tourId=' +
       tourId +
+      ', source=' +
+      source +
       ', idempotencyKey=' +
       idem +
       ', userAgent=' +

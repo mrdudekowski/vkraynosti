@@ -201,13 +201,14 @@ const TelegramGalleryLightbox = ({
             {urls.map(url => (
               <div
                 key={url}
-                className="flex h-full w-full shrink-0 items-center justify-center px-4"
+                className="flex h-full min-w-full shrink-0 items-center justify-center px-4"
               >
                 <PlaceholderImage
+                  layout="intrinsic"
                   src={url}
                   alt={tourTitle}
                   className="max-h-full max-w-full"
-                  imgClassName="max-h-[calc(100dvh-8rem)] w-full select-none object-contain"
+                  imgClassName="max-h-[calc(100dvh-8rem)] w-auto max-w-full select-none object-contain"
                   loading="eager"
                   fetchPriority="high"
                 />

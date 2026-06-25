@@ -1,5 +1,7 @@
+import { TELEGRAM_MINI_APP_SOURCE } from '../constants/telegramMiniApp';
 import { getTourCanonicalUrl } from '../constants/tourUrls';
 import { resolveTourSlugById } from '../data/tourSlugs';
+import type { TelegramUser } from '../lib/telegram/types';
 import type { TourRequestModalPayload } from '../types';
 import type { TourRequestFormValues } from '../validation/tourRequestSchema';
 
@@ -13,6 +15,17 @@ interface TourRequestLeadPayload extends TourRequestFormValues {
   submittedAt: string;
   userAgent: string;
   preferredDepartureDate?: string;
+  telegramId?: number;
+  telegramUsername?: string;
+  telegramFirstName?: string;
+  telegramLastName?: string;
+  telegramLanguageCode?: string;
+  source?: string;
+}
+
+export interface SendTourRequestLeadOptions {
+  telegramUser?: TelegramUser | null;
+  source?: string;
 }
 
 export type TourRequestLeadErrorCode = 'not-configured' | 'network' | 'rejected';
@@ -88,9 +101,43 @@ const resolveLeadSourceUrl = (tour: TourRequestModalPayload): string => {
   return getTourCanonicalUrl({ id: tour.tourId, season: tour.season, slug });
 };
 
+const buildTelegramLeadFields = (
+  telegramUser: TelegramUser | null | undefined,
+  source: string | undefined,
+): Pick<
+  TourRequestLeadPayload,
+  | 'telegramId'
+  | 'telegramUsername'
+  | 'telegramFirstName'
+  | 'telegramLastName'
+  | 'telegramLanguageCode'
+  | 'source'
+> => {
+  if (telegramUser == null) {
+    return source != null && source.length > 0 ? { source } : {};
+  }
+  return {
+    telegramId: telegramUser.telegramId,
+    ...(telegramUser.telegramUsername != null && telegramUser.telegramUsername.length > 0
+      ? { telegramUsername: telegramUser.telegramUsername }
+      : {}),
+    ...(telegramUser.telegramFirstName != null && telegramUser.telegramFirstName.length > 0
+      ? { telegramFirstName: telegramUser.telegramFirstName }
+      : {}),
+    ...(telegramUser.telegramLastName != null && telegramUser.telegramLastName.length > 0
+      ? { telegramLastName: telegramUser.telegramLastName }
+      : {}),
+    ...(telegramUser.languageCode != null && telegramUser.languageCode.length > 0
+      ? { telegramLanguageCode: telegramUser.languageCode }
+      : {}),
+    source: source ?? TELEGRAM_MINI_APP_SOURCE,
+  };
+};
+
 const buildLeadPayload = (
   tour: TourRequestModalPayload,
-  values: TourRequestFormValues
+  values: TourRequestFormValues,
+  options?: SendTourRequestLeadOptions,
 ): TourRequestLeadPayload => {
   const departure =
     values.preferredDepartureDate != null && values.preferredDepartureDate.length > 0
@@ -111,19 +158,21 @@ const buildLeadPayload = (
     ...(departure != null && departure.length > 0
       ? { preferredDepartureDate: departure }
       : {}),
+    ...buildTelegramLeadFields(options?.telegramUser, options?.source),
   };
 };
 
 export const sendTourRequestLead = async (
   tour: TourRequestModalPayload,
-  values: TourRequestFormValues
+  values: TourRequestFormValues,
+  options?: SendTourRequestLeadOptions,
 ) => {
   const endpoint = tourRequestEndpointUrl?.trim();
   if (!endpoint) {
     throw new TourRequestLeadError('not-configured', 'Tour request endpoint is not configured');
   }
 
-  const body = JSON.stringify(buildLeadPayload(tour, values));
+  const body = JSON.stringify(buildLeadPayload(tour, values, options));
 
   let response: Response;
   try {

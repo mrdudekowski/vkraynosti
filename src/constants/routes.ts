@@ -29,6 +29,14 @@ export const ROUTES = {
   TOUR_DETAIL: '/tours/:season/:tourId',
   SAFETY:      '/safety',
   PRIVACY:     '/privacy',
+  /** Telegram Mini App — каталог туров. */
+  TELEGRAM:    '/telegram',
+  /** Telegram Mini App — страница тура. */
+  TELEGRAM_TOUR: '/telegram/tour/:season/:tourId',
+  /** Telegram Mini App — форма заявки. */
+  TELEGRAM_TOUR_REQUEST: '/telegram/tour/:season/:tourId/request',
+  /** Telegram Mini App — успешная отправка заявки. */
+  TELEGRAM_SUCCESS: '/telegram/success',
 } as const;
 
 export const buildHomeSectionPath = (sectionId: string): string =>

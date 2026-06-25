@@ -13,9 +13,25 @@ const TourDetailPage = lazy(() => import('./pages/TourDetailPage'));
 const SafetyPage = lazy(() => import('./pages/SafetyPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const TelegramLayout = lazy(() => import('./components/telegram/TelegramLayout'));
+const TelegramCatalogPage = lazy(() => import('./pages/telegram/TelegramCatalogPage'));
+const TelegramTourPage = lazy(() => import('./pages/telegram/TelegramTourPage'));
+const TelegramRequestPage = lazy(() => import('./pages/telegram/TelegramRequestPage'));
+const TelegramSuccessPage = lazy(() => import('./pages/telegram/TelegramSuccessPage'));
 
 export const router = createBrowserRouter(
   [
+    {
+      path: ROUTES.TELEGRAM,
+      element: <TelegramLayout />,
+      errorElement: <RouteErrorFallback />,
+      children: [
+        { index: true, element: <TelegramCatalogPage /> },
+        { path: 'tour/:season/:tourId', element: <TelegramTourPage /> },
+        { path: 'tour/:season/:tourId/request', element: <TelegramRequestPage /> },
+        { path: 'success', element: <TelegramSuccessPage /> },
+      ],
+    },
     {
       path: ROUTES.HOME,
       element: <Layout />,

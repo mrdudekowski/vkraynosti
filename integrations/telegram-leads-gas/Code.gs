@@ -160,6 +160,12 @@ function doGet() {
       'question',
       'privacyAccepted',
       'submittedAt',
+      'source',
+      'telegramId',
+      'telegramUsername',
+      'telegramFirstName',
+      'telegramLastName',
+      'telegramLanguageCode',
     ],
     telegramDiagnosticsOnly: ['idempotencyKey', 'userAgent'],
   });
@@ -319,6 +325,41 @@ function logLeadDiagnostics_(body) {
 }
 
 /**
+ * @param {Object} body
+ * @return {string}
+ */
+function leadSourceHeadline_(body) {
+  var source = body.source ? String(body.source).trim() : '';
+  if (source === 'telegram-mini-app') {
+    return 'Новая заявка из Telegram Mini App!';
+  }
+  return 'Новая заявка с сайта!';
+}
+
+/**
+ * @param {Object} body
+ * @return {string[]}
+ */
+function formatTelegramMiniAppLines_(body) {
+  var lines = [];
+  if (body.telegramId != null && String(body.telegramId).trim() !== '') {
+    lines.push('Telegram ID: ' + escapeHtml_(String(body.telegramId).trim()));
+  }
+  var username = body.telegramUsername ? String(body.telegramUsername).trim() : '';
+  if (username) {
+    var handle = username.indexOf('@') === 0 ? username : '@' + username;
+    lines.push('Telegram: ' + escapeHtml_(handle));
+  }
+  var firstName = body.telegramFirstName ? String(body.telegramFirstName).trim() : '';
+  var lastName = body.telegramLastName ? String(body.telegramLastName).trim() : '';
+  var fullName = (firstName + ' ' + lastName).trim();
+  if (fullName) {
+    lines.push('Имя в Telegram: ' + escapeHtml_(fullName));
+  }
+  return lines;
+}
+
+/**
  * Текст заявки для менеджеров в Telegram. Только бизнес-поля — без idempotencyKey и userAgent.
  * @param {Object} body
  * @return {string}
@@ -337,9 +378,10 @@ function buildLeadMessage_(body) {
   var departureDate = formatDepartureDate_(body.preferredDepartureDate);
   var partySize = escapeHtml_(String(parseInt(String(body.partySize), 10)));
   var withChildren = body.withChildren === true ? 'Да' : 'Нет';
+  var telegramLines = formatTelegramMiniAppLines_(body);
 
   var lines = [
-    'Новая заявка с сайта!',
+    leadSourceHeadline_(body),
     'Сезон: ' + season,
     'Тур: ' + tourTitleLine,
     'Длительность: ' + duration,
@@ -348,6 +390,13 @@ function buildLeadMessage_(body) {
     '',
     'Имя: ' + escapeHtml_(String(body.name).trim()),
     'Телефон: ' + escapeHtml_(String(body.phone).trim()),
+  ];
+
+  if (telegramLines.length > 0) {
+    lines = lines.concat(telegramLines);
+  }
+
+  lines = lines.concat([
     'Количество человек: ' + partySize,
     'С детьми: ' + withChildren,
     'Email: ' + email,
@@ -357,7 +406,7 @@ function buildLeadMessage_(body) {
     '',
     'Согласие с политикой: ' + privacyAccepted,
     'Отправлено: ' + submittedAt,
-  ];
+  ]);
 
   return lines.join('\n');
 }

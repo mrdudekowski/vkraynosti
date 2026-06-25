@@ -10,6 +10,8 @@ type BrandWordmarkProps = {
   /** Hover как у ссылки navbar (`group` на родителе). */
   interactive?: boolean;
   wordmark?: string;
+  /** Класс остатка слова (после сезонной первой буквы). */
+  restClassName?: string;
   className?: string;
 };
 
@@ -18,6 +20,7 @@ const BrandWordmark = ({
   size = 'inherit',
   interactive = false,
   wordmark = UI.nav.brand,
+  restClassName = 'text-text-inverse',
   className = '',
 }: BrandWordmarkProps) => {
   const { firstLetter, rest } = splitBrandWordmark(wordmark);
@@ -25,8 +28,8 @@ const BrandWordmark = ({
   const hoverFadeClass =
     'transition-opacity duration-hover motion-reduce:transition-none';
   const restHoverClass = interactive
-    ? `text-text-inverse transition-colors duration-hover group-hover:text-brand-secondary`
-    : 'text-text-inverse';
+    ? `${restClassName} transition-colors duration-hover group-hover:text-brand-secondary`
+    : restClassName;
 
   const firstLetterNode = interactive ? (
     <span className="relative inline-block align-baseline">

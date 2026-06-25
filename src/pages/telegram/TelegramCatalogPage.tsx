@@ -55,8 +55,8 @@ const TelegramCatalogPage = () => {
 
   return (
     <TelegramMiniAppShell season={activeSeason}>
-      <TelegramCatalogHero />
-      <div className="mx-auto max-w-lg space-y-5 px-4 pb-8 pt-4">
+      <TelegramCatalogHero season={activeSeason} />
+      <div className="mx-auto max-w-lg space-y-5 px-4 pb-8 pt-2">
         <SeasonTabs activeSeason={activeSeason} onSeasonChange={handleSeasonChange} />
         <h2 className="font-heading text-2xl text-text-primary">
           {UI.telegramMiniApp.allToursHeading}

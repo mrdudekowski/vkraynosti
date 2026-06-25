@@ -12,6 +12,12 @@ describe('getTelegramUser', () => {
         ready: () => {},
         expand: () => {},
         close: () => {},
+        BackButton: {
+          show: () => {},
+          hide: () => {},
+          onClick: () => {},
+          offClick: () => {},
+        },
         initDataUnsafe: {
           user: {
             id: 42,

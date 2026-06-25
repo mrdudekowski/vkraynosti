@@ -26,6 +26,7 @@ const TelegramTourCard = ({ tour }: TelegramTourCardProps) => {
   const { displayDuration } = useTourDisplayDuration(tour);
   const { displayPrice } = useTourDisplayPrice(tour);
   const difficultyLabel = resolveTourDifficultyLabel(tour);
+  const tourPath = buildTelegramTourPath(tour);
 
   const nearestDateLabel = useMemo(() => {
     const tourEvents = events.filter(event => event.tourId === tour.id);
@@ -34,7 +35,11 @@ const TelegramTourCard = ({ tour }: TelegramTourCardProps) => {
   }, [events, tour.id]);
 
   return (
-    <article className="card-base flex flex-col overflow-hidden">
+    <Link
+      to={tourPath}
+      className="card-base flex flex-col overflow-hidden cursor-pointer no-underline text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
+      prefetch="intent"
+    >
       <div className="relative overflow-hidden rounded-t-card">
         <PlaceholderImage
           src={tour.imageUrl}
@@ -70,16 +75,13 @@ const TelegramTourCard = ({ tour }: TelegramTourCardProps) => {
           </p>
         )}
         <div className="mt-auto flex justify-end">
-          <Link
-            to={buildTelegramTourPath(tour)}
-            className="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm no-underline"
-          >
+          <span className="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm">
             {UI.telegramMiniApp.tourCardDetails}
             <FontAwesomeIcon icon={faChevronRight} className="h-3 w-3" aria-hidden />
-          </Link>
+          </span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 };
 

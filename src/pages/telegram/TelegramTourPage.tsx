@@ -6,7 +6,6 @@ import { faClock } from '@fortawesome/free-solid-svg-icons/faClock';
 import { faMountain } from '@fortawesome/free-solid-svg-icons/faMountain';
 import { faTag } from '@fortawesome/free-solid-svg-icons/faTag';
 import { faSun } from '@fortawesome/free-solid-svg-icons/faSun';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons/faArrowUpRightFromSquare';
 import type { Season } from '../../types';
@@ -18,6 +17,7 @@ import { getTourCanonicalUrl } from '../../constants/tourUrls';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import TelegramMiniAppHeader from '../../components/telegram/TelegramMiniAppHeader';
 import TelegramMiniAppShell from '../../components/telegram/TelegramMiniAppShell';
+import TelegramTourGallery from '../../components/telegram/TelegramTourGallery';
 import PlaceholderImage from '../../components/shared/PlaceholderImage';
 import { useTourDisplayDuration } from '../../hooks/useTourDisplayDuration';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
@@ -65,7 +65,6 @@ const TelegramTourPage = () => {
     return buildTourDepartureCalendarModel(tour.id, tourEvents);
   }, [events, tour]);
 
-  const [activeSlide, setActiveSlide] = useState(0);
   const [selectedDepartureIso, setSelectedDepartureIso] = useState<string | null>(null);
 
   const futureDates = departureModel?.futureDates ?? [];
@@ -87,8 +86,6 @@ const TelegramTourPage = () => {
   }
 
   const difficultyLabel = resolveTourDifficultyLabel(tour);
-  const heroImages = galleryUrls.length > 0 ? galleryUrls : [tour.imageUrl];
-  const activeHero = heroImages[Math.min(activeSlide, heroImages.length - 1)] ?? tour.imageUrl;
   const description = truncateTelegramTourDescription(
     tour.descriptionLeadBold != null && tour.descriptionLeadBold.length > 0
       ? `${tour.descriptionLeadBold}. ${tour.description}`
@@ -113,47 +110,13 @@ const TelegramTourPage = () => {
       <div className="mx-auto max-w-lg pb-32">
         <div className="relative">
           <PlaceholderImage
-            src={activeHero}
+            src={tour.imageUrl}
             alt={tour.title}
             className="h-56 w-full"
             imgClassName={getTourCoverCardImgObjectClass(tour.id)}
             loading="eager"
             fetchPriority="high"
           />
-          {heroImages.length > 1 && (
-            <>
-              <button
-                type="button"
-                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-surface-light/85 p-2 text-brand-primary"
-                aria-label={UI.telegramMiniApp.carouselPrevious}
-                onClick={() =>
-                  setActiveSlide(index => (index - 1 + heroImages.length) % heroImages.length)
-                }
-              >
-                <FontAwesomeIcon icon={faChevronLeft} aria-hidden />
-              </button>
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-surface-light/85 p-2 text-brand-primary"
-                aria-label={UI.telegramMiniApp.carouselNext}
-                onClick={() => setActiveSlide(index => (index + 1) % heroImages.length)}
-              >
-                <FontAwesomeIcon icon={faChevronRight} aria-hidden />
-              </button>
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-                {heroImages.map((_, index) => (
-                  <span
-                    key={`dot-${index}`}
-                    className={[
-                      'h-1.5 w-1.5 rounded-full',
-                      index === activeSlide ? 'bg-text-inverse' : 'bg-text-inverse/50',
-                    ].join(' ')}
-                    aria-hidden
-                  />
-                ))}
-              </div>
-            </>
-          )}
         </div>
 
         <section className="-mt-6 rounded-t-[2rem] bg-surface-light px-4 pb-6 pt-8 shadow-tourIncludedPanel">
@@ -218,19 +181,8 @@ const TelegramTourPage = () => {
             <p className="font-body text-sm leading-relaxed text-text-primary">{description}</p>
           </div>
 
-          {galleryUrls.length > 1 && (
-            <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
-              {galleryUrls.slice(0, 4).map(url => (
-                <PlaceholderImage
-                  key={url}
-                  src={url}
-                  alt=""
-                  className="h-20 w-24 shrink-0 overflow-hidden rounded-card"
-                  imgClassName="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              ))}
-            </div>
+          {galleryUrls.length > 0 && (
+            <TelegramTourGallery urls={galleryUrls} tourTitle={tour.title} />
           )}
         </section>
       </div>

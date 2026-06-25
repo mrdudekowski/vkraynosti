@@ -360,7 +360,6 @@ export const UI = {
   telegramMiniApp: {
     brandTitle: 'ВКРАЙНОСТИ',
     brandSubtitle: 'Захватывающие путешествия по Приморью',
-    miniAppLabel: 'mini app',
     allToursHeading: 'Все поездки',
     catalogLoading: 'Загрузка направлений…',
     catalogEmpty: 'В этом сезоне пока нет доступных туров.',

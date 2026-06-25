@@ -5,15 +5,10 @@ import { UI } from '../../constants/ui';
 
 interface TelegramMiniAppHeaderProps {
   title: string;
-  subtitle?: string;
   backTo?: string;
 }
 
-const TelegramMiniAppHeader = ({
-  title,
-  subtitle = UI.telegramMiniApp.miniAppLabel,
-  backTo,
-}: TelegramMiniAppHeaderProps) => (
+const TelegramMiniAppHeader = ({ title, backTo }: TelegramMiniAppHeaderProps) => (
   <header className="sticky top-0 z-navbar border-b border-divider bg-surface-light/95 px-4 py-3 backdrop-blur-sm">
     <div className="mx-auto flex max-w-lg items-center gap-3">
       {backTo != null ? (
@@ -29,7 +24,6 @@ const TelegramMiniAppHeader = ({
       )}
       <div className="min-w-0 flex-1 text-center">
         <p className="truncate font-body text-sm font-semibold text-text-primary">{title}</p>
-        <p className="truncate font-body text-xs text-text-muted">{subtitle}</p>
       </div>
       <span className="w-16 shrink-0" aria-hidden />
     </div>

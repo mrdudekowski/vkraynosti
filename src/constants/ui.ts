@@ -351,6 +351,10 @@ export const UI = {
       return `${formattedDate}, ${count} ${word}`;
     },
   },
+  bootSplash: {
+    /** `aria-label` оверлея в `index.html` до монтирования React. */
+    loadingAria: 'Загрузка сайта',
+  },
   notFoundPage: {
     metaTitle:   'Страница не найдена | Вкрайности',
     heading:     'Страница не найдена',

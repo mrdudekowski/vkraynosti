@@ -19,6 +19,76 @@
       content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), clipboard-read=(), clipboard-write=()"
     />
     <title>Вкрайности</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap"
+    />
+    <style>
+      /* Boot splash — sync hex/timing with src/constants/bootSplash.ts */
+      html {
+        background-color: #f7f5f0;
+      }
+      #root {
+        visibility: hidden;
+      }
+      html[data-app-ready] #root {
+        visibility: visible;
+      }
+      #app-boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f7f5f0;
+        transition: opacity 200ms ease;
+      }
+      #app-boot-splash.boot-splash--hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .boot-wordmark {
+        font-family: 'Dela Gothic One', sans-serif;
+        font-size: 1.4375rem;
+        line-height: 2.0125rem;
+        font-weight: 400;
+        font-synthesis: none;
+      }
+      .boot-wordmark__first {
+        color: #c8622a;
+      }
+      html[data-boot-season='winter'] .boot-wordmark__first {
+        color: #7ba7bc;
+      }
+      html[data-boot-season='spring'] .boot-wordmark__first {
+        color: #c76b7e;
+      }
+      html[data-boot-season='summer'] .boot-wordmark__first {
+        color: #e8a838;
+      }
+      html[data-boot-season='fall'] .boot-wordmark__first {
+        color: #c8622a;
+      }
+      .boot-wordmark__rest {
+        color: #1a3c2e;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #app-boot-splash {
+          transition: none;
+        }
+      }
+    </style>
+    <script>
+      (function () {
+        var match = location.pathname.match(/\/(?:tours|telegram)\/(winter|spring|summer|fall)(?:\/|$)/);
+        if (match) {
+          document.documentElement.setAttribute('data-boot-season', match[1]);
+        }
+      })();
+    </script>
     <script>
       // GitHub Pages SPA: restore path encoded by 404.html
       (function (l) {
@@ -53,6 +123,17 @@
     </script>
   </head>
   <body>
+    <div
+      id="app-boot-splash"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="Загрузка сайта"
+    >
+      <span class="boot-wordmark" aria-hidden="true">
+        <span class="boot-wordmark__first">В</span><span class="boot-wordmark__rest">крайности</span>
+      </span>
+    </div>
     <div id="root"></div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script type="module" src="/src/main.tsx"></script>

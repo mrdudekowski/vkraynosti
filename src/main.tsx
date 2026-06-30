@@ -13,8 +13,11 @@ import { TourScheduleProvider } from './context/TourScheduleContext';
 import ErrorBoundary from './components/errors/ErrorBoundary';
 import AppLenis from './components/layout/AppLenis';
 import { router } from './router';
+import { installBootSplashFailsafe, scheduleBootSplashDismiss } from './utils/dismissBootSplash';
 import './bootstrap-fonts';
 import './index.css';
+
+installBootSplashFailsafe();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -33,3 +36,5 @@ createRoot(document.getElementById('root')!).render(
     </AppLenis>
   </StrictMode>
 );
+
+scheduleBootSplashDismiss();

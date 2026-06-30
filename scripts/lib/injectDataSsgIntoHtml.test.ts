@@ -3,13 +3,15 @@ import { injectDataSsgIntoHtml } from './injectDataSsgIntoHtml.ts';
 
 describe('injectDataSsgIntoHtml', () => {
   it('injects tour schedule bootstrap JSON before JSON-LD', () => {
-    const template = `<!doctype html><html><head></head><body><div id="root"></div></body></html>`;
+    const template = `<!doctype html><html><head></head><body><div id="app-boot-splash"></div><div id="root"></div></body></html>`;
     const html = injectDataSsgIntoHtml(template, {
       bodyHtml: '<main><h1>Tour</h1></main>',
       structuredData: [{ '@type': 'TouristTrip', name: 'Test' }],
       tourScheduleBootstrapJson: '{"events":[],"catalogPrices":{},"catalogDurationTypes":{},"catalogPublicationStatuses":{"spring-1":"active"}}',
     });
 
+    expect(html).toContain('id="app-boot-splash"');
+    expect(html).toContain('<main><h1>Tour</h1></main>');
     expect(html).toContain('id="tour-schedule-bootstrap"');
     expect(html).toContain('"spring-1":"active"');
     expect(html).toContain('application/ld+json');

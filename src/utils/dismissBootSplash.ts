@@ -1,0 +1,60 @@
+import {
+  BOOT_SPLASH_ELEMENT_ID,
+  BOOT_SPLASH_FADE_MS,
+  BOOT_SPLASH_FAILSAFE_MS,
+} from '../constants/bootSplash';
+
+const markAppReady = (): void => {
+  document.documentElement.setAttribute('data-app-ready', '');
+};
+
+const removeSplash = (): void => {
+  document.getElementById(BOOT_SPLASH_ELEMENT_ID)?.remove();
+};
+
+const finishBootSplash = (): void => {
+  markAppReady();
+  removeSplash();
+};
+
+/** Снимает boot splash после первого кадра React. */
+export const dismissBootSplash = (): void => {
+  const splash = document.getElementById(BOOT_SPLASH_ELEMENT_ID);
+  if (splash == null) {
+    finishBootSplash();
+    return;
+  }
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    finishBootSplash();
+    return;
+  }
+
+  splash.classList.add('boot-splash--hide');
+
+  let settled = false;
+  const settle = () => {
+    if (settled) {
+      return;
+    }
+    settled = true;
+    finishBootSplash();
+  };
+
+  splash.addEventListener('transitionend', settle, { once: true });
+  window.setTimeout(settle, BOOT_SPLASH_FADE_MS + 50);
+};
+
+export const scheduleBootSplashDismiss = (): void => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      dismissBootSplash();
+    });
+  });
+};
+
+export const installBootSplashFailsafe = (): void => {
+  window.setTimeout(() => {
+    dismissBootSplash();
+  }, BOOT_SPLASH_FAILSAFE_MS);
+};

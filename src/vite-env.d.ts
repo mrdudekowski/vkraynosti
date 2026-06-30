@@ -23,5 +23,6 @@ interface Window {
     restartStatusRotation: () => void;
     getStatusIndex: () => number;
     getStatusText: () => string;
+    getShownAt: () => number;
   };
 }

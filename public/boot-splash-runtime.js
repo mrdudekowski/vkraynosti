@@ -26,6 +26,7 @@
   var reducedMotion = false;
   var statusPaused = false;
   var appReady = false;
+  var shownAt = 0;
 
   var splash = null;
   var bubblesEl = null;
@@ -140,6 +141,7 @@
     statusIndex = 0;
     statusFading = false;
     statusPaused = false;
+    shownAt = performance.now();
     showStatusAtIndex(0, false);
     startAnimation();
   }
@@ -196,6 +198,7 @@
     if (!initDom()) {
       return;
     }
+    shownAt = performance.now();
     startAnimation();
   }
 
@@ -215,6 +218,9 @@
     },
     getStatusText: function () {
       return STATUS_LINES[statusIndex] || '';
+    },
+    getShownAt: function () {
+      return shownAt;
     },
   };
 

@@ -2,6 +2,7 @@ import {
   BOOT_SPLASH_ELEMENT_ID,
   BOOT_SPLASH_FADE_MS,
   BOOT_SPLASH_FAILSAFE_MS,
+  BOOT_SPLASH_MIN_VISIBLE_MS,
 } from '../constants/bootSplash';
 import { markBootSplashSeen } from './bootSplashVisit';
 
@@ -55,11 +56,21 @@ export const dismissBootSplash = (): void => {
 };
 
 export const scheduleBootSplashDismiss = (): void => {
-  requestAnimationFrame(() => {
+  if (document.documentElement.hasAttribute('data-skip-boot-splash')) {
+    dismissBootSplash();
+    return;
+  }
+
+  const shownAt = window.__vkBootSplash?.getShownAt() ?? performance.now();
+  const delay = Math.max(0, BOOT_SPLASH_MIN_VISIBLE_MS - (performance.now() - shownAt));
+
+  window.setTimeout(() => {
     requestAnimationFrame(() => {
-      dismissBootSplash();
+      requestAnimationFrame(() => {
+        dismissBootSplash();
+      });
     });
-  });
+  }, delay);
 };
 
 export const installBootSplashFailsafe = (): void => {

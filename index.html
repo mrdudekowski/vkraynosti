@@ -297,7 +297,23 @@
     </div>
     <div id="root"></div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="boot-splash-runtime.js"></script>
+    <script>
+      /* Sync load runtime с корректным base (prod SSG-вложенность + dev /vkraynosti/). */
+      (function () {
+        var base = '/';
+        var cssLink = document.querySelector('link[rel="stylesheet"][href*="/assets/"]');
+        if (cssLink) {
+          var href = cssLink.getAttribute('href') || '';
+          var assetsIdx = href.indexOf('/assets/');
+          if (assetsIdx > 0) {
+            base = href.slice(0, assetsIdx + 1);
+          }
+        } else if (/^\/vkraynosti(\/|$)/.test(location.pathname)) {
+          base = '/vkraynosti/';
+        }
+        document.write('<script src="' + base + 'boot-splash-runtime.js"><\\/script>');
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

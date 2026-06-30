@@ -18,6 +18,9 @@ export const BOOT_SPLASH_STATUS_HOLD_MS = 1_400 as const;
 /** Fade статуса; ориентир — `SAFETY_STATUS_FADE_MS`. */
 export const BOOT_SPLASH_STATUS_FADE_MS = 180 as const;
 
+/** Минимум видимости splash (2 фразы), чтобы анимация успела проиграться до React. */
+export const BOOT_SPLASH_MIN_VISIBLE_MS = BOOT_SPLASH_STATUS_HOLD_MS * 2;
+
 /** Пузыри прогресса загрузки; совпадает с числом `statusLines`. */
 export const BOOT_SPLASH_BUBBLE_COUNT = 7 as const;
 

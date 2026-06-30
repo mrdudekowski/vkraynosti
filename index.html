@@ -39,9 +39,6 @@
       html[data-skip-boot-splash] #app-boot-splash {
         display: none !important;
       }
-      html[data-skip-boot-splash] #root {
-        visibility: visible;
-      }
       #app-boot-splash {
         position: fixed;
         inset: 0;
@@ -190,19 +187,11 @@
       }
     </style>
     <script>
-      /* Sync: BOOT_SPLASH_SESSION_SEEN_KEY + shouldShowBootSplash in src/utils/bootSplashVisit.ts */
+      /* Sync: shouldShowBootSplash in src/utils/bootSplashVisit.ts */
       (function () {
         function skipBootSplash() {
-          document.documentElement.setAttribute('data-app-ready', '');
           document.documentElement.setAttribute('data-skip-boot-splash', '');
         }
-
-        try {
-          if (sessionStorage.getItem('vk-app-booted') === '1') {
-            skipBootSplash();
-            return;
-          }
-        } catch (e) {}
 
         var nav = performance.getEntriesByType('navigation')[0];
         if (nav) {

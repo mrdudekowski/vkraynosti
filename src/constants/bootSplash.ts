@@ -23,6 +23,3 @@ export const BOOT_SPLASH_MIN_VISIBLE_MS = BOOT_SPLASH_STATUS_HOLD_MS * 2;
 
 /** Пузыри прогресса загрузки; совпадает с числом `statusLines`. */
 export const BOOT_SPLASH_BUBBLE_COUNT = 7 as const;
-
-/** sessionStorage: splash уже показывали в этой вкладке — sync с inline script в `index.html`. */
-export const BOOT_SPLASH_SESSION_SEEN_KEY = 'vk-app-booted' as const;

@@ -4,7 +4,6 @@ import {
   BOOT_SPLASH_FAILSAFE_MS,
   BOOT_SPLASH_MIN_VISIBLE_MS,
 } from '../constants/bootSplash';
-import { markBootSplashSeen } from './bootSplashVisit';
 
 const markAppReady = (): void => {
   document.documentElement.setAttribute('data-app-ready', '');
@@ -15,7 +14,6 @@ const removeSplash = (): void => {
 };
 
 const finishBootSplash = (): void => {
-  markBootSplashSeen();
   markAppReady();
   removeSplash();
 };

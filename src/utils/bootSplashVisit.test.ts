@@ -28,25 +28,22 @@ describe('shouldShowBootSplash', () => {
   it('shows on first cold visit', () => {
     expect(
       shouldShowBootSplash({
-        sessionAlreadyBooted: false,
         navigation: freshNavigate,
       }),
     ).toBe(true);
   });
 
-  it('hides after session boot', () => {
+  it('shows on hard reload even after prior visit in tab', () => {
     expect(
       shouldShowBootSplash({
-        sessionAlreadyBooted: true,
-        navigation: freshNavigate,
+        navigation: { type: 'reload', transferSize: 3200, decodedBodySize: 12_000 },
       }),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('hides on bfcache restore', () => {
     expect(
       shouldShowBootSplash({
-        sessionAlreadyBooted: false,
         navigation: freshNavigate,
         pageshowPersisted: true,
       }),
@@ -56,7 +53,6 @@ describe('shouldShowBootSplash', () => {
   it('hides on back/forward navigation', () => {
     expect(
       shouldShowBootSplash({
-        sessionAlreadyBooted: false,
         navigation: { type: 'back_forward', transferSize: 0, decodedBodySize: 12_000 },
       }),
     ).toBe(false);
@@ -65,7 +61,6 @@ describe('shouldShowBootSplash', () => {
   it('hides when HTML came from cache', () => {
     expect(
       shouldShowBootSplash({
-        sessionAlreadyBooted: false,
         navigation: { type: 'reload', transferSize: 0, decodedBodySize: 12_000 },
       }),
     ).toBe(false);

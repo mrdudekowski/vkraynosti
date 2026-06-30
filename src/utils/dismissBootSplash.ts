@@ -59,8 +59,9 @@ export const scheduleBootSplashDismiss = (): void => {
     return;
   }
 
-  const shownAt = window.__vkBootSplash?.getShownAt() ?? performance.now();
-  const delay = Math.max(0, BOOT_SPLASH_MIN_VISIBLE_MS - (performance.now() - shownAt));
+  const shownAt = window.__vkBootSplash?.getShownAt();
+  const elapsed = shownAt != null && shownAt > 0 ? performance.now() - shownAt : 0;
+  const delay = Math.max(0, BOOT_SPLASH_MIN_VISIBLE_MS - elapsed);
 
   window.setTimeout(() => {
     requestAnimationFrame(() => {

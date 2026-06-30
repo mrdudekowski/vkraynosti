@@ -189,7 +189,13 @@
     return true;
   }
 
-  function init() {
+  function markAppReady() {
+    appReady = true;
+    stopAnimation();
+    renderBubbles(BUBBLE_COUNT);
+  }
+
+  function boot() {
     if (document.documentElement.hasAttribute('data-skip-boot-splash')) {
       return;
     }
@@ -200,12 +206,6 @@
     }
     shownAt = performance.now();
     startAnimation();
-  }
-
-  function markAppReady() {
-    appReady = true;
-    stopAnimation();
-    renderBubbles(BUBBLE_COUNT);
   }
 
   window.__vkBootSplash = {
@@ -224,9 +224,7 @@
     },
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
+  // ponytail: скрипт в конце body — splash уже в DOM; defer на DCL ломает порядок
+  // относительно type=module в <head> (React успевает вызвать markAppReady до init).
+  boot();
 })();

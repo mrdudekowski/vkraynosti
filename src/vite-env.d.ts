@@ -14,3 +14,14 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  __vkBootSplash?: {
+    markAppReady: () => void;
+    setStatusTimings: (holdMs: number, fadeMs: number) => void;
+    toggleStatusPause: () => boolean;
+    restartStatusRotation: () => void;
+    getStatusIndex: () => number;
+    getStatusText: () => string;
+  };
+}

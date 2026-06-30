@@ -36,6 +36,12 @@
       html[data-app-ready] #root {
         visibility: visible;
       }
+      html[data-skip-boot-splash] #app-boot-splash {
+        display: none !important;
+      }
+      html[data-skip-boot-splash] #root {
+        visibility: visible;
+      }
       #app-boot-splash {
         position: fixed;
         inset: 0;
@@ -50,12 +56,21 @@
         opacity: 0;
         pointer-events: none;
       }
+      .boot-splash__panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        max-width: 100%;
+      }
       .boot-wordmark {
         font-family: 'Dela Gothic One', sans-serif;
         font-size: 1.4375rem;
         line-height: 2.0125rem;
         font-weight: 400;
         font-synthesis: none;
+        margin: 0;
       }
       .boot-wordmark__first {
         color: #c8622a;
@@ -75,12 +90,139 @@
       .boot-wordmark__rest {
         color: #1a3c2e;
       }
+      .boot-status-wrap {
+        position: relative;
+        width: min(20rem, 100%);
+        min-height: 3.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .boot-status {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0 0.25rem;
+        font-family: system-ui, sans-serif;
+        font-size: 0.9375rem;
+        line-height: 1.45;
+        font-weight: 400;
+        color: #6b7280;
+        opacity: 0;
+        transform: translateY(0.4rem);
+        transition:
+          opacity 180ms ease,
+          transform 180ms ease;
+        pointer-events: none;
+      }
+      .boot-status.is-active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .boot-status.is-exiting {
+        opacity: 0;
+        transform: translateY(-0.35rem);
+      }
+      .boot-bubbles {
+        display: flex;
+        gap: 0.45rem;
+        align-items: center;
+        justify-content: center;
+        min-height: 0.75rem;
+      }
+      .boot-bubble {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 9999px;
+        background: color-mix(in srgb, #6b7280 35%, transparent);
+        transform: scale(0.82);
+        transition:
+          transform 180ms ease,
+          background-color 180ms ease;
+      }
+      .boot-bubble.is-filled {
+        background: #c8622a;
+        transform: scale(1);
+      }
+      html[data-boot-season='winter'] .boot-bubble.is-filled {
+        background: #7ba7bc;
+      }
+      html[data-boot-season='spring'] .boot-bubble.is-filled {
+        background: #c76b7e;
+      }
+      html[data-boot-season='summer'] .boot-bubble.is-filled {
+        background: #e8a838;
+      }
+      html[data-boot-season='fall'] .boot-bubble.is-filled {
+        background: #c8622a;
+      }
+      .boot-bubble.is-current {
+        animation: boot-bubble-pulse 1s ease-in-out infinite;
+      }
+      @keyframes boot-bubble-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.18);
+        }
+      }
       @media (prefers-reduced-motion: reduce) {
-        #app-boot-splash {
+        #app-boot-splash,
+        .boot-status,
+        .boot-bubble {
           transition: none;
+        }
+        .boot-status {
+          transform: none;
+        }
+        .boot-status.is-exiting {
+          transform: none;
+        }
+        .boot-bubble.is-current {
+          animation: none;
         }
       }
     </style>
+    <script>
+      /* Sync: BOOT_SPLASH_SESSION_SEEN_KEY + shouldShowBootSplash in src/utils/bootSplashVisit.ts */
+      (function () {
+        function skipBootSplash() {
+          document.documentElement.setAttribute('data-app-ready', '');
+          document.documentElement.setAttribute('data-skip-boot-splash', '');
+        }
+
+        try {
+          if (sessionStorage.getItem('vk-app-booted') === '1') {
+            skipBootSplash();
+            return;
+          }
+        } catch (e) {}
+
+        var nav = performance.getEntriesByType('navigation')[0];
+        if (nav) {
+          if (nav.type === 'back_forward') {
+            skipBootSplash();
+            return;
+          }
+          if (nav.transferSize === 0 && nav.decodedBodySize > 0) {
+            skipBootSplash();
+            return;
+          }
+        }
+
+        window.addEventListener('pageshow', function (event) {
+          if (event.persisted) {
+            skipBootSplash();
+          }
+        });
+      })();
+    </script>
     <script>
       (function () {
         var match = location.pathname.match(/\/(?:tours|telegram)\/(winter|spring|summer|fall)(?:\/|$)/);
@@ -125,17 +267,37 @@
   <body>
     <div
       id="app-boot-splash"
-      role="status"
+      role="progressbar"
       aria-live="polite"
       aria-busy="true"
-      aria-label="Загрузка сайта"
+      aria-label="Загрузка: Заряжаем powerbank на максимум"
+      aria-valuemin="0"
+      aria-valuemax="7"
+      aria-valuenow="1"
     >
-      <span class="boot-wordmark" aria-hidden="true">
-        <span class="boot-wordmark__first">В</span><span class="boot-wordmark__rest">крайности</span>
-      </span>
+      <div class="boot-splash__panel">
+        <p class="boot-wordmark" aria-hidden="true">
+          <span class="boot-wordmark__first">В</span><span class="boot-wordmark__rest">крайности</span>
+        </p>
+        <div class="boot-status-wrap">
+          <!-- Sync: UI.bootSplash.statusLines[0] in src/constants/ui.ts -->
+          <p class="boot-status is-active" id="boot-status-a">Заряжаем powerbank на максимум</p>
+          <p class="boot-status" id="boot-status-b"></p>
+        </div>
+        <div class="boot-bubbles" aria-hidden="true">
+          <span class="boot-bubble is-filled is-current"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+        </div>
+      </div>
     </div>
     <div id="root"></div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="boot-splash-runtime.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

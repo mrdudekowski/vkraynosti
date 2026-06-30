@@ -3,6 +3,7 @@ import {
   BOOT_SPLASH_FADE_MS,
   BOOT_SPLASH_FAILSAFE_MS,
 } from '../constants/bootSplash';
+import { markBootSplashSeen } from './bootSplashVisit';
 
 const markAppReady = (): void => {
   document.documentElement.setAttribute('data-app-ready', '');
@@ -13,12 +14,20 @@ const removeSplash = (): void => {
 };
 
 const finishBootSplash = (): void => {
+  markBootSplashSeen();
   markAppReady();
   removeSplash();
 };
 
 /** Снимает boot splash после первого кадра React. */
 export const dismissBootSplash = (): void => {
+  if (document.documentElement.hasAttribute('data-skip-boot-splash')) {
+    markAppReady();
+    return;
+  }
+
+  window.__vkBootSplash?.markAppReady();
+
   const splash = document.getElementById(BOOT_SPLASH_ELEMENT_ID);
   if (splash == null) {
     finishBootSplash();

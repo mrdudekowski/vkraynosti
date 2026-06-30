@@ -1,0 +1,411 @@
+<!doctype html>
+<!--
+  Boot splash prototype — не деплоится, только для проработки анимации.
+  Открыть: npm run dev → http://localhost:5173/vkraynosti/dev/boot-splash-preview.html
+
+  Тексты статусов — SSOT: src/constants/ui.ts → UI.bootSplash.statusLines
+  Тайминги — src/constants/bootSplash.ts (BOOT_SPLASH_STATUS_*)
+-->
+<html lang="ru" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light only" />
+    <title>Boot splash — прототип</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Source+Sans+3:wght@400;500&display=swap"
+    />
+    <style>
+      :root {
+        --surface-light: #f7f5f0;
+        --text-primary: #1a1a1a;
+        --text-muted: #6b7280;
+        --brand-primary: #1a3c2e;
+        --season-accent: #c8622a;
+        --status-fade-ms: 180ms;
+        --status-hold-ms: 1400ms;
+        --splash-fade-ms: 200ms;
+      }
+
+      html[data-boot-season='winter'] {
+        --season-accent: #7ba7bc;
+      }
+      html[data-boot-season='spring'] {
+        --season-accent: #c76b7e;
+      }
+      html[data-boot-season='summer'] {
+        --season-accent: #e8a838;
+      }
+      html[data-boot-season='fall'] {
+        --season-accent: #c8622a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--surface-light);
+        color: var(--text-primary);
+        font-family: 'Source Sans 3', system-ui, sans-serif;
+      }
+
+      .preview-toolbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10000;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8125rem;
+        background: color-mix(in srgb, var(--surface-light) 88%, #0d0d0d 12%);
+        border-bottom: 1px solid color-mix(in srgb, var(--text-muted) 25%, transparent);
+      }
+
+      .preview-toolbar label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .preview-toolbar input[type='range'] {
+        width: 6rem;
+      }
+
+      .preview-toolbar button {
+        font: inherit;
+        cursor: pointer;
+        border: 1px solid color-mix(in srgb, var(--brand-primary) 35%, transparent);
+        background: #fff;
+        border-radius: 0.375rem;
+        padding: 0.25rem 0.6rem;
+      }
+
+      .preview-toolbar button:hover {
+        background: color-mix(in srgb, var(--surface-light) 70%, #fff 30%);
+      }
+
+      #app-boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        padding-top: 3.5rem;
+        background-color: var(--surface-light);
+        transition: opacity var(--splash-fade-ms) ease;
+      }
+
+      #app-boot-splash.boot-splash--hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .boot-wordmark {
+        font-family: 'Dela Gothic One', sans-serif;
+        font-size: clamp(1.4375rem, 4.5vw, 2rem);
+        line-height: 1.35;
+        font-weight: 400;
+        font-synthesis: none;
+        margin: 0;
+      }
+
+      .boot-wordmark__first {
+        color: var(--season-accent);
+      }
+
+      .boot-wordmark__rest {
+        color: var(--brand-primary);
+      }
+
+      .boot-status-wrap {
+        position: relative;
+        width: min(20rem, 100%);
+        min-height: 3.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .boot-status {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0 0.25rem;
+        font-size: 0.9375rem;
+        line-height: 1.45;
+        font-weight: 400;
+        color: var(--text-muted);
+        opacity: 0;
+        transform: translateY(0.4rem);
+        transition:
+          opacity var(--status-fade-ms) ease,
+          transform var(--status-fade-ms) ease;
+        pointer-events: none;
+      }
+
+      .boot-status.is-active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .boot-status.is-exiting {
+        opacity: 0;
+        transform: translateY(-0.35rem);
+      }
+
+      .boot-bubbles {
+        display: flex;
+        gap: 0.45rem;
+        align-items: center;
+        justify-content: center;
+        min-height: 0.75rem;
+      }
+
+      .boot-bubble {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 9999px;
+        background: color-mix(in srgb, var(--text-muted) 35%, transparent);
+        transform: scale(0.82);
+        transition:
+          transform var(--status-fade-ms) ease,
+          background-color var(--status-fade-ms) ease;
+      }
+
+      .boot-bubble.is-filled {
+        background: var(--season-accent);
+        transform: scale(1);
+      }
+
+      .boot-bubble.is-current {
+        animation: boot-bubble-pulse 1s ease-in-out infinite;
+      }
+
+      @keyframes boot-bubble-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.18);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #app-boot-splash,
+        .boot-status,
+        .boot-bubble {
+          transition: none;
+        }
+        .boot-status {
+          transform: none;
+        }
+        .boot-status.is-exiting {
+          transform: none;
+        }
+        .boot-bubble.is-current {
+          animation: none;
+        }
+      }
+
+      .preview-hidden {
+        display: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        var match = location.pathname.match(/\/(?:tours|telegram)\/(winter|spring|summer|fall)(?:\/|$)/);
+        if (match) {
+          document.documentElement.setAttribute('data-boot-season', match[1]);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="preview-toolbar" aria-label="Настройки прототипа">
+      <label>
+        Сезон «В»
+        <select id="season-select">
+          <option value="fall">Осень</option>
+          <option value="winter">Зима</option>
+          <option value="spring">Весна</option>
+          <option value="summer">Лето</option>
+        </select>
+      </label>
+      <label>
+        Hold
+        <input id="hold-ms" type="range" min="1200" max="4000" step="100" value="1400" />
+        <span id="hold-ms-label">1400 ms</span>
+      </label>
+      <label>
+        Fade
+        <input id="fade-ms" type="range" min="80" max="400" step="10" value="180" />
+        <span id="fade-ms-label">180 ms</span>
+      </label>
+      <button type="button" id="replay-btn">Сначала</button>
+      <button type="button" id="pause-btn">Пауза</button>
+      <button type="button" id="dismiss-btn">Симулировать вход на сайт</button>
+      <button type="button" id="restore-btn" class="preview-hidden">Показать splash снова</button>
+      <span id="index-label" aria-live="polite"></span>
+    </div>
+
+    <div
+      id="app-boot-splash"
+      role="progressbar"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="Загрузка сайта"
+      aria-valuemin="0"
+      aria-valuemax="7"
+      aria-valuenow="0"
+    >
+      <div class="boot-splash__panel" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+        <p class="boot-wordmark" aria-hidden="true">
+          <span class="boot-wordmark__first">В</span><span class="boot-wordmark__rest">крайности</span>
+        </p>
+        <div class="boot-status-wrap">
+          <p class="boot-status is-active" id="boot-status-a">Заряжаем powerbank на максимум</p>
+          <p class="boot-status" id="boot-status-b"></p>
+        </div>
+        <div class="boot-bubbles" aria-hidden="true">
+          <span class="boot-bubble is-filled is-current"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+          <span class="boot-bubble"></span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var path = location.pathname;
+        var devMatch = path.match(/^(.*\/)dev\//);
+        var base = devMatch ? devMatch[1] : '/vkraynosti/';
+        var script = document.createElement('script');
+        script.src = base + 'boot-splash-runtime.js';
+        script.onload = function () {
+          if (typeof window.__initBootSplashPreview === 'function') {
+            window.__initBootSplashPreview();
+          }
+        };
+        script.onerror = function () {
+          var label = document.getElementById('index-label');
+          if (label) {
+            label.textContent = 'Ошибка загрузки ' + script.src;
+          }
+        };
+        document.head.appendChild(script);
+      })();
+    </script>
+    <script>
+      window.__initBootSplashPreview = function () {
+        var splash = document.getElementById('app-boot-splash');
+        var indexLabel = document.getElementById('index-label');
+        var holdInput = document.getElementById('hold-ms');
+        var fadeInput = document.getElementById('fade-ms');
+        var holdLabel = document.getElementById('hold-ms-label');
+        var fadeLabel = document.getElementById('fade-ms-label');
+        var seasonSelect = document.getElementById('season-select');
+        var pauseBtn = document.getElementById('pause-btn');
+        var replayBtn = document.getElementById('replay-btn');
+        var dismissBtn = document.getElementById('dismiss-btn');
+        var restoreBtn = document.getElementById('restore-btn');
+        var boot = window.__vkBootSplash;
+        var indexPollId = null;
+
+        if (!boot) {
+          if (indexLabel) {
+            indexLabel.textContent = 'Runtime не инициализирован';
+          }
+          return;
+        }
+
+        function getHoldMs() {
+          return Number(holdInput.value);
+        }
+
+        function getFadeMs() {
+          return Number(fadeInput.value);
+        }
+
+        function applyTimingVars() {
+          document.documentElement.style.setProperty('--status-hold-ms', getHoldMs() + 'ms');
+          document.documentElement.style.setProperty('--status-fade-ms', getFadeMs() + 'ms');
+          holdLabel.textContent = getHoldMs() + ' ms';
+          fadeLabel.textContent = getFadeMs() + ' ms';
+          boot.setStatusTimings(getHoldMs(), getFadeMs());
+        }
+
+        function updateIndexLabel() {
+          var phrase = boot.getStatusIndex() + 1;
+          indexLabel.textContent = phrase + ' / 7 · ' + boot.getStatusText();
+        }
+
+        function startIndexPoll() {
+          if (indexPollId != null) {
+            window.clearInterval(indexPollId);
+          }
+          indexPollId = window.setInterval(updateIndexLabel, 150);
+          updateIndexLabel();
+        }
+
+        holdInput.addEventListener('input', applyTimingVars);
+        fadeInput.addEventListener('input', applyTimingVars);
+
+        seasonSelect.addEventListener('change', function () {
+          document.documentElement.setAttribute('data-boot-season', seasonSelect.value);
+        });
+
+        pauseBtn.addEventListener('click', function () {
+          var paused = boot.toggleStatusPause();
+          pauseBtn.textContent = paused ? 'Продолжить' : 'Пауза';
+        });
+
+        replayBtn.addEventListener('click', function () {
+          boot.restartStatusRotation();
+          startIndexPoll();
+        });
+
+        dismissBtn.addEventListener('click', function () {
+          boot.markAppReady();
+          splash.classList.add('boot-splash--hide');
+          splash.setAttribute('aria-busy', 'false');
+          dismissBtn.classList.add('preview-hidden');
+          restoreBtn.classList.remove('preview-hidden');
+          if (indexPollId != null) {
+            window.clearInterval(indexPollId);
+          }
+        });
+
+        restoreBtn.addEventListener('click', function () {
+          location.reload();
+        });
+
+        applyTimingVars();
+        startIndexPoll();
+      };
+    </script>
+  </body>
+</html>

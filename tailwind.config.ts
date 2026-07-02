@@ -149,7 +149,10 @@ import {
 } from './src/constants/tourDetailHeroStack'
 import {
   TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
-  TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_BODY_MIN_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_FOOTER_MIN_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_MEDIA_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_TITLE_MIN_HEIGHT,
 } from './src/constants/tourCalendarLayout'
 import { TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH } from './src/constants/tourDepartureCalendar'
 
@@ -1036,6 +1039,8 @@ const config: Config = {
         /** Декоративный чекбокс в плашке #safety. */
         'safety-status-checkbox': SAFETY_STATUS_CHECKBOX_SIZE,
         'safety-status-checkbox-sm': SAFETY_STATUS_CHECKBOX_SIZE_SM,
+        /** Обложка компактной карточки в панели дня (`TourScheduleListItem`). */
+        'tour-calendar-day-event-media': TOUR_CALENDAR_DAY_EVENT_MEDIA_HEIGHT,
       },
       width: {
         'safety-status-checkbox': SAFETY_STATUS_CHECKBOX_SIZE,
@@ -1112,8 +1117,12 @@ const config: Config = {
       minHeight: {
         /** Минимальная высота круглой кнопки «к hero» на воротах (`min-w-home-gate-scroll-hint-target`). */
         'home-gate-scroll-hint-target': '2.75rem',
-        /** Панель «выберите дату» (`TourCalendarDayPanel`). */
-        'tour-calendar-day-panel': TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
+        /** Заголовок компактной карточки в панели дня (2 строки). */
+        'tour-calendar-day-event-title': TOUR_CALENDAR_DAY_EVENT_TITLE_MIN_HEIGHT,
+        /** Нижняя строка мета + цена в компактной карточке. */
+        'tour-calendar-day-event-footer': TOUR_CALENDAR_DAY_EVENT_FOOTER_MIN_HEIGHT,
+        /** Тело компактной карточки в панели дня. */
+        'tour-calendar-day-event-body': TOUR_CALENDAR_DAY_EVENT_BODY_MIN_HEIGHT,
         /** Минимальная высота прямоугольника баннера внутри ворот (адаптивно для mobile/tablet/desktop). */
         'home-season-banner-inner': 'clamp(8.5rem, 18vw, 12.5rem)',
         /** Плейсхолдер ячейки видео в сетке до готовности плеера (`GalleryGridVideo`). */

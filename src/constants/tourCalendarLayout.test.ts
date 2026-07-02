@@ -5,7 +5,17 @@ import {
   TOUR_CALENDAR_DAY_BUTTON_CLASS,
   TOUR_CALENDAR_DAY_CELL_CLASS,
   TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
-  TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_BODY_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_BODY_MIN_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_CARD_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_FOOTER_MIN_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_MEDIA_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_TITLE_MIN_HEIGHT,
+  TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS,
+  TOUR_CALENDAR_DAY_EVENTS_GRID_ITEM_CLASS,
   TOUR_CALENDAR_MONTH_GRID_CLASS,
   TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS,
   TOUR_CALENDAR_WEEKDAY_CLASS,
@@ -38,8 +48,32 @@ describe('tourCalendarLayout', () => {
     expect(TOUR_CALENDAR_DAY_CELL_CLASS).toContain('align-middle');
     expect(TOUR_CALENDAR_DAY_CELL_CLASS).not.toContain('flex');
     expect(TOUR_CALENDAR_DAY_CELL_CLASS).not.toContain('max-w-tour-calendar-day-cell');
-    expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).toContain('min-h-tour-calendar-day-panel');
+    expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).toContain('w-fit');
+    expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).not.toContain('min-h-tour-calendar-day-panel');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).not.toContain('min-h-[');
+    expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).toContain('grid-cols-2');
+    expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).toContain('items-stretch');
+    expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).not.toMatch(/\b(sm|md|lg|xl|2xl):/);
+    expect(TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS).toContain('h-tour-calendar-day-event-media');
+    expect(TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS).not.toContain('aspect-[');
+    expect(TOUR_CALENDAR_DAY_EVENT_CARD_CLASS).toContain('h-full');
+    expect(TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS).toContain('min-h-tour-calendar-day-event-title');
+    expect(TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS).toContain('min-h-tour-calendar-day-event-footer');
+    for (const className of [
+      TOUR_CALENDAR_DAY_EVENTS_GRID_ITEM_CLASS,
+      TOUR_CALENDAR_DAY_EVENT_CARD_CLASS,
+      TOUR_CALENDAR_DAY_EVENT_BODY_CLASS,
+      TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS,
+      TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS,
+      TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS,
+    ]) {
+      expect(className).not.toMatch(/\b(sm|md|lg|xl|2xl):/);
+    }
+  });
+
+  it('matches tailwind theme.extend height for day event media', () => {
+    const height = getExtend(tailwindConfig as Config, 'height');
+    expect(height?.['tour-calendar-day-event-media']).toBe(TOUR_CALENDAR_DAY_EVENT_MEDIA_HEIGHT);
   });
 
   it('matches tailwind theme.extend maxWidth and minHeight', () => {
@@ -47,7 +81,9 @@ describe('tourCalendarLayout', () => {
     const minHeight = getExtend(tailwindConfig as Config, 'minHeight');
     expect(maxWidth?.['tour-calendar-day-cell']).toBe(TOUR_CALENDAR_DAY_CELL_MAX_WIDTH);
     expect(maxWidth?.['tour-departure-day-cell']).toBe(TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH);
-    expect(minHeight?.['tour-calendar-day-panel']).toBe(TOUR_CALENDAR_DAY_PANEL_MIN_HEIGHT);
+    expect(minHeight?.['tour-calendar-day-event-title']).toBe(TOUR_CALENDAR_DAY_EVENT_TITLE_MIN_HEIGHT);
+    expect(minHeight?.['tour-calendar-day-event-footer']).toBe(TOUR_CALENDAR_DAY_EVENT_FOOTER_MIN_HEIGHT);
+    expect(minHeight?.['tour-calendar-day-event-body']).toBe(TOUR_CALENDAR_DAY_EVENT_BODY_MIN_HEIGHT);
   });
 
   it('uses table-fixed grid without flex on weekday and day cells', () => {

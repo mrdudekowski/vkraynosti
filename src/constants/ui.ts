@@ -324,6 +324,8 @@ export const UI = {
   },
   tourCalendar: {
     selectDateHint: 'Выберите дату в календаре',
+    selectDateHintLine1: 'Выберите дату',
+    selectDateHintLine2: 'в календаре',
     emptyDay: 'В этот день выездов нет',
     emptyMonth: 'В этом месяце выездов пока нет',
     emptyAll: 'Расписание скоро появится',

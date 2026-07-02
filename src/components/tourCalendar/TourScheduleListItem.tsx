@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom';
 import { getTourPublicPath } from '../../constants/routes';
 import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
+import {
+  TOUR_CALENDAR_DAY_EVENT_BODY_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_CARD_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS,
+} from '../../constants/tourCalendarLayout';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import type { Season } from '../../types';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
@@ -13,22 +20,17 @@ const SEASON_STRIPE_CLASS: Record<Season, string> = {
   fall: 'bg-season-fall',
 };
 
+const STATUS_BADGE_CLASS: Record<EnrichedScheduleEvent['status'], string> = {
+  planned: 'text-text-muted',
+  open: 'text-brand-secondary',
+  full: 'text-text-muted',
+  cancelled: 'text-text-muted',
+  completed: 'text-text-muted line-through decoration-text-muted/60',
+};
+
 interface TourScheduleListItemProps {
   event: EnrichedScheduleEvent;
 }
-
-const statusBadgeClass = (status: EnrichedScheduleEvent['status']): string => {
-  switch (status) {
-    case 'open':
-      return 'text-brand-secondary';
-    case 'full':
-      return 'text-text-muted';
-    case 'completed':
-      return 'text-text-muted line-through decoration-text-muted/60';
-    default:
-      return 'text-text-muted';
-  }
-};
 
 const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
   const { tour, season } = event;
@@ -37,14 +39,14 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
   return (
     <Link
       to={getTourPublicPath(tour)}
-      className="group flex items-center gap-3 rounded-card border border-divider bg-surface-light/95 p-3 shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+      className={TOUR_CALENDAR_DAY_EVENT_CARD_CLASS}
       prefetch="intent"
     >
       <span
-        className={`w-0.5 shrink-0 self-stretch rounded-full ${SEASON_STRIPE_CLASS[season]}`}
+        className={`block h-px shrink-0 ${SEASON_STRIPE_CLASS[season]}`}
         aria-hidden
       />
-      <div className="size-12 shrink-0 overflow-hidden rounded-lg">
+      <div className={TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS}>
         <PlaceholderImage
           src={tour.imageUrl}
           alt=""
@@ -53,19 +55,19 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
           loading="lazy"
         />
       </div>
-      <div className="min-w-0 flex-1">
-        <h3 className="font-heading text-base leading-tight text-text-primary group-hover:text-brand-primary">
-          {tour.title}
-        </h3>
-        <p className="mt-0.5 text-sm text-text-muted">
-          {event.durationType}
-          <span aria-hidden> · </span>
-          <span className={statusBadgeClass(event.status)}>{event.statusLabel}</span>
-        </p>
+      <div className={TOUR_CALENDAR_DAY_EVENT_BODY_CLASS}>
+        <h3 className={TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS}>{tour.title}</h3>
+        <div className={TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS}>
+          <p className="min-w-0 text-xs leading-tight text-text-muted">
+            {event.durationType}
+            <span aria-hidden> · </span>
+            <span className={STATUS_BADGE_CLASS[event.status]}>{event.statusLabel}</span>
+          </p>
+          <p className="shrink-0 text-xs font-semibold tabular-nums text-brand-primary">
+            {displayPrice}
+          </p>
+        </div>
       </div>
-      <p className="shrink-0 text-right text-sm font-semibold tabular-nums text-brand-primary">
-        {displayPrice}
-      </p>
     </Link>
   );
 };

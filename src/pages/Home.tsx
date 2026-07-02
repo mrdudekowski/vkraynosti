@@ -63,12 +63,14 @@ const TourCalendarSectionLazy = lazy(
 );
 const SafetySectionLazy = lazy(() => import('../components/home/SafetySection'));
 const ContactSectionLazy = lazy(() => import('../components/home/ContactSection'));
-const GRID_FADE_OUT_DURATION_MS = 260;
-const GRID_REVEAL_DURATION_MS = 500;
-const GRID_CASCADE_STEP_MS = 70;
-const HOME_TOURS_HEADING_ELEMENT_ID = 'home-tours-heading';
+import {
+  CASCADE_GRID_FADE_OUT_DURATION_MS,
+  getCascadeGridItemAnimation,
+  getCascadeGridTotalDurationMs,
+  type CascadeGridPhase,
+} from '../constants/cascadeGridReveal';
 
-type HomeToursGridPhase = 'idle' | 'fadingOut' | 'preFadeIn' | 'fadingIn';
+const HOME_TOURS_HEADING_ELEMENT_ID = 'home-tours-heading';
 
 const Home = () => {
   const location = useLocation();
@@ -79,7 +81,7 @@ const Home = () => {
   const [expandedSeason, setExpandedSeason] = useState<Season | null>(null);
   const isAllToursExpanded = expandedSeason === activeSeason;
   const [toursPromoVideoIndex, setToursPromoVideoIndex] = useState(0);
-  const [gridPhase, setGridPhase] = useState<HomeToursGridPhase>('idle');
+  const [gridPhase, setGridPhase] = useState<CascadeGridPhase>('idle');
   const [pendingExpandedSeason, setPendingExpandedSeason] = useState<Season | null>(null);
   const shouldScrollAfterCollapseRef = useRef(false);
   const expandCardMediaViewportRef = useRef<HTMLDivElement | null>(null);
@@ -264,7 +266,7 @@ const Home = () => {
     const timeoutId = window.setTimeout(() => {
       setExpandedSeason(pendingExpandedSeason);
       setGridPhase('preFadeIn');
-    }, GRID_FADE_OUT_DURATION_MS);
+    }, CASCADE_GRID_FADE_OUT_DURATION_MS);
     return () => window.clearTimeout(timeoutId);
   }, [gridPhase, pendingExpandedSeason]);
 
@@ -284,8 +286,7 @@ const Home = () => {
   useEffect(() => {
     if (gridPhase !== 'fadingIn') return;
     const renderedGridItemsCount = visibleTours.length + (shouldRenderExpandCard ? 1 : 0);
-    const cascadeDurationMs =
-      GRID_REVEAL_DURATION_MS + Math.max(renderedGridItemsCount - 1, 0) * GRID_CASCADE_STEP_MS;
+    const cascadeDurationMs = getCascadeGridTotalDurationMs(renderedGridItemsCount);
     const timeoutId = window.setTimeout(() => {
       shouldScrollAfterCollapseRef.current = false;
       setPendingExpandedSeason(null);
@@ -298,25 +299,7 @@ const Home = () => {
     visibleTours.length,
   ]);
 
-  const getGridItemAnimation = (itemIndex: number): { className: string; style?: { transitionDelay: string } } => {
-    const baseClassName = 'h-full transition-[opacity,transform,filter] duration-reveal ease-reveal-out';
-    const maxCascadeIndex = Math.min(itemIndex, 8);
-    const cascadeDelayStyle =
-      gridPhase === 'fadingIn' || gridPhase === 'preFadeIn'
-        ? { transitionDelay: `${maxCascadeIndex * GRID_CASCADE_STEP_MS}ms` }
-        : undefined;
-
-    if (gridPhase === 'fadingOut') {
-      return { className: `${baseClassName} opacity-0 -translate-y-reveal-y` };
-    }
-    if (gridPhase === 'preFadeIn') {
-      return { className: `${baseClassName} opacity-0 translate-y-reveal-y`, style: cascadeDelayStyle };
-    }
-    if (gridPhase === 'fadingIn') {
-      return { className: `${baseClassName} opacity-100 translate-y-0`, style: cascadeDelayStyle };
-    }
-    return { className: `${baseClassName} opacity-100 translate-y-0` };
-  };
+  const getGridItemAnimation = (itemIndex: number) => getCascadeGridItemAnimation(gridPhase, itemIndex);
 
   const toursSectionTitle = UI.sections.toursTitleBySeason[activeSeason];
   return (

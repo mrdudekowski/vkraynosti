@@ -32,17 +32,20 @@ export const TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS =
 /** Ячейка сетки: растягивается по высоте строки, без breakpoint-вариантов. */
 export const TOUR_CALENDAR_DAY_EVENTS_GRID_ITEM_CLASS = 'min-w-0' as const;
 
-/** Компактная карточка тура в панели дня. */
+/** Компактная карточка тура в панели дня (обложка слева, контент справа). */
 export const TOUR_CALENDAR_DAY_EVENT_CARD_CLASS =
-  'group flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg border border-divider bg-surface-light/95 shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary' as const;
+  'group flex h-full w-full min-h-tour-calendar-day-event-card min-w-0 flex-row overflow-hidden rounded-lg border border-divider bg-surface-light/95 shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary' as const;
 
-/** Обложка компактной карточки (фикс. высота, не aspect-ratio). */
+/** Вертикальная полоска сезона слева в карточке. */
+export const TOUR_CALENDAR_DAY_EVENT_SEASON_STRIPE_CLASS = 'w-px shrink-0 self-stretch' as const;
+
+/** Обложка слева (фикс. ширина, на всю высоту карточки). */
 export const TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS =
-  'h-tour-calendar-day-event-media w-full shrink-0 overflow-hidden' as const;
+  'h-full w-tour-calendar-day-event-media shrink-0 self-stretch overflow-hidden' as const;
 
-/** Тело компактной карточки. */
+/** Тело справа от обложки. */
 export const TOUR_CALENDAR_DAY_EVENT_BODY_CLASS =
-  'flex min-h-tour-calendar-day-event-body flex-1 flex-col justify-between gap-0.5 p-2' as const;
+  'flex min-w-0 flex-1 flex-col justify-center gap-0.5 p-2' as const;
 
 /** Заголовок: всегда резерв под 2 строки (`line-clamp-2`). */
 export const TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS =
@@ -52,18 +55,18 @@ export const TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS =
 export const TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS =
   'flex min-h-tour-calendar-day-event-footer shrink-0 items-end justify-between gap-1' as const;
 
-/** Скелетон карточки тура в панели дня (соотношение с вертикальной карточкой). */
+/** Скелетон карточки тура в панели дня (горизонтальная раскладка). */
 export const TOUR_CALENDAR_DAY_EVENT_SKELETON_CLASS =
-  'flex h-full w-full min-w-0 animate-pulse flex-col overflow-hidden rounded-lg bg-surface-light/60' as const;
+  'flex h-full w-full min-h-tour-calendar-day-event-card min-w-0 animate-pulse flex-row overflow-hidden rounded-lg bg-surface-light/60' as const;
 
-/** Высота обложки компактной карточки (`theme.extend.height`). */
-export const TOUR_CALENDAR_DAY_EVENT_MEDIA_HEIGHT = '4.5rem' as const;
+/** Ширина обложки слева (`theme.extend.width`). */
+export const TOUR_CALENDAR_DAY_EVENT_MEDIA_WIDTH = '4.5rem' as const;
+
+/** Мин. высота горизонтальной карточки (`theme.extend.minHeight`). */
+export const TOUR_CALENDAR_DAY_EVENT_CARD_MIN_HEIGHT = '5.25rem' as const;
 
 /** Мин. высота блока заголовка под 2 строки `text-xs leading-snug` (`theme.extend.minHeight`). */
 export const TOUR_CALENDAR_DAY_EVENT_TITLE_MIN_HEIGHT = '2.125rem' as const;
 
 /** Мин. высота нижней строки мета + цена (`theme.extend.minHeight`). */
 export const TOUR_CALENDAR_DAY_EVENT_FOOTER_MIN_HEIGHT = '1rem' as const;
-
-/** Мин. высота тела карточки (`theme.extend.minHeight`). */
-export const TOUR_CALENDAR_DAY_EVENT_BODY_MIN_HEIGHT = '3.375rem' as const;

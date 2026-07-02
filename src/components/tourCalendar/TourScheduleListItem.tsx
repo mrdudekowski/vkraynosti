@@ -6,6 +6,7 @@ import {
   TOUR_CALENDAR_DAY_EVENT_CARD_CLASS,
   TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS,
   TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS,
+  TOUR_CALENDAR_DAY_EVENT_SEASON_STRIPE_CLASS,
   TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS,
 } from '../../constants/tourCalendarLayout';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
@@ -43,7 +44,7 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
       prefetch="intent"
     >
       <span
-        className={`block h-px shrink-0 ${SEASON_STRIPE_CLASS[season]}`}
+        className={`${TOUR_CALENDAR_DAY_EVENT_SEASON_STRIPE_CLASS} ${SEASON_STRIPE_CLASS[season]}`}
         aria-hidden
       />
       <div className={TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS}>

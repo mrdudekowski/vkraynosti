@@ -36,9 +36,6 @@ export const TOUR_CALENDAR_DAY_EVENTS_GRID_ITEM_CLASS = 'min-w-0' as const;
 export const TOUR_CALENDAR_DAY_EVENT_CARD_CLASS =
   'group flex h-full w-full min-h-tour-calendar-day-event-card min-w-0 flex-row overflow-hidden rounded-lg border border-divider bg-surface-light/95 shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary' as const;
 
-/** Вертикальная полоска сезона слева в карточке. */
-export const TOUR_CALENDAR_DAY_EVENT_SEASON_STRIPE_CLASS = 'w-px shrink-0 self-stretch' as const;
-
 /** Обложка слева (фикс. ширина, на всю высоту карточки). */
 export const TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS =
   'h-full w-tour-calendar-day-event-media shrink-0 self-stretch overflow-hidden' as const;

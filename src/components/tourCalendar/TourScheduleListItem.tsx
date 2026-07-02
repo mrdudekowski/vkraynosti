@@ -6,20 +6,11 @@ import {
   TOUR_CALENDAR_DAY_EVENT_CARD_CLASS,
   TOUR_CALENDAR_DAY_EVENT_FOOTER_CLASS,
   TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS,
-  TOUR_CALENDAR_DAY_EVENT_SEASON_STRIPE_CLASS,
   TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS,
 } from '../../constants/tourCalendarLayout';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
-import type { Season } from '../../types';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 import PlaceholderImage from '../shared/PlaceholderImage';
-
-const SEASON_STRIPE_CLASS: Record<Season, string> = {
-  winter: 'bg-season-winter',
-  spring: 'bg-season-spring',
-  summer: 'bg-season-summer',
-  fall: 'bg-season-fall',
-};
 
 const STATUS_BADGE_CLASS: Record<EnrichedScheduleEvent['status'], string> = {
   planned: 'text-text-muted',
@@ -34,7 +25,7 @@ interface TourScheduleListItemProps {
 }
 
 const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
-  const { tour, season } = event;
+  const { tour } = event;
   const { displayPrice } = useTourDisplayPrice(tour);
 
   return (
@@ -43,10 +34,6 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
       className={TOUR_CALENDAR_DAY_EVENT_CARD_CLASS}
       prefetch="intent"
     >
-      <span
-        className={`${TOUR_CALENDAR_DAY_EVENT_SEASON_STRIPE_CLASS} ${SEASON_STRIPE_CLASS[season]}`}
-        aria-hidden
-      />
       <div className={TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS}>
         <PlaceholderImage
           src={tour.imageUrl}

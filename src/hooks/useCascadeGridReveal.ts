@@ -18,8 +18,10 @@ export const useCascadeGridReveal = <T,>(
   const pendingItemsRef = useRef(items);
   const pendingKeyRef = useRef<string | null>(contentKey);
 
-  pendingItemsRef.current = items;
-  pendingKeyRef.current = contentKey;
+  useEffect(() => {
+    pendingItemsRef.current = items;
+    pendingKeyRef.current = contentKey;
+  }, [contentKey, items]);
 
   const beginReveal = useCallback((hasVisibleItems: boolean) => {
     if (hasVisibleItems) {

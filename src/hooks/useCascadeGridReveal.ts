@@ -12,9 +12,13 @@ export const useCascadeGridReveal = <T,>(
   contentKey: string | null,
   cascadeLeadCount = 0,
 ) => {
-  const [phase, setPhase] = useState<CascadeGridPhase>('idle');
-  const [displayedItems, setDisplayedItems] = useState<T[]>([]);
-  const [displayedKey, setDisplayedKey] = useState<string | null>(null);
+  const [phase, setPhase] = useState<CascadeGridPhase>(() =>
+    contentKey != null ? 'preFadeIn' : 'idle',
+  );
+  const [displayedItems, setDisplayedItems] = useState<T[]>(() => (contentKey != null ? items : []));
+  const [displayedKey, setDisplayedKey] = useState<string | null>(() => contentKey);
+  const [prevContentKey, setPrevContentKey] = useState(contentKey);
+  const [prevItemsLength, setPrevItemsLength] = useState(items.length);
   const pendingItemsRef = useRef(items);
   const pendingKeyRef = useRef<string | null>(contentKey);
 
@@ -23,30 +27,37 @@ export const useCascadeGridReveal = <T,>(
     pendingKeyRef.current = contentKey;
   }, [contentKey, items]);
 
-  const beginReveal = useCallback((hasVisibleItems: boolean) => {
-    if (hasVisibleItems) {
-      setPhase('fadingOut');
-      return;
-    }
-    setDisplayedItems(pendingItemsRef.current);
-    setDisplayedKey(pendingKeyRef.current);
-    setPhase('preFadeIn');
-  }, []);
-
-  useEffect(() => {
+  if (contentKey !== prevContentKey) {
+    setPrevContentKey(contentKey);
     if (contentKey == null) {
       setDisplayedItems([]);
       setDisplayedKey(null);
       setPhase('idle');
-      return;
+    } else if (phase === 'idle') {
+      const hasVisible = displayedItems.length > 0 || displayedKey != null;
+      if (contentKey !== displayedKey || displayedItems.length !== items.length) {
+        if (hasVisible) {
+          setPhase('fadingOut');
+        } else {
+          setDisplayedItems(items);
+          setDisplayedKey(contentKey);
+          setPhase('preFadeIn');
+        }
+      }
     }
-
-    if (phase !== 'idle') return;
-
-    if (contentKey === displayedKey && displayedItems.length === items.length) return;
-
-    beginReveal(displayedItems.length > 0 || displayedKey != null);
-  }, [beginReveal, contentKey, displayedItems.length, displayedKey, items.length, phase]);
+  } else if (
+    contentKey != null &&
+    phase === 'idle' &&
+    contentKey === displayedKey &&
+    items.length !== prevItemsLength
+  ) {
+    setPrevItemsLength(items.length);
+    if (displayedItems.length > 0 || displayedKey != null) {
+      setPhase('fadingOut');
+    }
+  } else if (items.length !== prevItemsLength) {
+    setPrevItemsLength(items.length);
+  }
 
   useEffect(() => {
     if (phase !== 'fadingOut') return;

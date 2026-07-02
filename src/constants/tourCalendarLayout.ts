@@ -25,9 +25,9 @@ export const TOUR_CALENDAR_SELECT_DATE_HINT_HOST_CLASS = 'mb-4 flex w-full lg:ju
 export const TOUR_CALENDAR_DAY_HEADING_CLASS =
   'mb-4 w-fit rounded-card border border-divider bg-surface-light/75 px-4 py-2 font-heading text-lg capitalize text-text-primary shadow-sm backdrop-blur-sm' as const;
 
-/** Сетка карточек туров в панели выбранного дня (2 колонки на всех breakpoints). */
+/** Сетка карточек: 1 колонка ≤580px, 2 колонки от 581px (`tour-calendar-day-events:`). */
 export const TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS =
-  'grid min-w-0 grid-cols-2 items-stretch gap-2' as const;
+  'grid min-w-0 grid-cols-1 items-stretch gap-2 tour-calendar-day-events:grid-cols-2' as const;
 
 /** Ячейка сетки: растягивается по высоте строки, без breakpoint-вариантов. */
 export const TOUR_CALENDAR_DAY_EVENTS_GRID_ITEM_CLASS = 'min-w-0' as const;

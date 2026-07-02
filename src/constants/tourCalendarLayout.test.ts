@@ -51,7 +51,8 @@ describe('tourCalendarLayout', () => {
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).toContain('w-fit');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).not.toContain('min-h-tour-calendar-day-panel');
     expect(TOUR_CALENDAR_SELECT_DATE_PANEL_CLASS).not.toContain('min-h-[');
-    expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).toContain('grid-cols-2');
+    expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).toContain('grid-cols-1');
+    expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).toContain('tour-calendar-day-events:grid-cols-2');
     expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).toContain('items-stretch');
     expect(TOUR_CALENDAR_DAY_EVENTS_GRID_CLASS).not.toMatch(/\b(sm|md|lg|xl|2xl):/);
     expect(TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS).toContain('w-tour-calendar-day-event-media');

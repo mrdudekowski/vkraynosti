@@ -52,6 +52,9 @@ export const BREAKPOINT_TABLET_PX = 428 as const;
 /** Подпись сезона в navbar и `SeasonSwitcher` (`season-md:`). */
 export const BREAKPOINT_SEASON_MD_PX = 500 as const;
 
+/** Сетка карточек расписания: 2 колонки от этой ширины (`tour-calendar-day-events:`). ≤580px — 1 колонка. */
+export const BREAKPOINT_TOUR_CALENDAR_DAY_EVENTS_GRID_PX = 581 as const;
+
 /** max-width для `season-below-md:` — на 1px ниже `season-md`. */
 export const BREAKPOINT_SEASON_BELOW_MD_MAX_PX = BREAKPOINT_SEASON_MD_PX - 1;
 
@@ -81,6 +84,7 @@ export const TAILWIND_SCREEN_MIN_WIDTH_PX = {
   'nav-desktop': BREAKPOINT_NAV_DESKTOP_PX,
   'mobile-nav-drawer-compact': BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX,
   'team-hero-desktop': BREAKPOINT_TEAM_HERO_DESKTOP_PX,
+  'tour-calendar-day-events': BREAKPOINT_TOUR_CALENDAR_DAY_EVENTS_GRID_PX,
 } as const;
 
 /**

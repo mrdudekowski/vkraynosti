@@ -80,6 +80,7 @@ import {
   BREAKPOINT_TABLET_PX,
   BREAKPOINT_TEAM_HERO_BELOW_DESKTOP_MAX_PX,
   BREAKPOINT_TEAM_HERO_DESKTOP_PX,
+  BREAKPOINT_TOUR_CALENDAR_DAY_EVENTS_GRID_PX,
   BREAKPOINT_TOUR_COVER_WIDE_PX,
   BREAKPOINT_XL_PX,
   BREAKPOINT_XS_PX,
@@ -1586,6 +1587,8 @@ const config: Config = {
         /** Секция «Команда»: mobile ≤767px, desktop grid с 768px (`breakpoints.ts`). */
         'team-hero-below-desktop': { max: `${BREAKPOINT_TEAM_HERO_BELOW_DESKTOP_MAX_PX}px` },
         'team-hero-desktop': `${BREAKPOINT_TEAM_HERO_DESKTOP_PX}px`,
+        /** Сетка карточек расписания: 1 колонка ≤580px, 2 колонки от 581px. */
+        'tour-calendar-day-events': `${BREAKPOINT_TOUR_CALENDAR_DAY_EVENTS_GRID_PX}px`,
       },
     },
   },

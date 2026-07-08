@@ -85,7 +85,7 @@ export function getStaticIndexableRoutePaths(routesSource) {
 }
 
 /** Fallback when `public/data/tour-schedule/` is gitignored locally / before `sync:catalog`. */
-const TOUR_CATALOG_FIXTURE_REL_PATH = 'scripts/fixtures/tour-schedule/tours_list.json';
+import { readTourCatalogFile } from './readTourCatalogFile.mjs';
 
 /**
  * Published tour catalog (`public/data/tour-schedule/tours_list.json`): tour id →
@@ -93,20 +93,14 @@ const TOUR_CATALOG_FIXTURE_REL_PATH = 'scripts/fixtures/tour-schedule/tours_list
  * are dropped by `generate-tour-data-fixtures.mjs`, so they are simply absent here.
  */
 async function loadPublishedTourStatusById(rootDir) {
-  const catalogPath = resolve(rootDir, 'public/data/tour-schedule/tours_list.json');
-  const fixturePath = resolve(rootDir, TOUR_CATALOG_FIXTURE_REL_PATH);
   let parsed;
   try {
-    parsed = JSON.parse(await readFile(catalogPath, 'utf8'));
-  } catch {
-    try {
-      parsed = JSON.parse(await readFile(fixturePath, 'utf8'));
-    } catch (cause) {
-      throw new Error(
-        `Tour catalog not found/readable at ${catalogPath} (or fixture ${fixturePath}) — run \`npm run sync:catalog\` first`,
-        { cause },
-      );
-    }
+    parsed = JSON.parse(await readTourCatalogFile(rootDir, 'tours_list.json'));
+  } catch (cause) {
+    throw new Error(
+      `Tour catalog not readable — run \`npm run sync:catalog\` first`,
+      { cause },
+    );
   }
   const statusById = new Map();
   for (const tour of parsed.tours ?? []) {

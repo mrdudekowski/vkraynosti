@@ -1,5 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { readTourCatalogFile } from './readTourCatalogFile.mjs';
 import type {
   TourPublicationStatus,
   TourScheduleDurationType,
@@ -15,10 +14,9 @@ export interface TourScheduleSnapshot {
 
 /** Snapshot from `public/data/tour-schedule/` (same source as runtime + sitemap). */
 export async function loadTourScheduleSnapshot(rootDir: string): Promise<TourScheduleSnapshot> {
-  const catalogDir = resolve(rootDir, 'public/data/tour-schedule');
   const [listRaw, scheduleRaw] = await Promise.all([
-    readFile(resolve(catalogDir, 'tours_list.json'), 'utf8'),
-    readFile(resolve(catalogDir, 'schedule.json'), 'utf8'),
+    readTourCatalogFile(rootDir, 'tours_list.json'),
+    readTourCatalogFile(rootDir, 'schedule.json'),
   ]);
 
   const list = JSON.parse(listRaw) as {

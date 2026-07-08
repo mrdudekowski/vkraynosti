@@ -5,14 +5,16 @@
  * the GAS "Опубликовать" menu) instead of the committed snapshot.
  *
  * Source = same base the app fetches at runtime: VITE_PUBLIC_S3_BASE_URL or
- * VITE_PUBLIC_ASSET_BASE_URL. With no base set (local/dev), this is a no-op.
+ * VITE_PUBLIC_ASSET_BASE_URL. With no base set, seeds committed fixtures into public/.
  *
- * ponytail: best-effort — a CDN outage or invalid JSON keeps the committed snapshot
- * (build stays green) instead of failing the whole pipeline. Upgrade path: make the
- * fetch mandatory (fail-closed) once the CDN is treated as the hard SSOT for builds.
+ * ponytail: best-effort CDN fetch — on failure per file, keep existing public/ copy or fixture.
  */
-import { mkdir, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import {
+  TOUR_CATALOG_FIXTURE_DIR,
+  seedTourCatalogFromFixtures,
+} from './lib/readTourCatalogFile.mjs';
 
 const rootDir = process.cwd();
 const outDir = resolve(rootDir, 'public/data/tour-schedule');
@@ -40,9 +42,8 @@ const fetchCatalogJson = async (url) => {
 const run = async () => {
   const base = resolveCatalogBaseUrl();
   if (!base) {
-    process.stdout.write(
-      '[sync:catalog] no CDN base URL set — keeping committed public/data snapshot\n',
-    );
+    process.stdout.write('[sync:catalog] no CDN base URL set — seeding from fixtures\n');
+    await seedTourCatalogFromFixtures(rootDir);
     return;
   }
 
@@ -55,7 +56,11 @@ const run = async () => {
       process.stdout.write(`[sync:catalog] updated ${fileName} from ${url}\n`);
     } catch (error) {
       process.stdout.write(
-        `[sync:catalog] WARN keep committed ${fileName} (${error instanceof Error ? error.message : String(error)})\n`,
+        `[sync:catalog] WARN ${fileName} from CDN (${error instanceof Error ? error.message : String(error)}) — using fixture\n`,
+      );
+      await copyFile(
+        resolve(rootDir, TOUR_CATALOG_FIXTURE_DIR, fileName),
+        resolve(outDir, fileName),
       );
     }
   }

@@ -172,7 +172,9 @@ const Footer = () => {
       </div>
 
       <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p className="text-text-inverse/40 text-sm">{UI.footer.rights}</p>
+        <p className="text-text-inverse/40 text-sm" data-nosnippet>
+          {UI.footer.rights}
+        </p>
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
           <button
             type="button"

@@ -156,7 +156,7 @@ const buildTourSeoDescriptionDraft = (
   }
 
   if (publicationStatus === 'in_development') {
-    return UI.tourDetail.programInDevelopment;
+    return `${tour.title} — программа готовится. Поездки по Приморью из Владивостока.`;
   }
 
   const seasonLabel = UI.seasons[tour.season].label;

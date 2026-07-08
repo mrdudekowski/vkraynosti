@@ -1011,7 +1011,7 @@ export const TOUR_SUMMER_1_GRID_VIDEO_POSTERS: Record<string, string> = {
   [TOUR_SUMMER_1_CLIP7_GRID_WEBM]: `${TOUR_SUMMER_1_ASSET_BASE}/tch.clip7.poster.webp`,
 };
 
-/** «Северное Приморье» (summer-7). Медиа: `scripts/encode-summer-7-sever-media.ps1`. */
+/** «Северное Приморье» (summer-7). Hero: `content/HERO/Лето/sever_hero.webp` → `bazi.webp`; остальное: `scripts/encode-summer-7-sever-media.ps1`. */
 export const TOUR_SUMMER_7_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-7` as const;
 
 export const TOUR_SUMMER_7_COVER = `${TOUR_SUMMER_7_ASSET_BASE}/bazi.webp` as const;

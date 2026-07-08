@@ -34,6 +34,18 @@ dist-ssr
 .cursor/debug*.log
 .cursor/plans/
 .cursor/preview-ezh/
+.cursor/rules/ponytail.mdc
+
+# GAS integrations: tests and Node mirrors (not web-vkr deploy / npm run build)
+integrations/tour-schedule-gas/__tests__/
+scripts/lib/previousMonthBounds.mjs
+
+# Local media audit utility (not in npm run build / CI)
+scripts/zip-used-site-images.mjs
+
+# Local CDN catalog snapshots — deploy/CI: npm run sync:catalog (not committed on web-vkr)
+public/data/tour-schedule/
+public/data/tour-schedule.json
 
 # TimeWeb media inventory dumps (regenerate: npm run media:inventory)
 TimeWebDoc/audit-*.json

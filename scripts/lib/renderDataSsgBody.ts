@@ -4,6 +4,7 @@ import { ROUTES, SEASON_TO_LIST_ROUTE } from '../../src/constants/routes.ts';
 import {
   SEO_DEFAULTS,
   getSeasonSeoEntry,
+  getTourSeoEntry,
   getTourBreadcrumbSchema,
   getTourStructuredData,
   ORGANIZATION_SCHEMA,
@@ -182,6 +183,13 @@ function renderTourBody(
     `<li>${esc(UI.tourDetail.metaLabelPrice)}: ${esc(displayPrice)}</li>`,
   ].join('');
 
+  const durationType = snapshot.durationTypes.get(tour.id);
+  const seoEntry = getTourSeoEntry(tour, {
+    displayDuration:
+      durationType != null ? formatTourDurationDisplayLabel(durationType) : undefined,
+    publicationStatus,
+  });
+
   return `<div data-testid="tour-detail-main">
   <main>
     <nav aria-label="${esc(UI.breadcrumbs.navLabel)}">
@@ -191,6 +199,7 @@ function renderTourBody(
     </nav>
     <img src="${esc(imageUrl)}" alt="${esc(tour.title)}" width="1200" height="630" />
     <h1>${esc(tour.title)}</h1>
+    <p>${esc(seoEntry.description)}</p>
     <p>${esc(tour.subtitle)}</p>
     ${isInDevelopment ? `<p>${esc(UI.tourDetail.inDevelopmentHeading)}</p>` : ''}
     <section aria-label="${esc(UI.tourDetail.tourMetaFactsAriaLabel)}"><ul>${metaFacts}</ul></section>

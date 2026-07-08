@@ -134,9 +134,10 @@ async function patch404Shell() {
   const appleTouchIconHref =
     basePath === '/' ? '/apple-touch-icon.png' : `${basePath}apple-touch-icon.png`;
   const ogImage = `${siteRoot}/banners_summer/Summer.webp`;
+  // sync: SEO_DEFAULTS.home in src/constants/seo.ts
   const ogTitle = 'Вкрайности — Поездки по Приморью из Владивостока';
   const ogDescription =
-    'Авторские поездки по Приморью: заповедное побережье, сопки и море. Зима, весна, лето и осень — четыре сезона маршрутов из Владивостока с опытными гидами.';
+    'Поездки по Приморью из Владивостока: сопки, море и заповедные маршруты. Четыре сезона выездов с гидами.';
 
   const headInjection = `
     <meta name="color-scheme" content="light only" />

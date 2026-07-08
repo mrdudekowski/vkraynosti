@@ -14,10 +14,14 @@ import ErrorBoundary from './components/errors/ErrorBoundary';
 import AppLenis from './components/layout/AppLenis';
 import { router } from './router';
 import { installBootSplashFailsafe, scheduleBootSplashDismiss } from './utils/dismissBootSplash';
+import { stripBuildTimeSeoHead } from './utils/stripBuildTimeSeoHead';
 import './bootstrap-fonts';
 import './index.css';
 
 installBootSplashFailsafe();
+
+// OG shells inject canonical/OG for no-JS crawlers; PageMeta re-owns the head after hydration.
+stripBuildTimeSeoHead();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

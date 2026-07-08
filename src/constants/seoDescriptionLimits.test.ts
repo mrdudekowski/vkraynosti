@@ -39,6 +39,14 @@ describe('tour SEO descriptions', () => {
     }
   });
 
+  it('in_development tours stay within 120 chars without truncation', () => {
+    for (const tour of TOURS) {
+      const entry = getTourSeoEntry(tour, { publicationStatus: 'in_development' });
+      assertDescriptionLimit(`in_development:${tour.id}`, entry.description);
+      expect(entry.description).not.toBe('В разработке');
+    }
+  });
+
   it('manual overrides stay within 120 chars', () => {
     for (const [id, description] of Object.entries(TOUR_SEO_DESCRIPTION_BY_ID)) {
       assertDescriptionLimit(`override:${id}`, description);

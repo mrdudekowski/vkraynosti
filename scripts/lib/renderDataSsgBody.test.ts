@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { getTourSeoEntry } from '../../src/constants/seo.ts';
+import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
 import { injectDataSsgIntoHtml } from './injectDataSsgIntoHtml.ts';
 import { resolveDataSsgForRoute } from './renderDataSsgBody.ts';
 import type { TourScheduleSnapshot } from './loadTourScheduleSnapshot.ts';
@@ -38,9 +40,13 @@ describe('resolveDataSsgForRoute', () => {
     snapshot.durationTypes.set('spring-1', 'однодневный');
 
     const page = resolveDataSsgForRoute('/tours/spring/voskhozhdenie-na-lysovogo-deda', snapshot, 'active');
+    const tour = findTourBySeasonAndSegment('spring', 'voskhozhdenie-na-lysovogo-deda');
+    expect(tour).toBeDefined();
+    const seoEntry = getTourSeoEntry(tour!, { publicationStatus: 'active' });
 
     expect(page.bodyHtml).toContain('data-testid="tour-detail-main"');
     expect(page.bodyHtml).toContain('<main>');
+    expect(page.bodyHtml).toContain(seoEntry.description);
     expect(page.bodyHtml).toContain('Программа поездки');
     expect(page.structuredData).toHaveLength(2);
     expect(page.structuredData[0]).toMatchObject({ '@type': 'TouristTrip' });

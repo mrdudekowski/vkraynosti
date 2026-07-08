@@ -28,7 +28,9 @@ const CookieConsentBanner = () => {
             draggable={false}
           />
           <div className="flex min-w-0 flex-1 flex-col gap-3">
-            <p className="text-sm leading-relaxed text-text-inverse/90">{copy.bannerMessage}</p>
+            <p className="text-sm leading-relaxed text-text-inverse/90" data-nosnippet>
+              {copy.bannerMessage}
+            </p>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
               <button type="button" className="btn-primary text-sm" onClick={acceptAnalytics}>
                 {copy.acceptLabel}

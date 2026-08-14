@@ -11,12 +11,16 @@
  */
 import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadDotEnvLocal } from './lib/loadDotEnvLocal.mjs';
 import {
   TOUR_CATALOG_FIXTURE_DIR,
   seedTourCatalogFromFixtures,
 } from './lib/readTourCatalogFile.mjs';
 
-const rootDir = process.cwd();
+const rootDir = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
+loadDotEnvLocal(rootDir);
+
 const outDir = resolve(rootDir, 'public/data/tour-schedule');
 const CATALOG_FILES = ['tours_list.json', 'schedule.json'];
 

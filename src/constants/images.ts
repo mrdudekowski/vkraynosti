@@ -1331,10 +1331,10 @@ export const TOUR_SUMMER_12_GALLERY_GRID = TOUR_SUMMER_12_GALLERY_VIEWER;
 /** «Остров Петрова» (summer-14). Медиа: `public/tours/summer-14/`. */
 export const TOUR_SUMMER_14_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-14` as const;
 
-export const TOUR_SUMMER_14_COVER = `${TOUR_SUMMER_14_ASSET_BASE}/cover.webp` as const;
+export const TOUR_SUMMER_14_COVER = `${TOUR_SUMMER_14_ASSET_BASE}/island.webp` as const;
 export const TOUR_SUMMER_14_COVER_GRID = TOUR_SUMMER_14_COVER;
 export const TOUR_SUMMER_14_PREFACE_BACKGROUND =
-  `${TOUR_SUMMER_14_ASSET_BASE}/preface.webp` as const;
+  `${TOUR_SUMMER_14_ASSET_BASE}/grove.webp` as const;
 export const TOUR_SUMMER_14_COVE_IMAGE = `${TOUR_SUMMER_14_ASSET_BASE}/cove.webp` as const;
 export const TOUR_SUMMER_14_SPIT_IMAGE = `${TOUR_SUMMER_14_ASSET_BASE}/spit.webp` as const;
 export const TOUR_SUMMER_14_TRAIL_GROUP_IMAGE =

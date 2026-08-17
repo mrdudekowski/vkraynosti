@@ -37,7 +37,6 @@ describe('summer-14 Остров Петрова', () => {
     ]);
     expect(tour!.galleryImages).toHaveLength(8);
     expect(tour!.galleryGridUrls).toHaveLength(8);
-    expect(tour!.coverCrop?.card).toEqual({ x: 49.67, y: 53.99 });
   });
 
   it('собирает bento-left и bento-center-bottom из CMS', () => {

@@ -1545,11 +1545,6 @@ const TOURS_CORE: Tour[] = [
     prefaceBackgroundImageUrl: TOUR_SUMMER_14_PREFACE_BACKGROUND,
     galleryImages: [...TOUR_SUMMER_14_GALLERY_VIEWER],
     galleryGridUrls: [...TOUR_SUMMER_14_GALLERY_GRID],
-    coverCrop: {
-      card: { x: 49.67, y: 53.99 },
-      hero: { x: 57.39, y: 50.6 },
-      heroLg: { x: 51.02, y: 49.82 },
-    },
   },
   createSummerTourStub({
     id: 'summer-15',

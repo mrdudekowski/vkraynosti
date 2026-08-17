@@ -4,6 +4,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
   type TransitionEvent,
   type TransitionEventHandler,
 } from 'react';
@@ -23,6 +24,7 @@ export interface GalleryGridVideoProps {
   /** Если не задан — до появления во viewport показывается нейтральный плейсхолдер. */
   posterSrc?: string;
   className: string;
+  style?: CSSProperties;
   /** Доп. классы `object-position` для `<video>` и постера (токены темы). */
   videoObjectClassName?: string;
   prefersReducedMotion: boolean;
@@ -299,6 +301,7 @@ const GalleryGridVideo = ({
   gridSrc,
   posterSrc,
   className,
+  style,
   videoObjectClassName,
   prefersReducedMotion,
 }: GalleryGridVideoProps) => {
@@ -364,6 +367,7 @@ const GalleryGridVideo = ({
     <div
       ref={containerRef}
       className={`relative overflow-hidden rounded-card border-0 bg-transparent ${className}`}
+      style={style}
       aria-hidden
     >
       {prefersReducedMotion ? (

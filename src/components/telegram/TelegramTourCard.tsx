@@ -8,7 +8,7 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight
 import type { Tour } from '../../types';
 import { UI } from '../../constants/ui';
 import { buildTelegramTourPath } from '../../constants/telegramMiniApp';
-import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
+import { tourCardCoverImgProps } from '../../utils/tourCoverPresentation';
 import { useTourDisplayDuration } from '../../hooks/useTourDisplayDuration';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
 import { useTourSchedule } from '../../hooks/useTourSchedule';
@@ -34,18 +34,23 @@ const TelegramTourCard = ({ tour }: TelegramTourCardProps) => {
     return formatTourDepartureLabel(model.nearestFuture);
   }, [events, tour.id]);
 
+  const cover = tourCardCoverImgProps(tour);
+
   return (
     <Link
       to={tourPath}
       className="card-base flex flex-col overflow-hidden cursor-pointer no-underline text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
       prefetch="intent"
     >
-      <div className="relative overflow-hidden rounded-t-card">
+      <div
+        className={`relative overflow-hidden rounded-t-card ${cover.wrapperClassName ?? ''}`.trim()}
+        style={cover.wrapperStyle}
+      >
         <PlaceholderImage
           src={tour.imageUrl}
           alt={tour.title}
           className="h-44 w-full"
-          imgClassName={getTourCoverCardImgObjectClass(tour.id)}
+          imgClassName={cover.imgClassName}
           loading="lazy"
         />
         <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-brand-primary px-2.5 py-1 text-xs font-semibold text-text-inverse">

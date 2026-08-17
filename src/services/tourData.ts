@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { cmsTourScheduleOverlayCandidates } from '../cms/cmsContentUrls';
 import { TOUR_DATA_S3_PATHS, buildTourDataFileUrl } from '../constants/tourDataUrls';
 import type { SchedulePayload, TourDataFetchErrorCode, ToursListPayload } from '../types/tourData';
 import { TourDataFetchError } from '../types/tourData';
@@ -73,11 +74,42 @@ const parseSchedule = (json: unknown): SchedulePayload => {
   return parsed.data;
 };
 
+export { parseToursList as parseToursListPayload, parseSchedule as parseSchedulePayload };
+
+async function fetchJsonFromCandidates(urls: string[]): Promise<unknown> {
+  let lastError: TourDataFetchError | null = null;
+  for (const url of urls) {
+    try {
+      return await fetchJson(url);
+    } catch (error) {
+      lastError =
+        error instanceof TourDataFetchError
+          ? error
+          : new TourDataFetchError('network', `Failed to fetch ${url}`);
+    }
+  }
+  throw lastError ?? new TourDataFetchError('network', 'No calendar JSON candidates');
+}
+
+function toursListUrls(): string[] {
+  return [
+    ...cmsTourScheduleOverlayCandidates().toursList,
+    buildTourDataFileUrl(TOUR_DATA_S3_PATHS.toursList),
+  ];
+}
+
+function scheduleUrls(): string[] {
+  return [
+    ...cmsTourScheduleOverlayCandidates().schedule,
+    buildTourDataFileUrl(TOUR_DATA_S3_PATHS.schedule),
+  ];
+}
+
 export const loadToursList = async (): Promise<ToursListPayload> =>
-  parseToursList(await fetchJson(buildTourDataFileUrl(TOUR_DATA_S3_PATHS.toursList)));
+  parseToursList(await fetchJsonFromCandidates(toursListUrls()));
 
 export const loadSchedule = async (): Promise<SchedulePayload> =>
-  parseSchedule(await fetchJson(buildTourDataFileUrl(TOUR_DATA_S3_PATHS.schedule)));
+  parseSchedule(await fetchJsonFromCandidates(scheduleUrls()));
 
 export const loadTourSchedulePayload = async (): Promise<TourSchedulePayload> => {
   const [toursList, schedule] = await Promise.all([loadToursList(), loadSchedule()]);

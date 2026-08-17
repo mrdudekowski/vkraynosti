@@ -1,8 +1,31 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import type { Tour } from '../../types';
 import type { TourPublicationStatus } from '../../types/tourSchedule';
+import { clearCmsTourOverlay, setCmsTourOverlay } from '../../cms/cmsTourOverlay';
 import { getVisibleToursBySeason } from './getVisibleToursBySeason';
 
+const overlayTour = (id: string): Tour => ({
+  id,
+  slug: `${id}-cms`,
+  season: 'summer',
+  title: `CMS ${id}`,
+  subtitle: '',
+  heroPhrase: id,
+  duration: '1 день',
+  difficulty: 'Easy',
+  price: 'по запросу',
+  description: '',
+  program: [],
+  includedInPrice: [],
+  imageUrl: '/x.webp',
+  galleryImages: ['/x.webp'],
+});
+
 describe('getVisibleToursBySeason', () => {
+  afterEach(() => {
+    clearCmsTourOverlay();
+  });
+
   it('lists only active tours (in_development and hidden are excluded from grids)', () => {
     const statuses = new Map<string, TourPublicationStatus>([
       ['summer-13', 'in_development'],
@@ -42,5 +65,19 @@ describe('getVisibleToursBySeason', () => {
     expect(getVisibleToursBySeason('summer', new Map(), { scheduleLoaded: true })).toHaveLength(
       0,
     );
+  });
+
+  it('при активном overlay показывает CMS-only и скрывает туры только из кода', () => {
+    setCmsTourOverlay([overlayTour('cms-only-fixture')]);
+    const statuses = new Map<string, TourPublicationStatus>([
+      ['cms-only-fixture', 'active'],
+      ['summer-1', 'active'],
+    ]);
+
+    const visibleIds = getVisibleToursBySeason('summer', statuses, { scheduleLoaded: true }).map(
+      (item) => item.id,
+    );
+
+    expect(visibleIds).toEqual(['cms-only-fixture']);
   });
 });

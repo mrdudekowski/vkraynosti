@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { clearCmsTourOverlay } from '../cms/cmsTourOverlay';
 import { TOURS } from '../data/toursData';
 import { findTourBySeasonAndSegment, getTourBySlug } from '../data/tourLookup';
 import {
@@ -18,6 +19,10 @@ const summer10 = TOURS.find((tour) => tour.id === 'summer-10');
 if (summer10 == null) {
   throw new Error('summer-10 missing from catalog');
 }
+
+afterEach(() => {
+  clearCmsTourOverlay();
+});
 
 describe('getTourPublicPath', () => {
   it('returns slug URL for summer-10 pilot', () => {

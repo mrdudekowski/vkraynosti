@@ -10,6 +10,7 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
+!.env.cms-dev.example
 
 # Dependencies (never commit)
 node_modules/
@@ -46,6 +47,10 @@ scripts/zip-used-site-images.mjs
 # Local CDN catalog snapshots — deploy/CI: npm run sync:catalog (not committed on web-vkr)
 public/data/tour-schedule/
 public/data/tour-schedule.json
+public/data/cms/
+
+# CMS-dev export scratch
+/tmp/
 
 # TimeWeb media inventory dumps (regenerate: npm run media:inventory)
 TimeWebDoc/audit-*.json

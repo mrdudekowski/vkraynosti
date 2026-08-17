@@ -16,6 +16,10 @@ export const BENTO_BLOCK_TYPES = [
 
 export type BentoBlockType = (typeof BENTO_BLOCK_TYPES)[number];
 
+export function isBentoBlockType(value: string): value is BentoBlockType {
+  return (BENTO_BLOCK_TYPES as readonly string[]).includes(value);
+}
+
 const BENTO_BLOCK_SLOT_COUNTS: Record<BentoBlockType, number> = {
   'bento-left': 3,
   'bento-right': 3,

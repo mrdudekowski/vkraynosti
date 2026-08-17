@@ -390,7 +390,7 @@ const SEASON_PAGE_ATMOSPHERE = {
 } as const
 
 const config: Config = {
-  content: ['./index.html', './src/**/*.{ts,tsx}', './src/index.css'],
+  content: ['./index.html', './admin/index.html', './src/**/*.{ts,tsx}', './src/index.css'],
   safelist: [
     { pattern: /^(h|min-h|w)-nav-season-(circle|icon)-(fixed|fluid)$/, variants: ['md', 'max'] },
     { pattern: /^max-h-safety-status-stack-\d+$/, variants: ['sm'] },
@@ -1212,6 +1212,8 @@ const config: Config = {
         'tooltip': '0.3125rem',
         /** Кнопка CTA (прямоугольная, не pill). */
         cta: '0.3125rem',
+        /** Контролы CMS: input/button/badge, не card витрины. */
+        'admin-control': '0.5rem',
       },
       scale: {
         /** Зимние `*.banner-loop`: +20% к кадру внутри колонки (`HomeSeasonBannerColumn`, обрезка `overflow-hidden`). */

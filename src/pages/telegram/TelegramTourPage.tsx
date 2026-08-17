@@ -12,9 +12,10 @@ import type { Season } from '../../types';
 import { UI } from '../../constants/ui';
 import { ROUTES } from '../../constants/routes';
 import { buildTelegramRequestPath } from '../../constants/telegramMiniApp';
+import { useCmsToursRevision } from '../../cms/useCmsToursRevision';
 import { findTourBySeasonAndSegment } from '../../data/tourLookup';
 import { getTourCanonicalUrl } from '../../constants/tourUrls';
-import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
+import { tourCardCoverImgProps } from '../../utils/tourCoverPresentation';
 import TelegramMiniAppHeader from '../../components/telegram/TelegramMiniAppHeader';
 import TelegramMiniAppShell from '../../components/telegram/TelegramMiniAppShell';
 import TelegramTourGallery from '../../components/telegram/TelegramTourGallery';
@@ -40,6 +41,7 @@ const parseSeasonParam = (value: string | undefined): Season | null => {
 const TelegramTourPage = () => {
   const { season: seasonParam, tourId: tourSegment } = useParams();
   const season = parseSeasonParam(seasonParam);
+  useCmsToursRevision();
   const tour =
     season != null && tourSegment != null
       ? findTourBySeasonAndSegment(season, tourSegment)
@@ -92,6 +94,7 @@ const TelegramTourPage = () => {
       : tour.description,
   );
   const siteUrl = getTourCanonicalUrl(tour);
+  const cover = tourCardCoverImgProps(tour);
 
   const handleRequest = () => {
     navigate(buildTelegramRequestPath(tour), {
@@ -108,12 +111,15 @@ const TelegramTourPage = () => {
         backTo={`${ROUTES.TELEGRAM}${location.search}`}
       />
       <div className="mx-auto max-w-lg pb-32">
-        <div className="relative">
+        <div
+          className={`relative ${cover.wrapperClassName ?? ''}`.trim()}
+          style={cover.wrapperStyle}
+        >
           <PlaceholderImage
             src={tour.imageUrl}
             alt={tour.title}
             className="h-56 w-full"
-            imgClassName={getTourCoverCardImgObjectClass(tour.id)}
+            imgClassName={cover.imgClassName}
             loading="eager"
             fetchPriority="high"
           />

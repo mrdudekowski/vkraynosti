@@ -3,23 +3,26 @@ import { resolveContentSourceTourId } from '../data/seasonTourRegistry';
 /**
  * Вариант bento-сетки `TourDetailGallery` — по маршруту (`contentSourceTourId` или `tour.id`).
  */
-export type TourGalleryLayoutVariant =
-  | 'default'
-  | 'izubrinaya'
-  | 'arsgora'
-  | 'lysy-ded'
-  | 'olkhovaya'
-  | 'pidan'
-  | 'sestra'
-  | 'chitinza'
-  | 'falaza'
-  | 'vorobey-winery'
-  | 'dardanelles'
-  | 'askold'
-  | 'shkota'
-  | 'gamova'
-  | 'tachingouza'
-  | 'severCoast';
+export const TOUR_GALLERY_LAYOUT_VARIANTS = [
+  'default',
+  'izubrinaya',
+  'arsgora',
+  'lysy-ded',
+  'olkhovaya',
+  'pidan',
+  'sestra',
+  'chitinza',
+  'falaza',
+  'vorobey-winery',
+  'dardanelles',
+  'askold',
+  'shkota',
+  'gamova',
+  'tachingouza',
+  'severCoast',
+] as const;
+
+export type TourGalleryLayoutVariant = (typeof TOUR_GALLERY_LAYOUT_VARIANTS)[number];
 
 export function getTourGalleryLayoutVariant(tourId: string): TourGalleryLayoutVariant {
   const layoutKey = resolveContentSourceTourId(tourId) ?? tourId;

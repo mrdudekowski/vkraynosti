@@ -1,6 +1,7 @@
 import type { Tour } from '../../types';
 import type { TourBentoGalleryLayout } from '../../types/tourBento';
 import {
+  buildFallbackSinglesBentoLayout,
   buildTourBentoLayoutForId,
   TOUR_BENTO_LAYOUT_BUILDER_IDS,
   type TourBentoLayoutBuilderId,
@@ -12,7 +13,8 @@ function isTourBentoLayoutBuilderId(id: string): id is TourBentoLayoutBuilderId 
 
 /**
  * Data-driven bento для страницы тура.
- * Приоритет: `tour.bentoLayout` → builder по `tour.id` → builder по `contentSourceTourId`.
+ * Приоритет: `tour.bentoLayout` → builder по `tour.id` → builder по `contentSourceTourId`
+ * → одиночные блоки на остаток сетки (заглушки).
  */
 export function resolveTourBentoLayout(
   tour: Tour,
@@ -22,10 +24,14 @@ export function resolveTourBentoLayout(
     return tour.bentoLayout;
   }
 
-  const layoutTourId = tour.contentSourceTourId ?? tour.id;
-  if (!isTourBentoLayoutBuilderId(layoutTourId)) {
+  if (gridImages.length === 0) {
     return undefined;
   }
 
-  return buildTourBentoLayoutForId(layoutTourId, gridImages);
+  const layoutTourId = tour.contentSourceTourId ?? tour.id;
+  if (isTourBentoLayoutBuilderId(layoutTourId)) {
+    return buildTourBentoLayoutForId(layoutTourId, gridImages);
+  }
+
+  return buildFallbackSinglesBentoLayout(gridImages);
 }

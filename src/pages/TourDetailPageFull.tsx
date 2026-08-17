@@ -9,12 +9,8 @@ import { getTourGridVideoPosterGetter } from "../constants/tourGridVideoPosterRe
 import {
   getTourGalleryLayoutVariant,
 } from "../constants/tourGalleryLayoutVariant";
-import { TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring3CoverCrop";
-import { TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSpring6CoverCrop";
-import { TOUR_SUMMER_1_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSummer1GalleryCrop";
-import { TOUR_SUMMER_7_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSummer7CoverCrop";
-import { TOUR_SUMMER_11_COVER_HERO_IMG_OBJECT_CLASS } from "../constants/tourSummer11CoverCrop";
 import { UI } from "../constants/ui";
+import { tourHeroObjectProps } from "../utils/tourCoverPresentation";
 import { getTourGalleryGridUrls } from "../utils/tourGalleryUrls";
 import { splitTourDescription } from "../utils/splitTourDescription";
 import PageMeta from "../components/shared/PageMeta";
@@ -167,8 +163,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     publicationStatus: 'active',
   });
   const breadcrumbStructuredData = getTourBreadcrumbSchema(tour);
-  /** Bento/crop по маршруту; медиа — только `tour.id`. */
-  const heroLayoutTourId = tour.contentSourceTourId ?? tour.id;
+  const heroObject = tourHeroObjectProps(tour);
 
   const includedRevealClassName =
     prefaceBackgroundUrl != null
@@ -222,34 +217,9 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
         subtitle={tour.subtitle}
         backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
         backLinkSeason={tour.season}
-        heroImageObjectClassName={
-          heroLayoutTourId === 'spring-3'
-            ? TOUR_SPRING_3_COVER_HERO_IMG_OBJECT_CLASS
-            : heroLayoutTourId === 'spring-6'
-              ? TOUR_SPRING_6_COVER_HERO_IMG_OBJECT_CLASS
-              : tour.id === 'summer-1'
-                ? TOUR_SUMMER_1_COVER_HERO_IMG_OBJECT_CLASS
-                : tour.id === 'summer-7'
-                  ? TOUR_SUMMER_7_COVER_HERO_IMG_OBJECT_CLASS
-                  : tour.id === 'summer-11'
-                    ? TOUR_SUMMER_11_COVER_HERO_IMG_OBJECT_CLASS
-                    : undefined
-        }
-        desktopHeroImgClassName={
-          tour.id === 'winter-3'
-            ? 'lg:object-tour-detail-hero-desktop-winter-3'
-            : tour.id === 'winter-4'
-              ? 'lg:object-tour-detail-hero-desktop-winter-4'
-              : heroLayoutTourId === 'spring-1'
-                ? 'lg:object-tour-detail-hero-desktop-spring-1'
-                : heroLayoutTourId === 'spring-4'
-                  ? 'lg:object-tour-detail-hero-desktop-spring-4'
-                  : heroLayoutTourId === 'spring-5'
-                    ? 'lg:object-tour-detail-hero-desktop-spring-5'
-                    : heroLayoutTourId === 'spring-13' || tour.id === 'summer-5'
-                      ? 'lg:object-tour-detail-hero-desktop-spring-13'
-                      : undefined
-        }
+        heroImageObjectClassName={heroObject.heroImageObjectClassName}
+        desktopHeroImgClassName={heroObject.desktopHeroImgClassName}
+        heroObjectStyle={heroObject.style}
       />
 
       <div className="tour-detail-page-gutter">

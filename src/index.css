@@ -585,6 +585,146 @@
   }
 
   /**
+   * Кнопки и поля MPA админки — без pill `.btn-primary` витрины.
+   * Подключаются из `src/admin/`; здесь, потому что отдельный CSS без `@tailwind components` ломает PostCSS.
+   */
+  .admin-btn {
+    @apply inline-flex min-h-11 items-center justify-center rounded-admin-control px-3 text-sm font-medium
+      transition-colors duration-hover
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .admin-btn-primary {
+    @apply admin-btn bg-brand-primary text-text-inverse hover:brightness-110;
+  }
+
+  .admin-btn-secondary {
+    @apply admin-btn border border-divider bg-surface-light text-text-primary hover:bg-brand-primary/15;
+  }
+
+  .admin-btn-ghost {
+    @apply admin-btn text-text-muted hover:bg-brand-primary/15 hover:text-text-primary;
+  }
+
+  .admin-btn-destructive {
+    @apply admin-btn text-difficulty-hard-fg hover:bg-difficulty-hard-bg;
+  }
+
+  .admin-icon-btn {
+    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-admin-control text-text-muted
+      transition-colors duration-hover hover:bg-brand-primary/15 hover:text-text-primary
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .admin-icon-btn-danger {
+    @apply admin-icon-btn text-difficulty-hard-fg hover:bg-difficulty-hard-bg hover:text-difficulty-hard-fg;
+  }
+
+  .admin-input {
+    @apply w-full rounded-admin-control border border-divider bg-white px-2 py-1.5 text-sm text-text-primary
+      placeholder:text-text-muted/70
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+  }
+
+  .admin-input-error {
+    @apply border-difficulty-hard-fg;
+  }
+
+  .admin-textarea {
+    @apply admin-input min-h-16 resize-y;
+  }
+
+  .admin-badge {
+    @apply inline-flex shrink-0 items-center rounded-admin-control px-2 py-0.5 text-tooltip font-medium;
+  }
+
+  .admin-badge-neutral {
+    @apply admin-badge border border-divider text-text-muted;
+  }
+
+  .admin-badge-success {
+    @apply admin-badge bg-difficulty-easy-bg text-difficulty-easy-fg;
+  }
+
+  .admin-badge-warning {
+    @apply admin-badge bg-difficulty-medium-bg text-difficulty-medium-fg;
+  }
+
+  .admin-badge-danger {
+    @apply admin-badge bg-difficulty-hard-bg text-difficulty-hard-fg;
+  }
+
+  .admin-badge-info {
+    @apply admin-badge bg-brand-primary/15 text-text-primary;
+  }
+
+  .admin-alert {
+    @apply rounded-admin-control border px-3 py-2 text-sm;
+  }
+
+  .admin-alert-neutral {
+    @apply admin-alert border-divider text-text-muted;
+  }
+
+  .admin-alert-success {
+    @apply admin-alert border-difficulty-easy-fg/30 bg-difficulty-easy-bg text-difficulty-easy-fg;
+  }
+
+  .admin-alert-warning {
+    @apply admin-alert border-difficulty-medium-fg/30 bg-difficulty-medium-bg text-difficulty-medium-fg;
+  }
+
+  .admin-alert-danger {
+    @apply admin-alert border-difficulty-hard-fg/30 bg-difficulty-hard-bg text-difficulty-hard-fg;
+  }
+
+  .admin-alert-info {
+    @apply admin-alert border-brand-primary/30 bg-brand-primary/15 text-text-primary;
+  }
+
+  .admin-nav-item {
+    @apply text-text-primary hover:bg-brand-primary/10
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+  }
+
+  /**
+   * Фокус кадра из CMS (`object-position` процентами). Tailwind-классы `object-*` по-прежнему
+   * вешаются на img/video; этот класс — для значений вроде `50% 40%`.
+   */
+  .media-object-position,
+  .media-object-position img,
+  .media-object-position video {
+    object-position: var(--media-object-position, 50% 50%);
+  }
+
+  .tour-hero-object-position {
+    object-position: var(--tour-hero-object-position, 50% 50%);
+  }
+
+  @screen lg {
+    .tour-hero-object-position {
+      object-position: var(
+        --tour-hero-object-position-lg,
+        var(--tour-hero-object-position, 50% 50%)
+      );
+    }
+  }
+
+  .admin-dropzone {
+    @apply flex min-h-11 cursor-pointer flex-col items-center justify-center rounded-admin-control border border-dashed
+      border-divider bg-surface-light px-3 py-3 text-center text-sm text-text-muted
+      transition-colors duration-hover hover:border-brand-primary hover:text-text-primary
+      focus-within:ring-2 focus-within:ring-brand-primary/40;
+  }
+
+  .admin-nav-active {
+    @apply bg-brand-primary/15 font-medium text-text-primary
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+  }
+
+  /**
    * CTA страницы тура: апельсиновый `cta.fill`, начальный текст — `text.inverse` (кремовый белый: читаемо на оранжевом).
    * `cta.sweep` при hover; dual — те же правила, шрифт как у одиночной CTA (`font-body`).
    */

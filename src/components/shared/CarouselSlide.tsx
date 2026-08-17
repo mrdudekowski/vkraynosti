@@ -1,4 +1,4 @@
-import { type ReactNode, useRef } from 'react';
+import { type CSSProperties, type ReactNode, useRef } from 'react';
 import { DOM_DATA_HOME_HERO_ACTIVE_SLIDE } from '../../constants/homeHeroSnap';
 import { useHeroCarouselSwipe } from '../../hooks/useHeroCarouselSwipe';
 
@@ -13,6 +13,8 @@ interface CarouselSlideProps {
   shouldLoadBackground: boolean;
   /** `background-position` при `background-size: cover` (см. `theme.extend.objectPosition`). */
   backgroundPosition?: string;
+  backgroundClassName?: string;
+  backgroundStyle?: CSSProperties;
   /** Клик по верхней зоне (фон) — следующий слайд; не перекрывает нижний блок с `Link`. */
   onAdvanceNext: () => void;
   onAdvancePrev: () => void;
@@ -30,6 +32,8 @@ const CarouselSlide = ({
   isActive,
   shouldLoadBackground,
   backgroundPosition = 'center',
+  backgroundClassName,
+  backgroundStyle,
   onAdvanceNext,
   onAdvancePrev,
   swipeEnabled,
@@ -66,8 +70,8 @@ const CarouselSlide = ({
           sizes={backgroundSizes}
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-cover pointer-events-none"
-          style={{ objectPosition: backgroundPosition }}
+          className={`absolute inset-0 h-full w-full object-cover pointer-events-none ${backgroundClassName ?? ''}`.trim()}
+          style={backgroundStyle ?? { objectPosition: backgroundPosition }}
           loading={isActive ? 'eager' : 'lazy'}
           fetchPriority={isActive ? 'high' : 'auto'}
           decoding="async"

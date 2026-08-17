@@ -22,5 +22,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts", "scripts/lib/pruneDistForCdn.ts"]
+  "include": [
+    "vite.config.ts",
+    "scripts/lib/pruneDistForCdn.ts",
+    "scripts/lib/rewriteAdminDevUrl.ts"
+  ]
 }

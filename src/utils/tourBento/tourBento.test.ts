@@ -22,11 +22,13 @@ import {
   buildSummer9NeozhidannyBentoLayout,
   buildSummer10EzhSestraBentoLayout,
   buildSummer11RelaxBentoLayout,
+  buildWinter1IzubrinayaBentoLayout,
 } from '../../data/tourBentoLayouts';
 import { tourBentoGalleryLayoutSchema } from '../../types/tourBento';
 import { flattenBentoSlotsToUrls } from './flattenBentoSlotsToUrls';
 import { resolveTourBentoLayout } from './resolveTourBentoLayout';
-import { getTourById } from '../../data/toursData';
+import { getTourById, TOURS } from '../../data/toursData';
+import { getTourGalleryGridUrls } from '../tourGalleryUrls';
 
 describe('tourBento validation', () => {
   it('отклоняет неверное число слотов', () => {
@@ -249,11 +251,66 @@ describe('resolveTourBentoLayout', () => {
     );
   });
 
-  it('winter-1 без builder — undefined', () => {
+  it('winter-1 получает single + left + remainder singles', () => {
     const tour = getTourById('winter-1');
     expect(tour).toBeDefined();
-    const grid = tour!.galleryGridUrls?.slice(2) ?? [];
-    expect(resolveTourBentoLayout(tour!, grid)).toBeUndefined();
+    const grid = tour!.galleryGridUrls!.slice(2);
+    const layout = resolveTourBentoLayout(tour!, grid);
+
+    expect(layout).toBeDefined();
+    expect(layout!.blocks.map((block) => block.type)).toEqual([
+      'bento-single',
+      'bento-left',
+      'bento-single',
+      'bento-single',
+      'bento-single',
+    ]);
+    expect(flattenBentoSlotsToUrls(layout!)).toEqual([...grid]);
+  });
+
+  it('buildWinter1IzubrinayaBentoLayout отклоняет неверное число кадров', () => {
+    const gridImages = getTourById('winter-1')!.galleryGridUrls!.slice(2);
+    expect(() => buildWinter1IzubrinayaBentoLayout(gridImages.slice(0, 6))).toThrow(
+      /expected 7 grid images/
+    );
+  });
+
+  it('spring-10 не кладёт clip2 в слоты; summer-3 повторяет типы с путями summer-3', () => {
+    const spring = getTourById('spring-10');
+    const summer = getTourById('summer-3');
+    expect(spring).toBeDefined();
+    expect(summer).toBeDefined();
+
+    const springGrid = spring!.galleryGridUrls!.slice(2);
+    const summerGrid = summer!.galleryGridUrls!.slice(2);
+    const springLayout = resolveTourBentoLayout(spring!, springGrid);
+    const summerLayout = resolveTourBentoLayout(summer!, summerGrid);
+
+    expect(springLayout!.blocks.map((block) => block.type)).toEqual([
+      'bento-single',
+      'bento-left',
+      'bento-right',
+      'bento-single',
+    ]);
+    expect(flattenBentoSlotsToUrls(springLayout!)).not.toContain(springGrid[1]);
+    expect(summerLayout!.blocks.map((block) => block.type)).toEqual(
+      springLayout!.blocks.map((block) => block.type)
+    );
+    expect(flattenBentoSlotsToUrls(summerLayout!).every((url) => url.includes('/tours/summer-3/'))).toBe(
+      true
+    );
+  });
+
+  it('каждый тур с кадрами сетки получает bento layout', () => {
+    for (const tour of TOURS) {
+      const grid = getTourGalleryGridUrls(tour).slice(2);
+      if (grid.length === 0) {
+        continue;
+      }
+      const layout = resolveTourBentoLayout(tour, grid);
+      expect(layout, tour.id).toBeDefined();
+      expect(layout!.blocks.length, tour.id).toBeGreaterThan(0);
+    }
   });
 
   it('summer-8 получает bento-center-top + vert×2', () => {

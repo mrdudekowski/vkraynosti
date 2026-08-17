@@ -11,6 +11,7 @@ import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { getTourPublicPath } from '../../constants/routes';
 import { BREAKPOINT_LG_PX } from '../../constants/reveal';
 import { resolveContentSourceTourId } from '../../data/seasonTourRegistry';
+import { tourHeroObjectProps } from '../../utils/tourCoverPresentation';
 import { resolveTourHeroCoverBackgroundPosition } from '../../constants/tourCoverCropByCanonicalId';
 import { TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX } from '../../constants/tourSpring3CoverCrop';
 import { useMatchMinWidth } from '../../hooks/useMatchMinWidth';
@@ -59,17 +60,25 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
       {tours.map((tour, idx) => {
         const isActive = idx === current;
         const shouldLoadBackground = isActive || visitedSlideIndices.has(idx);
+        const heroObject = tourHeroObjectProps(tour);
+        const usesCmsHeroCrop = heroObject.style != null;
         return (
           <CarouselSlide
             key={tour.id}
             backgroundUrl={tour.imageUrl}
             isActive={isActive}
             shouldLoadBackground={shouldLoadBackground}
-            backgroundPosition={resolveTourHeroCoverBackgroundPosition(
-              resolveContentSourceTourId(tour.id) ?? tour.id,
-              heroCoverGteLayoutMin620,
-              spring3Lg
-            )}
+            backgroundPosition={
+              usesCmsHeroCrop
+                ? undefined
+                : resolveTourHeroCoverBackgroundPosition(
+                    resolveContentSourceTourId(tour.id) ?? tour.id,
+                    heroCoverGteLayoutMin620,
+                    spring3Lg
+                  )
+            }
+            backgroundClassName={usesCmsHeroCrop ? 'tour-hero-object-position' : undefined}
+            backgroundStyle={heroObject.style}
             onAdvanceNext={next}
             onAdvancePrev={prev}
             swipeEnabled={!prefersReducedMotion}

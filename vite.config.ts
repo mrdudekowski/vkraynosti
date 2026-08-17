@@ -1,22 +1,37 @@
 /// <reference types="vitest/config" />
+import fs from 'node:fs/promises'
 import path from 'node:path'
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type Plugin, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import {
   buildContentSecurityPolicy,
   parseMediaOriginFromAssetBaseUrl,
 } from './src/constants/contentSecurityPolicy.ts'
 import { pruneDistForCdn as pruneDistForCdnFromLib } from './scripts/lib/pruneDistForCdn.ts'
+import { rewriteAdminDevUrl } from './scripts/lib/rewriteAdminDevUrl.ts'
 import { stripGithubPagesSpaRedirectScript } from './scripts/lib/stripGithubPagesScripts.ts'
+const loadedViteEnv = loadEnv(
+  process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  process.cwd(),
+  'VITE_'
+)
 const mediaCdnOrigin = parseMediaOriginFromAssetBaseUrl(
-  process.env.VITE_PUBLIC_ASSET_BASE_URL ?? ''
+  loadedViteEnv.VITE_PUBLIC_ASSET_BASE_URL || process.env.VITE_PUBLIC_ASSET_BASE_URL || ''
 )
-const contentSecurityPolicy = buildContentSecurityPolicy(
-  mediaCdnOrigin != null ? [mediaCdnOrigin] : []
+const cmsS3Origin = parseMediaOriginFromAssetBaseUrl(
+  loadedViteEnv.VITE_CMS_S3_BASE_URL || process.env.VITE_CMS_S3_BASE_URL || ''
 )
+const extraCspOrigins = [mediaCdnOrigin, cmsS3Origin].filter(
+  (origin): origin is string => origin != null
+)
+const contentSecurityPolicy = buildContentSecurityPolicy(extraCspOrigins)
 
 function stripGithubPagesScriptForTimewebPlugin(): Plugin {
-  const base = process.env.VITE_BASE_PATH?.trim() || '/vkraynosti/'
+  const base = (
+    loadedViteEnv.VITE_BASE_PATH ||
+    process.env.VITE_BASE_PATH ||
+    '/vkraynosti/'
+  ).trim()
   const isTimeweb = !base || base === '/'
 
   return {
@@ -45,6 +60,47 @@ function pruneDistForCdnPlugin(): Plugin {
   }
 }
 
+function serveAdminHtmlPlugin(basePath: string): Plugin {
+  const attach = (server: ViteDevServer) => {
+    server.middlewares.use((req, res, next) => {
+      if (req.method !== 'GET' && req.method !== 'HEAD') {
+        next()
+        return
+      }
+      const original = (req as { originalUrl?: string }).originalUrl ?? req.url
+      if (original == null) {
+        next()
+        return
+      }
+      const rewritten = rewriteAdminDevUrl(original, basePath)
+      if (rewritten === original) {
+        next()
+        return
+      }
+
+      void (async () => {
+        try {
+          const htmlPath = path.resolve(server.config.root, 'admin/index.html')
+          const html = await fs.readFile(htmlPath, 'utf8')
+          const transformed = await server.transformIndexHtml('/admin/index.html', html)
+          res.setHeader('Content-Type', 'text/html; charset=utf-8')
+          res.statusCode = 200
+          res.end(transformed)
+        } catch (error) {
+          next(error)
+        }
+      })()
+    })
+  }
+
+  return {
+    name: 'serve-admin-html',
+    configureServer(server) {
+      attach(server)
+    },
+  }
+}
+
 function injectContentSecurityPolicyPlugin(csp: string): Plugin {
   const cspMetaPattern =
     /http-equiv="Content-Security-Policy"\s+content="[^"]*"/;
@@ -64,7 +120,11 @@ function injectContentSecurityPolicyPlugin(csp: string): Plugin {
 }
 
 // https://vite.dev/config/
-const appBasePath = process.env.VITE_BASE_PATH?.trim() || '/vkraynosti/'
+const appBasePath = (
+  loadedViteEnv.VITE_BASE_PATH ||
+  process.env.VITE_BASE_PATH ||
+  '/vkraynosti/'
+).trim()
 const isTimewebAppBuild = !appBasePath || appBasePath === '/'
 
 const securityHeaders = {
@@ -78,6 +138,7 @@ const securityHeaders = {
 
 export default defineConfig({
   plugins: [
+    serveAdminHtmlPlugin(appBasePath.endsWith('/') ? appBasePath : `${appBasePath}/`),
     react(),
     injectContentSecurityPolicyPlugin(contentSecurityPolicy),
     stripGithubPagesScriptForTimewebPlugin(),
@@ -85,6 +146,12 @@ export default defineConfig({
   ],
   server: {
     headers: securityHeaders,
+    proxy: {
+      '/api/cms': {
+        target: `http://127.0.0.1:${process.env.CMS_API_PORT || '8787'}`,
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     headers: securityHeaders,
@@ -98,6 +165,10 @@ export default defineConfig({
   base: appBasePath.endsWith('/') ? appBasePath : `${appBasePath}/`,
   build: {
     rollupOptions: {
+      input: {
+        main: path.resolve(process.cwd(), 'index.html'),
+        admin: path.resolve(process.cwd(), 'admin/index.html'),
+      },
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return;

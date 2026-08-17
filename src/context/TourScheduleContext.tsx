@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useCmsToursRevision } from '../cms/useCmsToursRevision';
 import { loadTourSchedulePayload } from '../services/tourData';
 import { TourDataFetchError } from '../types/tourData';
 import type {
@@ -7,6 +8,7 @@ import type {
   TourPublicationStatus,
   TourScheduleDurationType,
   TourScheduleLoadStatus,
+  TourSchedulePayload,
 } from '../types/tourSchedule';
 import {
   buildCachedSchedule,
@@ -21,11 +23,13 @@ const SCHEDULE_CLIENT_CACHE_MAX_AGE_MS = 5 * 60 * 1000;
 
 let cachedSchedule: CachedTourSchedule | null = null;
 let cachedScheduleFetchedAt: number | null = null;
+let cachedPayload: TourSchedulePayload | null = null;
 let inflightPromise: Promise<CachedTourSchedule> | null = null;
 
 const bootstrapPayload = readTourScheduleBootstrapPayload();
 if (bootstrapPayload != null && cachedSchedule == null) {
   cachedSchedule = buildCachedSchedule(bootstrapPayload);
+  cachedPayload = bootstrapPayload;
   // ponytail: bootstrap is build-time snapshot for crawlers/first paint only — always refetch live CDN on mount
   cachedScheduleFetchedAt = null;
 }
@@ -48,6 +52,7 @@ const loadSchedule = async (force = false): Promise<CachedTourSchedule> => {
         console.warn('[tourSchedule] Ignoring empty catalog response; keeping previous snapshot');
         return previousSnapshot;
       }
+      cachedPayload = payload;
       cachedSchedule = result;
       cachedScheduleFetchedAt = Date.now();
       return result;
@@ -84,6 +89,7 @@ const scheduleDeferredLoad = (run: () => void): (() => void) => {
 };
 
 export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
+  const cmsToursRevision = useCmsToursRevision();
   const [status, setStatus] = useState<TourScheduleLoadStatus>(
     cachedSchedule ? 'success' : 'loading'
   );
@@ -102,6 +108,7 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   >(cachedSchedule?.publicationStatuses ?? new Map());
   const [error, setError] = useState<Error | null>(null);
   const retryNonce = useRef(0);
+  const [payloadGeneration, setPayloadGeneration] = useState(0);
 
   const applySchedule = useCallback((result: CachedTourSchedule) => {
     setEvents(result.events);
@@ -111,7 +118,17 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
     setPublicationStatuses(result.publicationStatuses);
     setStatus('success');
     setError(null);
+    setPayloadGeneration((current) => current + 1);
   }, []);
+
+  const overlayAwareSchedule = useMemo(() => {
+    void cmsToursRevision;
+    void payloadGeneration;
+    if (cachedPayload == null) {
+      return null;
+    }
+    return buildCachedSchedule(cachedPayload);
+  }, [cmsToursRevision, payloadGeneration]);
 
   useEffect(() => {
     if (cachedSchedule && !isClientScheduleCacheStale()) return;
@@ -162,6 +179,7 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
     retryNonce.current += 1;
     cachedSchedule = null;
     cachedScheduleFetchedAt = null;
+    cachedPayload = null;
     setStatus('loading');
     setError(null);
 
@@ -174,8 +192,27 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   }, [applySchedule]);
 
   const value = useMemo(
-    () => ({ status, events, eventsByDate, prices, durationTypes, publicationStatuses, error, retry }),
-    [status, events, eventsByDate, prices, durationTypes, publicationStatuses, error, retry]
+    () => ({
+      status,
+      events: overlayAwareSchedule?.events ?? events,
+      eventsByDate: overlayAwareSchedule?.eventsByDate ?? eventsByDate,
+      prices: overlayAwareSchedule?.prices ?? prices,
+      durationTypes: overlayAwareSchedule?.durationTypes ?? durationTypes,
+      publicationStatuses: overlayAwareSchedule?.publicationStatuses ?? publicationStatuses,
+      error,
+      retry,
+    }),
+    [
+      status,
+      events,
+      eventsByDate,
+      prices,
+      durationTypes,
+      publicationStatuses,
+      error,
+      retry,
+      overlayAwareSchedule,
+    ]
   );
 
   return <TourScheduleContext.Provider value={value}>{children}</TourScheduleContext.Provider>;

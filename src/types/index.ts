@@ -1,6 +1,7 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import type { TourBentoGalleryLayout } from './tourBento';
 import type { TourScheduleDurationType } from './tourSchedule';
+import type { TourCoverCrop } from '../utils/mediaObjectPosition';
 
 export interface TourProgramStep {
   timeLabel: string;
@@ -73,6 +74,11 @@ export interface Tour {
    * URL из `src/constants/images.ts` или того же массива, что и `galleryImages` (только webp).
    */
   prefaceBackgroundImageUrl?: string;
+  /**
+   * Кадрирование обложки: карточка, hero до lg, hero с lg.
+   * Если нет — витрина берёт легаси-классы по `tour.id`.
+   */
+  coverCrop?: TourCoverCrop;
   /**
    * Весенний тур с тем же маршрутом (контент, bento-layout).
    * Медиа всегда из папки `public/tours/{id}/` этого тура, не из source.

@@ -5,6 +5,7 @@ describe('tourData service', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
     vi.stubEnv('VITE_PUBLIC_S3_BASE_URL', 'https://cdn.example.test');
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', '');
   });
 
   afterEach(() => {
@@ -77,5 +78,31 @@ describe('tourData service', () => {
     const payload = await loadTourSchedulePayload();
     expect(payload.events).toHaveLength(1);
     expect(payload.catalogPublicationStatuses['summer-3']).toBe('active');
+  });
+
+  it('при CMS env сначала читает published/tour-schedule с cms-dev', async () => {
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://s3.example/vkraynosti-cms-dev/');
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        schemaVersion: 1,
+        generatedAt: '2026-06-08T00:00:00.000Z',
+        tours: [
+          {
+            id: 'summer-3',
+            title: 'Остров',
+            priceRub: 8500,
+            durationType: 'однодневный',
+            publicationStatus: 'active',
+          },
+        ],
+      }),
+    } as Response);
+
+    await loadToursList();
+    expect(fetch).toHaveBeenCalledWith(
+      'https://s3.example/vkraynosti-cms-dev/published/tour-schedule/tours_list.json',
+      { cache: 'no-store' },
+    );
   });
 });

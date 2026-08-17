@@ -1,4 +1,4 @@
-import { getTourById } from '../../data/toursData';
+import { getRuntimeTourById } from '../../data/runtimeCatalog';
 import type {
   EnrichedScheduleEvent,
   TourPublicationStatus,
@@ -24,7 +24,7 @@ export const enrichScheduleEvents = (
       continue;
     }
 
-    const tour = getTourById(event.tourId);
+    const tour = getRuntimeTourById(event.tourId);
     if (!tour) {
       console.warn(`[tourSchedule] Unknown tourId: ${event.tourId}`);
       continue;

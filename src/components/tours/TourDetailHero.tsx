@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import ScrollScrubFade from '../shared/ScrollScrubFade';
@@ -25,6 +26,8 @@ interface TourDetailHeroProps {
    * `object-center` + `desktopHeroImgClassName` / дефолтного `lg:object-tour-detail-hero-desktop`.
    */
   heroImageObjectClassName?: string;
+  /** CSS-переменные кадрирования hero из CMS (`--tour-hero-object-position`). */
+  heroObjectStyle?: CSSProperties;
 }
 
 const TourDetailHeroComponent = ({
@@ -36,8 +39,9 @@ const TourDetailHeroComponent = ({
   backLinkSeason,
   desktopHeroImgClassName,
   heroImageObjectClassName,
+  heroObjectStyle,
 }: TourDetailHeroProps) => (
-  <div className="relative h-tour-detail-hero overflow-hidden">
+  <div className="relative h-tour-detail-hero overflow-hidden" style={heroObjectStyle}>
     <PlaceholderImage
       src={imageUrl}
       alt={imageAlt}

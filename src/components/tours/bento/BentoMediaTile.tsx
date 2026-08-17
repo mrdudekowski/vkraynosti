@@ -3,6 +3,8 @@ import GalleryGridVideo from '../GalleryGridVideo';
 import { getBentoSlotTileClassName, type BentoSlotPlacement } from '../../../constants/tourBento';
 import type { BentoMediaSlot } from '../../../types/tourBento';
 import { isVideoAssetUrl } from '../../../utils/isVideoAssetUrl';
+import { resolveMediaObjectPosition } from '../../../utils/mediaObjectPosition';
+import type { CSSProperties } from 'react';
 
 export interface BentoMediaTileProps {
   slot: BentoMediaSlot;
@@ -15,15 +17,22 @@ export interface BentoMediaTileProps {
   isFirstGalleryTile?: boolean;
 }
 
-function imgClassNameForSlot(slot: BentoMediaSlot): string {
-  const position = slot.objectPosition;
-  if (position == null || position === '') {
-    return '';
+function slotPositionProps(slot: BentoMediaSlot): {
+  className?: string;
+  style?: CSSProperties;
+  imgClassName?: string;
+} {
+  const resolved = resolveMediaObjectPosition(slot.objectPosition);
+  if (resolved.objectPosition != null) {
+    return {
+      className: 'media-object-position',
+      style: { ['--media-object-position']: resolved.objectPosition } as CSSProperties,
+    };
   }
-  if (position.startsWith('object-')) {
-    return position;
+  if (resolved.className != null) {
+    return { imgClassName: resolved.className };
   }
-  return '';
+  return {};
 }
 
 const BentoMediaTile = ({
@@ -37,7 +46,7 @@ const BentoMediaTile = ({
 }: BentoMediaTileProps) => {
   const tileClassName = getBentoSlotTileClassName(placement);
   const tileAlt = slot.alt ?? `${tourTitle} — фото ${indexInGrid + 1}`;
-  const imgExtra = imgClassNameForSlot(slot);
+  const position = slotPositionProps(slot);
   const loading = isFirstGalleryTile ? 'eager' : 'lazy';
   const deferSrcUntilVisible = false;
 
@@ -48,8 +57,9 @@ const BentoMediaTile = ({
         key={`${slot.src}-${indexInGrid}`}
         gridSrc={slot.src}
         posterSrc={poster}
-        className={tileClassName}
-        videoObjectClassName={imgExtra.length > 0 ? imgExtra : undefined}
+        className={`${tileClassName} ${position.className ?? ''}`.trim()}
+        style={position.style}
+        videoObjectClassName={position.imgClassName}
         prefersReducedMotion={prefersReducedMotion}
       />
     );
@@ -58,13 +68,14 @@ const BentoMediaTile = ({
   return (
     <div
       key={`${slot.src}-${indexInGrid}`}
-      className={`overflow-hidden rounded-card ${tileClassName}`}
+      className={`overflow-hidden rounded-card ${tileClassName} ${position.className ?? ''}`.trim()}
+      style={position.style}
     >
       <PlaceholderImage
         src={slot.src}
         alt={tileAlt}
         className="h-full w-full"
-        imgClassName={imgExtra}
+        imgClassName={position.imgClassName}
         loading={loading}
         fetchPriority={isFirstGalleryTile ? 'high' : undefined}
         deferSrcUntilVisible={deferSrcUntilVisible}

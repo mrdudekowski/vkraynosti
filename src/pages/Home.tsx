@@ -13,7 +13,7 @@ import SeasonSwitcher from '../components/shared/SeasonSwitcher';
 import TourCard from '../components/shared/TourCard';
 import PlaceholderImage from '../components/shared/PlaceholderImage';
 import CrossfadeVideo from '../components/shared/CrossfadeVideo';
-import { getTourCoverCardImgObjectClass } from '../constants/tourCoverCropByCanonicalId';
+import { tourCardCoverImgProps } from '../utils/tourCoverPresentation';
 import { resolveContentSourceTourId } from '../data/seasonTourRegistry';
 import { HOME_SEASON_BANNER_WINTER_LOOP_VIDEOS, IMAGES } from '../constants/images';
 import {
@@ -183,6 +183,13 @@ const Home = () => {
   const collapsedVisibleCount = Math.min(HOME_TOURS_COLLAPSED_MAX_VISIBLE, tours.length);
   const visibleTours = isAllToursExpanded ? tours : tours.slice(0, collapsedVisibleCount);
   const activeSeasonLeadTour = tours[0];
+  const expandCover =
+    activeSeasonLeadTour == null
+      ? undefined
+      : tourCardCoverImgProps(
+          activeSeasonLeadTour,
+          resolveContentSourceTourId(activeSeasonLeadTour.id) ?? activeSeasonLeadTour.id,
+        );
   const springPromoVideoUrls = useMemo(
     () =>
       springTours
@@ -405,16 +412,18 @@ const Home = () => {
                                   className="h-full w-full object-cover opacity-60"
                                 />
                               ) : (
-                                <PlaceholderImage
-                                  src={activeSeasonLeadTour.imageUrl}
-                                  alt={`${UI.tourCard.nextSeasonCloneImageAltPrefix}: ${UI.sections.toursTitleBySeason[activeSeason]}`}
-                                  className="h-full w-full opacity-50"
-                                  imgClassName={getTourCoverCardImgObjectClass(
-                                    resolveContentSourceTourId(activeSeasonLeadTour.id) ??
-                                      activeSeasonLeadTour.id
-                                  )}
-                                  loading="lazy"
-                                />
+                                <div
+                                  className={`h-full w-full ${expandCover?.wrapperClassName ?? ''}`.trim()}
+                                  style={expandCover?.wrapperStyle}
+                                >
+                                  <PlaceholderImage
+                                    src={activeSeasonLeadTour.imageUrl}
+                                    alt={`${UI.tourCard.nextSeasonCloneImageAltPrefix}: ${UI.sections.toursTitleBySeason[activeSeason]}`}
+                                    className="h-full w-full opacity-50"
+                                    imgClassName={expandCover?.imgClassName}
+                                    loading="lazy"
+                                  />
+                                </div>
                               )}
                             </div>
                             <div

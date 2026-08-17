@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import type { KeyboardEvent } from 'react';
 import type { Tour } from '../../types';
 import { getTourPublicPath } from '../../constants/routes';
-import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
 import { UI } from '../../constants/ui';
 import { resolveTourDifficultyLabel } from '../../utils/tourDifficultyLabel';
+import { tourCardCoverImgProps } from '../../utils/tourCoverPresentation';
 import { useIsTourInDevelopment } from '../../hooks/useTourPublicationStatus';
 import { useTourDisplayDuration } from '../../hooks/useTourDisplayDuration';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
@@ -99,16 +99,19 @@ const cardInner = (
     </div>
   );
 
+  const cover = tourCardCoverImgProps(tour);
+
   return (
     <>
       <div
-        className={`overflow-hidden rounded-t-card ${compact ? 'h-32' : 'h-48'}`}
+        className={`overflow-hidden rounded-t-card ${compact ? 'h-32' : 'h-48'} ${cover.wrapperClassName ?? ''}`.trim()}
+        style={cover.wrapperStyle}
       >
         <PlaceholderImage
           src={tour.imageUrl}
           alt={tour.title}
           className="h-full w-full"
-          imgClassName={getTourCoverCardImgObjectClass(tour.id)}
+          imgClassName={cover.imgClassName}
           loading={priorityImage ? 'eager' : 'lazy'}
           fetchPriority={priorityImage ? 'high' : 'auto'}
         />

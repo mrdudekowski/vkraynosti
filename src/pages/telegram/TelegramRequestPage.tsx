@@ -20,8 +20,9 @@ import {
   TELEGRAM_MINI_APP_SOURCE,
 } from '../../constants/telegramMiniApp';
 import { TOUR_REQUEST_MAX_PARTY_SIZE } from '../../data/tourRequestFormFields';
+import { useCmsToursRevision } from '../../cms/useCmsToursRevision';
 import { findTourBySeasonAndSegment } from '../../data/tourLookup';
-import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
+import { tourCardCoverImgProps } from '../../utils/tourCoverPresentation';
 import TelegramMiniAppHeader from '../../components/telegram/TelegramMiniAppHeader';
 import TelegramMiniAppShell from '../../components/telegram/TelegramMiniAppShell';
 import PlaceholderImage from '../../components/shared/PlaceholderImage';
@@ -76,6 +77,7 @@ const buildInitialFormValues = (
 const TelegramRequestPage = () => {
   const { season: seasonParam, tourId: tourSegment } = useParams();
   const season = parseSeasonParam(seasonParam);
+  useCmsToursRevision();
   const tour =
     season != null && tourSegment != null
       ? findTourBySeasonAndSegment(season, tourSegment)
@@ -130,6 +132,8 @@ const TelegramRequestPage = () => {
       </TelegramMiniAppShell>
     );
   }
+
+  const cover = tourCardCoverImgProps(tour);
 
   const difficultyLabel = resolveTourDifficultyLabel(tour);
   const selectedDateLabel = formatTourDepartureLabel(formValues.preferredDepartureDate);
@@ -224,13 +228,18 @@ const TelegramRequestPage = () => {
       <form className="mx-auto max-w-lg space-y-5 px-4 pb-8 pt-4" onSubmit={handleSubmit}>
         <article className="rounded-card border border-divider bg-white p-4 shadow-tourIncludedPanel">
           <div className="flex gap-3">
-            <PlaceholderImage
-              src={tour.imageUrl}
-              alt=""
-              className="h-20 w-24 shrink-0 overflow-hidden rounded-card"
-              imgClassName={getTourCoverCardImgObjectClass(tour.id)}
-              loading="lazy"
-            />
+            <div
+              className={`h-20 w-24 shrink-0 overflow-hidden rounded-card ${cover.wrapperClassName ?? ''}`.trim()}
+              style={cover.wrapperStyle}
+            >
+              <PlaceholderImage
+                src={tour.imageUrl}
+                alt=""
+                className="h-full w-full"
+                imgClassName={cover.imgClassName}
+                loading="lazy"
+              />
+            </div>
             <div className="min-w-0">
               <p className="text-xs text-text-muted">{UI.telegramMiniApp.selectedTourLabel}</p>
               <h1 className="font-heading text-lg text-brand-primary">{tour.title}</h1>

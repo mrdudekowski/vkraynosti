@@ -1,5 +1,5 @@
+import { getRuntimeTourById, getRuntimeTours } from './runtimeCatalog';
 import type { Tour } from '../types';
-import { TOURS } from './toursData';
 import { TOUR_SLUG_ALIAS_TO_TOUR_ID } from './tourSlugs';
 
 export function getTourBySlug(slug: string): Tour | undefined {
@@ -7,14 +7,14 @@ export function getTourBySlug(slug: string): Tour | undefined {
   if (normalized.length === 0) {
     return undefined;
   }
-  const bySlug = TOURS.find((tour) => tour.slug === normalized);
+  const bySlug = getRuntimeTours().find((tour) => tour.slug === normalized);
   if (bySlug != null) {
     return bySlug;
   }
   const aliasTourId =
     TOUR_SLUG_ALIAS_TO_TOUR_ID[normalized as keyof typeof TOUR_SLUG_ALIAS_TO_TOUR_ID];
   if (aliasTourId != null) {
-    return TOURS.find((tour) => tour.id === aliasTourId);
+    return getRuntimeTourById(aliasTourId);
   }
   return undefined;
 }
@@ -28,7 +28,8 @@ export function findTourBySeasonAndSegment(
     return undefined;
   }
 
-  const bySlug = TOURS.find((tour) => tour.season === season && tour.slug === normalized);
+  const catalog = getRuntimeTours();
+  const bySlug = catalog.find((tour) => tour.season === season && tour.slug === normalized);
   if (bySlug != null) {
     return bySlug;
   }
@@ -36,11 +37,11 @@ export function findTourBySeasonAndSegment(
   const aliasTourId =
     TOUR_SLUG_ALIAS_TO_TOUR_ID[normalized as keyof typeof TOUR_SLUG_ALIAS_TO_TOUR_ID];
   if (aliasTourId != null) {
-    const byAlias = TOURS.find((tour) => tour.season === season && tour.id === aliasTourId);
+    const byAlias = catalog.find((tour) => tour.season === season && tour.id === aliasTourId);
     if (byAlias != null) {
       return byAlias;
     }
   }
 
-  return TOURS.find((tour) => tour.season === season && tour.id === normalized);
+  return catalog.find((tour) => tour.season === season && tour.id === normalized);
 }

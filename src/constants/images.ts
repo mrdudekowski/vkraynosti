@@ -57,6 +57,10 @@ export const TOUR_WINTER_1_TOP_IMAGE = TOUR_WINTER_1_GALLERY_GRID[5];
 /** Кадр с посадкой / людьми — отдельное кадрирование в `TourDetailGallery`. */
 export const TOUR_WINTER_1_REST4_IMAGE = TOUR_WINTER_1_GALLERY_GRID[8];
 
+/** Кадрирование `iz.rest4` в сетке (`object-cover`). */
+export const TOUR_WINTER_1_GALLERY_REST4_OBJECT_CLASS =
+  'object-gallery-winter-rest4' as const;
+
 /** Совпадает с `TOUR_WINTER_1_GALLERY_VIEWER`. */
 export const TOUR_WINTER_1_GALLERY = TOUR_WINTER_1_GALLERY_VIEWER;
 
@@ -208,6 +212,9 @@ export const TOUR_WINTER_4_GALLERY = TOUR_WINTER_4_GALLERY_VIEWER;
 
 /** Кадр горы в сетке; кадрирование — `object-gallery-winter-4-gora`. */
 export const TOUR_WINTER_4_GORA_IMAGE = TOUR_WINTER_4_GALLERY_GRID[7];
+
+export const TOUR_WINTER_4_GALLERY_GORA_OBJECT_CLASS =
+  'object-gallery-winter-4-gora' as const;
 
 /** После `galleryGridUrls.slice(2)`: bento clip1, doggo, doggos (`TourDetailGallery`). */
 export const TOUR_WINTER_4_CLIP1_VIDEO = TOUR_WINTER_4_GALLERY_GRID[2];
@@ -720,6 +727,10 @@ export const TOUR_SPRING_10_PREFACE_BACKGROUND_MOBILE = `${TOUR_SPRING_10}/beach
 /** Сетка `askold`: вертикальные панорамы — якорь обрезки в `TourDetailGallery`. */
 export const TOUR_SPRING_10_VIEW2_GRID = `${TOUR_SPRING_10}/view2.webp` as const;
 export const TOUR_SPRING_10_VIEW3_GRID = `${TOUR_SPRING_10}/view3.webp` as const;
+
+/** Вертикальные панорамы Аскольда — якорь обрезки в сетке. */
+export const TOUR_SPRING_10_GALLERY_TALL_PANORAMA_OBJECT_CLASS =
+  'object-gallery-spring-10-tall-panorama' as const;
 
 /**
  * «Остров Шкота» (spring-11).

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { getTourPublicPath } from '../../constants/routes';
-import { getTourCoverCardImgObjectClass } from '../../constants/tourCoverCropByCanonicalId';
+import { tourCardCoverImgProps } from '../../utils/tourCoverPresentation';
 import {
   TOUR_CALENDAR_DAY_EVENT_BODY_CLASS,
   TOUR_CALENDAR_DAY_EVENT_CARD_CLASS,
@@ -28,18 +28,20 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
   const { tour } = event;
   const { displayPrice } = useTourDisplayPrice(tour);
 
+  const cover = tourCardCoverImgProps(tour);
+
   return (
     <Link
       to={getTourPublicPath(tour)}
       className={TOUR_CALENDAR_DAY_EVENT_CARD_CLASS}
       prefetch="intent"
     >
-      <div className={TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS}>
+      <div className={`${TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS} ${cover.wrapperClassName ?? ''}`.trim()} style={cover.wrapperStyle}>
         <PlaceholderImage
           src={tour.imageUrl}
           alt=""
           className="size-full"
-          imgClassName={getTourCoverCardImgObjectClass(tour.id)}
+          imgClassName={cover.imgClassName}
           loading="lazy"
         />
       </div>

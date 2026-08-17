@@ -42,6 +42,7 @@ describe('fetchTourSchedule', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
     vi.stubEnv('VITE_PUBLIC_S3_BASE_URL', BASE);
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', '');
   });
 
   afterEach(() => {

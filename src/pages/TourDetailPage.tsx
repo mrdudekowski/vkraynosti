@@ -1,4 +1,5 @@
 import { useParams, Link, Navigate } from "react-router-dom";
+import { useCmsToursRevision } from "../cms/useCmsToursRevision";
 import { findTourBySeasonAndSegment } from "../data/tourLookup";
 import {
   ROUTES,
@@ -25,6 +26,7 @@ const TourDetailPage = () => {
     season: string;
     tourId: string;
   }>();
+  useCmsToursRevision();
   const tour =
     season.length > 0 && tourSegment.length > 0
       ? findTourBySeasonAndSegment(season as Season, tourSegment)

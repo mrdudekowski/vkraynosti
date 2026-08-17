@@ -1,6 +1,7 @@
 export {
   BENTO_BLOCK_TYPES,
   getBentoBlockSlotCount,
+  isBentoBlockType,
   type BentoBlockType,
 } from './blockTypes';
 export {

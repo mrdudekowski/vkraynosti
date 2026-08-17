@@ -1,4 +1,4 @@
-import { getToursBySeason } from '../../data/toursData';
+import { getRuntimeToursBySeason } from '../../data/runtimeCatalog';
 import type { Season, Tour } from '../../types';
 import type { TourPublicationStatus } from '../../types/tourSchedule';
 
@@ -20,7 +20,7 @@ export function getVisibleToursBySeason(
     return [];
   }
 
-  return getToursBySeason(season).filter(tour => {
+  return getRuntimeToursBySeason(season).filter(tour => {
     const fromCatalog = publicationStatuses.get(tour.id);
     // Same rule as calendar/table: only `active` tours are listed publicly.
     // `in_development` pages stay reachable by URL (noindex); `hidden` → not-found.

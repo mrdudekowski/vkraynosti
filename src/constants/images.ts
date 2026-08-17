@@ -1328,7 +1328,47 @@ export const TOUR_SUMMER_12_GALLERY_VIEWER = [
 
 export const TOUR_SUMMER_12_GALLERY_GRID = TOUR_SUMMER_12_GALLERY_VIEWER;
 
-/** Заглушки медиа summer-13…19 до финального encode — `summerTourStubMedia.ts`. */
+/** «Остров Петрова» (summer-14). Медиа: `public/tours/summer-14/`. */
+export const TOUR_SUMMER_14_ASSET_BASE = `${TOURS_ASSET_BASE}/summer-14` as const;
+
+export const TOUR_SUMMER_14_COVER = `${TOUR_SUMMER_14_ASSET_BASE}/cover.webp` as const;
+export const TOUR_SUMMER_14_COVER_GRID = TOUR_SUMMER_14_COVER;
+export const TOUR_SUMMER_14_PREFACE_BACKGROUND =
+  `${TOUR_SUMMER_14_ASSET_BASE}/preface.webp` as const;
+export const TOUR_SUMMER_14_COVE_IMAGE = `${TOUR_SUMMER_14_ASSET_BASE}/cove.webp` as const;
+export const TOUR_SUMMER_14_SPIT_IMAGE = `${TOUR_SUMMER_14_ASSET_BASE}/spit.webp` as const;
+export const TOUR_SUMMER_14_TRAIL_GROUP_IMAGE =
+  `${TOUR_SUMMER_14_ASSET_BASE}/trail-group.webp` as const;
+export const TOUR_SUMMER_14_CLIFFS_IMAGE = `${TOUR_SUMMER_14_ASSET_BASE}/cliffs.webp` as const;
+export const TOUR_SUMMER_14_SUNSET_PIER_IMAGE =
+  `${TOUR_SUMMER_14_ASSET_BASE}/sunset-pier.webp` as const;
+export const TOUR_SUMMER_14_BOARDWALK_IMAGE =
+  `${TOUR_SUMMER_14_ASSET_BASE}/boardwalk.webp` as const;
+
+/** Кадрирование слотов bento с CMS-dev (остров Петрова). */
+export const TOUR_SUMMER_14_COVE_OBJECT_POSITION = '63.38% 47.34%' as const;
+export const TOUR_SUMMER_14_CLIFFS_OBJECT_POSITION = '48.69% 52.42%' as const;
+export const TOUR_SUMMER_14_SUNSET_PIER_OBJECT_POSITION = '41.08% 54.77%' as const;
+export const TOUR_SUMMER_14_BOARDWALK_OBJECT_POSITION = '54.62% 53.75%' as const;
+
+/**
+ * Порядок: cover → preface → bento после `slice(2)` (6 слотов):
+ * cove, spit, trail-group, cliffs, sunset-pier, boardwalk.
+ */
+export const TOUR_SUMMER_14_GALLERY_VIEWER = [
+  TOUR_SUMMER_14_COVER_GRID,
+  TOUR_SUMMER_14_PREFACE_BACKGROUND,
+  TOUR_SUMMER_14_COVE_IMAGE,
+  TOUR_SUMMER_14_SPIT_IMAGE,
+  TOUR_SUMMER_14_TRAIL_GROUP_IMAGE,
+  TOUR_SUMMER_14_CLIFFS_IMAGE,
+  TOUR_SUMMER_14_SUNSET_PIER_IMAGE,
+  TOUR_SUMMER_14_BOARDWALK_IMAGE,
+] as const;
+
+export const TOUR_SUMMER_14_GALLERY_GRID = TOUR_SUMMER_14_GALLERY_VIEWER;
+
+/** Заглушки медиа summer-13, 15…19 до финального encode — `summerTourStubMedia.ts`. */
 
 /**
  * Секунда входа 5-секундного сегмента в исходном `*.grid.webm` для баннера зимы (колонки 0…9).

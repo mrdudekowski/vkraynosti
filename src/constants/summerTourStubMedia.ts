@@ -35,9 +35,6 @@ export function defineSummerTourStubMedia(
 /** Один день в Та-Чингоузе (summer-13). */
 export const TOUR_SUMMER_13_STUB = defineSummerTourStubMedia('summer-13');
 
-/** Уникальный остров Петрова (summer-14). */
-export const TOUR_SUMMER_14_STUB = defineSummerTourStubMedia('summer-14');
-
 /** Один день в Дубовой (summer-15). */
 export const TOUR_SUMMER_15_STUB = defineSummerTourStubMedia('summer-15');
 

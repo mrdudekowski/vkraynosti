@@ -44,7 +44,7 @@ const AdminAssetPreview = ({ asset, play, className = '', objectPosition }: Admi
         className={mediaClass}
         style={positionStyle}
         src={asset.videoUrl}
-        poster={asset.stillUrl}
+        poster={asset.stillUrl ?? undefined}
         muted
         loop
         playsInline

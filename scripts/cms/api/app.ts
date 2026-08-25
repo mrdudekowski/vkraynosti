@@ -652,7 +652,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
   const app = new Hono<{ Variables: AppVariables }>();
   const allowedOrigins = new Set(
     (process.env.CMS_CORS_ORIGINS ??
-      'https://mrdudekowski-vkraynosti-61ea.twc1.net,https://vkraynosti.ru,https://www.vkraynosti.ru')
+      'https://mrdudekowski-vkraynosti-61ea.twc1.net,https://admin.vkraynosti.ru,https://vkraynosti.ru,https://www.vkraynosti.ru')
       .split(',')
       .map((origin) => origin.trim().replace(/\/+$/, ''))
       .filter(Boolean)

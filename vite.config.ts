@@ -175,7 +175,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(projectRoot, 'index.html'),
-        admin: path.resolve(projectRoot, 'admin/index.html'),
+        admin: path.resolve(projectRoot, 'admin.html'),
       },
       output: {
         manualChunks(id) {

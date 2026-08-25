@@ -98,6 +98,7 @@ const env: CmsApiEnv = {
   port: 8787,
   authSecret: 'test-auth-secret-16',
   cookieSecure: false,
+  cookieSameSite: 'None',
   crmInboundSecret: 'inbound-secret-16',
   users: [
     { login: adminLogin, password: 'admin-pass', role: 'admin' },
@@ -242,6 +243,17 @@ describe('CMS API', () => {
       canPublishTours: true,
       canPublishSchedule: true,
     });
+  });
+
+  it('выдаёт cross-origin cookie для отдельного admin frontend', async () => {
+    const { app } = createApp();
+    const response = await app.request('/api/cms/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ login: adminLogin, password: 'admin-pass' }),
+    });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('set-cookie')).toContain('SameSite=None');
   });
 
   it('stores a hashed session and returns 401 after revoke', async () => {

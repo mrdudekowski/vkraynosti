@@ -6,6 +6,8 @@ export const cmsTourMetaSchema = z.object({
   rev: z.number().int().positive(),
   updatedAt: z.string().min(1),
   editor: z.string().min(1),
+  submittedForPublishAt: z.string().min(1).nullable().optional(),
+  returnReason: z.string().min(1).max(280).nullable().optional(),
 });
 
 export type CmsTourMeta = z.infer<typeof cmsTourMetaSchema>;

@@ -1,42 +1,40 @@
-import { unusedBentoPoolAssets } from './bentoPoolAssets';
-import { isIncludedIconKey } from './includedIconCatalog';
+import {
+  CMS_MEDIA_PUBLISH_BLOCKERS,
+  cmsMediaPublishBlockers,
+} from './cmsMediaPublishRules';
 import type { CmsTourDocument } from './cmsTourDocument';
+import { isTourReady } from './tourCompleteness';
 
-export const CMS_PUBLISH_BLOCKERS = [
-  'cover_required',
-  'pool_not_empty',
-  'bento_empty_slots',
-  'included_icon_required',
-] as const;
+export {
+  CMS_MEDIA_PUBLISH_BLOCKERS,
+  cmsMediaPublishBlockers,
+  hasEmptyBentoSlots,
+} from './cmsMediaPublishRules';
+
+export const CMS_PUBLISH_BLOCKERS = [...CMS_MEDIA_PUBLISH_BLOCKERS, 'tour_not_ready'] as const;
 export type CmsPublishBlocker = (typeof CMS_PUBLISH_BLOCKERS)[number];
 
-export function hasEmptyBentoSlots(document: CmsTourDocument): boolean {
-  return document.bento.blocks.some((block) =>
-    block.slots.some((slot) => slot.assetId == null || slot.assetId.length === 0),
-  );
+/**
+ * Правила «Опубликовать»: медиа-галерея и заполненность всех пяти разделов.
+ */
+export function cmsPublishBlockers(document: CmsTourDocument): CmsPublishBlocker[] {
+  const blockers: CmsPublishBlocker[] = cmsMediaPublishBlockers(document);
+  if (!isTourReady(document)) {
+    blockers.push('tour_not_ready');
+  }
+  return blockers;
 }
 
 /**
- * Правила «Опубликовать»: обложка, заполненная сетка, пустой пул, иконки у пунктов с текстом.
- * Фон «О поездке» не блокер.
+ * Скрытие уже опубликованного тура — смена видимости, а не выпуск карточки.
+ * Неполное заполнение не должно оставлять тур на сайте.
  */
-export function cmsPublishBlockers(document: CmsTourDocument): CmsPublishBlocker[] {
-  const blockers: CmsPublishBlocker[] = [];
-  if (document.coverAssetId == null || document.coverAssetId.length === 0) {
-    blockers.push('cover_required');
+export function cmsPublishBlockersForIntent(
+  document: CmsTourDocument,
+  options: { hasPublishedSnapshot: boolean },
+): CmsPublishBlocker[] {
+  if (document.status === 'hidden' && options.hasPublishedSnapshot) {
+    return [];
   }
-  if (hasEmptyBentoSlots(document)) {
-    blockers.push('bento_empty_slots');
-  }
-  if (unusedBentoPoolAssets(document).length > 0) {
-    blockers.push('pool_not_empty');
-  }
-  if (
-    document.included.some(
-      (item) => item.text.trim().length > 0 && !isIncludedIconKey(item.iconKey),
-    )
-  ) {
-    blockers.push('included_icon_required');
-  }
-  return blockers;
+  return cmsPublishBlockers(document);
 }

@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { startOfDay } from 'date-fns';
+import { useCallback, useMemo, useState } from 'react';
+import { startOfMonth } from 'date-fns';
 import type { Season } from '../../types';
 import {
   TOUR_CALENDAR_SELECT_DATE_HINT_HOST_CLASS,
@@ -8,6 +8,7 @@ import {
 import { UI } from '../../constants/ui';
 import { useCascadeGridReveal } from '../../hooks/useCascadeGridReveal';
 import { useTourScheduleCalendarEvents } from '../../hooks/useTourScheduleCalendarEvents';
+import { findNearestCalendarDepartureDate } from '../../utils/tourSchedule/findNearestCalendarDepartureDate';
 import { toIsoDate } from '../../utils/tourSchedule/toIsoDate';
 import TourCalendarDayPanel from './TourCalendarDayPanel';
 import TourCalendarMonth from './TourCalendarMonth';
@@ -20,15 +21,19 @@ interface TourCalendarProps {
 
 const TourCalendar = ({ season }: TourCalendarProps) => {
   const { status, events, eventsByDate, retry } = useTourScheduleCalendarEvents();
-  const [displayMonth, setDisplayMonth] = useState(() => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1);
-  });
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => startOfDay(new Date()));
+  const nearestDate = useMemo(
+    () => findNearestCalendarDepartureDate(events),
+    [events],
+  );
+  const [monthOverride, setMonthOverride] = useState<Date | undefined>(undefined);
+  const [selection, setSelection] = useState<'auto' | Date | undefined>('auto');
+
+  const selectedDate = selection === 'auto' ? nearestDate : selection;
+  const displayMonth = monthOverride ?? startOfMonth(nearestDate ?? new Date());
 
   const handleMonthChange = useCallback((month: Date) => {
-    setDisplayMonth(month);
-    setSelectedDate(undefined);
+    setMonthOverride(month);
+    setSelection(undefined);
   }, []);
 
   const isLoading = status === 'idle' || status === 'loading';
@@ -87,7 +92,7 @@ const TourCalendar = ({ season }: TourCalendarProps) => {
             displayMonth={displayMonth}
             selectedDate={selectedDate}
             onDisplayMonthChange={handleMonthChange}
-            onSelectDate={setSelectedDate}
+            onSelectDate={setSelection}
           />
         )}
         {isLoading && (

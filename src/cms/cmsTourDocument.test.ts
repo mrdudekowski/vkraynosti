@@ -87,6 +87,27 @@ describe('cmsToursFileSchema', () => {
     expect(() => parseCmsToursFile({ schemaVersion: 2, tours: [] })).toThrow();
   });
 
+  it('принимает durationDays как целое >= 1 и отклоняет 0', () => {
+    expect(
+      cmsToursFileSchema.safeParse({
+        schemaVersion: 1,
+        tours: [{ ...validTour, durationDays: 2 }],
+      }).success,
+    ).toBe(true);
+    expect(
+      cmsToursFileSchema.safeParse({
+        schemaVersion: 1,
+        tours: [{ ...validTour, durationDays: 21 }],
+      }).success,
+    ).toBe(true);
+    expect(
+      cmsToursFileSchema.safeParse({
+        schemaVersion: 1,
+        tours: [{ ...validTour, durationDays: 0 }],
+      }).success,
+    ).toBe(false);
+  });
+
   it('принимает legacy-галерею без bento-блоков', () => {
     const parsed = cmsToursFileSchema.safeParse({
       schemaVersion: 1,

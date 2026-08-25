@@ -1,5 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVideo } from '@fortawesome/free-solid-svg-icons/faVideo';
+import { Video } from 'lucide-react';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import type { CmsTourAsset } from '../../cms/cmsTourDocument';
 import { cmsAssetHasVideo } from '../cmsAssetHasVideo';
@@ -13,7 +12,7 @@ export const AdminVideoBadge = () => (
     aria-label={ADMIN_UI.videoBadge}
     title={ADMIN_UI.videoBadge}
   >
-    <FontAwesomeIcon icon={faVideo} aria-hidden />
+    <Video size={16} strokeWidth={1.75} aria-hidden />
   </span>
 );
 
@@ -43,7 +42,7 @@ const AdminAssetPreview = ({ asset, play, className = '', objectPosition }: Admi
       <video
         className={mediaClass}
         style={positionStyle}
-        src={asset.videoUrl}
+        src={asset.videoUrl ?? undefined}
         poster={asset.stillUrl ?? undefined}
         muted
         loop

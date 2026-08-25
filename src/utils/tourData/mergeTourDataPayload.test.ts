@@ -59,6 +59,43 @@ describe('mergeTourDataToSchedulePayload', () => {
     expect(payload.catalogPrices['summer-3']).toBe(8500);
   });
 
+  it('keeps a completed date of a tour that is no longer in the public list', () => {
+    const payload = mergeTourDataToSchedulePayload(
+      {
+        ...toursList,
+        tours: [toursList.tours[0]!],
+      },
+      {
+        ...schedule,
+        events: [
+          ...schedule.events,
+          {
+            date: '2026-07-12',
+            tourId: 'summer-9',
+            seats: 8,
+            status: 'completed',
+            comment: null,
+            durationType: 'однодневный',
+            overridePriceRub: 6000,
+          },
+        ],
+      },
+    );
+
+    expect(payload.events).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          date: '2026-07-12',
+          tourId: 'summer-9',
+          durationType: 'однодневный',
+          priceRub: 6000,
+          status: 'completed',
+        }),
+      ]),
+    );
+    expect(payload.catalogPublicationStatuses['summer-9']).toBe('hidden');
+  });
+
   it('uses overridePriceRub when provided', () => {
     const payload = mergeTourDataToSchedulePayload(toursList, {
       ...schedule,

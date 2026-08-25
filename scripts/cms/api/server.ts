@@ -1,13 +1,33 @@
 import { serve } from '@hono/node-server';
-import { loadCmsApiEnv } from './env.ts';
-import { createCmsApiApp } from './app.ts';
-import { createS3JsonStore } from './store.ts';
+import path from 'node:path';
+import { createAuthRepository } from './auth/authRepository.ts';
+import { createDatabase } from './db/client.ts';
+import { loadDatabaseConfig } from './db/config.ts';
+import { loadCmsApiEnv, readDotEnvFile } from './env.ts';
+import { createCmsApiApp, loadTourDocumentForDepartureWrite } from './app.ts';
+import { createDepartureRepository } from './schedule/departureRepository.ts';
+import { createCmsJsonStore } from './store.ts';
 
 const rootDir = process.cwd();
 const env = await loadCmsApiEnv(rootDir);
+const fileEnv = await readDotEnvFile(path.join(rootDir, '.env.cms-dev'));
+const database = createDatabase(
+  loadDatabaseConfig({
+    ...fileEnv,
+    DATABASE_URL: process.env.DATABASE_URL ?? fileEnv.DATABASE_URL,
+    DATABASE_SSL: process.env.DATABASE_SSL ?? fileEnv.DATABASE_SSL,
+    DATABASE_MAX_CONNECTIONS:
+      process.env.DATABASE_MAX_CONNECTIONS ?? fileEnv.DATABASE_MAX_CONNECTIONS,
+  })
+);
+const store = createCmsJsonStore(env);
 const app = createCmsApiApp({
   env,
-  store: createS3JsonStore(env.s3),
+  store,
+  authRepository: createAuthRepository(database.db),
+  departureRepository: createDepartureRepository(database.db, {
+    loadTourDocument: (tourId) => loadTourDocumentForDepartureWrite(store, tourId),
+  }),
 });
 
 serve(
@@ -17,6 +37,8 @@ serve(
     hostname: '127.0.0.1',
   },
   (info) => {
-    console.info(`CMS API http://127.0.0.1:${info.port} (proxy: /api/cms)`);
+    console.info(
+      `CMS API http://127.0.0.1:${info.port} (store: ${env.storeKind}, proxy: /api/cms)`
+    );
   }
 );

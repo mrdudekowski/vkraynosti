@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { ADMIN_LOGIN_LOGO } from '../constants/images';
 import AdminAlert from './components/AdminAlert';
 import AdminButton from './components/AdminButton';
 import { AdminTextInput } from './components/AdminFields';
@@ -30,11 +31,16 @@ const LoginPage = ({ onLoggedIn }: LoginPageProps) => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface-dark px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-surface-light px-4">
       <form
         onSubmit={(event) => void onSubmit(event)}
         className="flex w-full max-w-md flex-col gap-4 rounded-card border border-divider bg-surface-light p-6"
       >
+        <img
+          src={ADMIN_LOGIN_LOGO}
+          alt={ADMIN_UI.logoAlt}
+          className="mx-auto h-auto w-full max-w-xs object-contain"
+        />
         <h1 className="text-xl font-semibold text-text-primary">{ADMIN_UI.loginTitle}</h1>
         <label className="flex flex-col gap-1">
           <span className="text-sm font-medium text-text-primary">{ADMIN_UI.loginLabel}</span>

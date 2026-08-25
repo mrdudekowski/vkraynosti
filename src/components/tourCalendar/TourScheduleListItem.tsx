@@ -9,6 +9,7 @@ import {
   TOUR_CALENDAR_DAY_EVENT_TITLE_CLASS,
 } from '../../constants/tourCalendarLayout';
 import { useTourDisplayPrice } from '../../hooks/useTourDisplayPrice';
+import { useTourSchedule } from '../../hooks/useTourSchedule';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 import PlaceholderImage from '../shared/PlaceholderImage';
 
@@ -27,15 +28,13 @@ interface TourScheduleListItemProps {
 const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
   const { tour } = event;
   const { displayPrice } = useTourDisplayPrice(tour);
+  const { publicationStatuses } = useTourSchedule();
+  const offSite = publicationStatuses.get(event.tourId) === 'hidden';
 
   const cover = tourCardCoverImgProps(tour);
 
-  return (
-    <Link
-      to={getTourPublicPath(tour)}
-      className={TOUR_CALENDAR_DAY_EVENT_CARD_CLASS}
-      prefetch="intent"
-    >
+  const body = (
+    <>
       <div className={`${TOUR_CALENDAR_DAY_EVENT_MEDIA_CLASS} ${cover.wrapperClassName ?? ''}`.trim()} style={cover.wrapperStyle}>
         <PlaceholderImage
           src={tour.imageUrl}
@@ -58,6 +57,20 @@ const TourScheduleListItem = ({ event }: TourScheduleListItemProps) => {
           </p>
         </div>
       </div>
+    </>
+  );
+
+  if (offSite) {
+    return <article className={TOUR_CALENDAR_DAY_EVENT_CARD_CLASS}>{body}</article>;
+  }
+
+  return (
+    <Link
+      to={getTourPublicPath(tour)}
+      className={TOUR_CALENDAR_DAY_EVENT_CARD_CLASS}
+      prefetch="intent"
+    >
+      {body}
     </Link>
   );
 };

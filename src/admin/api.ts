@@ -1,13 +1,15 @@
+import type { PublishQueueItem } from '../cms/publishQueue';
 import type { CmsTourDocument } from '../cms/cmsTourDocument';
 import type { CmsTourMeta } from '../cms/cmsTourMeta';
 import type { CmsTourTextPatch } from '../cms/applyTourTextPatch';
 import type { CmsTourLayoutPatch } from '../cms/applyTourLayoutPatch';
-import { CMS_PUBLISH_BLOCKERS } from '../cms/cmsPublishRules';
 import type { CrmDeal, CrmFile, CrmMessenger, CrmTouchKind } from '../crm/crmDocument';
 
 export type AdminSession = {
   login: string;
   role: 'admin' | 'editor';
+  canPublishTours: boolean;
+  canPublishSchedule: boolean;
 };
 
 export type AdminTourListItem = {
@@ -16,11 +18,42 @@ export type AdminTourListItem = {
   season: CmsTourDocument['season'];
   status: CmsTourDocument['status'];
   published: boolean;
+  publishedStatus?: CmsTourDocument['status'] | null;
+  slug: string;
   imageUrl: string | null;
+  ready: boolean;
+  readyCount: number;
+  readyTotal: number;
+  returnReason?: string | null;
+  readiness?: { ready: boolean; blockers: Array<{ code: string; section: string; focus: string }> };
+};
+
+export type AdminDepartureStatus = 'planned' | 'open' | 'full' | 'cancelled' | 'completed';
+export type AdminEditableDepartureStatus = Exclude<AdminDepartureStatus, 'completed'>;
+
+export type AdminDeparture = {
+  id: string;
+  tourId: string;
+  startsOn: string;
+  endsOn?: string;
+  seats: number;
+  status: AdminDepartureStatus;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string | null;
 };
 
 async function readJson<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
+}
+
+async function readDeparture(response: Response): Promise<AdminDeparture> {
+  if (!response.ok) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? 'departure_failed');
+  }
+  return readJson<AdminDeparture>(response);
 }
 
 export async function adminLogin(login: string, password: string): Promise<AdminSession> {
@@ -60,6 +93,73 @@ export async function adminListTours(): Promise<AdminTourListItem[]> {
   return body.tours;
 }
 
+export async function adminListDepartures(input: {
+  from: string;
+  to: string;
+  includeHistory?: boolean;
+}): Promise<AdminDeparture[]> {
+  const query = new URLSearchParams({
+    from: input.from,
+    to: input.to,
+    ...(input.includeHistory == null
+      ? {}
+      : { includeHistory: String(input.includeHistory) }),
+  });
+  const response = await fetch(`/api/cms/departures?${query}`, {
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? 'departures_failed');
+  }
+  const body = await readJson<{ departures: AdminDeparture[] }>(response);
+  return body.departures;
+}
+
+export async function adminCreateDeparture(input: {
+  tourId: string;
+  startsOn: string;
+  seats?: number;
+}): Promise<AdminDeparture> {
+  const response = await fetch('/api/cms/departures', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  return readDeparture(response);
+}
+
+export async function adminUpdateDeparture(
+  id: string,
+  input: {
+    version: number;
+    startsOn?: string;
+    seats?: number;
+    status?: AdminEditableDepartureStatus;
+  },
+): Promise<AdminDeparture> {
+  const response = await fetch(`/api/cms/departures/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  return readDeparture(response);
+}
+
+export async function adminDeleteDeparture(id: string): Promise<void> {
+  const response = await fetch(`/api/cms/departures/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (response.status === 204) {
+    return;
+  }
+  const body = await readJson<{ error?: string }>(response);
+  throw new Error(body.error ?? 'departure_delete_failed');
+}
+
 export async function adminCreateTour(input: {
   title: string;
   season: CmsTourDocument['season'];
@@ -86,7 +186,12 @@ export async function adminCreateTour(input: {
 
 export async function adminGetTour(
   id: string
-): Promise<{ document: CmsTourDocument; meta: CmsTourMeta }> {
+): Promise<{
+  document: CmsTourDocument;
+  meta: CmsTourMeta;
+  published: boolean;
+  publishedStatus?: CmsTourDocument['status'] | null;
+}> {
   const response = await fetch(`/api/cms/tours/${id}`, { credentials: 'include' });
   if (!response.ok) {
     throw new Error('get_failed');
@@ -98,13 +203,14 @@ export async function adminSaveTour(
   id: string,
   rev: number,
   patch: CmsTourTextPatch,
-  layout: CmsTourLayoutPatch
+  layout: CmsTourLayoutPatch,
+  status?: CmsTourDocument['status'],
 ): Promise<{ document: CmsTourDocument; meta: CmsTourMeta }> {
   const response = await fetch(`/api/cms/tours/${id}`, {
     method: 'PUT',
     credentials: 'include',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ rev, patch, layout }),
+    body: JSON.stringify({ rev, patch, layout, status }),
   });
   if (response.status === 409) {
     const body = await readJson<{ error?: string }>(response);
@@ -175,13 +281,17 @@ export async function adminDeleteTourAsset(
 
 export async function adminPublishTour(
   id: string,
-  rev: number
+  rev: number,
+  options: { confirmDeleteFutureDepartures?: boolean } = {},
 ): Promise<{ document: CmsTourDocument; meta: CmsTourMeta }> {
   const response = await fetch(`/api/cms/tours/${id}/publish`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ rev }),
+    body: JSON.stringify({
+      rev,
+      confirmDeleteFutureDepartures: options.confirmDeleteFutureDepartures === true,
+    }),
   });
   if (response.status === 409) {
     throw new Error('rev_conflict');
@@ -191,18 +301,114 @@ export async function adminPublishTour(
   }
   if (!response.ok) {
     const body = (await response.json()) as { error?: string };
-    throw new Error(
-      body.error != null && (CMS_PUBLISH_BLOCKERS as readonly string[]).includes(body.error)
-        ? body.error
-        : 'publish_failed'
-    );
+    throw new Error(body.error ?? 'publish_failed');
   }
   return readJson(response);
+}
+
+export type AdminPublishQueueItem = PublishQueueItem;
+
+export async function adminListPublishQueue(): Promise<AdminPublishQueueItem[]> {
+  const response = await fetch('/api/cms/publish-queue', { credentials: 'include' });
+  if (!response.ok) {
+    throw new Error('queue_failed');
+  }
+  const body = await readJson<{ items: AdminPublishQueueItem[] }>(response);
+  return body.items;
+}
+
+export async function adminSubmitPublishQueue(input: {
+  tourIds?: string[];
+  departureIds?: string[];
+} = {}): Promise<void> {
+  const response = await fetch('/api/cms/publish-queue/submit', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    throw new Error('submit_failed');
+  }
+}
+
+export async function adminPublishQueue(input: {
+  tourIds?: string[];
+  departureIds?: string[];
+  tourRevs?: Record<string, number>;
+  confirmDeleteFutureDepartures?: boolean;
+} = {}): Promise<void> {
+  const response = await fetch('/api/cms/publish-queue/publish', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (response.status === 403) {
+    throw new Error('forbidden');
+  }
+  if (!response.ok) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? 'publish_failed');
+  }
+}
+
+export async function adminReturnPublishQueue(input: {
+  reason: string;
+  tourIds?: string[];
+  departureIds?: string[];
+}): Promise<void> {
+  const response = await fetch('/api/cms/publish-queue/return', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (response.status === 403) {
+    throw new Error('forbidden');
+  }
+  if (!response.ok) {
+    throw new Error('return_failed');
+  }
+}
+
+export async function adminPublishDepartures(ids: string[]): Promise<void> {
+  const response = await fetch('/api/cms/departures/publish', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  });
+  if (response.status === 403) {
+    throw new Error('forbidden');
+  }
+  if (!response.ok) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? 'publish_failed');
+  }
+}
+
+export async function adminPublishAllEligibleDepartures(): Promise<void> {
+  const response = await fetch('/api/cms/departures/publish', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ allEligible: true }),
+  });
+  if (response.status === 403) {
+    throw new Error('forbidden');
+  }
+  if (!response.ok) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? 'publish_failed');
+  }
 }
 
 export type AdminUser = {
   login: string;
   role: AdminSession['role'];
+  canPublishTours: boolean;
+  canPublishSchedule: boolean;
 };
 
 export async function adminListUsers(): Promise<AdminUser[]> {
@@ -240,7 +446,12 @@ export async function adminCreateUser(
 
 export async function adminUpdateUser(
   login: string,
-  patch: { role?: AdminUser['role']; password?: string }
+  patch: {
+    role?: AdminUser['role'];
+    password?: string;
+    canPublishTours?: boolean;
+    canPublishSchedule?: boolean;
+  }
 ): Promise<AdminUser[]> {
   const response = await fetch(`/api/cms/users/${encodeURIComponent(login)}`, {
     method: 'PUT',

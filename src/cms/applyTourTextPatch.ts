@@ -1,5 +1,6 @@
 import { isValidTourSlug } from '../constants/tourUrls';
 import { cmsTourDocumentSchema, type CmsTourDocument } from './cmsTourDocument';
+import { isTourDurationDays, publicDurationFromDays } from './durationDays';
 import { isIncludedIconKey, isUnsetIncludedIconKey } from './includedIconCatalog';
 
 export type CmsTourTextPatch = {
@@ -8,6 +9,7 @@ export type CmsTourTextPatch = {
   subtitle?: string;
   heroPhrase?: string;
   duration?: string;
+  durationDays?: number;
   difficulty?: CmsTourDocument['difficulty'];
   difficultyDisplayLabel?: string;
   metaAudienceLabel?: string;
@@ -102,6 +104,18 @@ export function applyTourTextPatch(
     throw new Error('Invalid difficulty');
   }
 
+  let durationDays = document.durationDays;
+  if (patch.durationDays != null) {
+    if (!isTourDurationDays(patch.durationDays)) {
+      throw new Error('Invalid durationDays');
+    }
+    durationDays = patch.durationDays;
+  }
+  const duration =
+    durationDays != null && isTourDurationDays(durationDays)
+      ? publicDurationFromDays(durationDays)
+      : textOrCurrent(patch.duration, document.duration);
+
   const difficultyDisplayLabel = optionalOrCurrent(
     patch.difficultyDisplayLabel,
     document.difficultyDisplayLabel,
@@ -120,6 +134,7 @@ export function applyTourTextPatch(
   delete rest.pricePrevious;
   delete rest.priceFootnote;
   delete rest.seoDescription;
+  delete rest.durationDays;
 
   return cmsTourDocumentSchema.parse({
     ...rest,
@@ -127,7 +142,8 @@ export function applyTourTextPatch(
     slug,
     subtitle: textOrCurrent(patch.subtitle, document.subtitle),
     heroPhrase: textOrCurrent(patch.heroPhrase, document.heroPhrase),
-    duration: textOrCurrent(patch.duration, document.duration),
+    duration,
+    ...(durationDays != null ? { durationDays } : {}),
     difficulty: patch.difficulty ?? document.difficulty,
     price: textOrCurrent(patch.price, document.price),
     ...(difficultyDisplayLabel != null ? { difficultyDisplayLabel } : {}),
@@ -156,6 +172,7 @@ export function applyTourTextPatch(
   });
 }
 
+/** Hidden остаётся в overlay: календарь гостя может показать прошедшую дату, карточки при этом нет. */
 export function upsertTourInPublishedCatalog(
   catalog: { schemaVersion: 1; tours: CmsTourDocument[] },
   document: CmsTourDocument
@@ -167,6 +184,9 @@ export function upsertTourInPublishedCatalog(
       : [...catalog.tours, document];
   return {
     schemaVersion: catalog.schemaVersion,
-    tours: document.status === 'active' ? tours : tours.filter((tour) => tour.id !== document.id),
+    tours:
+      document.status === 'active' || document.status === 'hidden'
+        ? tours
+        : tours.filter((tour) => tour.id !== document.id),
   };
 }

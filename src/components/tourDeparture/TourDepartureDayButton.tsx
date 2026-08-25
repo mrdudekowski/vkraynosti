@@ -6,13 +6,10 @@ import type { TourDepartureCalendarMode } from '../../types/tourSchedule';
 import { UI } from '../../constants/ui';
 import { dateHasDeparture } from './monthHasDepartures';
 import { TOUR_DEPARTURE_DAY_DEPARTURE_CLASS } from '../../constants/tourDepartureCalendar';
-import {
-  TOUR_CALENDAR_DAY_NUMBER_CLASS,
-  TOUR_CALENDAR_DAY_SELECTED_CLASS,
-} from '../../constants/tourCalendarShared';
+import { TOUR_CALENDAR_DAY_SELECTED_CLASS } from '../../constants/tourCalendarShared';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 import { toIsoDate } from '../../utils/tourSchedule/toIsoDate';
-import TourCalendarDayEventDots from '../tourCalendar/TourCalendarDayEventDots';
+import TourCalendarDayFace from '../tourCalendar/TourCalendarDayFace';
 
 interface TourDepartureDayButtonProps extends DayButtonProps {
   mode: TourDepartureCalendarMode;
@@ -48,10 +45,7 @@ const TourDepartureDayButton = ({
     .join(' ');
 
   const dayContent = (
-    <>
-      <span className={TOUR_CALENDAR_DAY_NUMBER_CLASS}>{day.date.getDate()}</span>
-      {dayEvents.length > 0 && <TourCalendarDayEventDots events={dayEvents} />}
-    </>
+    <TourCalendarDayFace dayOfMonth={day.date.getDate()} events={dayEvents} />
   );
 
   if (mode === 'display') {

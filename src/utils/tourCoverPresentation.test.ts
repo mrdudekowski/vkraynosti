@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TOUR_HERO_OBJECT_POSITION_CLASS } from './mediaObjectPosition';
 import { tourCardCoverImgProps, tourHeroObjectProps } from './tourCoverPresentation';
 
 describe('tourCoverPresentation', () => {
@@ -16,7 +17,7 @@ describe('tourCoverPresentation', () => {
       id: 'summer-7',
       coverCrop: { hero: { x: 50, y: 32 }, heroLg: { x: 50, y: 24 } },
     });
-    expect(props.heroImageObjectClassName).toBe('tour-hero-object-position');
+    expect(props.heroImageObjectClassName).toBe(TOUR_HERO_OBJECT_POSITION_CLASS);
     expect(props.style).toMatchObject({
       ['--tour-hero-object-position']: '50% 32%',
       ['--tour-hero-object-position-lg']: '50% 24%',

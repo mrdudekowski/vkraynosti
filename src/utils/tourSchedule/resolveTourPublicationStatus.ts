@@ -51,9 +51,7 @@ export function isTourHiddenFromSite(
   }
 
   const fromCatalog = publicationStatuses.get(tourId);
-  if (fromCatalog === 'hidden') return true;
-  if (fromCatalog === undefined) return true;
-  return false;
+  return fromCatalog !== 'active';
 }
 
 export function isTourPublicationInDevelopment(

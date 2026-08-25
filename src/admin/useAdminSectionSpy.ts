@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
+import { EDITOR_SECTION_IDS, type AdminEditorSectionId } from './tourEditorTabs';
 
-const SECTION_IDS = [
-  'admin-catalog',
-  'admin-about',
-  'admin-included',
-  'admin-program',
-  'admin-gallery',
-] as const;
-
-export type AdminEditorSectionId = (typeof SECTION_IDS)[number];
+export type { AdminEditorSectionId };
 
 export function useAdminSectionSpy(enabled: boolean): AdminEditorSectionId {
   const [active, setActive] = useState<AdminEditorSectionId>('admin-catalog');
@@ -17,7 +10,7 @@ export function useAdminSectionSpy(enabled: boolean): AdminEditorSectionId {
     if (!enabled) {
       return;
     }
-    const nodes = SECTION_IDS.map((id) => window.document.getElementById(id)).filter(
+    const nodes = EDITOR_SECTION_IDS.map((id) => window.document.getElementById(id)).filter(
       (node): node is HTMLElement => node != null,
     );
     if (nodes.length === 0) {
@@ -29,7 +22,7 @@ export function useAdminSectionSpy(enabled: boolean): AdminEditorSectionId {
           .filter((entry) => entry.isIntersecting)
           .sort((left, right) => right.intersectionRatio - left.intersectionRatio);
         const top = visible[0]?.target.id;
-        if (top != null && (SECTION_IDS as readonly string[]).includes(top)) {
+        if (top != null && (EDITOR_SECTION_IDS as readonly string[]).includes(top)) {
           setActive(top as AdminEditorSectionId);
         }
       },

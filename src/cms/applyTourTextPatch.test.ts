@@ -136,6 +136,57 @@ describe('applyTourTextPatch', () => {
     expect(next.status).toBe(document.status);
   });
 
+  it('derives public duration from durationDays', () => {
+    const next = applyTourTextPatch(document, {
+      description: 'x',
+      prefaceAssetId: 'preface',
+      included: document.included,
+      program: document.program,
+      durationDays: 2,
+    });
+    expect(next.durationDays).toBe(2);
+    expect(next.duration).toBe('2 дня');
+  });
+
+  it('keeps public duration derived when only duration text is patched', () => {
+    const next = applyTourTextPatch(
+      { ...document, duration: '2 дня', durationDays: 2 },
+      {
+        description: 'x',
+        prefaceAssetId: 'preface',
+        included: document.included,
+        program: document.program,
+        duration: '16 часов',
+      },
+    );
+    expect(next.durationDays).toBe(2);
+    expect(next.duration).toBe('2 дня');
+  });
+
+  it('allows legacy duration text when durationDays is absent', () => {
+    const next = applyTourTextPatch(document, {
+      description: 'x',
+      prefaceAssetId: 'preface',
+      included: document.included,
+      program: document.program,
+      duration: '16 часов',
+    });
+    expect(next.durationDays).toBeUndefined();
+    expect(next.duration).toBe('16 часов');
+  });
+
+  it('accepts durationDays 21', () => {
+    const next = applyTourTextPatch(document, {
+      description: 'x',
+      prefaceAssetId: 'preface',
+      included: document.included,
+      program: document.program,
+      durationDays: 21,
+    });
+    expect(next.durationDays).toBe(21);
+    expect(next.duration).toBe('21 день');
+  });
+
   it('меняет название и человекопонятный URL', () => {
     const next = applyTourTextPatch(document, {
       title: '  Полуостров Краббе  ',
@@ -186,5 +237,14 @@ describe('upsertTourInPublishedCatalog', () => {
     );
     expect(catalog.tours).toHaveLength(1);
     expect(catalog.tours[0]?.description).toBe('После правки');
+  });
+
+  it('оставляет hidden в overlay для календаря и убирает in_development', () => {
+    const inDevelopment = { ...document, status: 'in_development' as const };
+    const hidden = { ...document, status: 'hidden' as const };
+    const withDev = upsertTourInPublishedCatalog({ schemaVersion: 1, tours: [document] }, inDevelopment);
+    expect(withDev.tours.map((tour) => tour.id)).toEqual([]);
+    const withHidden = upsertTourInPublishedCatalog({ schemaVersion: 1, tours: [document] }, hidden);
+    expect(withHidden.tours).toEqual([expect.objectContaining({ id: document.id, status: 'hidden' })]);
   });
 });

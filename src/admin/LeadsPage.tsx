@@ -11,6 +11,7 @@ import {
   type CrmListView,
 } from '../crm/crmDocument';
 import { adminAddCrmTouch, adminGetCrm, adminUpdateCrmDeal } from './api';
+import { getAdminTours, peekAdminTours } from './adminDataCache';
 import CrmCreateModal from './components/CrmCreateModal';
 import CrmPersonPanel from './components/CrmPersonPanel';
 import AdminAlert from './components/AdminAlert';
@@ -18,7 +19,11 @@ import AdminBadge from './components/AdminBadge';
 import AdminButton from './components/AdminButton';
 import AdminEmptyState from './components/AdminEmptyState';
 import { AdminTextInput } from './components/AdminFields';
+import AdminPageFrame from './components/AdminPageFrame';
 import AdminPageHeader from './components/AdminPageHeader';
+import AdminSkeleton from './components/AdminSkeleton';
+import TourCoverImage from './components/TourCoverImage';
+import { ADMIN_PATHS } from './constants/routes';
 import { ADMIN_UI } from './constants/ui';
 import { crmDealStatusTone } from './crmAppearance';
 
@@ -30,6 +35,9 @@ const LeadsPage = () => {
   const navigate = useNavigate();
   const { personId } = useParams<{ personId?: string }>();
   const [file, setFile] = useState<CrmFile | null>(null);
+  const [tourImageUrls, setTourImageUrls] = useState<Record<string, string | null>>(
+    () => Object.fromEntries((peekAdminTours() ?? []).map((tour) => [tour.id, tour.imageUrl])),
+  );
   const [view, setView] = useState<CrmListView>('leads');
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
@@ -48,6 +56,13 @@ const LeadsPage = () => {
           setError(ADMIN_UI.crmError);
         }
       });
+    void getAdminTours()
+      .then((tours) => {
+        if (!cancelled) {
+          setTourImageUrls(Object.fromEntries(tours.map((tour) => [tour.id, tour.imageUrl])));
+        }
+      })
+      .catch(() => undefined);
     return () => {
       cancelled = true;
     };
@@ -67,14 +82,15 @@ const LeadsPage = () => {
     return searchPeople(listContactPeople(file), query);
   }, [file, query]);
 
-  if (file == null && error != null) {
-    return <p className="p-6 text-sm text-difficulty-hard-fg">{error}</p>;
-  }
   if (file == null) {
     return (
-      <p className="p-6 text-sm text-text-muted" role="status">
-        {ADMIN_UI.loading}
-      </p>
+      <AdminPageFrame variant="wide">
+        {error != null ? (
+          <AdminAlert tone="danger">{error}</AdminAlert>
+        ) : (
+          <AdminSkeleton variant="list" count={4} />
+        )}
+      </AdminPageFrame>
     );
   }
 
@@ -84,7 +100,8 @@ const LeadsPage = () => {
       : dealRows.length === 0;
 
   return (
-    <div className="flex min-h-full flex-col gap-4 p-4 lg:flex-row">
+    <AdminPageFrame variant="wide">
+    <div className="flex min-h-full flex-col gap-4 lg:flex-row">
       <div className={`min-w-0 flex-1 ${selected != null ? 'hidden lg:flex lg:flex-col' : 'flex flex-col'} gap-4`}>
         <AdminPageHeader
           title={ADMIN_UI.crmTitle}
@@ -100,7 +117,7 @@ const LeadsPage = () => {
             <AdminButton
               key={item}
               type="button"
-              variant={view === item ? 'primary' : 'ghost'}
+              variant={view === item ? 'secondary' : 'ghost'}
               onClick={() => setView(item)}
             >
               {ADMIN_UI.crmViews[item]}
@@ -135,7 +152,7 @@ const LeadsPage = () => {
                 <button
                   type="button"
                   className="flex min-h-11 w-full items-center justify-between gap-2 px-2 py-2 text-left"
-                  onClick={() => void navigate(`/leads/${person.id}`)}
+                  onClick={() => void navigate(ADMIN_PATHS.lead(person.id))}
                 >
                   <span className="min-w-0 truncate font-medium text-text-primary">{person.name}</span>
                   <span className="shrink-0 text-sm text-text-muted">
@@ -149,50 +166,59 @@ const LeadsPage = () => {
           <ul className="flex flex-col">
             {dealRows.map(({ person, deal }) => (
               <li key={deal.id} className="border-b border-divider py-2 last:border-b-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    className="min-h-11 min-w-0 flex-1 truncate text-left font-medium text-text-primary"
-                    onClick={() => void navigate(`/leads/${person.id}`)}
-                  >
-                    {person.name}
-                  </button>
-                  <AdminBadge tone={crmDealStatusTone(deal.status)}>
-                    {ADMIN_UI.crmStatuses[deal.status]}
-                  </AdminBadge>
-                </div>
-                <p className="text-sm text-text-muted">
-                  {deal.tourTitle} · {deal.date}
-                  {deal.nextStep.length > 0 ? ` · ${deal.nextStep}` : ''}
-                </p>
-                {deal.comment.length > 0 || deal.pauseReason.length > 0 ? (
-                  <p className="text-sm text-text-primary">{deal.pauseReason || deal.comment}</p>
-                ) : null}
-                <div className="mt-1 flex flex-wrap gap-2">
-                  <AdminButton
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      void adminAddCrmTouch(deal.id, file.rev, 'called')
-                        .then(setFile)
-                        .catch(() => setError(ADMIN_UI.crmError));
-                    }}
-                  >
-                    {ADMIN_UI.crmCalled}
-                  </AdminButton>
-                  <AdminButton
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      void adminUpdateCrmDeal(deal.id, file.rev, {
-                        status: deal.status === 'in_progress' ? 'new' : 'in_progress',
-                      })
-                        .then(setFile)
-                        .catch(() => setError(ADMIN_UI.crmError));
-                    }}
-                  >
-                    {ADMIN_UI.crmStatuses.in_progress}
-                  </AdminButton>
+                <div className="flex items-start gap-3">
+                  <TourCoverImage
+                    src={tourImageUrls[deal.tourId]}
+                    alt={deal.tourTitle}
+                    className="h-10 w-14 shrink-0 rounded-admin-control"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        className="min-h-11 min-w-0 flex-1 truncate text-left font-medium text-text-primary"
+                        onClick={() => void navigate(ADMIN_PATHS.lead(person.id))}
+                      >
+                        {person.name}
+                      </button>
+                      <AdminBadge tone={crmDealStatusTone(deal.status)}>
+                        {ADMIN_UI.crmStatuses[deal.status]}
+                      </AdminBadge>
+                    </div>
+                    <p className="text-sm text-text-muted">
+                      {deal.tourTitle} · {deal.date}
+                      {deal.nextStep.length > 0 ? ` · ${deal.nextStep}` : ''}
+                    </p>
+                    {deal.comment.length > 0 || deal.pauseReason.length > 0 ? (
+                      <p className="text-sm text-text-primary">{deal.pauseReason || deal.comment}</p>
+                    ) : null}
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      <AdminButton
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          void adminAddCrmTouch(deal.id, file.rev, 'called')
+                            .then(setFile)
+                            .catch(() => setError(ADMIN_UI.crmError));
+                        }}
+                      >
+                        {ADMIN_UI.crmCalled}
+                      </AdminButton>
+                      <AdminButton
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          void adminUpdateCrmDeal(deal.id, file.rev, {
+                            status: deal.status === 'in_progress' ? 'new' : 'in_progress',
+                          })
+                            .then(setFile)
+                            .catch(() => setError(ADMIN_UI.crmError));
+                        }}
+                      >
+                        {ADMIN_UI.crmStatuses.in_progress}
+                      </AdminButton>
+                    </div>
+                  </div>
                 </div>
               </li>
             ))}
@@ -205,8 +231,9 @@ const LeadsPage = () => {
             key={selected.id}
             file={file}
             person={selected}
+            tourImageUrls={tourImageUrls}
             onFile={setFile}
-            onBack={() => void navigate('/leads')}
+            onBack={() => void navigate(ADMIN_PATHS.leads)}
           />
         </div>
       ) : null}
@@ -217,11 +244,12 @@ const LeadsPage = () => {
           onCreated={(id) => {
             setCreating(false);
             void adminGetCrm().then(setFile);
-            void navigate(`/leads/${id}`);
+            void navigate(ADMIN_PATHS.lead(id));
           }}
         />
       ) : null}
     </div>
+    </AdminPageFrame>
   );
 };
 

@@ -14,12 +14,8 @@ import type { Season } from "../types";
 import ScrollScrubFade from "../components/shared/ScrollScrubFade";
 import { useBrowserBackToHomeTours } from "../hooks/useBrowserBackToHomeTours";
 import { useTourSchedule } from "../hooks/useTourSchedule";
-import {
-  isTourHiddenFromSite,
-  resolveTourPublicationStatus,
-} from "../utils/tourSchedule/resolveTourPublicationStatus";
+import { isTourHiddenFromSite } from "../utils/tourSchedule/resolveTourPublicationStatus";
 import TourDetailPageFull from "./TourDetailPageFull";
-import TourDetailPageInDevelopment from "./TourDetailPageInDevelopment";
 
 const TourDetailPage = () => {
   const { season = "", tourId: tourSegment = "" } = useParams<{
@@ -33,10 +29,6 @@ const TourDetailPage = () => {
       : undefined;
   const { publicationStatuses, status: scheduleStatus, retry } = useTourSchedule();
   const scheduleLoaded = scheduleStatus === 'success';
-  const publicationStatus =
-    tour != null
-      ? resolveTourPublicationStatus(tour.id, publicationStatuses, { scheduleLoaded })
-      : null;
   const isHidden =
     tour != null && isTourHiddenFromSite(tour.id, publicationStatuses, scheduleLoaded);
 
@@ -126,10 +118,6 @@ const TourDetailPage = () => {
 
   if (season !== tour.season) {
     return <Navigate replace to={getTourPublicPath(tour)} />;
-  }
-
-  if (publicationStatus === 'in_development') {
-    return <TourDetailPageInDevelopment tour={tour} />;
   }
 
   return <TourDetailPageFull tour={tour} />;

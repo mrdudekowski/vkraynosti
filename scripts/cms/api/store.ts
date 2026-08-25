@@ -4,7 +4,9 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import type { CmsApiEnv } from './env';
+import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import type { CmsApiEnv, CmsApiS3Config } from './env';
 
 export type CmsJsonStore = {
   getJson: (key: string) => Promise<unknown | null>;
@@ -34,7 +36,7 @@ export function createMemoryJsonStore(
   };
 }
 
-export function createS3JsonStore(env: CmsApiEnv['s3']): CmsJsonStore {
+export function createS3JsonStore(env: CmsApiS3Config): CmsJsonStore {
   const client = new S3Client({
     region: env.region,
     endpoint: env.endpoint,
@@ -105,4 +107,70 @@ export function createS3JsonStore(env: CmsApiEnv['s3']): CmsJsonStore {
       );
     },
   };
+}
+
+function resolveFilesystemKey(rootDir: string, key: string): string {
+  const root = path.resolve(rootDir);
+  const filePath = path.resolve(root, key.split('/').join(path.sep));
+  if (filePath !== root && !filePath.startsWith(`${root}${path.sep}`)) {
+    throw new Error(`Invalid CMS store key: ${key}`);
+  }
+  return filePath;
+}
+
+export function createFilesystemJsonStore(rootDir: string): CmsJsonStore {
+  const root = path.resolve(rootDir);
+
+  return {
+    async getJson(key) {
+      const filePath = resolveFilesystemKey(root, key);
+      try {
+        const text = await readFile(filePath, 'utf8');
+        return JSON.parse(text) as unknown;
+      } catch (error) {
+        if (
+          error != null &&
+          typeof error === 'object' &&
+          'code' in error &&
+          error.code === 'ENOENT'
+        ) {
+          return null;
+        }
+        throw error;
+      }
+    },
+    async putJson(key, value) {
+      const filePath = resolveFilesystemKey(root, key);
+      await mkdir(path.dirname(filePath), { recursive: true });
+      await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+    },
+    async putBytes(key, body) {
+      const filePath = resolveFilesystemKey(root, key);
+      await mkdir(path.dirname(filePath), { recursive: true });
+      await writeFile(filePath, body);
+    },
+    async deleteBytes(key) {
+      const filePath = resolveFilesystemKey(root, key);
+      try {
+        await unlink(filePath);
+      } catch (error) {
+        if (
+          error != null &&
+          typeof error === 'object' &&
+          'code' in error &&
+          error.code === 'ENOENT'
+        ) {
+          return;
+        }
+        throw error;
+      }
+    },
+  };
+}
+
+export function createCmsJsonStore(env: CmsApiEnv): CmsJsonStore {
+  if (env.storeKind === 'filesystem') {
+    return createFilesystemJsonStore(env.localStoreDir);
+  }
+  return createS3JsonStore(env.s3);
 }

@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { loadTourCatalog, parseDurationType, parsePriceRub } from './tourScheduleCatalog.mjs';
 
 describe('tourScheduleCatalog', () => {
-  it('loads 43 tours with unique ids matching site seasons', () => {
+  it('loads 44 tours with unique ids matching site seasons', () => {
     const tours = loadTourCatalog();
-    expect(tours).toHaveLength(43);
+    expect(tours).toHaveLength(44);
     const ids = tours.map((t) => t.id);
-    expect(new Set(ids).size).toBe(43);
+    expect(new Set(ids).size).toBe(44);
     for (const tour of tours) {
       expect(tour.id.startsWith(`${tour.season}-`)).toBe(true);
     }

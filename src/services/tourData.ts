@@ -29,6 +29,7 @@ const scheduleEventSchema = z.object({
   status: z.enum(['planned', 'open', 'full', 'cancelled', 'completed']),
   comment: z.string().nullable(),
   overridePriceRub: z.number().nonnegative().optional(),
+  durationType: z.enum(['однодневный', 'многодневный']).optional(),
 });
 
 const scheduleSchema = z
@@ -92,17 +93,19 @@ async function fetchJsonFromCandidates(urls: string[]): Promise<unknown> {
 }
 
 function toursListUrls(): string[] {
-  return [
-    ...cmsTourScheduleOverlayCandidates().toursList,
-    buildTourDataFileUrl(TOUR_DATA_S3_PATHS.toursList),
-  ];
+  const overlay = cmsTourScheduleOverlayCandidates().toursList;
+  if (overlay.length > 0) {
+    return overlay;
+  }
+  return [buildTourDataFileUrl(TOUR_DATA_S3_PATHS.toursList)];
 }
 
 function scheduleUrls(): string[] {
-  return [
-    ...cmsTourScheduleOverlayCandidates().schedule,
-    buildTourDataFileUrl(TOUR_DATA_S3_PATHS.schedule),
-  ];
+  const overlay = cmsTourScheduleOverlayCandidates().schedule;
+  if (overlay.length > 0) {
+    return overlay;
+  }
+  return [buildTourDataFileUrl(TOUR_DATA_S3_PATHS.schedule)];
 }
 
 export const loadToursList = async (): Promise<ToursListPayload> =>

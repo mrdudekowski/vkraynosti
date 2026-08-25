@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { realpathSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { defineConfig, loadEnv, type Plugin, type ViteDevServer } from 'vite'
@@ -10,9 +11,11 @@ import {
 import { pruneDistForCdn as pruneDistForCdnFromLib } from './scripts/lib/pruneDistForCdn.ts'
 import { rewriteAdminDevUrl } from './scripts/lib/rewriteAdminDevUrl.ts'
 import { stripGithubPagesSpaRedirectScript } from './scripts/lib/stripGithubPagesScripts.ts'
+
+const projectRoot = realpathSync.native(process.cwd())
 const loadedViteEnv = loadEnv(
   process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  process.cwd(),
+  projectRoot,
   'VITE_'
 )
 const mediaCdnOrigin = parseMediaOriginFromAssetBaseUrl(
@@ -51,7 +54,7 @@ function pruneDistForCdnPlugin(): Plugin {
     name: 'prune-dist-for-cdn',
     apply: 'build',
     closeBundle() {
-      const distDir = path.resolve(process.cwd(), 'dist')
+      const distDir = path.resolve(projectRoot, 'dist')
       const { pruned } = pruneDistForCdnFromLib(distDir)
       if (pruned.length > 0) {
         console.log(`[prune-dist-for-cdn] Removed from dist: ${pruned.join(', ')}`)
@@ -137,6 +140,7 @@ const securityHeaders = {
 } as const;
 
 export default defineConfig({
+  root: projectRoot,
   plugins: [
     serveAdminHtmlPlugin(appBasePath.endsWith('/') ? appBasePath : `${appBasePath}/`),
     react(),
@@ -161,13 +165,17 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.test.ts', 'scripts/**/*.test.mjs'],
+    exclude: [
+      'scripts/cms/api/app.test.ts',
+      'scripts/cms/api/**/*.integration.test.ts',
+    ],
   },
   base: appBasePath.endsWith('/') ? appBasePath : `${appBasePath}/`,
   build: {
     rollupOptions: {
       input: {
-        main: path.resolve(process.cwd(), 'index.html'),
-        admin: path.resolve(process.cwd(), 'admin/index.html'),
+        main: path.resolve(projectRoot, 'index.html'),
+        admin: path.resolve(projectRoot, 'admin/index.html'),
       },
       output: {
         manualChunks(id) {

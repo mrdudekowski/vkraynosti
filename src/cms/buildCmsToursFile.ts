@@ -22,10 +22,13 @@ export function buildCmsTourPackages(
   options: {
     publicBaseUrl: string;
     rewriteTourIds?: readonly string[];
+    rewriteAllTourMedia?: boolean;
     meta?: Partial<CmsTourMeta>;
   }
 ): CmsTourPackage[] {
-  const rewriteIds = new Set(options.rewriteTourIds ?? CMS_DEV_REWRITTEN_TOUR_IDS);
+  const rewriteIds = options.rewriteAllTourMedia
+    ? new Set(tours.map((tour) => tour.id))
+    : new Set(options.rewriteTourIds ?? CMS_DEV_REWRITTEN_TOUR_IDS);
   const base = options.publicBaseUrl.replace(/\/+$/, '');
 
   return tours.map((tour) => {
@@ -57,6 +60,7 @@ export function buildCmsToursFile(
   options: {
     publicBaseUrl: string;
     rewriteTourIds?: readonly string[];
+    rewriteAllTourMedia?: boolean;
   }
 ): CmsToursFile {
   return compilePublishedToursFile(buildCmsTourPackages(tours, options));

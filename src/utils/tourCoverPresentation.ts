@@ -10,6 +10,7 @@ import {
   formatCoverCropCssVars,
   formatMediaFocalPoint,
   hasHeroCoverCrop,
+  TOUR_HERO_OBJECT_POSITION_CLASS,
 } from './mediaObjectPosition';
 
 type CoverTour = Pick<Tour, 'id' | 'contentSourceTourId' | 'coverCrop'>;
@@ -84,7 +85,7 @@ export function tourHeroObjectProps(tour: CoverTour): {
 } {
   if (hasHeroCoverCrop(tour.coverCrop)) {
     return {
-      heroImageObjectClassName: 'tour-hero-object-position',
+      heroImageObjectClassName: TOUR_HERO_OBJECT_POSITION_CLASS,
       style: formatCoverCropCssVars(tour.coverCrop) as CSSProperties,
     };
   }

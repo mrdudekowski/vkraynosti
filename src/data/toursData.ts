@@ -108,10 +108,13 @@ import {
   TOUR_SUMMER_12_GALLERY_GRID,
   TOUR_SUMMER_12_GALLERY_VIEWER,
   TOUR_SUMMER_12_PREFACE_BACKGROUND,
+  TOUR_SUMMER_14_COVER_GRID,
+  TOUR_SUMMER_14_GALLERY_GRID,
+  TOUR_SUMMER_14_GALLERY_VIEWER,
+  TOUR_SUMMER_14_PREFACE_BACKGROUND,
 } from '../constants/images';
 import {
   TOUR_SUMMER_13_STUB,
-  TOUR_SUMMER_14_STUB,
   TOUR_SUMMER_15_STUB,
   TOUR_SUMMER_16_STUB,
   TOUR_SUMMER_17_STUB,
@@ -121,6 +124,7 @@ import { FALL_TOUR_MEDIA_BY_ID } from '../constants/generated/fallTourMedia.gene
 import { SUMMER_PAIRED_TOUR_MEDIA_BY_ID } from '../constants/generated/summerPairedTourMedia.generated';
 import { UI } from '../constants/ui';
 import { SUMMER_TOUR_DISPLAY_ORDER } from '../constants/summerTourDisplayOrder';
+import { persistTourDescriptionColumns } from '../utils/splitTourDescription';
 import { sortToursByDisplayOrder } from '../utils/sortToursByDisplayOrder';
 import { buildFallToursFromSpring } from './createFallTourFromSpring';
 import { applyTourSlugs } from './tourSlugs';
@@ -1489,13 +1493,65 @@ const TOURS_CORE: Tour[] = [
     difficulty: 'Easy',
     media: TOUR_SUMMER_13_STUB,
   }),
-  createSummerTourStub({
+  {
     id: 'summer-14',
-    title: 'Уникальный остров Петрова',
+    season: 'summer',
+    title: 'Остров Петрова',
+    subtitle:
+      'Один день среди заповедного моря, тисовой рощи и редкой красоты Приморья.',
+    heroPhrase:
+      'Туда, где бирюзовая вода, древний лес и кажется, будто время стало тише.',
     duration: '1 день',
     difficulty: 'Easy',
-    media: TOUR_SUMMER_14_STUB,
-  }),
+    difficultyDisplayLabel: formatDifficultyRangeLabel('Easy', 'Medium'),
+    price: 'по запросу',
+    priceFootnote: 'Актуальную стоимость сообщим по запросу.',
+    description:
+      'Это один день среди тех красот Приморья, в которые влюбляешься сразу. Море, заповедный остров и тёплая компания — всё, чтобы уехать домой с лёгкой головой и очень красивыми впечатлениями.',
+    descriptionAside:
+      'Маршрут про живую красоту: хочется идти медленнее и смотреть внимательнее. Рядом — бухта Петрова с знаменитыми «поющими песками», визитной карточкой этой локации.',
+    program: [
+      { timeLabel: '05:00', description: 'Выезд из Владивостока' },
+      { timeLabel: '10:00', description: 'Прибытие в б. Петрова' },
+      {
+        timeLabel: '10:00–12:00',
+        description:
+          'Свободное время в бухте: релакс, фото-видео, прогулка вдоль моря, купания',
+      },
+      { timeLabel: '12:00–12:45', description: 'Горячий обед' },
+      {
+        timeLabel: '13:00–16:00',
+        description: 'Прогулка по острову Петрова с экотропой и видовыми точками',
+      },
+      {
+        timeLabel: '16:00–17:00',
+        description:
+          'Завершающий чилл в бухте: обмен впечатлениями, прощание с бухтой',
+      },
+      { timeLabel: '17:00', description: 'Выезд в сторону города' },
+      { timeLabel: '21:00–22:00', description: 'Возвращение во Владивосток' },
+    ],
+    programAdditionalNotes: [
+      'Тайминг ориентировочный и зависит от погоды, состояния моря, дорожных условий и режима посещения заповедной территории. На остров действуют ограничения по количеству посетителей, поэтому места лучше бронировать заранее.',
+    ],
+    includedInPrice: [
+      inc('Трансфер туда и обратно', faShuttleVan),
+      inc('Организация маршрута', faBookOpen),
+      inc('Сопровождение команды Вкрайности', faUserTie),
+      inc('Посещение острова Петрова', faWater),
+      inc('Время на прогулку, отдых и фото', faPersonHiking),
+      inc('Наша забота и тёплая атмосфера в поездке', faHeart),
+    ],
+    imageUrl: TOUR_SUMMER_14_COVER_GRID,
+    prefaceBackgroundImageUrl: TOUR_SUMMER_14_PREFACE_BACKGROUND,
+    galleryImages: [...TOUR_SUMMER_14_GALLERY_VIEWER],
+    galleryGridUrls: [...TOUR_SUMMER_14_GALLERY_GRID],
+    coverCrop: {
+      card: { x: 49.67, y: 53.99 },
+      hero: { x: 57.39, y: 50.6 },
+      heroLg: { x: 51.02, y: 49.82 },
+    },
+  },
   createSummerTourStub({
     id: 'summer-15',
     title: 'Один день в Дубовой',
@@ -1548,7 +1604,24 @@ const TOURS_BEFORE_FALL: Tour[] = [
 
 const FALL_TOURS = buildFallToursFromSpring(springTours, FALL_TOUR_MEDIA_BY_ID);
 
-export const TOURS: Tour[] = applyTourSlugs([...TOURS_BEFORE_FALL, ...FALL_TOURS]);
+function withPersistedDescriptionColumns(tour: Tour): Tour {
+  const columns = persistTourDescriptionColumns(tour.description, tour.descriptionAside);
+  if (
+    columns.description === tour.description &&
+    columns.descriptionAside === tour.descriptionAside
+  ) {
+    return tour;
+  }
+  return {
+    ...tour,
+    description: columns.description,
+    ...(columns.descriptionAside != null ? { descriptionAside: columns.descriptionAside } : {}),
+  };
+}
+
+export const TOURS: Tour[] = applyTourSlugs([...TOURS_BEFORE_FALL, ...FALL_TOURS]).map(
+  withPersistedDescriptionColumns,
+);
 
 export const getToursBySeason = (season: Tour['season']): Tour[] =>
   TOURS.filter(t => t.season === season);

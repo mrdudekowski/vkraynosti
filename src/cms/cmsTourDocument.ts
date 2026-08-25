@@ -43,11 +43,13 @@ export const cmsCoverCropSchema = z.object({
   heroLg: cmsMediaFocalPointSchema.optional(),
 });
 
+export const CMS_TOUR_STATUSES = ['draft', 'in_development', 'active', 'hidden'] as const;
+
 export const cmsTourDocumentSchema = z.object({
   id: z.string().min(1),
   slug: z.string().min(1),
   season: z.enum(['winter', 'spring', 'summer', 'fall']),
-  status: z.enum(['draft', 'in_development', 'active', 'hidden']).default('draft'),
+  status: z.enum(CMS_TOUR_STATUSES).default('draft'),
   title: z.string().min(1),
   subtitle: z.string().default(''),
   heroPhrase: z.string().default(''),
@@ -55,6 +57,7 @@ export const cmsTourDocumentSchema = z.object({
   descriptionLeadBold: z.string().optional(),
   descriptionAside: z.string().optional(),
   duration: z.string().default(''),
+  durationDays: z.number().int().min(1).optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard', 'Expert']).default('Medium'),
   difficultyDisplayLabel: z.string().optional(),
   metaAudienceLabel: z.string().optional(),

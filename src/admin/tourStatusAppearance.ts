@@ -11,5 +11,8 @@ export function tourStatusTone(status: CmsTourDocument['status']): AdminBadgeTon
   if (status === 'hidden') {
     return 'info';
   }
+  if (status === 'draft') {
+    return 'draft';
+  }
   return 'neutral';
 }

@@ -26,4 +26,20 @@ describe('filterEventsByPublicationStatuses', () => {
 
     expect(filtered.map(item => item.tourId)).toEqual(['spring-1']);
   });
+
+  it('keeps completed dates of a hidden tour', () => {
+    const statuses = new Map([['spring-2', 'hidden' as const]]);
+
+    const filtered = filterEventsByPublicationStatuses(
+      [
+        { ...event('spring-2'), status: 'open' as const },
+        { ...event('spring-2'), date: '2026-05-01', status: 'completed' as const },
+      ],
+      statuses,
+    );
+
+    expect(filtered).toEqual([
+      expect.objectContaining({ tourId: 'spring-2', status: 'completed' }),
+    ]);
+  });
 });

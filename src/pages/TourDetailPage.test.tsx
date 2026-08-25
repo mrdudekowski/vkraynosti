@@ -8,6 +8,10 @@ import { TourScheduleContext } from '../context/tour-schedule-context-definition
 import { getTourById } from '../data/toursData';
 import { UI } from '../constants/ui';
 import {
+  formatMediaFocalPoint,
+  TOUR_DETAIL_HERO_OBJECT_POSITION_CLASS,
+} from '../utils/mediaObjectPosition';
+import {
   getLegacyTourPath,
   getTourPublicPath,
 } from '../constants/tourUrls';
@@ -27,6 +31,7 @@ const scheduleContextValue = {
     ['spring-1', 'active' as const],
     ['summer-10', 'active' as const],
     ['summer-13', 'in_development' as const],
+    ['summer-14', 'active' as const],
   ]),
   error: null,
   retry: vi.fn(),
@@ -110,17 +115,12 @@ describe('TourDetailPage hidden', () => {
 });
 
 describe('TourDetailPage inDevelopment', () => {
-  it('renders in-development layout for summer-13', () => {
+  it('shows not found for in_development tour after schedule loaded', () => {
     renderTourDetailPage('summer-13');
 
-    expect(screen.getByTestId('tour-detail-main')).toBeInTheDocument();
-    expect(screen.getByTestId('tour-detail-in-development')).toBeInTheDocument();
-    expect(screen.getByText(UI.tourDetail.inDevelopmentHeading)).toBeInTheDocument();
-    expect(screen.getByText(UI.tourDetail.programInDevelopment)).toBeInTheDocument();
-    const departuresEmptyMessages = screen.getAllByText(UI.tourDetail.departuresEmpty);
-    expect(departuresEmptyMessages.length).toBeGreaterThanOrEqual(1);
-    expect(screen.queryByText(UI.tourDetail.gallery)).not.toBeInTheDocument();
-    expect(screen.queryByText(UI.tourDetail.includedHeading)).not.toBeInTheDocument();
+    expect(screen.getByText(UI.tourDetail.notFound)).toBeInTheDocument();
+    expect(screen.queryByTestId('tour-detail-main')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('tour-detail-in-development')).not.toBeInTheDocument();
   });
 });
 
@@ -131,6 +131,22 @@ describe('TourDetailPage full layout', () => {
     expect(screen.getByTestId('tour-detail-main')).toBeInTheDocument();
     expect(screen.queryByTestId('tour-detail-in-development')).not.toBeInTheDocument();
     expect(screen.getByText(UI.tourDetail.includedHeading)).toBeInTheDocument();
+  });
+
+  it('applies CMS cover crop object-position on the tour hero', () => {
+    const tour = getTourById('summer-14');
+    if (tour?.coverCrop?.hero == null || tour.coverCrop.heroLg == null) {
+      throw new Error('summer-14 coverCrop missing');
+    }
+
+    renderTourDetailPage('summer-14');
+
+    const frame = document.querySelector(`.${TOUR_DETAIL_HERO_OBJECT_POSITION_CLASS}`);
+    expect(frame).not.toBeNull();
+    expect(frame).toHaveStyle({
+      '--tour-hero-object-position': formatMediaFocalPoint(tour.coverCrop.hero),
+      '--tour-hero-object-position-lg': formatMediaFocalPoint(tour.coverCrop.heroLg),
+    });
   });
 });
 

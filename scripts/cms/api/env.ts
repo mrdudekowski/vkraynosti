@@ -10,6 +10,7 @@ export type CmsApiUser = {
 };
 
 export type CmsStoreKind = 's3' | 'filesystem';
+export type CmsCookieSameSite = 'Strict' | 'Lax' | 'None';
 
 export type CmsApiS3Config = {
   bucket: string;
@@ -25,6 +26,7 @@ export type CmsApiEnv = {
   port: number;
   authSecret: string;
   cookieSecure: boolean;
+  cookieSameSite: CmsCookieSameSite;
   crmInboundSecret: string;
   users: CmsApiUser[];
   storeKind: CmsStoreKind;
@@ -121,6 +123,11 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
     port: Number.isFinite(port) ? port : 3000,
     authSecret,
     cookieSecure: get('CMS_COOKIE_SECURE') === 'true',
+    cookieSameSite: get('CMS_COOKIE_SAME_SITE') === 'None'
+      ? 'None'
+      : get('CMS_COOKIE_SAME_SITE') === 'Strict'
+        ? 'Strict'
+        : 'Lax',
     crmInboundSecret: get('CMS_CRM_INBOUND_SECRET'),
     users,
     storeKind,

@@ -785,7 +785,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     });
     setCookie(c, CMS_SESSION_COOKIE, rawToken, {
       httpOnly: true,
-      sameSite: 'Lax',
+      sameSite: env.cookieSameSite,
       path: '/',
       maxAge: Math.floor(CMS_SESSION_TTL_MS / 1000),
       secure: env.cookieSecure,

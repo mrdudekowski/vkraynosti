@@ -34,11 +34,11 @@ serve(
   {
     fetch: app.fetch,
     port: env.port,
-    hostname: '127.0.0.1',
+    hostname: '0.0.0.0',
   },
   (info) => {
     console.info(
-      `CMS API http://127.0.0.1:${info.port} (store: ${env.storeKind}, proxy: /api/cms)`
+      `CMS API http://0.0.0.0:${info.port} (store: ${env.storeKind}, proxy: /api/cms)`
     );
   }
 );

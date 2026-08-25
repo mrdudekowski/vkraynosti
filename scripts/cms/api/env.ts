@@ -108,8 +108,8 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
     throw new Error('S3 keys/bucket missing in .env.cms-dev (or set CMS_STORE=filesystem)');
   }
 
-  const portRaw = process.env.CMS_API_PORT || get('CMS_API_PORT');
-  const port = portRaw.length > 0 ? Number.parseInt(portRaw, 10) : 8787;
+  const portRaw = process.env.PORT || process.env.CMS_API_PORT || get('CMS_API_PORT');
+  const port = portRaw.length > 0 ? Number.parseInt(portRaw, 10) : 3000;
   const publicBaseUrl = (
     get('S3_PUBLIC_BASE_URL') ||
     (bucket.length > 0
@@ -118,7 +118,7 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
   ).replace(/\/+$/, '');
 
   return {
-    port: Number.isFinite(port) ? port : 8787,
+    port: Number.isFinite(port) ? port : 3000,
     authSecret,
     cookieSecure: get('CMS_COOKIE_SECURE') === 'true',
     crmInboundSecret: get('CMS_CRM_INBOUND_SECRET'),

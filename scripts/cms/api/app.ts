@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
+import { cors } from 'hono/cors';
 import { z } from 'zod';
 import {
   applyTourTextPatch,
@@ -649,6 +650,23 @@ function departureErrorResponse(error: unknown): {
 export function createCmsApiApp(deps: CmsApiDeps) {
   const { env, store, authRepository, departureRepository } = deps;
   const app = new Hono<{ Variables: AppVariables }>();
+  const allowedOrigins = new Set(
+    (process.env.CMS_CORS_ORIGINS ??
+      'https://mrdudekowski-vkraynosti-61ea.twc1.net,https://vkraynosti.ru,https://www.vkraynosti.ru')
+      .split(',')
+      .map((origin) => origin.trim().replace(/\/+$/, ''))
+      .filter(Boolean)
+  );
+  app.use(
+    '/api/cms/*',
+    cors({
+      origin: (origin) => (allowedOrigins.has(origin) ? origin : undefined),
+      allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowHeaders: ['Content-Type'],
+      credentials: true,
+      maxAge: 600,
+    })
+  );
   const seedPromise = seedLocalCmsUsersIfEmpty(authRepository, env);
 
   async function loadQueueTours(): Promise<QueueTourInput[]> {

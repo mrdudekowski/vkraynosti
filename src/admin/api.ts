@@ -5,6 +5,18 @@ import type { CmsTourTextPatch } from '../cms/applyTourTextPatch';
 import type { CmsTourLayoutPatch } from '../cms/applyTourLayoutPatch';
 import type { CrmDeal, CrmFile, CrmMessenger, CrmTouchKind } from '../crm/crmDocument';
 
+const cmsApiBaseUrl = (import.meta.env.VITE_CMS_API_BASE_URL ?? '').trim().replace(/\/+$/, '');
+
+function cmsApiUrl(input: RequestInfo | URL): RequestInfo | URL {
+  if (cmsApiBaseUrl.length === 0 || typeof input !== 'string' || !input.startsWith('/')) {
+    return input;
+  }
+  return `${cmsApiBaseUrl}${input}`;
+}
+
+const fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
+  globalThis.fetch(cmsApiUrl(input), init);
+
 export type AdminSession = {
   login: string;
   role: 'admin' | 'editor';

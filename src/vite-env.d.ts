@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_PUBLIC_S3_BASE_URL?: string;
   /** Публичный origin бакета CMS-dev (туры JSON + медиа). Пусто = overlay выключен. */
   readonly VITE_CMS_S3_BASE_URL?: string;
+  /** Backend origin for CMS/CRM admin API; empty keeps same-origin `/api/cms`. */
+  readonly VITE_CMS_API_BASE_URL?: string;
   readonly VITE_YANDEX_METRIKA_ID?: string;
   readonly VITE_SITE_URL?: string;
   readonly VITE_BASE_PATH?: string;

@@ -194,6 +194,7 @@ const SidebarBody = ({
         ) : null}
       </nav>
       <div className="mt-auto flex flex-col gap-1 px-2 pb-3">
+        <AdminProfileMenu session={session} onLogout={onLogout} />
         <button type="button" className="admin-sidebar-nav w-full" onClick={onLogout} title={ADMIN_UI.logout}>
           <AdminIcon icon={LogOut} />
           <span className={compact ? 'sr-only' : undefined}>{ADMIN_UI.logout}</span>
@@ -408,7 +409,6 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
         />
       ) : null}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <AdminProfileMenu session={session} onLogout={onLogout} />
         <main
           id="admin-main"
           className={`min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto ${

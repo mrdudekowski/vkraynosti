@@ -1,4 +1,4 @@
-import { CalendarOff } from 'lucide-react';
+import { CalendarOff, Plus } from 'lucide-react';
 import type { AdminDeparture, AdminTourListItem } from '../api';
 import type { DepartureQuickStatus } from '../departureQuickStatus';
 import { ADMIN_UI } from '../constants/ui';
@@ -7,9 +7,9 @@ import {
   formatScheduleSeatsTotal,
   formatScheduleWeekdayDate,
 } from '../formatAdminCopy';
-import AdminButton from './AdminButton';
 import AdminEmptyState from './AdminEmptyState';
 import ScheduleWeekDepartureRow from './ScheduleWeekDepartureRow';
+import AdminIcon from './AdminIcon';
 
 type ScheduleWeekDayPanelProps = {
   iso: string;
@@ -54,8 +54,8 @@ const ScheduleWeekDayPanel = ({
             {departures.length > 0 ? ` · ${formatScheduleSeatsTotal(seatsTotal)}` : ''}
           </p>
         </div>
-        <AdminButton type="button" variant="secondary" onClick={onAdd}>
-          {ADMIN_UI.scheduleAddDeparture}
+        <button type="button" className="admin-schedule-context-add" aria-label={`${ADMIN_UI.scheduleAddOnDate} ${iso}`} onClick={onAdd}>
+          <AdminIcon icon={Plus} size={18} />
         </AdminButton>
       </div>
       {departures.length === 0 ? (
@@ -63,11 +63,6 @@ const ScheduleWeekDayPanel = ({
           <AdminEmptyState
             title={ADMIN_UI.scheduleDayEmpty}
             icon={CalendarOff}
-            action={
-              <AdminButton type="button" variant="secondary" onClick={onAdd}>
-                {ADMIN_UI.scheduleAddDeparture}
-              </AdminButton>
-            }
           />
         </div>
       ) : (

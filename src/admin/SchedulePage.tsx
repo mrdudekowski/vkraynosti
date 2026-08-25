@@ -534,16 +534,11 @@ const SchedulePage = () => {
 
   return (
     <AdminPageFrame variant="wide" className={sectionScroll ? 'admin-schedule-section-frame' : undefined}>
-      <ScheduleReferenceTopBar onOpenCreateMenu={() => setWizard({})} />
+      <ScheduleReferenceTopBar />
       <div className={sectionScroll ? 'admin-schedule-section-stack' : 'flex flex-col gap-5'}>
         <AdminPageHeader
         title={ADMIN_UI.scheduleTitle}
         description={monthGrid ? undefined : ADMIN_UI.scheduleMoveHint}
-        action={
-          <AdminButton type="button" onClick={() => setWizard({})}>
-            {ADMIN_UI.scheduleAdd}
-          </AdminButton>
-        }
         secondary={
           session.canPublishSchedule ? (
             <AdminButton
@@ -663,7 +658,6 @@ const SchedulePage = () => {
           todayIso={todayIso}
           onSelectDay={onSelectWeekDay}
           onAddOnDate={openWizardForCell}
-          onAddWeek={() => setWizard({})}
           onOpenDeparture={openExisting}
           onStatusChange={(departure, status) => {
             void changeQuickStatus(departure, status);
@@ -686,7 +680,6 @@ const SchedulePage = () => {
           className="admin-schedule-day-agenda"
           onSelectDay={onSelectWeekDay}
           onAddOnDate={openWizardForCell}
-          onAddWeek={() => openWizardForCell(cursorIso)}
           onOpenDeparture={openExisting}
           onStatusChange={(departure, status) => {
             void changeQuickStatus(departure, status);

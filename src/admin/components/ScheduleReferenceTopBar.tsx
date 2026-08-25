@@ -1,13 +1,8 @@
-import { Bell, Plus, Search } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 import { ADMIN_UI } from '../constants/ui';
-import AdminButton from './AdminButton';
 import AdminIcon from './AdminIcon';
 
-type ScheduleReferenceTopBarProps = {
-  onOpenCreateMenu: () => void;
-};
-
-const ScheduleReferenceTopBar = ({ onOpenCreateMenu }: ScheduleReferenceTopBarProps) => (
+const ScheduleReferenceTopBar = () => (
   <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-divider pb-3 sm:pr-56">
     <label className="relative min-w-0 flex-1 sm:max-w-sm">
       <AdminIcon
@@ -37,10 +32,6 @@ const ScheduleReferenceTopBar = ({ onOpenCreateMenu }: ScheduleReferenceTopBarPr
       >
         <AdminIcon icon={Bell} size={16} />
       </button>
-      <AdminButton type="button" onClick={onOpenCreateMenu}>
-        <AdminIcon icon={Plus} size={16} />
-        {ADMIN_UI.quickAdd}
-      </AdminButton>
     </div>
   </div>
 );

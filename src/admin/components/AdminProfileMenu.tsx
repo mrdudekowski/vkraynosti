@@ -15,13 +15,13 @@ export default function AdminProfileMenu({ session, onLogout }: { session: Admin
     return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', escape); };
   }, [open]);
   const role = session.role === 'admin' ? ADMIN_UI.scheduleAccountRoleAdmin : ADMIN_UI.scheduleAccountRoleEditor;
-  return <div ref={ref} className="fixed right-4 top-3 z-navbar">
-    <button type="button" className="flex items-center gap-2 rounded-admin-control bg-surface-light/95 px-2 py-1.5 shadow-admin-overlay" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+  return <div ref={ref} className="relative w-full">
+    <button type="button" className="flex min-h-11 w-full items-center gap-2 rounded-admin-control px-2 py-1.5 text-left transition-colors hover:bg-text-inverse/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-inverse/50" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
       <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-dark text-xs font-semibold text-text-primary">{session.login.slice(0, 1).toUpperCase()}</span>
-      <span className="hidden text-left text-tooltip sm:block"><span className="block font-medium text-text-primary">{session.login}</span><span className="text-text-muted">{role}</span></span>
-      <AdminIcon icon={ChevronDown} size={16} className="text-text-muted" />
+      <span className="min-w-0 flex-1 text-tooltip"><span className="block truncate font-medium text-text-inverse">{session.login}</span><span className="block truncate text-text-inverse/60">{role}</span></span>
+      <AdminIcon icon={ChevronDown} size={16} className="shrink-0 text-text-inverse/60" />
     </button>
-    {open ? <div role="menu" className="absolute right-0 mt-2 w-60 rounded-admin-control border border-divider bg-surface-light p-2 shadow-admin-overlay">
+    {open ? <div role="menu" className="absolute bottom-full left-0 z-tooltip mb-2 w-full min-w-60 rounded-admin-control border border-divider bg-surface-light p-2 shadow-admin-overlay">
       <p className="px-2 py-1 text-xs text-text-muted">{role}</p>
       <p className="px-2 py-1 text-sm text-text-primary">{session.canPublishTours ? 'Публикация туров разрешена' : 'Только черновики туров'}</p>
       <p className="px-2 py-1 text-sm text-text-primary">{session.canPublishSchedule ? 'Публикация выездов разрешена' : 'Только черновики выездов'}</p>

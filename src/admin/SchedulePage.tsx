@@ -539,6 +539,11 @@ const SchedulePage = () => {
         <AdminPageHeader
         title={ADMIN_UI.scheduleTitle}
         description={monthGrid ? undefined : ADMIN_UI.scheduleMoveHint}
+        action={
+          <AdminButton type="button" onClick={() => setWizard({})}>
+            {ADMIN_UI.scheduleAdd}
+          </AdminButton>
+        }
         secondary={
           session.canPublishSchedule ? (
             <AdminButton

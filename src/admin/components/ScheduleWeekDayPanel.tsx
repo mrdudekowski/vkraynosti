@@ -56,7 +56,7 @@ const ScheduleWeekDayPanel = ({
         </div>
         <button type="button" className="admin-schedule-context-add" aria-label={`${ADMIN_UI.scheduleAddOnDate} ${iso}`} onClick={onAdd}>
           <AdminIcon icon={Plus} size={18} />
-        </AdminButton>
+        </button>
       </div>
       {departures.length === 0 ? (
         <div className="mt-4">

@@ -43,13 +43,13 @@ jobs:
       - name: Sync tour catalog from CDN
         env:
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
-          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
+          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
         run: npm run sync:catalog
 
       - name: Generate sitemap and robots
         env:
-          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_SITE_URL || '' }}
-          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && '/' || '/vkraynosti/' }}
+          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_SITE_URL || '' }}
+          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && '/' || '/vkraynosti/' }}
         run: |
           npm run generate:sitemap
           npm run generate:robots
@@ -62,9 +62,9 @@ jobs:
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
           VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
-          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
-          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_SITE_URL || '' }}
-          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && '/' || '/vkraynosti/' }}
+          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
+          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_SITE_URL || '' }}
+          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && '/' || '/vkraynosti/' }}
         run: npm run build
 
       - name: Data-SSG routes (body + JSON-LD for crawlers)
@@ -72,9 +72,9 @@ jobs:
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
           VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
-          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
-          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_SITE_URL || '' }}
-          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && '/' || '/vkraynosti/' }}
+          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
+          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_SITE_URL || '' }}
+          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && '/' || '/vkraynosti/' }}
         run: npm run data:ssg
 
       - name: Generate OG shells for SEO
@@ -82,9 +82,9 @@ jobs:
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
           VITE_YANDEX_METRIKA_ID: ${{ vars.VITE_YANDEX_METRIKA_ID }}
-          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
-          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && vars.VITE_SITE_URL || '' }}
-          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr') && '/' || '/vkraynosti/' }}
+          VITE_PUBLIC_ASSET_BASE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_PUBLIC_ASSET_BASE_URL || '' }}
+          VITE_SITE_URL: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && vars.VITE_SITE_URL || '' }}
+          VITE_BASE_PATH: ${{ (github.ref == 'refs/heads/web-vkr' || github.head_ref == 'web-vkr' || github.ref == 'refs/heads/cms-crm-phase1-staging' || github.head_ref == 'cms-crm-phase1-staging') && '/' || '/vkraynosti/' }}
         run: npm run og:shells
 
       - name: Verify OG shells

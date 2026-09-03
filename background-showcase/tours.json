@@ -1,41 +1,255 @@
 {
-  "source": "scripts/fixtures/tour-schedule/tours_list.json",
-  "snapshotDate": "2026-06-11",
+  "source": "public/data/cms/tour-schedule/tours_list.json",
+  "snapshotDate": "2026-08-17",
   "publicationRule": "publicationStatus === active",
+  "featured": {
+    "id": "winter-1",
+    "slug": "voskhozhdenie-na-izyubrinuyu",
+    "season": "winter",
+    "status": "active",
+    "title": "Восхождение на Изюбриную",
+    "subtitle": "Снежные покровы в тайге Сихоте-Алиня",
+    "heroPhrase": "Сказочные заснеженные ели Изюбриной",
+    "description": " — живописная вершина в Чугуевском районе Приморского края на пересечении хребтов Белки и Лугового. «Самая снежная» вершина известна своими сказочными заснеженными елями и является местом притяжения зимнего туризма. Входит в список «Лунного медведя».",
+    "descriptionLeadBold": "Гора Изюбриная (1433 м)",
+    "duration": "16 часов",
+    "difficulty": "Medium",
+    "price": "6 000 ₽",
+    "program": [
+      {
+        "timeLabel": "04:30",
+        "description": "Выезд из Владивостока навстречу приключениям!"
+      },
+      {
+        "timeLabel": "10:00",
+        "description": "Прибытие к подножию самой зимней горы Приморья"
+      },
+      {
+        "timeLabel": "10:00–13:30",
+        "description": "Бодрое восхождение"
+      },
+      {
+        "timeLabel": "13:30–14:00",
+        "description": "Отдых на вершине, фото- и видео-фиксация нашего успеха!"
+      },
+      {
+        "timeLabel": "14:00–15:30",
+        "description": "Приятный спуск на своих двоих или экстремальный на ледянках или сноубордах."
+      },
+      {
+        "timeLabel": "15:30–17:00",
+        "description": "Горячий обед на костре и согревающий глинтвейн у подножья"
+      },
+      {
+        "timeLabel": "17:00–00:00",
+        "description": "Возвращение в город"
+      }
+    ],
+    "included": [
+      {
+        "text": "Трансфер от точки сбора и обратно во Владивосток",
+        "iconKey": "van-shuttle"
+      },
+      {
+        "text": "Горячее питание и согревающий глинтвейн",
+        "iconKey": "mug-hot"
+      },
+      {
+        "text": "Ледоступы/кошки (при необходимости)",
+        "iconKey": "person-hiking"
+      },
+      {
+        "text": "Гамаши, чтобы ноги оставались в тепле (при необходимости)",
+        "iconKey": "socks"
+      },
+      {
+        "text": "Гид проводник и захватывающие истории о крае и местности.",
+        "iconKey": "user-tie"
+      },
+      {
+        "text": "Ледянки/хобы для весёлой прокатки",
+        "iconKey": "person-snowboarding"
+      }
+    ],
+    "coverAssetId": "cover",
+    "prefaceAssetId": "preface",
+    "assets": [
+      {
+        "id": "cover",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/hero.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "preface",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.close.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "g-2",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.peoplewalk.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "g-3",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/trees2.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "g-4",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/trees.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "g-5",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.top.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "g-6",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.rest2.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "g-7",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.pan2.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      },
+      {
+        "id": "g-8",
+        "stillUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.rest4.webp",
+        "videoUrl": null,
+        "alt": "Восхождение на Изюбриную"
+      }
+    ],
+    "bento": {
+      "blocks": [
+        {
+          "type": "bento-single",
+          "slots": [
+            {
+              "assetId": "g-2"
+            }
+          ]
+        },
+        {
+          "type": "bento-left",
+          "slots": [
+            {
+              "assetId": "g-3"
+            },
+            {
+              "assetId": "g-4"
+            },
+            {
+              "assetId": "g-5"
+            }
+          ]
+        },
+        {
+          "type": "bento-single",
+          "slots": [
+            {
+              "assetId": "g-6"
+            }
+          ]
+        },
+        {
+          "type": "bento-single",
+          "slots": [
+            {
+              "assetId": "g-7"
+            }
+          ]
+        },
+        {
+          "type": "bento-single",
+          "slots": [
+            {
+              "assetId": "g-8",
+              "objectPosition": "object-gallery-winter-rest4"
+            }
+          ]
+        }
+      ]
+    },
+    "legacyGalleryVariant": null
+  },
   "tours": [
     {
       "id": "fall-1",
       "title": "Восхождение на Лысого Деда",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Самый восточный «тысячник» с трагической историей",
+      "difficulty": "Medium",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-1/cover.webp"
     },
     {
       "id": "fall-10",
       "title": "Путешествие на остров Аскольд",
       "priceRub": 7000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Остров-призрак с маяками, кекурами и морскими котиками",
+      "difficulty": "Medium",
+      "duration": "12–14 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-10/hero.webp"
     },
     {
       "id": "fall-11",
       "title": "Путешествие на остров Шкота",
       "priceRub": 5000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Необитаемый остров с маяком и морскими котиками",
+      "difficulty": "Easy",
+      "duration": "8–10 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-11/cover.webp"
     },
     {
       "id": "fall-12",
       "title": "Путешествие на мыс Тобизина",
       "priceRub": 5000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Край земли с каменной «шахматной доской»",
+      "difficulty": "Easy",
+      "duration": "6–8 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-12/cover.webp"
     },
     {
       "id": "fall-13",
       "title": "Полуостров Гамова",
       "priceRub": 6500,
       "durationType": "однодневный",
+      "publicationStatus": "active",
+      "subtitle": "Райский уголок на юге Приморья",
+      "difficulty": "Easy",
+      "duration": "15 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-13/cover.webp"
+    },
+    {
+      "id": "fall-14",
+      "title": "Заповедная Та-Чингоуза",
+      "priceRub": 16500,
+      "durationType": "многодневный",
+      "publicationStatus": "active"
+    },
+    {
+      "id": "fall-15",
+      "title": "Робинзонада Краббе х Гамова",
+      "priceRub": 15000,
+      "durationType": "многодневный",
       "publicationStatus": "active"
     },
     {
@@ -43,259 +257,407 @@
       "title": "Восхождение на Ольховую",
       "priceRub": 7000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Высочайшая вершина с горными озёрами",
+      "difficulty": "Hard",
+      "duration": "16–18 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-2/cover.webp"
     },
     {
       "id": "fall-3",
       "title": "Восхождение на Пидан (Ливадийскую)",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Главная мистическая вершина Приморья",
+      "difficulty": "Medium",
+      "duration": "15 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-3/cover.webp"
     },
     {
       "id": "fall-4",
       "title": "Восхождение на гору Сестра",
       "priceRub": 9000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Скальные «Зубы Дракона» и панорамы южного Сихотэ-Алиня",
+      "difficulty": "Hard",
+      "duration": "18–20 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-4/cover.webp"
     },
     {
       "id": "fall-5",
       "title": "Восхождение на Читинзу (Скалистую)",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Вершина контрастов, скальных изваяний и таинственного свиста",
+      "difficulty": "Hard",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-5/cover.webp"
     },
     {
       "id": "fall-6",
       "title": "Маралы х Драконы",
       "priceRub": 7200,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Благородные олени и скальные драконы за один день",
+      "difficulty": "Easy",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-6/hero.webp"
     },
     {
       "id": "fall-7",
       "title": "Путешествие в ущелье Дарданеллы",
       "priceRub": 4500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Каменные стражи и горная река в сердце Приморья",
+      "difficulty": "Easy",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-7/hero.webp"
     },
     {
       "id": "fall-8",
       "title": "Восхождение на г. Фалаза",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Одна из самых красивых и доступных вершин Приморья",
+      "difficulty": "Medium",
+      "duration": "1 день / 13 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-8/cover.webp"
     },
     {
       "id": "fall-9",
       "title": "Восхождение на г. Воробей + Дегустация",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Лёгкое восхождение в Приморье и дегустация местных вин в Анисимовке",
+      "difficulty": "Easy",
+      "duration": "1 день / 14,5 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-9/hero.webp"
     },
     {
       "id": "spring-1",
       "title": "Восхождение на Лысого Деда",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Самый восточный «тысячник» с трагической историей",
+      "difficulty": "Medium",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-1/hero.webp"
     },
     {
       "id": "spring-10",
       "title": "Путешествие на остров Аскольд",
       "priceRub": 7000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Остров-призрак с маяками, кекурами и морскими котиками",
+      "difficulty": "Medium",
+      "duration": "12–14 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-10/hero.webp"
     },
     {
       "id": "spring-11",
       "title": "Путешествие на остров Шкота",
       "priceRub": 5000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Необитаемый остров с маяком и морскими котиками",
+      "difficulty": "Easy",
+      "duration": "8–10 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-11/hero.webp"
     },
     {
       "id": "spring-12",
       "title": "Путешествие на мыс Тобизина",
       "priceRub": 5000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Край земли с каменной «шахматной доской»",
+      "difficulty": "Easy",
+      "duration": "6–8 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-12/cover.webp"
     },
     {
       "id": "spring-13",
       "title": "Полуостров Гамова",
       "priceRub": 6500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Райский уголок на юге Приморья",
+      "difficulty": "Easy",
+      "duration": "15 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-13/cover.webp"
     },
     {
       "id": "spring-2",
       "title": "Восхождение на Ольховую",
       "priceRub": 7000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Высочайшая вершина с горными озёрами",
+      "difficulty": "Hard",
+      "duration": "16–18 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-2/hero.webp"
     },
     {
       "id": "spring-3",
       "title": "Восхождение на Пидан (Ливадийскую)",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Главная мистическая вершина Приморья",
+      "difficulty": "Medium",
+      "duration": "15 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-3/hero.webp"
     },
     {
       "id": "spring-4",
       "title": "Восхождение на гору Сестра",
       "priceRub": 9000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Скальные «Зубы Дракона» и панорамы южного Сихотэ-Алиня",
+      "difficulty": "Hard",
+      "duration": "18–20 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-4/hero.webp"
     },
     {
       "id": "spring-5",
       "title": "Восхождение на Читинзу (Скалистую)",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Вершина контрастов, скальных изваяний и таинственного свиста",
+      "difficulty": "Hard",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-5/hero.webp"
     },
     {
       "id": "spring-6",
       "title": "Маралы х Драконы",
       "priceRub": 7200,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Благородные олени и скальные драконы за один день",
+      "difficulty": "Easy",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-6/hero.webp"
     },
     {
       "id": "spring-7",
       "title": "Путешествие в ущелье Дарданеллы",
       "priceRub": 4500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Каменные стражи и горная река в сердце Приморья",
+      "difficulty": "Easy",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-7/hero.webp"
     },
     {
       "id": "spring-8",
       "title": "Восхождение на г. Фалаза",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Одна из самых красивых и доступных вершин Приморья",
+      "difficulty": "Medium",
+      "duration": "1 день / 13 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-8/hero.webp"
     },
     {
       "id": "spring-9",
       "title": "Восхождение на г. Воробей + Дегустация",
       "priceRub": 6000,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Лёгкое восхождение в Приморье и дегустация местных вин в Анисимовке",
+      "difficulty": "Easy",
+      "duration": "1 день / 14,5 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/spring-9/hero.webp"
     },
     {
       "id": "summer-1",
       "title": "Заповедная Та-Чингоуза",
-      "priceRub": 15000,
+      "priceRub": 16500,
       "durationType": "многодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Бухта Кит, кордон Тачингоуза, бухта Просёлочная, мараловая ферма",
+      "difficulty": "Easy",
+      "duration": "2 дня / 1 ночь",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-1/first.webp"
     },
     {
       "id": "summer-10",
       "title": "Робинзонада - Приморское Бали",
       "priceRub": null,
       "durationType": "многодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Два дня у моря: видовая вершина, бирюзовая бухта и ещё один красивый день у воды",
+      "difficulty": "Easy",
+      "duration": "2 дня / 1 ночь",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-10/cover.webp"
     },
     {
       "id": "summer-11",
-      "title": "Релакс-поездка в бухту Ежовую / Спокойную",
-      "priceRub": null,
+      "title": "Релакс-тур в бухту Ежовую / Спокойную",
+      "priceRub": 7200,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Один день у моря: отдых, сапы и красота Приморья без спешки",
+      "difficulty": "Easy",
+      "duration": "1 день",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-11/cover.webp"
+    },
+    {
+      "id": "summer-14",
+      "title": "Уникальный остров Петрова",
+      "priceRub": 10500,
+      "durationType": "однодневный",
+      "publicationStatus": "active",
+      "subtitle": "Программа и детали будут опубликованы",
+      "difficulty": "Easy",
+      "duration": "1 день",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-14/cover.webp"
     },
     {
       "id": "summer-2",
       "title": "Путешествие на мыс Тобизина",
-      "priceRub": 5000,
+      "priceRub": 7500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Край земли с каменной «шахматной доской»",
+      "difficulty": "Easy",
+      "duration": "6–8 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-2/cover.webp"
     },
     {
       "id": "summer-3",
       "title": "Путешествие на остров Аскольд",
-      "priceRub": 7000,
+      "priceRub": 7500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Остров-призрак с маяками, кекурами и морскими котиками",
+      "difficulty": "Medium",
+      "duration": "12–14 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-3/hero.webp"
     },
     {
       "id": "summer-4",
       "title": "Путешествие на остров Шкота",
-      "priceRub": 5000,
+      "priceRub": 7500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Необитаемый остров с маяком и морскими котиками",
+      "difficulty": "Easy",
+      "duration": "8–10 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-4/hero.webp"
     },
     {
       "id": "summer-5",
       "title": "Полуостров Гамова",
-      "priceRub": 6500,
+      "priceRub": 7200,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Райский уголок на юге Приморья",
+      "difficulty": "Easy",
+      "duration": "15 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-5/cover.webp"
     },
     {
       "id": "summer-6",
       "title": "Путешествие в ущелье Дарданеллы",
       "priceRub": 4500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Каменные стражи и горная река в сердце Приморья",
+      "difficulty": "Easy",
+      "duration": "14–16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-6/hero.webp"
     },
     {
       "id": "summer-7",
       "title": "Северное Приморье: Тайны побережья",
       "priceRub": 19500,
       "durationType": "многодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Бухта Дубовая, маяк Балюзек и космическая тайна Дальнегорска",
+      "difficulty": "Medium",
+      "duration": "2 дня / 1 ночь",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-7/bazi.webp"
     },
     {
       "id": "summer-8",
       "title": "Полуостров Краббе",
-      "priceRub": null,
+      "priceRub": 7500,
       "durationType": "однодневный",
-      "publicationStatus": "active"
-    },
-    {
-      "id": "summer-9",
-      "title": "Водопад Неожиданный х Майхинское хозяйство",
-      "priceRub": null,
-      "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Один день среди морских скал, бухт и тех видов, в которые влюбляешься сразу.",
+      "difficulty": "Medium",
+      "duration": "1 день",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/summer-8/cover.webp"
     },
     {
       "id": "winter-1",
       "title": "Восхождение на Изюбриную",
-      "priceRub": 6000,
+      "priceRub": null,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Снежные покровы в тайге Сихоте-Алиня",
+      "difficulty": "Medium",
+      "duration": "16 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/hero.webp"
     },
     {
       "id": "winter-2",
       "title": "Восхождение на г. Голец",
-      "priceRub": 6500,
+      "priceRub": null,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Настоящее путешествие в зимнюю сказку!",
+      "difficulty": "Medium",
+      "duration": "16,5 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-2/hero.webp"
     },
     {
       "id": "winter-3",
       "title": "Горнолыжный уикенд: Фалаза х Грибановка",
-      "priceRub": 10000,
+      "priceRub": null,
       "durationType": "многодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "2 снежных дня у подножья Фалазы. Для новичков и опытных райдеров",
+      "difficulty": "Medium",
+      "duration": "2 дня",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-3/hero.webp"
     },
     {
       "id": "winter-4",
-      "title": "Хаски-поездка",
+      "title": "Хаски-тур",
       "priceRub": null,
       "durationType": "однодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "Знакомство с дружелюбными хаски и историей Приморского края — и всё это в один день!",
+      "difficulty": "Easy",
+      "duration": "12,5 часов",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-4/hero.webp"
     },
     {
       "id": "winter-5",
       "title": "Горнолыжный уикенд: АрсГора",
       "priceRub": null,
       "durationType": "многодневный",
-      "publicationStatus": "active"
+      "publicationStatus": "active",
+      "subtitle": "2 дня снежного склона на обновлённых трассах Арсеньева",
+      "difficulty": "Medium",
+      "duration": "2 дня",
+      "imageUrl": "https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-5/hero.webp"
     }
   ]
 }

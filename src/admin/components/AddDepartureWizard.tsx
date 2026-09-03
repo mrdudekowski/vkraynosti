@@ -13,6 +13,7 @@ import AdminConfirmDialog from './AdminConfirmDialog';
 import AdminDialog from './AdminDialog';
 import { AdminTextInput } from './AdminFields';
 import AdminSeasonSwitcher from './AdminSeasonSwitcher';
+import AdminSelect from './AdminSelect';
 import ScheduleTourPickCard from './ScheduleTourPickCard';
 
 export type SchedulePickableTour = {
@@ -237,12 +238,13 @@ const AddDepartureWizard = ({
           >
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium text-text-primary">{ADMIN_UI.scheduleSeats}</span>
-              <AdminTextInput
-                type="number"
-                min={1}
-                value={seats}
-                onChange={(event) => setSeats(Number(event.target.value))}
-              />
+              <AdminSelect value={seats} onChange={(event) => setSeats(Number(event.target.value))}>
+                {Array.from({ length: 20 }, (_, index) => index + 1).map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </AdminSelect>
             </label>
             <AdminButton type="submit">{ADMIN_UI.scheduleWizardSubmit}</AdminButton>
           </form>

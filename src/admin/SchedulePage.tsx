@@ -197,7 +197,9 @@ const SchedulePage = () => {
   const weekLayout = storedWeekLayout ?? 'list';
   const monthGrid = mode === 'month' && viewport !== 'mobile';
   const weekSplitDesktop = mode === 'week' && weekLayout === 'split' && viewport === 'desktop';
-  const sectionScroll = mode !== 'month';
+  // Mobile must use the shell's single touch-scroll surface. Nested flex scrollers
+  // combined with body overflow locking prevent swipe scrolling in the calendar.
+  const sectionScroll = mode !== 'month' && viewport === 'desktop';
   const showRail = !monthGrid && !weekSplitDesktop;
   const [cursorIso, setCursorIso] = useState(() =>
     dateParam != null && ISO_DATE.test(dateParam) ? dateParam : vladivostokCalendarDate(),

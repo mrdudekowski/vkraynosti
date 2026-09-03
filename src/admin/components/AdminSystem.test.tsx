@@ -101,4 +101,17 @@ describe('AdminStickyContextBar', () => {
 
     expect(screen.getByText(ADMIN_UI.autosaved)).toBeInTheDocument();
   });
+
+  it('в компактном режиме показывает лаунчер действий с бейджем блокеров', () => {
+    render(
+      <AdminStickyContextBar
+        mobileCompact
+        blockerCount={2}
+        primary={<button type="button">Сохранить</button>}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: ADMIN_UI.openEditorActions })).toBeInTheDocument();
+    expect(screen.getByText('2 блокера')).toBeInTheDocument();
+  });
 });

@@ -45,6 +45,7 @@ function textPatchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
       iconKey: item.iconKey,
     })),
     program: document.program.map((step) => ({
+      day: step.day,
       timeLabel: step.timeLabel,
       description: step.description,
     })),

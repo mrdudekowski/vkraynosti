@@ -55,6 +55,20 @@ describe('siteTourToCmsDocument', () => {
     );
   });
 
+  it('сохраняет день программы при обратном преобразовании в CMS', () => {
+    const document = siteTourToCmsDocument({
+      ...tour,
+      program: [
+        { day: 1, timeLabel: '08:00', description: 'Сбор' },
+        { day: 2, timeLabel: '09:00', description: 'Маршрут' },
+      ],
+    });
+    expect(document.program).toEqual([
+      { day: 1, timeLabel: '08:00', description: 'Сбор' },
+      { day: 2, timeLabel: '09:00', description: 'Маршрут' },
+    ]);
+  });
+
   it('ключ S3 берёт из path-style URL без имени бакета в Key', () => {
     const rewritten = rewriteCmsDocumentAssetBase(
       siteTourToCmsDocument(tour),

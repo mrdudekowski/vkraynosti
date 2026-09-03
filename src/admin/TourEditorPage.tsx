@@ -137,7 +137,7 @@ function editorTourDocument(
     description: patch.description,
     descriptionAside: patch.descriptionAside,
     included: patch.included,
-    program: patch.program,
+    program: patch.program.map((step) => ({ ...step, day: step.day ?? 1 })),
     coverAssetId: layout.coverAssetId,
     prefaceAssetId: patch.prefaceAssetId,
     bento: layout.bento,
@@ -822,6 +822,7 @@ const TourEditorPage = () => {
           inert={activeSection !== 'admin-program' ? true : undefined}
         >
           <ProgramSection
+            durationDays={patch.durationDays ?? document.durationDays}
             program={patch.program}
             notes={patch.programAdditionalNotes ?? []}
             onProgram={(program) => setPatch((current) => ({ ...current, program }))}
@@ -852,6 +853,7 @@ const TourEditorPage = () => {
         </div>
       </AdminPageFrame>
       <AdminStickyContextBar
+        mobileCompact
         readiness={readinessLabel}
         blockerCount={publishBlockers.length}
         saveHint={autosaveHint}

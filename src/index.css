@@ -663,9 +663,22 @@
   }
 
   .admin-editor-row {
-    @apply flex gap-1 rounded-admin-control px-0.5
+    @apply flex min-w-0 gap-1 rounded-admin-control px-0.5
       transition-colors duration-admin motion-reduce:transition-none
       hover:bg-surface-dark/5;
+  }
+
+  @media (max-width: 767px) {
+    .admin-editor-row > .admin-input,
+    .admin-editor-row > .admin-textarea {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .admin-editor-row .admin-input,
+    .admin-editor-row .admin-textarea {
+      max-width: 100%;
+    }
   }
 
   .admin-editor-list {
@@ -1018,6 +1031,12 @@
     @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden;
   }
 
+  .admin-schedule-week-list,
+  .admin-schedule-day-agenda {
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+
   .admin-schedule-section-stack {
     @apply flex min-h-0 flex-1 flex-col gap-5 overflow-hidden;
   }
@@ -1097,6 +1116,7 @@
     min-width: 0;
     min-height: 0;
     overflow-y: auto;
+    touch-action: pan-y;
     overscroll-behavior-y: contain;
     scrollbar-width: none;
     -ms-overflow-style: none;

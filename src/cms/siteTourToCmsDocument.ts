@@ -127,7 +127,11 @@ export function siteTourToCmsDocument(tour: Tour): CmsTourDocument {
     price: tour.price,
     ...(tour.pricePrevious != null ? { pricePrevious: tour.pricePrevious } : {}),
     ...(tour.priceFootnote != null ? { priceFootnote: tour.priceFootnote } : {}),
-    program: tour.program,
+    program: tour.program.map((step) => ({
+      day: step.day ?? 1,
+      timeLabel: step.timeLabel,
+      description: step.description,
+    })),
     ...(tour.programAdditionalNotes != null
       ? { programAdditionalNotes: tour.programAdditionalNotes }
       : {}),

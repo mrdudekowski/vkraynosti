@@ -61,7 +61,7 @@ describe('IncludedSection', () => {
     );
   });
 
-  it('disables first-up and last-down and focuses a newly added item', async () => {
+  it('не показывает стрелки перемещения и фокусирует новый пункт', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(
@@ -76,8 +76,16 @@ describe('IncludedSection', () => {
       </AdminToastProvider>,
     );
 
-    expect(screen.getAllByRole('button', { name: ADMIN_UI.moveUp })[0]).toBeDisabled();
-    expect(screen.getAllByRole('button', { name: ADMIN_UI.moveDown })[1]).toBeDisabled();
+    expect(screen.queryByRole('button', { name: ADMIN_UI.moveUp })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: ADMIN_UI.moveDown })).not.toBeInTheDocument();
+
+    await user.click(screen.getAllByRole('button', { name: ADMIN_UI.dragItem })[0]!);
+    expect(screen.getByRole('button', { name: ADMIN_UI.saveOrder })).toBeInTheDocument();
+    await user.click(screen.getAllByRole('listitem')[1]!);
+    expect(onChange).toHaveBeenCalledWith([
+      { text: 'Трансфер', iconKey: 'van-shuttle' },
+      { text: 'Гид', iconKey: 'user-tie' },
+    ]);
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.addIncluded }));
     expect(onChange).toHaveBeenCalledWith([

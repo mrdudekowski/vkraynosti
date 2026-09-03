@@ -62,12 +62,13 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
   const prefersReducedMotion = usePrefersReducedMotion();
   const programRevealEnabled = isLgOrAbove && !prefersReducedMotion;
+  const publicProgram = [...tour.program].sort((left, right) => (left.day ?? 1) - (right.day ?? 1));
   const mainColumnRef = useRef<HTMLDivElement>(null);
   const programViewportRef = useRef<HTMLDivElement>(null);
   const programTrackRef = useRef<HTMLDivElement>(null);
   const activeProgramItemRef = useRef<HTMLElement>(null);
   const { revealedCount, showProgramFooter } = useTourProgramScrollReveal({
-    stepCount: tour.program.length,
+    stepCount: publicProgram.length,
     enabled: programRevealEnabled,
     mainColumnRef,
   });
@@ -83,7 +84,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     activeItemRef: activeProgramItemRef,
     updateKey: `${mountedStepCount}-${mountedFooter ? 'footer' : 'steps'}-${revealedCount}-${showProgramFooter ? 'footer-on' : 'footer-off'}`,
   });
-  const mountedProgramSteps = tour.program.slice(0, mountedStepCount);
+  const mountedProgramSteps = publicProgram.slice(0, mountedStepCount);
   const activeProgramStepRefIndex = getTourProgramActiveStepRefIndex({
     revealedCount,
     mountedStepCount,
@@ -417,36 +418,46 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                     style={programTrackStyle}
                   >
                     <ol className="border-l border-divider pl-4 ml-2 space-y-6">
-                      {mountedProgramSteps.map((step, idx) => (
-                        <li
-                          key={`${step.timeLabel}-${idx}`}
-                          ref={
-                            activeProgramStepRefIndex === idx
-                              ? (node) => {
-                                  activeProgramItemRef.current = node;
-                                }
-                              : undefined
-                          }
-                          className={[
-                            'flex gap-3',
-                            getTourProgramStepRevealClassName(idx < revealedCount),
-                          ].join(' ')}
-                        >
-                          <FontAwesomeIcon
-                            icon={faClock}
-                            className="text-brand-primary mt-1 shrink-0"
-                            aria-hidden
-                          />
-                          <div>
-                            <p className="text-tooltip text-text-muted">
-                              {step.timeLabel}
-                            </p>
-                            <p className="text-tour-detail-program-body text-text-muted">
-                              {step.description}
-                            </p>
-                          </div>
-                        </li>
-                      ))}
+                      {mountedProgramSteps.map((step, idx) => {
+                        const stepDay = step.day ?? 1;
+                        const showDayHeading =
+                          new Set(publicProgram.map((item) => item.day ?? 1)).size > 1 &&
+                          (idx === 0 || (mountedProgramSteps[idx - 1]?.day ?? 1) !== stepDay);
+                        return (
+                          <li key={`${step.timeLabel}-${idx}`} className="list-none">
+                            {showDayHeading ? (
+                              <h3 className="mb-3 text-sm font-semibold text-text-primary">
+                                День {stepDay}
+                              </h3>
+                            ) : null}
+                            <div
+                              ref={
+                                activeProgramStepRefIndex === idx
+                                  ? (node) => {
+                                      activeProgramItemRef.current = node;
+                                    }
+                                  : undefined
+                              }
+                              className={[
+                                'flex gap-3',
+                                getTourProgramStepRevealClassName(idx < revealedCount),
+                              ].join(' ')}
+                            >
+                              <FontAwesomeIcon
+                                icon={faClock}
+                                className="text-brand-primary mt-1 shrink-0"
+                                aria-hidden
+                              />
+                              <div>
+                                <p className="text-tooltip text-text-muted">{step.timeLabel}</p>
+                                <p className="text-tour-detail-program-body text-text-muted">
+                                  {step.description}
+                                </p>
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ol>
                     {mountedFooter && (
                       <div

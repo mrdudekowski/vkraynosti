@@ -60,6 +60,22 @@ describe('cmsToursFileSchema', () => {
       tours: [validTour],
     });
     expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.tours[0]?.program[0]?.day).toBe(1);
+  });
+
+  it('сохраняет явный день программы и отклоняет день 0', () => {
+    const accepted = cmsToursFileSchema.safeParse({
+      schemaVersion: 1,
+      tours: [{ ...validTour, durationDays: 2, program: [{ day: 2, timeLabel: '09:00', description: 'Старт' }] }],
+    });
+    expect(accepted.success).toBe(true);
+    if (accepted.success) expect(accepted.data.tours[0]?.program[0]?.day).toBe(2);
+
+    const rejected = cmsToursFileSchema.safeParse({
+      schemaVersion: 1,
+      tours: [{ ...validTour, program: [{ day: 0, timeLabel: '09:00', description: 'Старт' }] }],
+    });
+    expect(rejected.success).toBe(false);
   });
 
   it('отклоняет блок с неверным числом слотов', () => {

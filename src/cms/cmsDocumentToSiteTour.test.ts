@@ -20,7 +20,7 @@ const document: CmsTourDocument = {
   duration: '1 день',
   difficulty: 'Medium',
   price: 'по запросу',
-  program: [{ timeLabel: '05:30', description: 'Выезд' }],
+  program: [{ day: 1, timeLabel: '05:30', description: 'Выезд' }],
   included: [{ text: 'Трансфер', iconKey: 'shuttle-van' }],
   coverAssetId: 'cover',
   prefaceAssetId: 'preface',
@@ -81,6 +81,21 @@ describe('cmsDocumentToSiteTour', () => {
       coverCrop: { card: { x: 20, y: 80 }, hero: { x: 50, y: 30 } },
     });
     expect(tour.coverCrop).toEqual({ card: { x: 20, y: 80 }, hero: { x: 50, y: 30 } });
+  });
+
+  it('сохраняет дни программы при преобразовании в публичный тур', () => {
+    const tour = cmsDocumentToSiteTour({
+      ...document,
+      durationDays: 2,
+      program: [
+        { day: 1, timeLabel: '08:00', description: 'Сбор' },
+        { day: 2, timeLabel: '09:00', description: 'Маршрут' },
+      ],
+    });
+    expect(tour.program).toEqual([
+      { day: 1, timeLabel: '08:00', description: 'Сбор' },
+      { day: 2, timeLabel: '09:00', description: 'Маршрут' },
+    ]);
   });
 
   it('не кладёт в витрину блоки с пустыми ячейками', () => {

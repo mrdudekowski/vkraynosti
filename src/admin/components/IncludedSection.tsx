@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, GripVertical, ListChecks, Plus, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { GripVertical, ListChecks, Plus, Trash2 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUmbrellaBeach } from '@fortawesome/free-solid-svg-icons/faUmbrellaBeach';
 import {
@@ -76,6 +76,9 @@ const IconPicker = ({ selectedKey, onSelect, onClose }: IconPickerProps) => (
 const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
   const { push } = useAdminToast();
   const [pickerIndex, setPickerIndex] = useState<number | null>(null);
+  const [movingIndex, setMovingIndex] = useState<number | null>(null);
+  const holdTimer = useRef<number | null>(null);
+  const held = useRef(false);
 
   const replaceWithUndo = (next: IncludedDraftItem[], message: string) => {
     if (next === items) {
@@ -92,6 +95,30 @@ const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
     window.requestAnimationFrame(() => {
       window.document.getElementById(`included-text-${nextIndex}`)?.focus();
     });
+  };
+
+  const moveTo = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    const direction = fromIndex < toIndex ? 1 : -1;
+    let next = items;
+    let current = fromIndex;
+    while (current !== toIndex) {
+      next = moveItem(next, current, direction);
+      current += direction;
+    }
+    replaceWithUndo(next, ADMIN_UI.listReordered);
+    setMovingIndex(toIndex);
+  };
+
+  const startHold = (index: number) => {
+    holdTimer.current = window.setTimeout(() => {
+      held.current = true;
+      setMovingIndex(index);
+    }, 350);
+  };
+  const clearHold = () => {
+    if (holdTimer.current != null) window.clearTimeout(holdTimer.current);
+    holdTimer.current = null;
   };
 
   return (
@@ -117,6 +144,10 @@ const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
             <li
               key={`included-${index}`}
               className={`admin-editor-row items-center ${missingIcon ? 'admin-row-warning p-1' : ''}`.trim()}
+              onClick={(event) => {
+                if (movingIndex == null || event.target instanceof HTMLElement && event.target.closest('button, input, textarea')) return;
+                moveTo(movingIndex, index);
+              }}
               onDragOver={(event) => event.preventDefault()}
               onDrop={(event) => {
                 const fromIndex = Number.parseInt(event.dataTransfer.getData(ITEM_DRAG), 10);
@@ -136,12 +167,24 @@ const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
               <button
                 type="button"
                 draggable
-                className="admin-icon-btn cursor-grab"
                 aria-label={ADMIN_UI.dragItem}
+                aria-pressed={movingIndex === index}
+                className={`admin-icon-btn cursor-grab ${movingIndex === index ? 'ring-2 ring-brand-primary' : ''}`}
                 onDragStart={(event) => {
                   event.dataTransfer.setData(ITEM_DRAG, String(index));
                   event.dataTransfer.effectAllowed = 'move';
                 }}
+                onClick={() => {
+                  if (held.current) {
+                    held.current = false;
+                    return;
+                  }
+                  setMovingIndex((current) => (current === index ? null : index));
+                }}
+                onPointerDown={() => startHold(index)}
+                onPointerUp={clearHold}
+                onPointerCancel={clearHold}
+                onPointerLeave={clearHold}
               >
                 <GripVertical aria-hidden size={16} strokeWidth={1.75} />
               </button>
@@ -175,18 +218,6 @@ const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
                 }}
               />
               <AdminIconButton
-                icon={ChevronUp}
-                label={ADMIN_UI.moveUp}
-                disabled={index === 0}
-                onClick={() => replaceWithUndo(moveItem(items, index, -1), ADMIN_UI.listReordered)}
-              />
-              <AdminIconButton
-                icon={ChevronDown}
-                label={ADMIN_UI.moveDown}
-                disabled={index === items.length - 1}
-                onClick={() => replaceWithUndo(moveItem(items, index, 1), ADMIN_UI.listReordered)}
-              />
-              <AdminIconButton
                 icon={Trash2}
                 label={ADMIN_UI.removeItem}
                 danger
@@ -211,6 +242,11 @@ const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
         <Plus className="mr-2" size={16} strokeWidth={1.75} aria-hidden />
         {ADMIN_UI.addIncluded}
       </AdminButton>
+      ) : null}
+      {movingIndex != null ? (
+        <AdminButton variant="secondary" className="self-start" onClick={() => setMovingIndex(null)}>
+          {ADMIN_UI.saveOrder}
+        </AdminButton>
       ) : null}
       {pickerIndex != null ? (
         <IconPicker

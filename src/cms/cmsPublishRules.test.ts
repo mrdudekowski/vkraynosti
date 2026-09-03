@@ -37,7 +37,7 @@ const ready: CmsTourDocument = {
   duration: '1 день',
   durationDays: 1,
   price: 'по запросу',
-  program: [{ timeLabel: '04:30', description: 'Выезд' }],
+    program: [{ day: 1, timeLabel: '04:30', description: 'Выезд' }],
   included: [{ text: 'Трансфер', iconKey: 'van-shuttle' }],
 };
 

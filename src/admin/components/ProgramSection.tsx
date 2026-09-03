@@ -1,5 +1,7 @@
-import { ChevronDown, ChevronUp, Clock, GripVertical, ListOrdered, Plus, StickyNote, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Clock, GripVertical, ListOrdered, Plus, StickyNote, Trash2 } from 'lucide-react';
 import { UI } from '../../constants/ui';
+import { TOUR_DURATION_DAY_OPTIONS } from '../../cms/durationDays';
 import { ADMIN_UI } from '../constants/ui';
 import { moveItem } from '../moveItem';
 import { useAdminToast } from '../toast/adminToastContext';
@@ -7,16 +9,19 @@ import { pushAdminUndo } from '../toast/pushAdminUndo';
 import AdminButton from './AdminButton';
 import AdminEditorSurface from './AdminEditorSurface';
 import AdminEmptyState from './AdminEmptyState';
-import { AdminTextArea, AdminTextInput } from './AdminFields';
+import { AdminTextArea } from './AdminFields';
 import AdminIcon from './AdminIcon';
 import AdminIconButton from './AdminIconButton';
+import AdminSelect from './AdminSelect';
 
 export type ProgramDraftStep = {
+  day?: number;
   timeLabel: string;
   description: string;
 };
 
 type ProgramSectionProps = {
+  durationDays?: number;
   program: ProgramDraftStep[];
   notes: string[];
   onProgram: (program: ProgramDraftStep[]) => void;
@@ -24,10 +29,28 @@ type ProgramSectionProps = {
 };
 
 const STEP_DRAG = 'application/x-vkr-program-step';
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, index) => {
+  const hour = String(Math.floor(index / 2)).padStart(2, '0');
+  const minute = index % 2 === 0 ? '00' : '30';
+  return `${hour}:${minute}`;
+});
 
-const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionProps) => {
+const ProgramSection = ({ durationDays, program, notes, onProgram, onNotes }: ProgramSectionProps) => {
   const { push } = useAdminToast();
+  const [movingIndex, setMovingIndex] = useState<number | null>(null);
+  const [selectedDay, setSelectedDay] = useState(1);
+  const holdTimer = useRef<number | null>(null);
+  const held = useRef(false);
   const programReady = program.some((step) => step.description.trim().length > 0);
+  const maxDay = durationDays != null && durationDays >= 1 ? durationDays : 1;
+  const availableDays = TOUR_DURATION_DAY_OPTIONS.filter((day) => day <= maxDay);
+  const activeDay = Math.min(selectedDay, maxDay);
+  const visibleProgram = program
+    .map((step, sourceIndex) => ({ step, sourceIndex, day: step.day ?? 1 }))
+    .filter((entry) => entry.day === activeDay);
+  const overflowCount = durationDays != null
+    ? program.filter((step) => (step.day ?? 1) > durationDays).length
+    : 0;
 
   const replaceProgram = (next: ProgramDraftStep[], message: string) => {
     if (next === program) {
@@ -49,10 +72,43 @@ const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionPr
 
   const addStep = () => {
     const nextIndex = program.length;
-    onProgram([...program, { timeLabel: '', description: '' }]);
+    onProgram([...program, { day: activeDay, timeLabel: '', description: '' }]);
     window.requestAnimationFrame(() => {
       window.document.getElementById(`program-time-${nextIndex}`)?.focus();
     });
+  };
+
+  const moveTo = (fromIndex: number, toIndex: number) => {
+    const positions = program
+      .map((step, index) => ((step.day ?? 1) === activeDay ? index : -1))
+      .filter((index) => index >= 0);
+    const fromPosition = positions.indexOf(fromIndex);
+    const toPosition = positions.indexOf(toIndex);
+    if (fromPosition < 0 || toPosition < 0 || fromPosition === toPosition) return;
+    let reordered = visibleProgram.map(({ step }) => step);
+    const moveDirection = fromPosition < toPosition ? 1 : -1;
+    let current = fromPosition;
+    while (current !== toPosition) {
+      reordered = moveItem(reordered, current, moveDirection);
+      current += moveDirection;
+    }
+    const next = [...program];
+    positions.forEach((sourceIndex, position) => {
+      next[sourceIndex] = reordered[position]!;
+    });
+    replaceProgram(next, ADMIN_UI.listReordered);
+    setMovingIndex(positions[toPosition] ?? null);
+  };
+
+  const startHold = (index: number) => {
+    holdTimer.current = window.setTimeout(() => {
+      held.current = true;
+      setMovingIndex(index);
+    }, 350);
+  };
+  const clearHold = () => {
+    if (holdTimer.current != null) window.clearTimeout(holdTimer.current);
+    holdTimer.current = null;
   };
 
   return (
@@ -75,24 +131,21 @@ const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionPr
           />
         ) : (
           <ol className="admin-editor-list flex flex-col gap-0.5">
-            {program.map((step, index) => (
+            {visibleProgram.map(({ step, sourceIndex: index }) => (
               <li
                 key={`step-${index}`}
                 className="admin-editor-row items-start"
+                onClick={(event) => {
+                  if (movingIndex == null || event.target instanceof HTMLElement && event.target.closest('button, input, textarea')) return;
+                  moveTo(movingIndex, index);
+                }}
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => {
                   const fromIndex = Number.parseInt(event.dataTransfer.getData(STEP_DRAG), 10);
                   if (!Number.isInteger(fromIndex) || fromIndex === index) {
                     return;
                   }
-                  const direction = fromIndex < index ? 1 : -1;
-                  let next = program;
-                  let current = fromIndex;
-                  while (current !== index) {
-                    next = moveItem(next, current, direction);
-                    current += direction;
-                  }
-                  replaceProgram(next, ADMIN_UI.listReordered);
+                  moveTo(fromIndex, index);
                 }}
               >
                 <button
@@ -100,6 +153,18 @@ const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionPr
                   draggable
                   className="admin-icon-btn mt-0.5 cursor-grab"
                   aria-label={ADMIN_UI.dragItem}
+                  aria-pressed={movingIndex === index}
+                  onClick={() => {
+                    if (held.current) {
+                      held.current = false;
+                      return;
+                    }
+                    setMovingIndex((current) => (current === index ? null : index));
+                  }}
+                  onPointerDown={() => startHold(index)}
+                  onPointerUp={clearHold}
+                  onPointerCancel={clearHold}
+                  onPointerLeave={clearHold}
                   onDragStart={(event) => {
                     event.dataTransfer.setData(STEP_DRAG, String(index));
                     event.dataTransfer.effectAllowed = 'move';
@@ -111,7 +176,7 @@ const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionPr
                   <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-text-muted">
                     <AdminIcon icon={Clock} size={16} />
                   </span>
-                  <AdminTextInput
+                  <AdminSelect
                     id={`program-time-${index}`}
                     className="pl-8"
                     aria-label={ADMIN_UI.timeLabel}
@@ -123,9 +188,16 @@ const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionPr
                       next[index] = { ...current, timeLabel: event.target.value };
                       onProgram(next);
                     }}
-                  />
+                  >
+                    <option value="">—:—</option>
+                    {TIME_OPTIONS.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                  </AdminSelect>
                 </div>
-                <AdminTextArea
+                  <AdminTextArea
                   id={`program-step-${index}`}
                   className="min-h-11 flex-1"
                   rows={1}
@@ -139,18 +211,6 @@ const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionPr
                     next[index] = { ...current, description: event.target.value };
                     onProgram(next);
                   }}
-                />
-                <AdminIconButton
-                  icon={ChevronUp}
-                  label={ADMIN_UI.moveUp}
-                  disabled={index === 0}
-                  onClick={() => replaceProgram(moveItem(program, index, -1), ADMIN_UI.listReordered)}
-                />
-                <AdminIconButton
-                  icon={ChevronDown}
-                  label={ADMIN_UI.moveDown}
-                  disabled={index === program.length - 1}
-                  onClick={() => replaceProgram(moveItem(program, index, 1), ADMIN_UI.listReordered)}
                 />
                 <AdminIconButton
                   icon={Trash2}
@@ -167,10 +227,35 @@ const ProgramSection = ({ program, notes, onProgram, onNotes }: ProgramSectionPr
             ))}
           </ol>
         )}
+        {overflowCount > 0 ? <p className="text-sm text-difficulty-medium-fg">{ADMIN_UI.programOverflow}</p> : null}
+        {availableDays.length > 1 ? (
+          <div className="flex min-w-0 gap-1 overflow-x-auto pb-1" role="tablist" aria-label={ADMIN_UI.programHeading}>
+            {availableDays.map((day) => (
+              <AdminButton
+                key={day}
+                type="button"
+                variant={day === activeDay ? 'primary' : 'secondary'}
+                role="tab"
+                aria-selected={day === activeDay}
+                onClick={() => {
+                  setSelectedDay(day);
+                  setMovingIndex(null);
+                }}
+              >
+                {ADMIN_UI.programDay(day)}
+              </AdminButton>
+            ))}
+          </div>
+        ) : null}
         {program.length > 0 ? (
           <AdminButton variant="secondary" className="self-start" onClick={addStep}>
             <Plus className="mr-2" size={16} strokeWidth={1.75} aria-hidden />
             {ADMIN_UI.addStep}
+          </AdminButton>
+        ) : null}
+        {movingIndex != null ? (
+          <AdminButton variant="secondary" className="self-start" onClick={() => setMovingIndex(null)}>
+            {ADMIN_UI.saveOrder}
           </AdminButton>
         ) : null}
       </AdminEditorSurface>

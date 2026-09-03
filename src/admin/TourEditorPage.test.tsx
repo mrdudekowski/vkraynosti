@@ -53,7 +53,7 @@ function readyTour(): CmsTourDocument {
     durationDays: 1,
     difficulty: 'Medium',
     price: 'по запросу',
-    program: [{ timeLabel: '04:30', description: 'Выезд' }],
+    program: [{ day: 1, timeLabel: '04:30', description: 'Выезд' }],
     included: [{ text: 'Трансфер', iconKey: 'van-shuttle' }],
     coverAssetId: 'cover',
     prefaceAssetId: 'preface',

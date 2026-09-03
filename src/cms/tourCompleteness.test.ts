@@ -19,7 +19,7 @@ function readyTour(overrides: Partial<CmsTourDocument> = {}): CmsTourDocument {
     durationDays: 1,
     difficulty: 'Medium',
     price: 'по запросу',
-    program: [{ timeLabel: '04:30', description: 'Выезд' }],
+    program: [{ day: 1, timeLabel: '04:30', description: 'Выезд' }],
     included: [{ text: 'Трансфер', iconKey: 'van-shuttle' }],
     coverAssetId: 'cover',
     prefaceAssetId: 'preface',
@@ -94,7 +94,7 @@ describe('tourSectionCompletion', () => {
   it('program requires at least one step with description', () => {
     expect(tourSectionCompletion(readyTour({ program: [] })).program).toBe(false);
     expect(
-      tourSectionCompletion(readyTour({ program: [{ timeLabel: '04:30', description: '  ' }] })).program,
+      tourSectionCompletion(readyTour({ program: [{ day: 1, timeLabel: '04:30', description: '  ' }] })).program,
     ).toBe(false);
     expect(tourSectionCompletion(readyTour()).program).toBe(true);
   });

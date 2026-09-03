@@ -29,7 +29,7 @@ describe('AddDepartureWizard', () => {
 
     await user.click(screen.getByRole('tab', { name: ADMIN_UI.seasons.summer }));
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
-    expect(screen.getByLabelText(ADMIN_UI.scheduleSeats)).toHaveValue(8);
+    expect(screen.getByLabelText(ADMIN_UI.scheduleSeats)).toHaveValue('8');
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardSubmit }));
     expect(onComplete).toHaveBeenCalledWith({

@@ -27,7 +27,7 @@ function readyTour(overrides: Partial<CmsTourDocument> = {}): CmsTourDocument {
     durationDays: 1,
     difficulty: 'Medium',
     price: '6 000 ₽',
-    program: [{ timeLabel: '04:30', description: 'Выезд' }],
+    program: [{ day: 1, timeLabel: '04:30', description: 'Выезд' }],
     included: [{ text: 'Трансфер', iconKey: 'van-shuttle' }],
     coverAssetId: 'cover',
     prefaceAssetId: 'preface',

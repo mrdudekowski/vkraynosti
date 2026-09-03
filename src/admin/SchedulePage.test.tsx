@@ -49,7 +49,7 @@ function readyTour(overrides: Partial<CmsTourDocument> = {}): CmsTourDocument {
     durationDays: 1,
     difficulty: 'Medium',
     price: 'по запросу',
-    program: [{ timeLabel: '04:30', description: 'Выезд' }],
+    program: [{ day: 1, timeLabel: '04:30', description: 'Выезд' }],
     included: [{ text: 'Трансфер', iconKey: 'van-shuttle' }],
     coverAssetId: 'cover',
     prefaceAssetId: 'preface',
@@ -193,7 +193,7 @@ describe('SchedulePage', () => {
     expect(screen.queryByRole('button', { name: 'Неготовый' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
-    expect(screen.getByLabelText(ADMIN_UI.scheduleSeats)).toHaveValue(8);
+    expect(screen.getByLabelText(ADMIN_UI.scheduleSeats)).toHaveValue('8');
     const wizard = screen.getByRole('dialog', { name: ADMIN_UI.scheduleWizardTitle });
     await user.click(within(wizard).getByRole('button', { name: ADMIN_UI.scheduleWizardSubmit }));
     await waitFor(() =>
@@ -616,6 +616,24 @@ describe('SchedulePage', () => {
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleModeMonth }));
     expect(document.body.dataset.adminScheduleSections).toBeUndefined();
     expect(document.querySelector('.admin-schedule-week-list')).not.toBeInTheDocument();
+  });
+
+  it('на мобильном оставляет вертикальный touch-scroll календаря во всех режимах', async () => {
+    const user = userEvent.setup();
+    mockViewportWidth(390);
+    renderSchedule();
+    await waitFor(() => expect(adminListTours).toHaveBeenCalled());
+
+    expect(document.body.dataset.adminScheduleSections).toBeUndefined();
+    expect(document.querySelector('.admin-schedule-day-agenda')).toHaveClass('overflow-y-auto');
+
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleModeWeek }));
+    expect(document.body.dataset.adminScheduleSections).toBeUndefined();
+    expect(document.querySelector('.admin-schedule-week-list')).toHaveClass('overflow-y-auto');
+
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleModeMonth }));
+    expect(document.body.dataset.adminScheduleSections).toBeUndefined();
+    expect(document.querySelector('.admin-schedule-day-agenda')).toHaveClass('overflow-y-auto');
   });
 
   it('в списке недели показывает все выезды дня и не открывает мастер по клику на пустой день', async () => {

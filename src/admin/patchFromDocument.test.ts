@@ -16,7 +16,9 @@ const document: CmsTourDocument = {
   duration: '1 день',
   difficulty: 'Medium',
   price: 'по запросу',
-  program: [],
+  program: [
+    { day: 2, timeLabel: '09:00', description: 'Старт' },
+  ],
   included: [],
   coverAssetId: null,
   prefaceAssetId: null,
@@ -40,5 +42,11 @@ describe('patchFromDocument', () => {
     const stored = storedTextPatchFromDocument(document);
     expect(stored.description).toBe(document.description);
     expect(stored.descriptionAside).toBe('');
+  });
+
+  it('переносит день программы в draft', () => {
+    expect(patchFromDocument(document).program).toEqual([
+      { day: 2, timeLabel: '09:00', description: 'Старт' },
+    ]);
   });
 });

@@ -88,9 +88,9 @@ export function applyTourLayoutPatch(
 
 export function allocateUploadAssetId(existingIds: readonly string[]): string {
   const used = new Set(existingIds);
-  let index = 1;
-  while (used.has(`u-${index}`)) {
-    index += 1;
+  let id = `asset-${globalThis.crypto.randomUUID()}`;
+  while (used.has(id)) {
+    id = `asset-${globalThis.crypto.randomUUID()}`;
   }
-  return `u-${index}`;
+  return id;
 }

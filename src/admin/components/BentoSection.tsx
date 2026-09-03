@@ -23,9 +23,11 @@ import { EDITOR_FOCUS_IDS } from '../tourEditorTabs';
 import { useAdminToast } from '../toast/adminToastContext';
 import { pushAdminUndo } from '../toast/pushAdminUndo';
 import AdminAssetPreview, { AdminVideoBadge } from './AdminAssetPreview';
+import AdminButton from './AdminButton';
 import AdminEditorSurface from './AdminEditorSurface';
 import AdminFocalPoint from './AdminFocalPoint';
 import AdminIconButton from './AdminIconButton';
+import AdminDialog from './AdminDialog';
 import AdminMediaDropzone from './AdminMediaDropzone';
 import AdminUnusedMediaPicker from './AdminUnusedMediaPicker';
 import BentoLayoutChip from './BentoLayoutChip';
@@ -40,9 +42,10 @@ type BentoSectionProps = {
   prefaceAssetId: string | null;
   bento: CmsTourDocument['bento'];
   onBento: (bento: CmsTourDocument['bento']) => void;
-  onPoolFiles: (files: File[]) => Promise<void>;
+  onPoolFiles: (files: File[]) => Promise<{ assetIds?: string[]; failedFiles?: File[] } | void>;
   onDeleteAsset: (assetId: string) => Promise<void>;
   uploading: boolean;
+  uploadProgress?: { completed: number; total: number } | null;
 };
 
 type SlotRef = { blockIndex: number; slotIndex: number };
@@ -68,9 +71,13 @@ const BentoSection = ({
   onPoolFiles,
   onDeleteAsset,
   uploading,
+  uploadProgress = null,
 }: BentoSectionProps) => {
   const { push } = useAdminToast();
   const [slotTarget, setSlotTarget] = useState<SlotRef | null>(null);
+  const [poolActionAsset, setPoolActionAsset] = useState<CmsTourDocument['assets'][number] | null>(null);
+  const [placementAssetId, setPlacementAssetId] = useState<string | null>(null);
+  const [failedUploads, setFailedUploads] = useState<File[]>([]);
   const [galleryOpen, setGalleryOpen] = useState(true);
   const [typeMenu, setTypeMenu] = useState<number | null>(null);
 
@@ -90,6 +97,17 @@ const BentoSection = ({
 
   const dropAsset = (blockIndex: number, slotIndex: number, assetId: string) => {
     onBento(placeAssetInSlot(bento, blockIndex, slotIndex, assetId));
+  };
+
+  const openPlacement = (assetId: string) => {
+    setPoolActionAsset(null);
+    setPlacementAssetId(assetId);
+  };
+
+  const handlePoolFiles = async (files: File[]) => {
+    const result = await onPoolFiles(files);
+    setFailedUploads(result?.failedFiles ?? []);
+    return result;
   };
 
   const onSlotDrop = (event: DragEvent<HTMLElement>, blockIndex: number, slotIndex: number) => {
@@ -112,7 +130,7 @@ const BentoSection = ({
     event.preventDefault();
     const droppedFiles = filesFromTransfer(event);
     if (droppedFiles.length > 0) {
-      void onPoolFiles(droppedFiles);
+      void handlePoolFiles(droppedFiles);
       return;
     }
     const fromSlot = parseSlotRef(event.dataTransfer.getData(SLOT_DRAG));
@@ -144,12 +162,101 @@ const BentoSection = ({
       {slotTarget != null ? (
         <AdminUnusedMediaPicker
           assets={unused}
+          uploading={uploading}
+          uploadProgress={uploadProgress}
+          onUploadFiles={(files) => {
+            void handlePoolFiles(files).then((result) => {
+              const assetId = result?.assetIds?.[0];
+              if (assetId != null) {
+                dropAsset(slotTarget.blockIndex, slotTarget.slotIndex, assetId);
+                setSlotTarget(null);
+              }
+            });
+          }}
           onSelect={(assetId) => {
             dropAsset(slotTarget.blockIndex, slotTarget.slotIndex, assetId);
             setSlotTarget(null);
           }}
           onClose={() => setSlotTarget(null)}
         />
+      ) : null}
+      {poolActionAsset != null ? (
+        <AdminDialog
+          title={ADMIN_UI.poolAssetActions}
+          titleId="admin-pool-asset-actions-title"
+          closeLabel={ADMIN_UI.closePicker}
+          onClose={() => setPoolActionAsset(null)}
+        >
+          <p className="text-sm text-text-primary">{poolActionAsset.alt || poolActionAsset.id}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <AdminButton type="button" onClick={() => openPlacement(poolActionAsset.id)}>
+              {ADMIN_UI.addToBento}
+            </AdminButton>
+            <AdminButton
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (window.confirm(ADMIN_UI.confirmDeleteAsset)) {
+                  void onDeleteAsset(poolActionAsset.id);
+                  setPoolActionAsset(null);
+                }
+              }}
+            >
+              {ADMIN_UI.deleteFromPool}
+            </AdminButton>
+          </div>
+        </AdminDialog>
+      ) : null}
+      {placementAssetId != null ? (
+        <AdminDialog
+          title={ADMIN_UI.selectBentoSlot}
+          titleId="admin-bento-slot-picker-title"
+          closeLabel={ADMIN_UI.closePicker}
+          size="lg"
+          onClose={() => setPlacementAssetId(null)}
+        >
+          {firstEmptySlot == null ? (
+            <p className="text-sm text-text-muted">{ADMIN_UI.noFreeBentoSlot}</p>
+          ) : null}
+          <div className="flex flex-col gap-3">
+            {bento.blocks.map((block, blockIndex) => (
+              <div key={`pick-block-${blockIndex}`} className="rounded-card border border-divider p-2">
+                <p className="text-sm font-medium text-text-primary">{ADMIN_UI.blockTypes[block.type]}</p>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {block.slots.map((slot, slotIndex) => {
+                    const empty = slot.assetId == null || slot.assetId.length === 0;
+                    return (
+                      <button
+                        key={`pick-slot-${blockIndex}-${slotIndex}`}
+                        type="button"
+                        disabled={!empty}
+                        className="admin-btn-secondary min-h-11 disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={() => {
+                          if (!empty || placementAssetId == null) return;
+                          dropAsset(blockIndex, slotIndex, placementAssetId);
+                          setPlacementAssetId(null);
+                        }}
+                      >
+                        {empty ? ADMIN_UI.emptySlot : ADMIN_UI.usedInGrid}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          {firstEmptySlot == null ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {BENTO_BLOCK_TYPES.map((type) => (
+                <BentoLayoutChip
+                  key={`pick-add-${type}`}
+                  type={type}
+                  onClick={() => onBento({ blocks: [...bento.blocks, createEmptyBentoBlock(type)] })}
+                />
+              ))}
+            </div>
+          ) : null}
+        </AdminDialog>
       ) : null}
       <AdminEditorSurface
         icon={LayoutGrid}
@@ -371,8 +478,26 @@ const BentoSection = ({
               id="cms-pool-upload"
               label={ADMIN_UI.dropMedia}
               disabled={uploading}
-              onFiles={(files) => void onPoolFiles(files)}
+              onFiles={(files) => void handlePoolFiles(files)}
             />
+            {uploadProgress != null ? (
+              <p className="text-sm text-text-muted" role="status">
+                {ADMIN_UI.uploadProgress(uploadProgress.completed, uploadProgress.total)}
+              </p>
+            ) : null}
+            {failedUploads.length > 0 ? (
+              <div className="flex items-center justify-between gap-2 rounded-admin-control border border-difficulty-medium-fg/40 p-2">
+                <span className="text-sm text-text-muted">{ADMIN_UI.failedUploads(failedUploads.length)}</span>
+                <AdminButton
+                  type="button"
+                  variant="secondary"
+                  disabled={uploading}
+                  onClick={() => void handlePoolFiles(failedUploads)}
+                >
+                  {ADMIN_UI.retryUpload}
+                </AdminButton>
+              </div>
+            ) : null}
             {pool.length === 0 ? (
               <p className="text-sm text-text-muted">{ADMIN_UI.poolEmpty}</p>
             ) : (
@@ -386,6 +511,9 @@ const BentoSection = ({
                         draggable={!used}
                         className="relative h-12 w-14 shrink-0 overflow-hidden rounded-admin-control border border-divider"
                         aria-label={asset.alt || asset.id}
+                        onClick={() => {
+                          if (!used) setPoolActionAsset(asset);
+                        }}
                         onDragStart={(event) => {
                           if (used) {
                             event.preventDefault();
@@ -437,6 +565,9 @@ const BentoSection = ({
                   draggable={!usedAssetIds.has(asset.id)}
                   className="relative overflow-hidden rounded-card border border-divider"
                   aria-label={asset.alt || asset.id}
+                  onClick={() => {
+                    if (!usedAssetIds.has(asset.id)) setPoolActionAsset(asset);
+                  }}
                   onDragStart={(event) => {
                     if (usedAssetIds.has(asset.id)) {
                       event.preventDefault();

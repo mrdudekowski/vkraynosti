@@ -161,6 +161,7 @@ const TourEditorPage = () => {
   const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ completed: number; total: number } | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [addDepartureOpen, setAddDepartureOpen] = useState(false);
   const [problemsOpen, setProblemsOpen] = useState(false);
@@ -420,30 +421,41 @@ const TourEditorPage = () => {
     );
   }
 
-  const uploadFiles = async (files: File[]) => {
+  const uploadFiles = async (files: File[], options: { continueOnError?: boolean } = {}) => {
     const prepared = await prepareCmsUploads(files);
     if (prepared.length === 0) {
       throw new Error('upload_failed');
     }
     setUploading(true);
     setStatus(null);
+    setUploadProgress({ completed: 0, total: prepared.length });
     try {
       let rev = meta.rev;
       let nextDocument = document;
       let nextMeta = meta;
       const assetIds: string[] = [];
+      const failedFiles: File[] = [];
       for (const item of prepared) {
-        const payload = await adminUploadTourAsset(
-          nextDocument.id,
-          rev,
-          item.still,
-          item.video,
-          (patch.title ?? document.title).trim(),
-        );
-        rev = payload.meta.rev;
-        nextDocument = payload.document;
-        nextMeta = payload.meta;
-        assetIds.push(payload.assetId);
+        try {
+          const payload = await adminUploadTourAsset(
+            nextDocument.id,
+            rev,
+            item.still,
+            item.video,
+            (patch.title ?? document.title).trim(),
+          );
+          rev = payload.meta.rev;
+          nextDocument = payload.document;
+          nextMeta = payload.meta;
+          assetIds.push(payload.assetId);
+        } catch (error) {
+          if (!options.continueOnError) throw error;
+          failedFiles.push(item.still);
+        } finally {
+          setUploadProgress((current) =>
+            current == null ? current : { ...current, completed: current.completed + 1 },
+          );
+        }
       }
       setDocument(nextDocument);
       setMeta(nextMeta);
@@ -456,7 +468,8 @@ const TourEditorPage = () => {
           ...current.assetAlts,
         },
       }));
-      return { document: nextDocument, assetIds };
+      if (failedFiles.length > 0) setStatus('uploadError');
+      return { document: nextDocument, assetIds, failedFiles };
     } catch (error) {
       setStatus(
         error instanceof Error && error.message === 'rev_conflict' ? 'conflict' : 'uploadError'
@@ -464,11 +477,13 @@ const TourEditorPage = () => {
       throw error;
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   };
 
   const onPoolFiles = async (files: File[]) => {
-    await uploadFiles(files);
+    const payload = await uploadFiles(files, { continueOnError: true });
+    return { assetIds: payload.assetIds, failedFiles: payload.failedFiles };
   };
 
   const onCoverFiles = async (files: File[]) => {
@@ -831,6 +846,7 @@ const TourEditorPage = () => {
             onPoolFiles={onPoolFiles}
             onDeleteAsset={onDeleteAsset}
             uploading={uploading}
+            uploadProgress={uploadProgress}
           />
         </div>
         </div>

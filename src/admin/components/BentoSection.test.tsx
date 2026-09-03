@@ -87,7 +87,7 @@ describe('BentoSection', () => {
     expect(screen.getByText(ADMIN_UI.unusedInGrid)).toBeInTheDocument();
   });
 
-  it('по плюсу в ячейке открывает свободные кадры пула, а не выбор с устройства', async () => {
+  it('по плюсу в ячейке открывает свободные кадры и загрузку с устройства', async () => {
     const user = userEvent.setup();
     const onBento = vi.fn();
     renderBento(
@@ -103,12 +103,38 @@ describe('BentoSection', () => {
 
     const dialog = screen.getByRole('dialog', { name: ADMIN_UI.pickUnusedTitle });
     expect(dialog).toBeInTheDocument();
-    expect(window.document.querySelectorAll('input[type="file"]')).toHaveLength(1);
+    expect(within(dialog).getByText(ADMIN_UI.addMedia)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: unusedAsset.alt }));
     expect(onBento).toHaveBeenCalledWith({
       blocks: [{ type: 'bento-single', slots: [{ assetId: unusedAsset.id }] }],
     });
     expect(screen.queryByRole('dialog', { name: ADMIN_UI.pickUnusedTitle })).not.toBeInTheDocument();
+  });
+
+  it('по нажатию на файл пула открывает действия с ним', async () => {
+    const user = userEvent.setup();
+    renderBento({ ...baseDocument, assets: [unusedAsset] });
+
+    await user.click(screen.getByRole('button', { name: unusedAsset.alt }));
+
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.poolAssetActions });
+    expect(within(dialog).getByRole('button', { name: ADMIN_UI.addToBento })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: ADMIN_UI.deleteFromPool })).toBeInTheDocument();
+  });
+
+  it('из действий файла открывает выбор свободной ячейки', async () => {
+    const user = userEvent.setup();
+    renderBento({
+      ...baseDocument,
+      assets: [unusedAsset],
+      bento: { blocks: [{ type: 'bento-single', slots: [{ assetId: null }] }] },
+    });
+
+    await user.click(screen.getByRole('button', { name: unusedAsset.alt }));
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.addToBento }));
+
+    expect(screen.getByRole('dialog', { name: ADMIN_UI.selectBentoSlot })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: ADMIN_UI.emptySlot })).toBeInTheDocument();
   });
 });

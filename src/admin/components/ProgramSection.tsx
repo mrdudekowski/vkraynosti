@@ -134,7 +134,7 @@ const ProgramSection = ({ durationDays, program, notes, onProgram, onNotes }: Pr
             {visibleProgram.map(({ step, sourceIndex: index }) => (
               <li
                 key={`step-${index}`}
-                className="admin-editor-row items-start"
+                className="admin-editor-row flex-wrap items-start gap-2 admin-desktop:flex-nowrap admin-desktop:gap-1"
                 onClick={(event) => {
                   if (movingIndex == null || event.target instanceof HTMLElement && event.target.closest('button, input, textarea')) return;
                   moveTo(movingIndex, index);
@@ -199,7 +199,7 @@ const ProgramSection = ({ durationDays, program, notes, onProgram, onNotes }: Pr
                 </div>
                   <AdminTextArea
                   id={`program-step-${index}`}
-                  className="min-h-11 flex-1"
+                  className="order-4 min-h-11 basis-full flex-1 admin-desktop:order-none admin-desktop:basis-auto"
                   rows={1}
                   aria-label={ADMIN_UI.stepLabel}
                   hasError={!programReady && step.description.trim().length === 0}
@@ -229,7 +229,7 @@ const ProgramSection = ({ durationDays, program, notes, onProgram, onNotes }: Pr
         )}
         {overflowCount > 0 ? <p className="text-sm text-difficulty-medium-fg">{ADMIN_UI.programOverflow}</p> : null}
         {availableDays.length > 1 ? (
-          <div className="flex min-w-0 gap-1 overflow-x-auto pb-1" role="tablist" aria-label={ADMIN_UI.programHeading}>
+          <div className="grid min-w-0 grid-cols-2 gap-2 pb-1 admin-desktop:flex" role="tablist" aria-label={ADMIN_UI.programHeading}>
             {availableDays.map((day) => (
               <AdminButton
                 key={day}

@@ -682,7 +682,16 @@
   }
 
   .admin-editor-list {
-    @apply max-h-[min(28rem,calc(100dvh-18rem))] overflow-y-auto overscroll-y-contain pr-1;
+    @apply max-h-none overflow-visible pr-1;
+    overscroll-behavior-y: auto;
+  }
+
+  @screen admin-desktop {
+    .admin-editor-list {
+      max-height: min(28rem, calc(100dvh - 18rem));
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+    }
   }
 
   .admin-readiness-track {

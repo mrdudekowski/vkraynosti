@@ -143,7 +143,7 @@ const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
           return (
             <li
               key={`included-${index}`}
-              className={`admin-editor-row items-center ${missingIcon ? 'admin-row-warning p-1' : ''}`.trim()}
+              className={`admin-editor-row flex-wrap items-center gap-2 ${missingIcon ? 'admin-row-warning p-1' : ''} admin-desktop:flex-nowrap admin-desktop:gap-1`.trim()}
               onClick={(event) => {
                 if (movingIndex == null || event.target instanceof HTMLElement && event.target.closest('button, input, textarea')) return;
                 moveTo(movingIndex, index);
@@ -207,6 +207,7 @@ const IncludedSection = ({ items, onChange }: IncludedSectionProps) => {
               </button>
               <AdminTextInput
                 id={`included-text-${index}`}
+                className="order-4 basis-full admin-desktop:order-none admin-desktop:basis-auto"
                 aria-label={ADMIN_UI.includedTextLabel}
                 value={item.text}
                 onChange={(event) => {

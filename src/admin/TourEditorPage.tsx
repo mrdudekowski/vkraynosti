@@ -731,7 +731,7 @@ const TourEditorPage = () => {
           }
         />
         </div>
-        <div className="flex min-w-0 flex-col gap-3 pb-48 md:pb-28">
+        <div className="flex min-w-0 flex-col gap-3 pb-24 md:pb-28">
         <div
           role="tabpanel"
           id="admin-panel-admin-catalog"

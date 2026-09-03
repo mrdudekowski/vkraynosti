@@ -28,6 +28,7 @@ describe('AdminEditorSectionTabs', () => {
       'aria-selected',
       'true',
     );
+    expect(screen.getByRole('tablist')).not.toHaveClass('overflow-x-auto');
     expect(
       screen.getByRole('tab', { name: `${ADMIN_UI.sectionNav.about}, ${ADMIN_UI.tabHasBlocker}` }),
     ).toBeInTheDocument();

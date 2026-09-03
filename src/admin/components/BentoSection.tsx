@@ -278,7 +278,7 @@ const BentoSection = ({
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => onBlockDrop(event, blockIndex)}
               >
-                <div className="flex items-center gap-1">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <button
                     type="button"
                     draggable
@@ -296,7 +296,7 @@ const BentoSection = ({
                   </p>
                   <button
                     type="button"
-                    className="admin-btn-secondary text-tooltip"
+                    className="admin-btn-secondary min-w-0 max-w-full text-tooltip"
                     onClick={() => setTypeMenu((current) => (current === blockIndex ? null : blockIndex))}
                   >
                     {ADMIN_UI.changeBlockType}
@@ -304,6 +304,7 @@ const BentoSection = ({
                   <AdminIconButton
                     icon={ChevronUp}
                     label={ADMIN_UI.moveUp}
+                    className="hidden admin-desktop:inline-flex"
                     disabled={blockIndex === 0}
                     onClick={() => {
                       const next = moveItem(bento.blocks, blockIndex, -1);
@@ -317,6 +318,7 @@ const BentoSection = ({
                   <AdminIconButton
                     icon={ChevronDown}
                     label={ADMIN_UI.moveDown}
+                    className="hidden admin-desktop:inline-flex"
                     disabled={blockIndex === bento.blocks.length - 1}
                     onClick={() => {
                       const next = moveItem(bento.blocks, blockIndex, 1);

@@ -69,7 +69,7 @@ const AdminDialog = ({
           </h2>
           <AdminIconButton icon={X} label={closeLabel} onClick={onClose} />
         </div>
-        <div className="min-h-0 overflow-y-auto px-4 pb-4">{children}</div>
+        <div className="min-h-0 overflow-y-auto px-4 pb-4 pb-safe-bottom">{children}</div>
       </div>
     </div>,
     window.document.body,

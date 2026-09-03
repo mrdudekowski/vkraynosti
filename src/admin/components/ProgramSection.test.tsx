@@ -73,6 +73,8 @@ describe('ProgramSection', () => {
       </AdminToastProvider>,
     );
 
+    const dayTabs = screen.getByRole('tablist', { name: ADMIN_UI.programHeading });
+    expect(dayTabs).not.toHaveClass('overflow-x-auto');
     await user.click(screen.getByRole('tab', { name: 'День 2' }));
     expect(screen.getByDisplayValue('Старт')).toBeInTheDocument();
     expect(screen.queryByDisplayValue('Выезд')).not.toBeInTheDocument();

@@ -159,7 +159,7 @@ const CoverCropFields = ({
       <div
         role="tablist"
         aria-label={ADMIN_UI.coverCropHeading}
-        className="flex gap-1 overflow-x-auto overscroll-x-contain pb-1"
+        className="grid min-w-0 grid-cols-2 gap-2 pb-1 admin-desktop:flex"
         onKeyDown={onTabListKeyDown}
       >
         {FRAMES.map((frame) => {
@@ -173,7 +173,7 @@ const CoverCropFields = ({
               aria-selected={selected}
               aria-controls={`admin-cover-crop-panel-${frame.key}`}
               tabIndex={selected ? 0 : -1}
-              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-admin-control px-3 py-2 text-sm ${
+              className={`inline-flex min-h-11 min-w-0 w-full items-center justify-center gap-1.5 rounded-admin-control px-2 py-2 text-center text-sm admin-desktop:w-auto ${
                 selected ? 'admin-nav-active' : 'admin-nav-item'
               }`}
               onClick={() => setSelectedKey(frame.key)}

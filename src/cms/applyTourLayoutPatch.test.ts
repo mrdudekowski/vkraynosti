@@ -129,8 +129,12 @@ describe('applyTourLayoutPatch', () => {
 });
 
 describe('allocateUploadAssetId', () => {
-  it('берёт следующий свободный u-N', () => {
-    expect(allocateUploadAssetId(['cover', 'g-0'])).toBe('u-1');
-    expect(allocateUploadAssetId(['u-1', 'u-2'])).toBe('u-3');
+  it('генерирует новый ID, не переиспользуя удалённые u-N', () => {
+    const first = allocateUploadAssetId(['cover', 'u-1', 'u-2']);
+    const second = allocateUploadAssetId(['cover', 'u-1', 'u-2']);
+
+    expect(first).toMatch(/^asset-[0-9a-f-]{36}$/);
+    expect(second).toMatch(/^asset-[0-9a-f-]{36}$/);
+    expect(second).not.toBe(first);
   });
 });

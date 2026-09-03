@@ -51,6 +51,9 @@ describe('CoverCropFields', () => {
     const cardTab = screen.getByRole('tab', { name: ADMIN_UI.coverCropCard });
     const heroTab = screen.getByRole('tab', { name: ADMIN_UI.coverCropHero });
     const heroLgTab = screen.getByRole('tab', { name: ADMIN_UI.coverCropHeroLg });
+    expect(screen.getByRole('tablist', { name: ADMIN_UI.coverCropHeading })).not.toHaveClass(
+      'overflow-x-auto',
+    );
 
     expect(cardTab).toHaveAttribute('aria-selected', 'true');
     expect(heroTab).toHaveAttribute('aria-selected', 'false');

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ADMIN_UI } from './constants/ui';
@@ -82,7 +82,11 @@ describe('UsersPage', () => {
     expect(screen.getByLabelText(`bob: ${ADMIN_UI.publishToursFlag}`)).toBeInTheDocument();
     expect(screen.queryByLabelText(`alice: ${ADMIN_UI.publishToursFlag}`)).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.closeOverlay }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'bob' })).getByRole('button', {
+        name: ADMIN_UI.closeOverlay,
+      }),
+    );
     await user.click(screen.getByRole('button', { name: 'alice' }));
     expect(screen.queryByLabelText(`alice: ${ADMIN_UI.publishToursFlag}`)).not.toBeInTheDocument();
     expect(screen.getAllByText(ADMIN_UI.fullAccess).length).toBeGreaterThan(0);

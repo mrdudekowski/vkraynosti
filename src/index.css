@@ -621,7 +621,7 @@
   }
 
   .admin-icon-btn-compact {
-    @apply admin-icon-btn h-7 w-7;
+    @apply admin-icon-btn;
   }
 
   .admin-icon-btn-danger {
@@ -629,7 +629,7 @@
   }
 
   .admin-input {
-    @apply w-full rounded-admin-control border border-divider bg-white px-2 py-1.5 text-sm text-text-primary
+    @apply min-h-11 w-full rounded-admin-control border border-divider bg-white px-2 py-1.5 text-sm text-text-primary
       placeholder:text-text-muted/70
       transition-colors duration-admin
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
@@ -916,7 +916,7 @@
   }
 
   .admin-schedule-day-add {
-    @apply admin-icon-btn-compact h-6 w-6 bg-surface-dark text-text-inverse opacity-0 transition-opacity duration-admin
+    @apply admin-icon-btn-compact bg-surface-dark text-text-inverse opacity-0 transition-opacity duration-admin
       focus-visible:opacity-100 motion-reduce:transition-none;
   }
 
@@ -1130,7 +1130,7 @@
   }
 
   .admin-schedule-week-day-add {
-    @apply admin-icon-btn-compact h-8 w-8 shrink-0 opacity-70 hover:opacity-100 focus-visible:opacity-100;
+    @apply admin-icon-btn-compact shrink-0 opacity-70 hover:opacity-100 focus-visible:opacity-100;
   }
 
   .admin-schedule-week-row {

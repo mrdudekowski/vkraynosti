@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { X } from 'lucide-react';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
+import AdminIconButton from './AdminIconButton';
 
 type AdminDialogProps = {
   title: string;
@@ -59,12 +61,15 @@ const AdminDialog = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`relative z-modal-raised max-h-modal-body w-full ${PANEL_WIDTH[size]} overflow-y-auto rounded-admin-overlay border border-divider bg-surface-light p-4 shadow-admin-overlay`}
+        className={`relative z-modal-raised flex max-h-modal-body w-full ${PANEL_WIDTH[size]} flex-col overflow-hidden rounded-admin-overlay border border-divider bg-surface-light shadow-admin-overlay`}
       >
-        <h2 id={titleId} className="mb-3 text-base font-semibold text-text-primary">
-          {title}
-        </h2>
-        {children}
+        <div className="flex shrink-0 items-start justify-between gap-3 px-4 pb-3 pt-4">
+          <h2 id={titleId} className="min-w-0 text-base font-semibold text-text-primary">
+            {title}
+          </h2>
+          <AdminIconButton icon={X} label={closeLabel} onClick={onClose} />
+        </div>
+        <div className="min-h-0 overflow-y-auto px-4 pb-4">{children}</div>
       </div>
     </div>,
     window.document.body,

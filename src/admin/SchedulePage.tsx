@@ -376,8 +376,12 @@ const SchedulePage = () => {
       invalidateAdminDepartures();
       invalidateAdminPublishQueue();
       setError(null);
-    } catch {
-      setError(ADMIN_UI.scheduleSaveError);
+    } catch (error) {
+      setError(
+        error instanceof Error && error.message === 'tour_not_ready'
+          ? ADMIN_UI.scheduleTourNotReady
+          : ADMIN_UI.scheduleSaveError,
+      );
     }
   };
 

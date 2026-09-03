@@ -191,6 +191,7 @@ export const ADMIN_UI = {
   departureStatusMenu: 'Сменить статус выезда',
   scheduleLoadError: 'Не удалось загрузить календарь',
   scheduleSaveError: 'Не удалось сохранить выезд',
+  scheduleTourNotReady: 'Сначала завершите подготовку тура, затем создайте выезд.',
   scheduleNoPublishableDepartures: 'Нет выездов, готовых к публикации.',
   scheduleDraftUpToDate: 'Расписание актуально',
   scheduleDraftChangesOne: '1 неопубликованное изменение',

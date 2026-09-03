@@ -29,9 +29,6 @@ describe('AddDepartureWizard', () => {
 
     await user.click(screen.getByRole('tab', { name: ADMIN_UI.seasons.summer }));
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
-    expect(screen.getByRole('button', { name: ADMIN_UI.scheduleStaffSkip })).toBeDisabled();
-
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
     expect(screen.getByLabelText(ADMIN_UI.scheduleSeats)).toHaveValue(8);
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardSubmit }));
@@ -62,7 +59,6 @@ describe('AddDepartureWizard', () => {
     ).toHaveTextContent('Изюбриная');
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleCrossSeasonConfirm }));
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardSubmit }));
     expect(onComplete).toHaveBeenCalledWith({
       tourId: 'winter-1',

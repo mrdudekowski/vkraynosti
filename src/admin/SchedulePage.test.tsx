@@ -165,6 +165,10 @@ describe('SchedulePage', () => {
 
   it('shows day, week and month modes, opens the wizard on an empty cell, and lists only on-site tours', async () => {
     const user = userEvent.setup();
+    vi.mocked(adminListTours).mockResolvedValue([
+      listItem('summer-1', 'Изюбриная', true, 'active', 'fall'),
+      { ...listItem('summer-2', 'Неготовый', false, 'draft', 'fall'), ready: false },
+    ]);
     renderSchedule();
     const today = vladivostokCalendarDate();
 
@@ -189,7 +193,6 @@ describe('SchedulePage', () => {
     expect(screen.queryByRole('button', { name: 'Неготовый' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
     expect(screen.getByLabelText(ADMIN_UI.scheduleSeats)).toHaveValue(8);
     const wizard = screen.getByRole('dialog', { name: ADMIN_UI.scheduleWizardTitle });
     await user.click(within(wizard).getByRole('button', { name: ADMIN_UI.scheduleWizardSubmit }));
@@ -200,6 +203,25 @@ describe('SchedulePage', () => {
         seats: 8,
       }),
     );
+  });
+
+  it('объясняет, что выезд нельзя создать для неподготовленного тура', async () => {
+    const user = userEvent.setup();
+    const today = vladivostokCalendarDate();
+    vi.mocked(adminListTours).mockResolvedValue([listItem('summer-1', 'Изюбриная', true, 'active', 'fall')]);
+    vi.mocked(adminCreateDeparture).mockRejectedValueOnce(new Error('tour_not_ready'));
+    renderSchedule();
+
+    await waitFor(() => expect(adminListTours).toHaveBeenCalled());
+    await user.click(await screen.findByRole('button', { name: `${ADMIN_UI.scheduleEmptyCell} ${today}` }));
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: ADMIN_UI.scheduleWizardTitle })).getByRole('button', {
+        name: ADMIN_UI.scheduleWizardSubmit,
+      }),
+    );
+
+    expect(await screen.findByText(ADMIN_UI.scheduleTourNotReady)).toBeInTheDocument();
   });
 
   it('opens the existing departure instead of creating a second start', async () => {
@@ -391,10 +413,11 @@ describe('SchedulePage', () => {
       await screen.findByRole('button', { name: `${ADMIN_UI.scheduleAddOnDate} ${today}` }),
     );
     const wizard = await screen.findByRole('dialog', { name: ADMIN_UI.scheduleWizardTitle });
+    await user.click(within(wizard).getByRole('tab', { name: ADMIN_UI.seasons.summer }));
     expect(within(wizard).queryByRole('button', { name: 'Изюбриная' })).not.toBeInTheDocument();
     expect(within(wizard).getByRole('button', { name: 'Вторая' })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.cancel }));
+    await user.click(within(wizard).getByRole('button', { name: ADMIN_UI.cancel }));
     await user.click(await screen.findByRole('button', { name: /Изюбриная/ }));
     expect(await screen.findByRole('dialog', { name: ADMIN_UI.scheduleEditorTitle })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleDelete }));
@@ -426,7 +449,7 @@ describe('SchedulePage', () => {
     await user.click(await screen.findByRole('button', { name: /Изюбриная/ }));
     await user.click(await screen.findByRole('button', { name: ADMIN_UI.scheduleDelete }));
     const confirm = screen.getByRole('dialog', { name: ADMIN_UI.scheduleDeleteTitle });
-    await user.click(within(confirm).getByRole('button', { name: ADMIN_UI.cancel }));
+    await user.click(within(confirm).getAllByRole('button', { name: ADMIN_UI.cancel }).at(-1)!);
 
     expect(await screen.findByRole('dialog', { name: ADMIN_UI.scheduleEditorTitle })).toBeInTheDocument();
     expect(adminDeleteDeparture).not.toHaveBeenCalled();

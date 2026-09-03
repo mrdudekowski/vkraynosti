@@ -3,7 +3,7 @@ import { ADMIN_UI } from '../constants/ui';
 import AdminIcon from './AdminIcon';
 
 const ScheduleReferenceTopBar = () => (
-  <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-divider pb-3 sm:pr-56">
+  <div className="hidden min-h-14 flex-wrap items-center justify-between gap-3 border-b border-divider pb-3 md:flex md:pr-56">
     <label className="relative min-w-0 flex-1 sm:max-w-sm">
       <AdminIcon
         icon={Search}

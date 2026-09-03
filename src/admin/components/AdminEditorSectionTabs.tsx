@@ -22,7 +22,9 @@ const AdminEditorSectionTabs = ({
   const moveTo = (id: AdminEditorSectionId) => {
     onChange(id);
     window.requestAnimationFrame(() => {
-      window.document.getElementById(`admin-tab-${id}`)?.focus();
+      const tab = window.document.getElementById(`admin-tab-${id}`);
+      tab?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      tab?.focus();
     });
   };
 

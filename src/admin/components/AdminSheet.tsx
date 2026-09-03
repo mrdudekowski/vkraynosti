@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { X } from 'lucide-react';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 import { useAdminViewport } from '../hooks/useAdminViewport';
+import AdminIconButton from './AdminIconButton';
 
 export type AdminSheetPlacement = 'drawer' | 'sheet' | 'fullscreen' | 'adaptive';
 
@@ -29,11 +31,11 @@ function resolvePlacement(
 
 const PANEL_CLASS: Record<Exclude<AdminSheetPlacement, 'adaptive'>, string> = {
   drawer:
-    'relative z-modal ml-auto flex h-full w-full max-w-md flex-col overflow-y-auto rounded-l-admin-overlay border-l border-divider bg-surface-light p-4 shadow-admin-overlay',
+    'relative z-modal ml-auto flex h-full w-full max-w-md flex-col overflow-hidden rounded-l-admin-overlay border-l border-divider bg-surface-light shadow-admin-overlay',
   sheet:
-    'relative z-modal mt-auto max-h-[85vh] w-full overflow-y-auto rounded-t-admin-overlay border-t border-divider bg-surface-light p-4 shadow-admin-overlay',
+    'relative z-modal mt-auto flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-admin-overlay border-t border-divider bg-surface-light shadow-admin-overlay',
   fullscreen:
-    'relative z-modal flex h-full w-full flex-col overflow-y-auto bg-surface-light p-4',
+    'relative z-modal flex h-full w-full flex-col overflow-hidden bg-surface-light',
 };
 
 const AdminSheet = ({
@@ -86,10 +88,13 @@ const AdminSheet = ({
         aria-labelledby={titleId}
         className={PANEL_CLASS[resolved]}
       >
-        <h2 id={titleId} className="mb-3 text-admin-section text-text-primary">
-          {title}
-        </h2>
-        {children}
+        <div className="flex shrink-0 items-start justify-between gap-3 px-4 pb-3 pt-4">
+          <h2 id={titleId} className="min-w-0 text-admin-section text-text-primary">
+            {title}
+          </h2>
+          <AdminIconButton icon={X} label={closeLabel} onClick={onClose} />
+        </div>
+        <div className="min-h-0 overflow-y-auto px-4 pb-4">{children}</div>
       </div>
     </div>,
     window.document.body,

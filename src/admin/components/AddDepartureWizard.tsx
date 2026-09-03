@@ -28,7 +28,7 @@ export type AddDepartureWizardComplete = {
   seats: number;
 };
 
-type WizardStep = 'tour' | 'date' | 'staff' | 'seats';
+type WizardStep = 'tour' | 'date' | 'seats';
 type PendingAdvance = 'tour' | 'date' | 'submit';
 
 type AddDepartureWizardProps = {
@@ -47,7 +47,7 @@ function firstStep(lockedTourId: string | undefined, lockedStartsOn: string | un
   if (lockedStartsOn == null) {
     return 'date';
   }
-  return 'staff';
+  return 'seats';
 }
 
 function defaultSeason(lockedStartsOn: string | undefined): Season {
@@ -108,11 +108,11 @@ const AddDepartureWizard = ({
       : '';
 
   const advanceFromTour = () => {
-    setStep(lockedStartsOn == null ? 'date' : 'staff');
+    setStep(lockedStartsOn == null ? 'date' : 'seats');
   };
 
   const advanceFromDate = () => {
-    setStep('staff');
+    setStep('seats');
   };
 
   const submitWizard = () => {
@@ -225,12 +225,6 @@ const AddDepartureWizard = ({
             >
               {ADMIN_UI.scheduleWizardNext}
             </AdminButton>
-          </div>
-        ) : null}
-        {step === 'staff' ? (
-          <div className="flex flex-col gap-3">
-            <AdminButton disabled>{ADMIN_UI.scheduleStaffSkip}</AdminButton>
-            <AdminButton onClick={() => setStep('seats')}>{ADMIN_UI.scheduleWizardNext}</AdminButton>
           </div>
         ) : null}
         {step === 'seats' ? (

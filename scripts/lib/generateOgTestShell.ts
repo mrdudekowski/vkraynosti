@@ -52,14 +52,17 @@ export async function generateStaticOgTestPage(
   config: StaticOgTestPageConfig,
 ): Promise<void> {
   await materializeSourceImage(distDir, rootDir, config.sourceLogical);
-  await ensureTelegramFriendlyOgImage(distDir, config.sourceLogical);
+  const resolvedImageLogical = await ensureTelegramFriendlyOgImage(
+    distDir,
+    config.sourceLogical,
+  );
 
   const meta: OgShellMeta = {
     title: config.title,
     description: config.description,
     path: config.route,
     robots: config.robots ?? 'noindex,nofollow',
-    imagePathOrUrl: config.imageLogical,
+    imagePathOrUrl: resolvedImageLogical,
   };
 
   const siteUrl = process.env.VITE_SITE_URL?.trim() || 'https://example.com';

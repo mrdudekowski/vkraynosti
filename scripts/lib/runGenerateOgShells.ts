@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { TOURS } from '../../src/data/toursData.ts';
 import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
@@ -17,6 +17,7 @@ import { injectOgShellIntoHtml } from './renderOgShellHead.ts';
 import { renderLegacyTourRedirectShell } from './renderLegacyTourRedirectShell.ts';
 import { resolveOgShellMeta } from './resolveOgShellMeta.ts';
 import { routePathToDistFile } from './seoRoutes.mjs';
+import { OG_FALLBACK_JPEG_LOGICAL } from './ogShellTelegramImage.ts';
 
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
@@ -33,6 +34,11 @@ export async function runGenerateOgShells(): Promise<void> {
   } catch {
     throw new Error('dist/index.html not found — run `npm run build` first');
   }
+
+  await copyFile(
+    resolve(rootDir, OG_FALLBACK_JPEG_LOGICAL),
+    resolve(distDir, OG_FALLBACK_JPEG_LOGICAL),
+  );
 
   const routes = await getRenderableRoutePaths(rootDir);
   const statusByPath = await getTourStatusByPublicPath(rootDir);

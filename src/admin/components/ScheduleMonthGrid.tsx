@@ -21,6 +21,7 @@ type ScheduleMonthGridProps = {
   onOpenDeparture: (departure: AdminDeparture, iso: string, totalOnDay: number) => void;
   onOpenDayDetail: (iso: string) => void;
   onDropChip: (departureId: string, startsOn: string) => void;
+  dragEnabled?: boolean;
 };
 
 const ScheduleMonthGrid = ({
@@ -38,6 +39,7 @@ const ScheduleMonthGrid = ({
   onOpenDeparture,
   onOpenDayDetail,
   onDropChip,
+  dragEnabled = true,
 }: ScheduleMonthGridProps) => (
   <div className="admin-schedule-month">
     <div className="admin-schedule-weekdays" aria-hidden="true">
@@ -96,11 +98,11 @@ const ScheduleMonthGrid = ({
               {visible.map((departure) => (
                 <div
                   key={departure.id}
-                  draggable={departure.status !== 'completed'}
-                  className={departure.status !== 'completed' ? 'admin-schedule-draggable' : undefined}
-                  onDragStart={(event) => {
+                  draggable={dragEnabled && departure.status !== 'completed' ? true : undefined}
+                  className={dragEnabled && departure.status !== 'completed' ? 'admin-schedule-draggable' : undefined}
+                  onDragStart={dragEnabled ? (event) => {
                     event.dataTransfer.setData('text/plain', departure.id);
-                  }}
+                  } : undefined}
                 >
                   <ScheduleMonthDepartureItem
                     departure={departure}

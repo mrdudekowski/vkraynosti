@@ -17,6 +17,7 @@ type ScheduleWeekSplitLayoutProps = {
   onOpenDeparture: (departure: AdminDeparture) => void;
   onStatusChange?: (departure: AdminDeparture, status: DepartureQuickStatus) => void;
   onDropChip: (departureId: string, startsOn: string) => void;
+  dragEnabled?: boolean;
 };
 
 const ScheduleWeekSplitLayout = ({
@@ -33,6 +34,7 @@ const ScheduleWeekSplitLayout = ({
   onOpenDeparture,
   onStatusChange,
   onDropChip,
+  dragEnabled = true,
 }: ScheduleWeekSplitLayoutProps) => {
   const dayDepartures = departures.filter((departure) => departure.startsOn === selectedDayIso);
 
@@ -54,6 +56,7 @@ const ScheduleWeekSplitLayout = ({
           onOpenDeparture={onOpenDeparture}
           onStatusChange={onStatusChange}
           onDropChip={onDropChip}
+          dragEnabled={dragEnabled}
         />
       </div>
       <ScheduleWeekDayPanel

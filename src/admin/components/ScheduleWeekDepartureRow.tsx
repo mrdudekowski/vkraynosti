@@ -18,6 +18,7 @@ type ScheduleWeekDepartureRowProps = {
   onOpen: () => void;
   onStatusChange?: (status: DepartureQuickStatus) => void;
   onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
+  dragEnabled?: boolean;
 };
 
 const THUMB: Record<ScheduleWeekDepartureRowProps['variant'], string> = {
@@ -37,6 +38,7 @@ const ScheduleWeekDepartureRow = ({
   onOpen,
   onStatusChange,
   onDragStart,
+  dragEnabled = true,
 }: ScheduleWeekDepartureRowProps) => {
   const cancelled = departure.status === 'cancelled';
   const showGuestException =
@@ -51,8 +53,8 @@ const ScheduleWeekDepartureRow = ({
   return (
     <div
       className={`admin-schedule-week-row admin-schedule-week-row-${variant} ${selectedClass} ${cancelledClass}`}
-      draggable={onDragStart != null && departure.status !== 'completed'}
-      onDragStart={onDragStart}
+      draggable={dragEnabled && onDragStart != null && departure.status !== 'completed' ? true : undefined}
+      onDragStart={dragEnabled ? onDragStart : undefined}
     >
       <button
         type="button"

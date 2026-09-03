@@ -196,6 +196,7 @@ const SchedulePage = () => {
   const mode = storedMode ?? defaultScheduleMode(viewport);
   const weekLayout = storedWeekLayout ?? 'list';
   const monthGrid = mode === 'month' && viewport !== 'mobile';
+  const dragEnabled = viewport === 'desktop';
   const weekSplitDesktop = mode === 'week' && weekLayout === 'split' && viewport === 'desktop';
   // Mobile must use the shell's single touch-scroll surface. Nested flex scrollers
   // combined with body overflow locking prevent swipe scrolling in the calendar.
@@ -634,6 +635,7 @@ const SchedulePage = () => {
               onDropChip={(departureId, startsOn) => {
                 void onDropChip(departureId, startsOn);
               }}
+              dragEnabled={dragEnabled}
             />
           </div>
         </>
@@ -656,6 +658,7 @@ const SchedulePage = () => {
           onDropChip={(departureId, startsOn) => {
             void onDropChip(departureId, startsOn);
           }}
+          dragEnabled={dragEnabled}
         />
       ) : mode === 'week' ? (
         <ScheduleWeekListLayout
@@ -676,6 +679,7 @@ const SchedulePage = () => {
           onDropChip={(departureId, startsOn) => {
             void onDropChip(departureId, startsOn);
           }}
+          dragEnabled={dragEnabled}
         />
       ) : (
         <ScheduleWeekListLayout
@@ -698,6 +702,7 @@ const SchedulePage = () => {
           onDropChip={(departureId, startsOn) => {
             void onDropChip(departureId, startsOn);
           }}
+          dragEnabled={dragEnabled}
         />
       )}
           </main>

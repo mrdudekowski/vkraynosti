@@ -21,6 +21,7 @@ type ScheduleWeekListLayoutProps = {
   onOpenDeparture: (departure: AdminDeparture) => void;
   onStatusChange?: (departure: AdminDeparture, status: DepartureQuickStatus) => void;
   onDropChip: (departureId: string, startsOn: string) => void;
+  dragEnabled?: boolean;
 };
 
 const ScheduleWeekListLayout = ({
@@ -39,6 +40,7 @@ const ScheduleWeekListLayout = ({
   onOpenDeparture,
   onStatusChange,
   onDropChip,
+  dragEnabled = true,
 }: ScheduleWeekListLayoutProps) => (
   <div className={`${className} mt-3 overflow-y-auto overscroll-y-contain`}>
     {departures.length === 0 ? (
@@ -64,6 +66,7 @@ const ScheduleWeekListLayout = ({
       onOpenDeparture={onOpenDeparture}
       onStatusChange={onStatusChange}
       onDropChip={onDropChip}
+      dragEnabled={dragEnabled}
     />
   </div>
 );

@@ -21,6 +21,7 @@ type ScheduleWeekDaysColumnProps = {
   onOpenDeparture: (departure: AdminDeparture) => void;
   onStatusChange?: (departure: AdminDeparture, status: DepartureQuickStatus) => void;
   onDropChip: (departureId: string, startsOn: string) => void;
+  dragEnabled?: boolean;
 };
 
 const ScheduleWeekDaysColumn = ({
@@ -38,6 +39,7 @@ const ScheduleWeekDaysColumn = ({
   onOpenDeparture,
   onStatusChange,
   onDropChip,
+  dragEnabled = true,
 }: ScheduleWeekDaysColumnProps) => (
   <div className="flex min-w-0 flex-col">
     {days.map((iso) => {
@@ -100,6 +102,7 @@ const ScheduleWeekDaysColumn = ({
                       onStatusChange(departure, status);
                     }
               }
+              dragEnabled={dragEnabled}
               onDragStart={(event) => {
                 event.dataTransfer.setData('text/plain', departure.id);
               }}

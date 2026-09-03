@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   isTimewebAppBuild,
+  sanitizeTimeweb404Html,
   stripGithubPages404RedirectScript,
   stripGithubPagesSpaRedirectScript,
 } from './stripGithubPagesScripts.ts';
@@ -22,6 +23,18 @@ describe('stripGithubPages404RedirectScript', () => {
   it('removes 404 redirect script', () => {
     const html = `<head><script>// GitHub Pages SPA redirect: encode</script></head>`;
     expect(stripGithubPages404RedirectScript(html)).not.toContain('SPA redirect');
+  });
+});
+
+describe('sanitizeTimeweb404Html', () => {
+  it('removes the GitHub Pages redirect from the production 404 shell', () => {
+    const html = `<head><script>// GitHub Pages SPA redirect: encode</script></head>`;
+    expect(sanitizeTimeweb404Html(html, { VITE_BASE_PATH: '/' })).not.toContain('SPA redirect');
+  });
+
+  it('preserves the redirect for the GitHub Pages build', () => {
+    const html = `<head><script>// GitHub Pages SPA redirect: encode</script></head>`;
+    expect(sanitizeTimeweb404Html(html, { VITE_BASE_PATH: '/vkraynosti/' })).toContain('SPA redirect');
   });
 });
 

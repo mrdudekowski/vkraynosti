@@ -17,6 +17,8 @@ function mimeFromFile(file: File): string {
   if (name.endsWith('.webp')) return 'image/webp';
   if (name.endsWith('.jpg') || name.endsWith('.jpeg')) return 'image/jpeg';
   if (name.endsWith('.png')) return 'image/png';
+  if (name.endsWith('.heic')) return 'image/heic';
+  if (name.endsWith('.heif')) return 'image/heif';
   if (name.endsWith('.webm')) return 'video/webm';
   if (name.endsWith('.mp4')) return 'video/mp4';
   return 'application/octet-stream';

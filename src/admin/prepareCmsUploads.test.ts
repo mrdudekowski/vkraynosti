@@ -4,6 +4,8 @@ import { classifyCmsMediaFile, prepareCmsUploads } from './prepareCmsUploads';
 describe('classifyCmsMediaFile', () => {
   it('отличает фото, видео и мусор', () => {
     expect(classifyCmsMediaFile(new File([], 'a.webp', { type: 'image/webp' }))).toBe('still');
+    expect(classifyCmsMediaFile(new File([], 'a.heic', { type: 'image/heic' }))).toBe('still');
+    expect(classifyCmsMediaFile(new File([], 'a.heif'))).toBe('still');
     expect(classifyCmsMediaFile(new File([], 'a.webm', { type: 'video/webm' }))).toBe('video');
     expect(classifyCmsMediaFile(new File([], 'a.gif', { type: 'image/gif' }))).toBe('reject');
     expect(classifyCmsMediaFile(new File([], 'shot.webp'))).toBe('still');

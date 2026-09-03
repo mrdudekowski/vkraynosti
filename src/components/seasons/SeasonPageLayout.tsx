@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { ROUTES } from '../../constants/routes';
+import { getSeasonCollectionSchema } from '../../constants/seo';
 import { UI } from '../../constants/ui';
 import { IMAGES } from '../../constants/images';
 import Breadcrumbs from '../shared/Breadcrumbs';
@@ -36,6 +37,7 @@ const SeasonPageLayout = ({
         description={metaDescription}
         imageUrl={ogImageUrl}
         path={metaPath}
+        structuredData={[getSeasonCollectionSchema(seasonKey, metaPath)]}
       />
 
       <div

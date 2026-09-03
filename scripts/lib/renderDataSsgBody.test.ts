@@ -33,6 +33,12 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.structuredData).toHaveLength(2);
   });
 
+  it('renders season catalog with CollectionPage JSON-LD', () => {
+    const page = resolveDataSsgForRoute('/tours/summer', emptySnapshot());
+    expect(page.structuredData).toHaveLength(1);
+    expect(page.structuredData[0]).toMatchObject({ '@type': 'CollectionPage', name: 'Лето' });
+  });
+
   it('renders tour with program and TouristTrip JSON-LD', () => {
     const snapshot = emptySnapshot();
     snapshot.publicationStatuses.set('spring-1', 'active');

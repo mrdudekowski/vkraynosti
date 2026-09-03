@@ -4,6 +4,7 @@ import { ROUTES, SEASON_TO_LIST_ROUTE } from '../../src/constants/routes.ts';
 import {
   SEO_DEFAULTS,
   getSeasonSeoEntry,
+  getSeasonCollectionSchema,
   getTourSeoEntry,
   getTourBreadcrumbSchema,
   getTourStructuredData,
@@ -229,7 +230,7 @@ export function resolveDataSsgForRoute(
   if (seasonKey != null) {
     return {
       bodyHtml: renderSeasonBody(seasonKey, snapshot),
-      structuredData: [],
+      structuredData: [getSeasonCollectionSchema(seasonKey, SEASON_TO_LIST_ROUTE[seasonKey])],
     };
   }
 

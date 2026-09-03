@@ -22,6 +22,24 @@ describe('getCanonicalUrl', () => {
   });
 });
 
+describe('season collection schema', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('describes a season catalog as a CollectionPage', async () => {
+    vi.stubEnv('VITE_SITE_URL', 'https://vkraynosti.ru');
+    vi.resetModules();
+    const { getSeasonCollectionSchema } = await import('./seo');
+    expect(getSeasonCollectionSchema('summer', '/tours/summer')).toMatchObject({
+      '@type': 'CollectionPage',
+      name: 'Лето',
+      url: 'https://vkraynosti.ru/tours/summer/',
+      inLanguage: 'ru-RU',
+    });
+  });
+});
+
 describe('getAbsoluteOgImageUrl', () => {
   afterEach(() => {
     vi.unstubAllEnvs();

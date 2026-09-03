@@ -140,6 +140,20 @@ export const getSeasonSeoEntry = (season: Season, path: string): SeoEntry => ({
   path,
 });
 
+export const getSeasonCollectionSchema = (season: Season, path: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: UI.seasons[season].label,
+  description: SEASON_META_BY_KEY[season].description,
+  url: getCanonicalUrl(path),
+  inLanguage: 'ru-RU',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: getCanonicalUrl(ROUTES.HOME),
+  },
+});
+
 export interface TourSeoDurationOptions {
   displayDuration?: string;
   publicationStatus?: TourPublicationStatus;

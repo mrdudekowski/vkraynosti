@@ -428,6 +428,36 @@ describe('SchedulePage', () => {
     expect(screen.queryByRole('dialog', { name: ADMIN_UI.scheduleDeleteTitle })).not.toBeInTheDocument();
   });
 
+  it('blocks a duplicate departure and keeps the wizard open with a notification', async () => {
+    const user = userEvent.setup();
+    const today = vladivostokCalendarDate();
+    vi.mocked(adminListDepartures).mockResolvedValue([
+      {
+        id: 'dep-1',
+        tourId: 'summer-1',
+        startsOn: today,
+        endsOn: today,
+        seats: 8,
+        status: 'open',
+        version: 1,
+        createdAt: '2026-08-18T00:00:00.000Z',
+        updatedAt: '2026-08-18T00:00:00.000Z',
+      },
+    ]);
+
+    renderSchedule();
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleAdd }));
+    const wizard = await screen.findByRole('dialog', { name: ADMIN_UI.scheduleWizardTitle });
+    await user.click(within(wizard).getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
+    await user.type(within(wizard).getByLabelText(ADMIN_UI.schedulePickDate), today);
+    await user.click(within(wizard).getByRole('button', { name: ADMIN_UI.scheduleWizardNext }));
+    await user.click(within(wizard).getByRole('button', { name: ADMIN_UI.scheduleWizardSubmit }));
+
+    expect(adminCreateDeparture).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: ADMIN_UI.scheduleWizardTitle })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(ADMIN_UI.scheduleDuplicateDeparture);
+  });
+
   it('restores the editor when delete is cancelled', async () => {
     const user = userEvent.setup();
     const today = vladivostokCalendarDate();

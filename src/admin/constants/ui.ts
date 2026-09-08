@@ -183,6 +183,7 @@ export const ADMIN_UI = {
   scheduleDeleteConfirm: 'Удалить',
   scheduleDeleted: 'Выезд удалён',
   scheduleDeleteError: 'Не удалось удалить выезд',
+  scheduleDuplicateDeparture: 'Такой выезд уже есть на эту дату',
   scheduleNoToursForDate: 'Все туры на сайте уже стоят на эту дату.',
   scheduleNoOnSiteTours: 'В этом сезоне нет туров на сайте.',
   scheduleCrossSeasonTitle: 'Тур другого сезона',

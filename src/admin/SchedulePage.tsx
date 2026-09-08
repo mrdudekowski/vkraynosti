@@ -373,8 +373,7 @@ const SchedulePage = () => {
   const finishWizard = async (input: AddDepartureWizardComplete) => {
     const existing = activeOnDate(departures, input.tourId, input.startsOn);
     if (existing != null) {
-      setWizard(null);
-      openExisting(existing);
+      push({ message: ADMIN_UI.scheduleDuplicateDeparture });
       return;
     }
     try {

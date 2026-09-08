@@ -25,6 +25,8 @@ import { applyAdminTourGuestVisibility } from './applyAdminTourGuestVisibility';
 import { clearAdminDataCache } from './adminDataCache';
 import SeasonToursPage from './SeasonToursPage';
 
+type AdminCloneResult = Awaited<ReturnType<typeof adminCloneTour>>;
+
 const LocationProbe = () => {
   const location = useLocation();
   return <div data-testid="location">{location.pathname}</div>;
@@ -191,7 +193,7 @@ describe('SeasonToursPage', () => {
 
   it('блокирует повторную отправку во время клонирования', async () => {
     const user = userEvent.setup();
-    let resolveClone: (value: { document: CmsTourDocument; meta: { rev: number } }) => void = () => undefined;
+    let resolveClone: (value: AdminCloneResult) => void = () => undefined;
     vi.mocked(adminCloneTour).mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -209,7 +211,10 @@ describe('SeasonToursPage', () => {
     expect(within(dialog).getByRole('button', { name: ADMIN_UI.cloneTourSubmitting })).toBeDisabled();
     expect(adminCloneTour).toHaveBeenCalledTimes(1);
 
-    resolveClone({ document: { ...createdDocument, id: 'summer-1', season: 'summer' }, meta: { rev: 1 } });
+    resolveClone({
+      document: { ...createdDocument, id: 'summer-1', season: 'summer' },
+      meta: { rev: 1, updatedAt: '2026-08-16T00:00:00.000Z', editor: 'editor' },
+    });
     expect(await screen.findByTestId('location')).toHaveTextContent('/tours/summer-1');
   });
 

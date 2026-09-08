@@ -11,8 +11,8 @@ type AdminTourActionsMenuProps = {
   open: boolean;
   busy: boolean;
   onOpenChange: (open: boolean) => void;
-  onHide: () => void;
-  onShow: () => void;
+  onHide?: () => void;
+  onShow?: () => void;
   onClone?: () => void;
   queuesVisibility?: boolean;
 };
@@ -30,6 +30,7 @@ const AdminTourActionsMenu = ({
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const action = adminTourGuestVisibilityAction(tour);
+  const showVisibilityAction = action != null && onHide != null && onShow != null;
 
   useEffect(() => {
     if (!open) {
@@ -98,7 +99,7 @@ const AdminTourActionsMenu = ({
               {ADMIN_UI.cloneTourAction}
             </button>
           ) : null}
-          {action === 'hide' ? (
+          {showVisibilityAction && action === 'hide' ? (
             <button
               type="button"
               role="menuitem"
@@ -114,7 +115,7 @@ const AdminTourActionsMenu = ({
               <AdminIcon icon={EyeOff} size={16} />
               {queuesVisibility ? ADMIN_UI.tourHideQueuedAction : ADMIN_UI.tourHideFromSite}
             </button>
-          ) : (
+          ) : showVisibilityAction ? (
             <button
               type="button"
               role="menuitem"
@@ -130,7 +131,7 @@ const AdminTourActionsMenu = ({
               <AdminIcon icon={Eye} size={16} />
               {ADMIN_UI.tourShowOnSite}
             </button>
-          )}
+          ) : null}
         </div>
       ) : null}
     </div>

@@ -211,10 +211,10 @@ const TourList = ({
                       setOpenMenuTourId(open ? tour.id : null);
                     }}
                     onHide={() => {
-                      onChangeGuestVisibility(tour.id, 'hidden');
+                      onChangeGuestVisibility?.(tour.id, 'hidden');
                     }}
                     onShow={() => {
-                      onChangeGuestVisibility(tour.id, 'active');
+                      onChangeGuestVisibility?.(tour.id, 'active');
                     }}
                     onClone={onClone == null ? undefined : () => onClone(tour.id)}
                   />

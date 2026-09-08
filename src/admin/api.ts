@@ -196,6 +196,23 @@ export async function adminCreateTour(input: {
   return readJson(response);
 }
 
+export async function adminCloneTour(
+  id: string,
+  targetSeason: CmsTourDocument['season'],
+): Promise<{ document: CmsTourDocument; meta: CmsTourMeta }> {
+  const response = await fetch(`/api/cms/tours/${encodeURIComponent(id)}/clone`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ targetSeason }),
+  });
+  if (!response.ok) {
+    const body = (await response.json()) as { error?: string };
+    throw new Error(body.error ?? 'clone_failed');
+  }
+  return readJson(response);
+}
+
 export async function adminGetTour(
   id: string
 ): Promise<{

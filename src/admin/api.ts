@@ -213,6 +213,18 @@ export async function adminCloneTour(
   return readJson(response);
 }
 
+export async function adminDeleteTour(id: string): Promise<void> {
+  const response = await fetch(`/api/cms/tours/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (response.status === 204) {
+    return;
+  }
+  const body = await readJson<{ error?: string }>(response);
+  throw new Error(body.error ?? 'tour_delete_failed');
+}
+
 export async function adminGetTour(
   id: string
 ): Promise<{

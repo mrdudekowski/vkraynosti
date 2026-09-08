@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { adminCalendarSeason } from './adminCalendarSeason';
 import {
   adminCloneTour,
+  adminDeleteTour,
   type AdminDeparture,
   type AdminTourListItem,
 } from './api';
@@ -25,6 +26,7 @@ import AdminSeasonSwitcher from './components/AdminSeasonSwitcher';
 import AdminSkeleton from './components/AdminSkeleton';
 import CreateTourModal from './components/CreateTourModal';
 import CloneTourModal from './components/CloneTourModal';
+import DeleteTourModal from './components/DeleteTourModal';
 import TourList from './components/TourList';
 import { ADMIN_PATHS, isAdminSeasonParam } from './constants/routes';
 import { ADMIN_UI } from './constants/ui';
@@ -82,6 +84,9 @@ const SeasonToursPage = () => {
   const [cloneTour, setCloneTour] = useState<AdminTourListItem | null>(null);
   const [cloneBusy, setCloneBusy] = useState(false);
   const [cloneError, setCloneError] = useState<string | null>(null);
+  const [deleteTour, setDeleteTour] = useState<AdminTourListItem | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [busyTourId, setBusyTourId] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
@@ -196,6 +201,10 @@ const SeasonToursPage = () => {
           setCloneTour(tours.find((tour) => tour.id === tourId) ?? null);
           setCloneError(null);
         }}
+        onDelete={(tourId) => {
+          setDeleteTour(tours.find((tour) => tour.id === tourId) ?? null);
+          setDeleteError(null);
+        }}
         onChangeGuestVisibility={(id, status) => {
           void changeGuestVisibility(id, status);
         }}
@@ -228,6 +237,37 @@ const SeasonToursPage = () => {
               })
               .finally(() => {
                 setCloneBusy(false);
+              });
+          }}
+        />
+      ) : null}
+      {deleteTour != null ? (
+        <DeleteTourModal
+          tour={deleteTour}
+          busy={deleteBusy}
+          error={deleteError}
+          onClose={() => {
+            if (!deleteBusy) {
+              setDeleteTour(null);
+              setDeleteError(null);
+            }
+          }}
+          onConfirm={() => {
+            setDeleteBusy(true);
+            setDeleteError(null);
+            void adminDeleteTour(deleteTour.id)
+              .then(async () => {
+                invalidateAdminTours();
+                invalidateAdminPublishQueue();
+                setTours(await refreshAdminTours());
+                setDeleteTour(null);
+                push({ message: ADMIN_UI.deleteTourSuccess });
+              })
+              .catch((caught) => {
+                setDeleteError(caught instanceof Error ? caught.message : 'tour_delete_failed');
+              })
+              .finally(() => {
+                setDeleteBusy(false);
               });
           }}
         />

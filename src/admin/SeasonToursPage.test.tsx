@@ -14,13 +14,20 @@ vi.mock('./api', () => ({
   adminListDepartures: vi.fn(),
   adminCreateTour: vi.fn(),
   adminCloneTour: vi.fn(),
+  adminDeleteTour: vi.fn(),
 }));
 
 vi.mock('./applyAdminTourGuestVisibility', () => ({
   applyAdminTourGuestVisibility: vi.fn(),
 }));
 
-import { adminCloneTour, adminCreateTour, adminListDepartures, adminListTours } from './api';
+import {
+  adminCloneTour,
+  adminCreateTour,
+  adminDeleteTour,
+  adminListDepartures,
+  adminListTours,
+} from './api';
 import { applyAdminTourGuestVisibility } from './applyAdminTourGuestVisibility';
 import { clearAdminDataCache } from './adminDataCache';
 import SeasonToursPage from './SeasonToursPage';
@@ -89,6 +96,7 @@ describe('SeasonToursPage', () => {
     vi.mocked(adminListDepartures).mockReset();
     vi.mocked(adminCreateTour).mockReset();
     vi.mocked(adminCloneTour).mockReset();
+    vi.mocked(adminDeleteTour).mockReset();
     vi.mocked(applyAdminTourGuestVisibility).mockReset();
     vi.mocked(adminListTours).mockResolvedValue([onSiteTour]);
     vi.mocked(adminListDepartures).mockResolvedValue([]);
@@ -100,6 +108,7 @@ describe('SeasonToursPage', () => {
       document: { ...createdDocument, id: 'summer-1', season: 'summer' },
       meta: { rev: 1, updatedAt: '2026-08-16T00:00:00.000Z', editor: 'editor' },
     });
+    vi.mocked(adminDeleteTour).mockResolvedValue(undefined);
     vi.mocked(applyAdminTourGuestVisibility).mockResolvedValue('queued');
   });
 
@@ -231,5 +240,58 @@ describe('SeasonToursPage', () => {
 
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(ADMIN_UI.cloneTourMediaError);
     expect(screen.getByRole('dialog', { name: ADMIN_UI.cloneTourTitle })).toBeInTheDocument();
+  });
+
+  it('подтверждает удаление тура, обновляет список и показывает уведомление', async () => {
+    const user = userEvent.setup();
+    renderSeason();
+
+    await user.click(await screen.findByRole('button', { name: ADMIN_UI.tourMenu }));
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.deleteTourAction }));
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.deleteTourTitle });
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.deleteTourSubmit }));
+
+    expect(adminDeleteTour).toHaveBeenCalledWith('winter-1');
+    expect(screen.queryByRole('dialog', { name: ADMIN_UI.deleteTourTitle })).not.toBeInTheDocument();
+    expect(await screen.findByText(ADMIN_UI.deleteTourSuccess)).toBeInTheDocument();
+    expect(adminListTours).toHaveBeenCalledTimes(2);
+  });
+
+  it('оставляет диалог открытым, если удаление заблокировано зависимостями', async () => {
+    const user = userEvent.setup();
+    vi.mocked(adminDeleteTour).mockRejectedValue(new Error('tour_has_dependencies'));
+    renderSeason();
+
+    await user.click(await screen.findByRole('button', { name: ADMIN_UI.tourMenu }));
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.deleteTourAction }));
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.deleteTourTitle });
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.deleteTourSubmit }));
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      ADMIN_UI.deleteTourDependencies,
+    );
+    expect(screen.getByRole('dialog', { name: ADMIN_UI.deleteTourTitle })).toBeInTheDocument();
+  });
+
+  it('блокирует повторную отправку во время удаления', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: () => void = () => undefined;
+    vi.mocked(adminDeleteTour).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveDelete = resolve;
+        }),
+    );
+    renderSeason();
+
+    await user.click(await screen.findByRole('button', { name: ADMIN_UI.tourMenu }));
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.deleteTourAction }));
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.deleteTourTitle });
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.deleteTourSubmit }));
+
+    expect(within(dialog).getByRole('button', { name: ADMIN_UI.deleteTourSubmitting })).toBeDisabled();
+    expect(adminDeleteTour).toHaveBeenCalledTimes(1);
+    resolveDelete();
+    await screen.findByText(ADMIN_UI.deleteTourSuccess);
   });
 });

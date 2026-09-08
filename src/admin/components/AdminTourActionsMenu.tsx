@@ -1,4 +1,4 @@
-import { Eye, EyeOff, MoreHorizontal } from 'lucide-react';
+import { Copy, Eye, EyeOff, MoreHorizontal } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { AdminTourListItem } from '../api';
 import { adminTourGuestVisibilityAction } from '../adminTourVisibility';
@@ -13,6 +13,7 @@ type AdminTourActionsMenuProps = {
   onOpenChange: (open: boolean) => void;
   onHide: () => void;
   onShow: () => void;
+  onClone?: () => void;
   queuesVisibility?: boolean;
 };
 
@@ -23,6 +24,7 @@ const AdminTourActionsMenu = ({
   onOpenChange,
   onHide,
   onShow,
+  onClone,
   queuesVisibility = false,
 }: AdminTourActionsMenuProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -55,7 +57,7 @@ const AdminTourActionsMenu = ({
     };
   }, [onOpenChange, open]);
 
-  if (action == null) {
+  if (action == null && onClone == null) {
     return null;
   }
 
@@ -79,6 +81,23 @@ const AdminTourActionsMenu = ({
           role="menu"
           className="absolute right-0 z-tooltip mt-1 w-56 rounded-admin-control border border-divider bg-surface-light py-1 shadow-admin-overlay"
         >
+          {onClone != null ? (
+            <button
+              type="button"
+              role="menuitem"
+              className="admin-btn-ghost w-full justify-start gap-2"
+              disabled={busy}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onOpenChange(false);
+                onClone();
+              }}
+            >
+              <AdminIcon icon={Copy} size={16} />
+              {ADMIN_UI.cloneTourAction}
+            </button>
+          ) : null}
           {action === 'hide' ? (
             <button
               type="button"

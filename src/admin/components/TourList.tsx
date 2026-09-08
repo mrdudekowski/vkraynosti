@@ -40,6 +40,7 @@ type TourListProps = {
   busyTourId?: string | null;
   queuesVisibility?: boolean;
   onChangeGuestVisibility?: (tourId: string, status: 'hidden' | 'active') => void;
+  onClone?: (tourId: string) => void;
   onAddTour?: () => void;
 };
 
@@ -63,6 +64,7 @@ const TourList = ({
   busyTourId = null,
   queuesVisibility = false,
   onChangeGuestVisibility,
+  onClone,
   onAddTour,
 }: TourListProps) => {
   const navigate = useNavigate();
@@ -199,7 +201,7 @@ const TourList = ({
                 </div>
               ),
               action:
-                onChangeGuestVisibility != null ? (
+                onChangeGuestVisibility != null || onClone != null ? (
                   <AdminTourActionsMenu
                     tour={tour}
                     open={openMenuTourId === tour.id}
@@ -214,6 +216,7 @@ const TourList = ({
                     onShow={() => {
                       onChangeGuestVisibility(tour.id, 'active');
                     }}
+                    onClone={onClone == null ? undefined : () => onClone(tour.id)}
                   />
                 ) : null,
               onActivate: () => {
@@ -253,6 +256,7 @@ const TourList = ({
                         onChangeGuestVisibility(tour.id, 'active');
                       }
                 }
+                onClone={onClone == null ? undefined : () => onClone(tour.id)}
               />
             </li>
           ))}

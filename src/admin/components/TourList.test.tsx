@@ -152,4 +152,23 @@ describe('TourList', () => {
     await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.tourHideFromSite }));
     expect(onChangeGuestVisibility).toHaveBeenCalledWith('winter-1', 'hidden');
   });
+
+  it('передаёт выбранный тур в действие клонирования в карточках и списке', async () => {
+    const user = userEvent.setup();
+    const onClone = vi.fn();
+    render(
+      <MemoryRouter>
+        <TourList tours={tours} onChangeGuestVisibility={vi.fn()} onClone={onClone} />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getAllByRole('button', { name: ADMIN_UI.tourMenu })[0]);
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.cloneTourAction }));
+    expect(onClone).toHaveBeenCalledWith('winter-1');
+
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.tourViewList }));
+    await user.click(screen.getAllByRole('button', { name: ADMIN_UI.tourMenu })[0]);
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.cloneTourAction }));
+    expect(onClone).toHaveBeenCalledWith('winter-1');
+  });
 });

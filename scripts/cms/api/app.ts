@@ -39,6 +39,7 @@ import { vladivostokCalendarDate } from '../../../src/admin/scheduleCalendar.ts'
 import { cmsDraftIndexFile, parseCmsDraftIndex } from '../../../src/cms/cmsDraftIndex.ts';
 import { createEmptyCmsTour } from '../../../src/cms/createEmptyCmsTour.ts';
 import { cloneCmsTourDocument } from '../../../src/cms/cloneCmsTour.ts';
+import { deleteCmsTour } from './deleteCmsTour.ts';
 import { cmsTourCoverUrl } from '../../../src/cms/cmsTourCoverUrl.ts';
 import { checkHideTourPublish } from '../../../src/cms/hideTourFutureDepartures.ts';
 import { resolvePublishedTourDocument } from '../../../src/cms/publishedTourSnapshot.ts';
@@ -1420,6 +1421,28 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       }
       throw error;
     }
+  });
+
+  app.delete('/api/cms/tours/:id', async (c) => {
+    const tourId = readTourId(c.req.param('id'));
+    if (tourId == null) {
+      return c.json({ error: 'invalid_id' }, 400);
+    }
+    const tour = await loadDraftOrPublished(store, tourId);
+    if (tour == null) {
+      return c.json({ error: 'not_found' }, 404);
+    }
+    const [departures, crm] = await Promise.all([
+      departureRepository.listAllDepartures(),
+      loadCrmFile(store),
+    ]);
+    const hasDeparture = departures.some((departure) => departure.tourId === tourId);
+    const hasCrmDeal = crm.deals.some((deal) => deal.tourId === tourId);
+    if (hasDeparture || hasCrmDeal) {
+      return c.json({ error: 'tour_has_dependencies' }, 409);
+    }
+    await deleteCmsTour(store, tour);
+    return c.body(null, 204);
   });
 
   app.get('/api/cms/tours/:id', async (c) => {

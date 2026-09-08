@@ -14,6 +14,7 @@ type AdminTourActionsMenuProps = {
   onHide?: () => void;
   onShow?: () => void;
   onClone?: () => void;
+  onDelete?: () => void;
   queuesVisibility?: boolean;
 };
 
@@ -25,6 +26,7 @@ const AdminTourActionsMenu = ({
   onHide,
   onShow,
   onClone,
+  onDelete,
   queuesVisibility = false,
 }: AdminTourActionsMenuProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -58,7 +60,7 @@ const AdminTourActionsMenu = ({
     };
   }, [onOpenChange, open]);
 
-  if (action == null && onClone == null) {
+  if (action == null && onClone == null && onDelete == null) {
     return null;
   }
 
@@ -97,6 +99,22 @@ const AdminTourActionsMenu = ({
             >
               <AdminIcon icon={Copy} size={16} />
               {ADMIN_UI.cloneTourAction}
+            </button>
+          ) : null}
+          {onDelete != null ? (
+            <button
+              type="button"
+              role="menuitem"
+              className="admin-btn-ghost w-full justify-start gap-2 text-danger"
+              disabled={busy}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onOpenChange(false);
+                onDelete();
+              }}
+            >
+              {ADMIN_UI.deleteTourAction}
             </button>
           ) : null}
           {showVisibilityAction && action === 'hide' ? (

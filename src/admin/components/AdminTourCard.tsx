@@ -20,6 +20,7 @@ type AdminTourCardProps = {
   onHideFromSite?: () => void;
   onShowOnSite?: () => void;
   onClone?: () => void;
+  onDelete?: () => void;
   queuesVisibility?: boolean;
 };
 
@@ -32,12 +33,13 @@ const AdminTourCard = ({
   onHideFromSite,
   onShowOnSite,
   onClone,
+  onDelete,
   queuesVisibility = false,
 }: AdminTourCardProps) => {
   const liveVisibility = adminTourLiveVisibility(tour);
   const showMenu =
     onMenuOpenChange != null &&
-    (onClone != null || (onHideFromSite != null && onShowOnSite != null));
+    (onClone != null || onDelete != null || (onHideFromSite != null && onShowOnSite != null));
 
   return (
     <article className="admin-editor-surface relative flex h-full w-full flex-col gap-3">
@@ -81,6 +83,7 @@ const AdminTourCard = ({
               onHide={onHideFromSite}
               onShow={onShowOnSite}
               onClone={onClone}
+              onDelete={onDelete}
               queuesVisibility={queuesVisibility}
             />
           ) : null}

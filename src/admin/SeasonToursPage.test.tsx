@@ -13,13 +13,14 @@ vi.mock('./api', () => ({
   adminListTours: vi.fn(),
   adminListDepartures: vi.fn(),
   adminCreateTour: vi.fn(),
+  adminCloneTour: vi.fn(),
 }));
 
 vi.mock('./applyAdminTourGuestVisibility', () => ({
   applyAdminTourGuestVisibility: vi.fn(),
 }));
 
-import { adminCreateTour, adminListDepartures, adminListTours } from './api';
+import { adminCloneTour, adminCreateTour, adminListDepartures, adminListTours } from './api';
 import { applyAdminTourGuestVisibility } from './applyAdminTourGuestVisibility';
 import { clearAdminDataCache } from './adminDataCache';
 import SeasonToursPage from './SeasonToursPage';
@@ -85,11 +86,16 @@ describe('SeasonToursPage', () => {
     vi.mocked(adminListTours).mockReset();
     vi.mocked(adminListDepartures).mockReset();
     vi.mocked(adminCreateTour).mockReset();
+    vi.mocked(adminCloneTour).mockReset();
     vi.mocked(applyAdminTourGuestVisibility).mockReset();
     vi.mocked(adminListTours).mockResolvedValue([onSiteTour]);
     vi.mocked(adminListDepartures).mockResolvedValue([]);
     vi.mocked(adminCreateTour).mockResolvedValue({
       document: createdDocument,
+      meta: { rev: 1, updatedAt: '2026-08-16T00:00:00.000Z', editor: 'editor' },
+    });
+    vi.mocked(adminCloneTour).mockResolvedValue({
+      document: { ...createdDocument, id: 'summer-1', season: 'summer' },
       meta: { rev: 1, updatedAt: '2026-08-16T00:00:00.000Z', editor: 'editor' },
     });
     vi.mocked(applyAdminTourGuestVisibility).mockResolvedValue('queued');
@@ -166,5 +172,59 @@ describe('SeasonToursPage', () => {
     await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.tourHideQueuedAction }));
     expect(applyAdminTourGuestVisibility).toHaveBeenCalledWith('winter-1', 'hidden');
     expect(await screen.findByText(ADMIN_UI.tourHiddenQueued)).toBeInTheDocument();
+  });
+
+  it('клонирует тур в выбранный сезон и открывает страницу клона', async () => {
+    const user = userEvent.setup();
+    renderSeason();
+
+    await user.click(await screen.findByRole('button', { name: ADMIN_UI.tourMenu }));
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.cloneTourAction }));
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.cloneTourTitle });
+    await user.selectOptions(within(dialog).getByLabelText(ADMIN_UI.cloneTourSeason), 'summer');
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.cloneTourSubmit }));
+
+    expect(adminCloneTour).toHaveBeenCalledWith('winter-1', 'summer');
+    expect(await screen.findByTestId('location')).toHaveTextContent('/tours/summer-1');
+    expect(await screen.findByText(ADMIN_UI.cloneTourSuccess)).toBeInTheDocument();
+  });
+
+  it('блокирует повторную отправку во время клонирования', async () => {
+    const user = userEvent.setup();
+    let resolveClone: (value: { document: CmsTourDocument; meta: { rev: number } }) => void = () => undefined;
+    vi.mocked(adminCloneTour).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveClone = resolve;
+        }),
+    );
+    renderSeason();
+
+    await user.click(await screen.findByRole('button', { name: ADMIN_UI.tourMenu }));
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.cloneTourAction }));
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.cloneTourTitle });
+    await user.selectOptions(within(dialog).getByLabelText(ADMIN_UI.cloneTourSeason), 'summer');
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.cloneTourSubmit }));
+
+    expect(within(dialog).getByRole('button', { name: ADMIN_UI.cloneTourSubmitting })).toBeDisabled();
+    expect(adminCloneTour).toHaveBeenCalledTimes(1);
+
+    resolveClone({ document: { ...createdDocument, id: 'summer-1', season: 'summer' }, meta: { rev: 1 } });
+    expect(await screen.findByTestId('location')).toHaveTextContent('/tours/summer-1');
+  });
+
+  it('оставляет диалог открытым при ошибке копирования медиа', async () => {
+    const user = userEvent.setup();
+    vi.mocked(adminCloneTour).mockRejectedValue(new Error('source_media_not_found'));
+    renderSeason();
+
+    await user.click(await screen.findByRole('button', { name: ADMIN_UI.tourMenu }));
+    await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.cloneTourAction }));
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.cloneTourTitle });
+    await user.selectOptions(within(dialog).getByLabelText(ADMIN_UI.cloneTourSeason), 'summer');
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.cloneTourSubmit }));
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(ADMIN_UI.cloneTourMediaError);
+    expect(screen.getByRole('dialog', { name: ADMIN_UI.cloneTourTitle })).toBeInTheDocument();
   });
 });

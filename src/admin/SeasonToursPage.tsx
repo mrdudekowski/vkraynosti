@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { adminCalendarSeason } from './adminCalendarSeason';
 import {
+  adminCloneTour,
   type AdminDeparture,
   type AdminTourListItem,
 } from './api';
@@ -23,6 +24,7 @@ import AdminPageHeader from './components/AdminPageHeader';
 import AdminSeasonSwitcher from './components/AdminSeasonSwitcher';
 import AdminSkeleton from './components/AdminSkeleton';
 import CreateTourModal from './components/CreateTourModal';
+import CloneTourModal from './components/CloneTourModal';
 import TourList from './components/TourList';
 import { ADMIN_PATHS, isAdminSeasonParam } from './constants/routes';
 import { ADMIN_UI } from './constants/ui';
@@ -77,6 +79,9 @@ const SeasonToursPage = () => {
   );
   const [listError, setListError] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [cloneTour, setCloneTour] = useState<AdminTourListItem | null>(null);
+  const [cloneBusy, setCloneBusy] = useState(false);
+  const [cloneError, setCloneError] = useState<string | null>(null);
   const [busyTourId, setBusyTourId] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
@@ -187,10 +192,46 @@ const SeasonToursPage = () => {
         busyTourId={busyTourId}
         queuesVisibility
         onAddTour={() => setCreating(true)}
+        onClone={(tourId) => {
+          setCloneTour(tours.find((tour) => tour.id === tourId) ?? null);
+          setCloneError(null);
+        }}
         onChangeGuestVisibility={(id, status) => {
           void changeGuestVisibility(id, status);
         }}
       />
+      {cloneTour != null ? (
+        <CloneTourModal
+          tour={cloneTour}
+          busy={cloneBusy}
+          error={cloneError}
+          onClose={() => {
+            if (!cloneBusy) {
+              setCloneTour(null);
+              setCloneError(null);
+            }
+          }}
+          onSubmit={(targetSeason) => {
+            setCloneBusy(true);
+            setCloneError(null);
+            void adminCloneTour(cloneTour.id, targetSeason)
+              .then((result) => {
+                invalidateAdminTours();
+                invalidateAdminPublishQueue();
+                void refreshAdminTours();
+                setCloneTour(null);
+                void navigate(ADMIN_PATHS.tour(result.document.id));
+                push({ message: ADMIN_UI.cloneTourSuccess });
+              })
+              .catch((caught) => {
+                setCloneError(caught instanceof Error ? caught.message : 'clone_failed');
+              })
+              .finally(() => {
+                setCloneBusy(false);
+              });
+          }}
+        />
+      ) : null}
       {creating ? (
         <CreateTourModal
           lockedSeason={season}

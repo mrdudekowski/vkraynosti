@@ -4,7 +4,7 @@
 
 **Goal:** Add a season-selecting clone workflow to the admin tour list that creates a backend draft clone and automatically opens its editor page.
 
-**Architecture:** Keep the API adapter in `src/admin/api.ts`, isolate the form/dialog in `CloneTourModal`, and coordinate the operation from `TourList`, which already owns the per-tour action-menu state. Pass a single `onClone` callback through `AdminTourCard` and `AdminTourActionsMenu` so cards and list rows share exactly the same workflow. On success invalidate/refresh the tour cache, close the dialog, navigate to the returned tour ID, and push a toast.
+**Architecture:** Keep the API adapter in `src/admin/api.ts`, isolate the form/dialog in `CloneTourModal`, and coordinate the operation from `SeasonToursPage`, which already owns navigation, toast feedback, list refresh, and the analogous `CreateTourModal` workflow. Pass a single `onClone` callback through `TourList`, `AdminTourCard`, and `AdminTourActionsMenu` so cards and list rows share exactly the same entry point. On success invalidate/refresh the tour cache, close the dialog, navigate to the returned tour ID, and push a toast.
 
 **Tech Stack:** React 18, TypeScript, React Router, Vitest, Testing Library, existing admin primitives (`AdminDialog`, `AdminSelect`, `AdminButton`, `AdminAlert`) and existing toast/cache utilities.
 
@@ -173,8 +173,8 @@ git commit -m "feat(admin): add tour clone season dialog"
 - Modify: `src/admin/components/TourList.test.tsx`
 
 **Interfaces:**
-- Consumes: `onClone: () => void` from `TourList`
-- Produces: a single `CloneTourModal` instance controlled by `TourList`; cards and list rows expose the same menu item
+- Consumes: `onClone: (tourId: string) => void` from `TourList`
+- Produces: a single callback from the list; `SeasonToursPage` owns the modal and operation state; cards and list rows expose the same menu item
 
 - [ ] **Step 1: Extend tests for the action-menu callback**
 
@@ -190,7 +190,7 @@ Expected: FAIL because the action menu has no clone callback/item.
 
 - [ ] **Step 3: Add the callback without duplicating menu logic**
 
-Extend props with `onClone?: () => void`. Make the menu render when either a guest-visibility action or `onClone` exists; cloning must remain available even if a tour has no public page and even when the visibility callbacks are absent. Render a menu item using a copy/duplicate icon only when the callback is supplied. In `AdminTourCard`, pass the callback through and include it in the `showMenu` condition. In `TourList`, provide the callback for both `AdminDataList` and cards, setting the selected tour in the parent state.
+Extend props with `onClone?: () => void` in `AdminTourActionsMenu`, `AdminTourCard`, and `TourList`. Make the menu render when either a guest-visibility action or `onClone` exists; cloning must remain available even if a tour has no public page and even when the visibility callbacks are absent. Render a menu item using a copy/duplicate icon only when the callback is supplied. In `AdminTourCard`, pass the callback through and include it in the `showMenu` condition. In `TourList`, call `onClone(tour.id)` for both `AdminDataList` and cards; do not add API or dialog state to the list component.
 
 Keep the existing visibility action behavior unchanged and ensure clone does not require a public page or active status; drafts are valid clone sources.
 
@@ -212,16 +212,16 @@ git commit -m "feat(admin): expose tour clone action"
 ### Task 4: Orchestrate clone, cache refresh, toast, and navigation
 
 **Files:**
-- Modify: `src/admin/components/TourList.tsx`
-- Modify: `src/admin/components/TourList.test.tsx`
+- Modify: `src/admin/SeasonToursPage.tsx`
+- Modify: `src/admin/SeasonToursPage.test.tsx`
 
 **Interfaces:**
-- Consumes: `adminCloneTour`, `invalidateAdminTours`, `refreshAdminTours`, `ADMIN_PATHS.tour`, `useAdminToast`
-- Produces: `onSubmit(targetSeason)` that performs the approved workflow and navigates to the API-returned `document.id`
+- Consumes: `onClone(tourId)` from `TourList`, `adminCloneTour`, `invalidateAdminTours`, `refreshAdminTours`, `ADMIN_PATHS.tour`, `useAdminToast`
+- Produces: page-owned `CloneTourModal` state and `onSubmit(targetSeason)` that performs the approved workflow and navigates to the API-returned `document.id`
 
 - [ ] **Step 1: Write failing orchestration tests**
 
-Mock `adminCloneTour`, cache refresh, and `useNavigate`. Assert the complete success path:
+Mock `adminCloneTour`, cache refresh, and `useNavigate` in `SeasonToursPage.test.tsx`. Assert the complete success path:
 
 ```tsx
 await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.cloneTourAction }));
@@ -247,7 +247,7 @@ Expected: FAIL because the API call and navigation orchestration are not wired.
 
 - [ ] **Step 3: Implement parent state and success/error flow**
 
-Add state in `TourList`:
+Add state in `SeasonToursPage` beside `creating`:
 
 ```ts
 const [cloneTour, setCloneTour] = useState<AdminTourListItem | null>(null);
@@ -255,7 +255,7 @@ const [cloneBusy, setCloneBusy] = useState(false);
 const [cloneError, setCloneError] = useState<string | null>(null);
 ```
 
-Use `useNavigate()` and `useAdminToast()`. On submit:
+Use the existing `useNavigate()` and `useAdminToast()` in `SeasonToursPage`. Pass `onClone={(tourId) => { setCloneTour(tours.find((tour) => tour.id === tourId) ?? null); setCloneError(null); }}` to `TourList`. On submit:
 
 ```ts
 setCloneBusy(true);
@@ -274,12 +274,12 @@ try {
 }
 ```
 
-Render one `CloneTourModal` after the list content when `cloneTour != null`. Translate backend error codes in the modal. Keep the modal mounted until success or explicit cancel.
+Render one `CloneTourModal` next to `CreateTourModal` when `cloneTour != null`. Translate backend error codes in the modal. Keep the modal mounted until success or explicit cancel. The list remains a presentational/action-entry component and does not call the API.
 
 - [ ] **Step 4: Run the full affected admin tests**
 
 ```powershell
-npm exec vitest run src/admin/components/CloneTourModal.test.tsx src/admin/components/TourList.test.tsx
+npm exec vitest run src/admin/components/CloneTourModal.test.tsx src/admin/components/TourList.test.tsx src/admin/SeasonToursPage.test.tsx
 ```
 
 Expected: PASS, including success navigation, toast, errors, and both list presentations.

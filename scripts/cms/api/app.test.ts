@@ -12,6 +12,7 @@ import {
   CMS_PUBLISHED_TOURS_LIST_KEY,
   cmsDraftDocumentKey,
   cmsDraftMetaKey,
+  cmsMediaObjectKey,
 } from '../../../src/cms/cmsPackageKeys';
 import { mergeTourDataToSchedulePayload } from '../../../src/utils/tourData/mergeTourDataPayload';
 import { createCmsApiApp, loadTourDocumentForDepartureWrite } from './app';
@@ -771,6 +772,88 @@ describe('CMS API', () => {
     const body = (await response.json()) as { document: CmsTourDocument };
     expect(body.document.title).toBe('Восхождение на Изюбриную');
     expect(body.document.slug).toBe('voskhozhdenie-na-izyubrinuyu');
+  });
+
+  it('клонирует только контент тура в выбранный сезон и создаёт черновик', async () => {
+    const { app, store, departureRepository } = createApp();
+    const cookie = await login(app, editorLogin, 'editor-pass');
+    const sourceWithManagedCover: CmsTourDocument = {
+      ...document,
+      assets: document.assets.map((asset) =>
+        asset.id === 'cover'
+          ? {
+              ...asset,
+              stillUrl: 'https://s3.example/vkraynosti-cms-dev/media/tours/winter-1/cover.webp',
+            }
+          : asset,
+      ),
+    };
+    await store.putJson(cmsDraftDocumentKey('winter-1'), sourceWithManagedCover);
+    await store.putBytes(cmsMediaObjectKey('winter-1', 'cover.webp'), new Uint8Array([1, 2, 3]), 'image/webp');
+    const departure = await departureRepository.createDeparture({
+      tourId: 'winter-1',
+      startsOn: '2027-01-10',
+      seats: 8,
+      actorUserId: editorUserId,
+    });
+
+    const response = await app.request('/api/cms/tours/winter-1/clone', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ targetSeason: 'summer' }),
+    });
+    expect(response.status).toBe(201);
+    const body = (await response.json()) as {
+      document: CmsTourDocument;
+      meta: { rev: number; editor: string };
+    };
+    expect(body.document.id).toBe('summer-1');
+    expect(body.document.season).toBe('summer');
+    expect(body.document.status).toBe('draft');
+    expect(body.document.title).toBe(document.title);
+    expect(body.document.program).toEqual(document.program);
+    expect(body.document.assets).toHaveLength(document.assets.length);
+    const clonedCover = body.document.assets.find((asset) => asset.id === body.document.coverAssetId);
+    expect(clonedCover?.stillUrl).toMatch(/\/media\/tours\/summer-1\/asset-[^/]+\.webp$/);
+    expect(clonedCover?.stillUrl).not.toBe(sourceWithManagedCover.assets[0]?.stillUrl);
+    const clonedCoverKey = clonedCover?.stillUrl.split('/media/')[1];
+    expect(clonedCoverKey).toBeDefined();
+    await expect(store.getBytes(`media/${clonedCoverKey}`)).resolves.toMatchObject({
+      body: new Uint8Array([1, 2, 3]),
+      contentType: 'image/webp',
+    });
+    expect(body.meta).toMatchObject({ rev: 1, editor: editorLogin });
+    expect(await store.getJson(cmsDraftDocumentKey('summer-1'))).toEqual(body.document);
+
+    const clonedDepartures = (await departureRepository.listAllDepartures()).filter(
+      (item) => item.tourId === body.document.id,
+    );
+    expect(clonedDepartures).toEqual([]);
+    expect(departure.tourId).toBe('winter-1');
+  });
+
+  it('отклоняет клонирование с невалидным сезоном', async () => {
+    const { app } = createApp();
+    const cookie = await login(app, editorLogin, 'editor-pass');
+    const response = await app.request('/api/cms/tours/winter-1/clone', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ targetSeason: 'monsoon' }),
+    });
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: 'invalid_body' });
+  });
+
+  it('возвращает 404 для отсутствующего исходного тура', async () => {
+    const { app } = createApp();
+    const cookie = await login(app, editorLogin, 'editor-pass');
+    const response = await app.request('/api/cms/tours/winter-404/clone', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ targetSeason: 'summer' }),
+    });
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({ error: 'not_found' });
   });
 
   it('не даёт занять чужой slug', async () => {

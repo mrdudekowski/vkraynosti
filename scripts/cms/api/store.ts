@@ -11,6 +11,7 @@ import type { CmsApiEnv, CmsApiS3Config } from './env';
 export type CmsJsonStore = {
   getJson: (key: string) => Promise<unknown | null>;
   putJson: (key: string, value: unknown) => Promise<void>;
+  getBytes: (key: string) => Promise<{ body: Uint8Array; contentType: string | null } | null>;
   putBytes: (key: string, body: Uint8Array, contentType: string) => Promise<void>;
   deleteBytes: (key: string) => Promise<void>;
 };
@@ -26,6 +27,10 @@ export function createMemoryJsonStore(
     },
     async putJson(key, value) {
       data.set(key, value);
+    },
+    async getBytes(key) {
+      const body = bytes.get(key);
+      return body == null ? null : { body, contentType: null };
     },
     async putBytes(key, body) {
       bytes.set(key, body);
@@ -87,6 +92,29 @@ export function createS3JsonStore(env: CmsApiS3Config): CmsJsonStore {
         })
       );
     },
+    async getBytes(key) {
+      try {
+        const response = await client.send(
+          new GetObjectCommand({ Bucket: env.bucket, Key: key })
+        );
+        const body = await response.Body?.transformToByteArray();
+        return body == null ? null : { body, contentType: response.ContentType ?? null };
+      } catch (error) {
+        if (
+          error != null &&
+          typeof error === 'object' &&
+          (('name' in error && error.name === 'NoSuchKey') ||
+            ('$metadata' in error &&
+              typeof error.$metadata === 'object' &&
+              error.$metadata != null &&
+              'httpStatusCode' in error.$metadata &&
+              error.$metadata.httpStatusCode === 404))
+        ) {
+          return null;
+        }
+        throw error;
+      }
+    },
     async putBytes(key, body, contentType) {
       await client.send(
         new PutObjectCommand({
@@ -143,6 +171,22 @@ export function createFilesystemJsonStore(rootDir: string): CmsJsonStore {
       const filePath = resolveFilesystemKey(root, key);
       await mkdir(path.dirname(filePath), { recursive: true });
       await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+    },
+    async getBytes(key) {
+      const filePath = resolveFilesystemKey(root, key);
+      try {
+        return { body: await readFile(filePath), contentType: null };
+      } catch (error) {
+        if (
+          error != null &&
+          typeof error === 'object' &&
+          'code' in error &&
+          error.code === 'ENOENT'
+        ) {
+          return null;
+        }
+        throw error;
+      }
     },
     async putBytes(key, body) {
       const filePath = resolveFilesystemKey(root, key);

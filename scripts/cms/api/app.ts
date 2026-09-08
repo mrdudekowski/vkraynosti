@@ -38,6 +38,7 @@ import { tourReadiness, tourReadinessCounts } from '../../../src/cms/tourComplet
 import { vladivostokCalendarDate } from '../../../src/admin/scheduleCalendar.ts';
 import { cmsDraftIndexFile, parseCmsDraftIndex } from '../../../src/cms/cmsDraftIndex.ts';
 import { createEmptyCmsTour } from '../../../src/cms/createEmptyCmsTour.ts';
+import { cloneCmsTourDocument } from '../../../src/cms/cloneCmsTour.ts';
 import { cmsTourCoverUrl } from '../../../src/cms/cmsTourCoverUrl.ts';
 import { checkHideTourPublish } from '../../../src/cms/hideTourFutureDepartures.ts';
 import { resolvePublishedTourDocument } from '../../../src/cms/publishedTourSnapshot.ts';
@@ -53,6 +54,7 @@ import {
   cmsDraftMetaKey,
   cmsMediaObjectKey,
   cmsMediaObjectKeyFromPublicUrl,
+  cmsMediaPrefix,
   cmsPublishedDocumentKey,
 } from '../../../src/cms/cmsPackageKeys.ts';
 import { createCmsTourMeta, parseCmsTourMeta, type CmsTourMeta } from '../../../src/cms/cmsTourMeta.ts';
@@ -121,6 +123,10 @@ const createTourBodySchema = z.object({
   title: z.string().trim().min(1),
   season: z.enum(SEASON_ORDER),
   slug: z.string().trim().min(1).optional(),
+});
+
+const cloneTourBodySchema = z.object({
+  targetSeason: z.enum(SEASON_ORDER),
 });
 
 const publishBodySchema = z.object({
@@ -439,6 +445,76 @@ function mediaObjectKeysForAsset(
     }
   }
   return keys;
+}
+
+function mediaFileNameForTourAsset(tourId: string, url: string): string | null {
+  const key = cmsMediaObjectKeyFromPublicUrl(tourId, url);
+  if (key == null) {
+    return null;
+  }
+  return key.slice(`${cmsMediaPrefix(tourId)}/`.length);
+}
+
+function mediaContentTypeForFileName(fileName: string): string {
+  const extension = fileName.split('.').at(-1)?.toLowerCase();
+  if (extension === 'webp') return 'image/webp';
+  if (extension === 'jpg' || extension === 'jpeg') return 'image/jpeg';
+  if (extension === 'png') return 'image/png';
+  if (extension === 'webm') return 'video/webm';
+  if (extension === 'mp4') return 'video/mp4';
+  return 'application/octet-stream';
+}
+
+async function cloneTourMedia(
+  store: CmsJsonStore,
+  sourceId: string,
+  targetId: string,
+  source: CmsTourDocument,
+  publicBaseUrl: string,
+): Promise<{
+  assetIdBySourceId: Map<string, string>;
+  assetUrlBySourceUrl: Map<string, string>;
+  createdKeys: string[];
+}> {
+  const assetIdBySourceId = new Map<string, string>();
+  const assetUrlBySourceUrl = new Map<string, string>();
+  const createdKeys: string[] = [];
+  const targetAssetIds: string[] = [];
+
+  try {
+    for (const asset of source.assets) {
+      const targetAssetId = allocateUploadAssetId(targetAssetIds);
+      targetAssetIds.push(targetAssetId);
+      assetIdBySourceId.set(asset.id, targetAssetId);
+
+      for (const sourceUrl of [asset.stillUrl, asset.videoUrl].filter(
+        (url): url is string => url != null && url.length > 0,
+      )) {
+        const sourceFileName = mediaFileNameForTourAsset(sourceId, sourceUrl);
+        if (sourceFileName == null) {
+          continue;
+        }
+        const stored = await store.getBytes(cmsMediaObjectKey(sourceId, sourceFileName));
+        if (stored == null) {
+          throw new Error('source_media_not_found');
+        }
+        const targetFileName = `${targetAssetId}.${sourceFileName.split('.').at(-1)}`;
+        const targetKey = cmsMediaObjectKey(targetId, targetFileName);
+        await store.putBytes(
+          targetKey,
+          stored.body,
+          stored.contentType ?? mediaContentTypeForFileName(sourceFileName),
+        );
+        createdKeys.push(targetKey);
+        assetUrlBySourceUrl.set(sourceUrl, publicMediaUrl(publicBaseUrl, targetKey));
+      }
+    }
+  } catch (error) {
+    await Promise.all(createdKeys.map((key) => store.deleteBytes(key)));
+    throw error;
+  }
+
+  return { assetIdBySourceId, assetUrlBySourceUrl, createdKeys };
 }
 
 async function loadPerTourPublishedDocument(
@@ -1288,6 +1364,62 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     await persistDraft(store, tourId, document, meta);
     await appendDraftIndexId(store, tourId);
     return c.json({ document, meta }, 201);
+  });
+
+  app.post('/api/cms/tours/:id/clone', async (c) => {
+    const sourceId = readTourId(c.req.param('id'));
+    if (sourceId == null) {
+      return c.json({ error: 'invalid_id' }, 400);
+    }
+    const parsed = cloneTourBodySchema.safeParse(await readJsonBody(c));
+    if (!parsed.success) {
+      return c.json({ error: 'invalid_body' }, 400);
+    }
+    const source = await loadDraftOrPublished(store, sourceId);
+    if (source == null) {
+      return c.json({ error: 'not_found' }, 404);
+    }
+
+    const existing = await listCmsTourDocuments(store);
+    const targetId = nextSeasonTourId(
+      parsed.data.targetSeason,
+      existing.map((tour) => tour.id),
+    );
+    const slug = allocateUniqueSlug(
+      slugFromTitle(source.title),
+      takenSlugKeys(existing),
+    );
+    let media: Awaited<ReturnType<typeof cloneTourMedia>> | null = null;
+    try {
+      media = await cloneTourMedia(
+        store,
+        sourceId,
+        targetId,
+        source,
+        deps.env.s3.publicBaseUrl,
+      );
+      const document = cloneCmsTourDocument(source, {
+        id: targetId,
+        slug,
+        season: parsed.data.targetSeason,
+        assetIdBySourceId: media.assetIdBySourceId,
+        assetUrlBySourceUrl: media.assetUrlBySourceUrl,
+      });
+      const meta = createCmsTourMeta({
+        editor: c.get('session').sub,
+        submittedForPublishAt: new Date().toISOString(),
+      });
+      await persistDraft(store, targetId, document, meta);
+      return c.json({ document, meta }, 201);
+    } catch (error) {
+      if (media != null) {
+        await Promise.all(media.createdKeys.map((key) => store.deleteBytes(key)));
+      }
+      if (error instanceof Error && error.message === 'source_media_not_found') {
+        return c.json({ error: 'source_media_not_found' }, 422);
+      }
+      throw error;
+    }
   });
 
   app.get('/api/cms/tours/:id', async (c) => {

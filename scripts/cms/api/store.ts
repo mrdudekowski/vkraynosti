@@ -11,6 +11,7 @@ import type { CmsApiEnv, CmsApiS3Config } from './env';
 export type CmsJsonStore = {
   getJson: (key: string) => Promise<unknown | null>;
   putJson: (key: string, value: unknown) => Promise<void>;
+  deleteJson: (key: string) => Promise<void>;
   getBytes: (key: string) => Promise<{ body: Uint8Array; contentType: string | null } | null>;
   putBytes: (key: string, body: Uint8Array, contentType: string) => Promise<void>;
   deleteBytes: (key: string) => Promise<void>;
@@ -27,6 +28,9 @@ export function createMemoryJsonStore(
     },
     async putJson(key, value) {
       data.set(key, value);
+    },
+    async deleteJson(key) {
+      data.delete(key);
     },
     async getBytes(key) {
       const body = bytes.get(key);
@@ -89,6 +93,14 @@ export function createS3JsonStore(env: CmsApiS3Config): CmsJsonStore {
           CacheControl: key.startsWith('published/')
             ? 'public, max-age=60'
             : 'private, no-store',
+        })
+      );
+    },
+    async deleteJson(key) {
+      await client.send(
+        new DeleteObjectCommand({
+          Bucket: env.bucket,
+          Key: key,
         })
       );
     },
@@ -171,6 +183,22 @@ export function createFilesystemJsonStore(rootDir: string): CmsJsonStore {
       const filePath = resolveFilesystemKey(root, key);
       await mkdir(path.dirname(filePath), { recursive: true });
       await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+    },
+    async deleteJson(key) {
+      const filePath = resolveFilesystemKey(root, key);
+      try {
+        await unlink(filePath);
+      } catch (error) {
+        if (
+          error != null &&
+          typeof error === 'object' &&
+          'code' in error &&
+          error.code === 'ENOENT'
+        ) {
+          return;
+        }
+        throw error;
+      }
     },
     async getBytes(key) {
       const filePath = resolveFilesystemKey(root, key);

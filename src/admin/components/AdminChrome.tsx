@@ -351,7 +351,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   const bottomItems = items.filter((item) => item.inBottomNav === true);
   const moreItems = items.filter((item) => item.inBottomNav !== true);
   const showSidebar = viewport !== 'mobile';
-  const compact = viewport !== 'desktop' || collapsed;
+  const compact = viewport === 'desktop' && collapsed;
 
   const openQuickTour = () => {
     setCreateTourOpen(true);

@@ -594,6 +594,8 @@ describe('SchedulePage', () => {
     expect(layout).toBeInTheDocument();
     expect(document.body.dataset.adminScheduleSections).toBe('true');
     expect(document.querySelector('.admin-schedule-week-list')).toBeInTheDocument();
+    expect(document.querySelector('.admin-schedule-section-board-rail')).not.toHaveClass('overflow-y-auto');
+    expect(document.querySelector('.admin-schedule-week-list')).toHaveClass('overflow-y-auto');
     expect(screen.getByRole('button', { name: ADMIN_UI.scheduleWeekList })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -625,15 +627,15 @@ describe('SchedulePage', () => {
     await waitFor(() => expect(adminListTours).toHaveBeenCalled());
 
     expect(document.body.dataset.adminScheduleSections).toBeUndefined();
-    expect(document.querySelector('.admin-schedule-day-agenda')).toHaveClass('overflow-y-auto');
+    expect(document.querySelector('.admin-schedule-day-agenda')).toHaveClass('overflow-visible');
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleModeWeek }));
     expect(document.body.dataset.adminScheduleSections).toBeUndefined();
-    expect(document.querySelector('.admin-schedule-week-list')).toHaveClass('overflow-y-auto');
+    expect(document.querySelector('.admin-schedule-week-list')).toHaveClass('overflow-visible');
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.scheduleModeMonth }));
     expect(document.body.dataset.adminScheduleSections).toBeUndefined();
-    expect(document.querySelector('.admin-schedule-day-agenda')).toHaveClass('overflow-y-auto');
+    expect(document.querySelector('.admin-schedule-day-agenda')).toHaveClass('overflow-visible');
   });
 
   it('в списке недели показывает все выезды дня и не открывает мастер по клику на пустой день', async () => {

@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { CalendarDays, Inbox, LayoutDashboard, Map, Send, Users } from 'lucide-react';
+import { CalendarDays, LayoutDashboard, Map, Send, Users } from 'lucide-react';
 import {
   ADMIN_PATHS,
   isAdminDashboardSection,
@@ -70,9 +70,7 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     id: 'leads',
     to: ADMIN_PATHS.leads,
     label: ADMIN_UI.crmNav,
-    icon: Inbox,
-    secondary: true,
-    soon: true,
+    icon: Users,
     isActive: isAdminLeadsSection,
   },
 ];

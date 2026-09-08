@@ -41,7 +41,6 @@ import ScheduleCalendarToolbar from './components/ScheduleCalendarToolbar';
 import ScheduleDayDeparturesDialog from './components/ScheduleDayDeparturesDialog';
 import ScheduleMonthGrid from './components/ScheduleMonthGrid';
 import ScheduleOperationalRail from './components/ScheduleOperationalRail';
-import ScheduleReferenceTopBar from './components/ScheduleReferenceTopBar';
 import ScheduleWeekListLayout from './components/ScheduleWeekListLayout';
 import ScheduleWeekSplitLayout from './components/ScheduleWeekSplitLayout';
 import type { DepartureQuickStatus } from './departureQuickStatus';
@@ -184,16 +183,18 @@ const DepartureEditorSheet = ({
 const SchedulePage = () => {
   const { session } = useOutletContext<{ session: AdminSession }>();
   const { push } = useAdminToast();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
   const departureParam = searchParams.get('departure');
   const viewport = useAdminViewport();
-  const [storedMode, setMode] = useAdminStoredState(ADMIN_SCHEDULE_MODE_STORAGE_KEY, isScheduleMode);
+  const [storedMode, setStoredMode] = useAdminStoredState(ADMIN_SCHEDULE_MODE_STORAGE_KEY, isScheduleMode);
   const [storedWeekLayout, setWeekLayout] = useAdminStoredState(
     ADMIN_SCHEDULE_WEEK_LAYOUT_STORAGE_KEY,
     isScheduleWeekLayout,
   );
-  const mode = storedMode ?? defaultScheduleMode(viewport);
+  const queryMode = searchParams.get('mode');
+  const parsedMode = queryMode != null && isScheduleMode(queryMode) ? queryMode : null;
+  const mode = parsedMode ?? storedMode ?? defaultScheduleMode(viewport);
   const weekLayout = storedWeekLayout ?? 'list';
   const monthGrid = mode === 'month' && viewport !== 'mobile';
   const dragEnabled = viewport === 'desktop';
@@ -201,6 +202,14 @@ const SchedulePage = () => {
   // Mobile must use the shell's single touch-scroll surface. Nested flex scrollers
   // combined with body overflow locking prevent swipe scrolling in the calendar.
   const sectionScroll = mode !== 'month' && viewport === 'desktop';
+  const setMode = (nextMode: typeof mode) => {
+    setStoredMode(nextMode);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set('mode', nextMode);
+      return next;
+    }, { replace: true });
+  };
   const showRail = !monthGrid && !weekSplitDesktop;
   const [cursorIso, setCursorIso] = useState(() =>
     dateParam != null && ISO_DATE.test(dateParam) ? dateParam : vladivostokCalendarDate(),
@@ -541,7 +550,6 @@ const SchedulePage = () => {
 
   return (
     <AdminPageFrame variant="wide" className={sectionScroll ? 'admin-schedule-section-frame' : undefined}>
-      <ScheduleReferenceTopBar />
       <div className={sectionScroll ? 'admin-schedule-section-stack' : 'flex flex-col gap-5'}>
         <AdminPageHeader
         title={ADMIN_UI.scheduleTitle}
@@ -577,7 +585,7 @@ const SchedulePage = () => {
             sectionScroll ? 'admin-schedule-section-board' : ''
           } ${
             sectionScroll && showRail
-              ? 'admin-schedule-section-board-rail overflow-y-auto xl:overflow-hidden'
+              ? 'admin-schedule-section-board-rail xl:overflow-hidden'
               : ''
           }`}
         >
@@ -680,6 +688,7 @@ const SchedulePage = () => {
             void onDropChip(departureId, startsOn);
           }}
           dragEnabled={dragEnabled}
+          scrollEnabled={sectionScroll}
         />
       ) : (
         <ScheduleWeekListLayout
@@ -703,6 +712,7 @@ const SchedulePage = () => {
             void onDropChip(departureId, startsOn);
           }}
           dragEnabled={dragEnabled}
+          scrollEnabled={sectionScroll}
         />
       )}
           </main>

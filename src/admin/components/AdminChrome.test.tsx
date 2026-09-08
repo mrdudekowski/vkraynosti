@@ -159,9 +159,14 @@ describe('AdminChrome', () => {
     );
   });
 
-  it('на планшете держит rail без нижней навигации', () => {
+  it('на планшете показывает подписи основной навигации без нижней навигации', () => {
     renderChrome(adminSession, () => undefined, 768);
-    expect(screen.getByRole('button', { name: ADMIN_UI.expandNav })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: ADMIN_UI.collapseNav })).toBeInTheDocument();
+    const navigation = screen.getByRole('navigation', { name: ADMIN_UI.primaryNav });
+    expect(within(navigation).getByText(ADMIN_UI.dashboardNav)).not.toHaveClass('sr-only');
+    expect(within(navigation).getByText(ADMIN_UI.toursNav)).not.toHaveClass('sr-only');
+    expect(within(navigation).getByText(ADMIN_UI.scheduleNav)).not.toHaveClass('sr-only');
+    expect(within(navigation).getByText(ADMIN_UI.inboxNav)).not.toHaveClass('sr-only');
     expect(screen.queryByRole('button', { name: ADMIN_UI.moreNav })).not.toBeInTheDocument();
   });
 

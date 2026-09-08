@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   CRM_LIST_VIEWS,
   isBuiltInContactFolder,
@@ -34,12 +34,31 @@ function folderLabel(folder: string): string {
 const LeadsPage = () => {
   const navigate = useNavigate();
   const { personId } = useParams<{ personId?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [file, setFile] = useState<CrmFile | null>(null);
   const [tourImageUrls, setTourImageUrls] = useState<Record<string, string | null>>(
     () => Object.fromEntries((peekAdminTours() ?? []).map((tour) => [tour.id, tour.imageUrl])),
   );
-  const [view, setView] = useState<CrmListView>('leads');
-  const [query, setQuery] = useState('');
+  const viewParam = searchParams.get('view');
+  const view: CrmListView = CRM_LIST_VIEWS.includes(viewParam as CrmListView)
+    ? (viewParam as CrmListView)
+    : 'leads';
+  const query = searchParams.get('q') ?? '';
+  const setView = (nextView: CrmListView) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set('view', nextView);
+      return next;
+    }, { replace: true });
+  };
+  const setQuery = (nextQuery: string) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (nextQuery.length > 0) next.set('q', nextQuery);
+      else next.delete('q');
+      return next;
+    }, { replace: true });
+  };
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

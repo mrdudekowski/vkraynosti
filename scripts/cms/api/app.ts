@@ -21,6 +21,7 @@ import {
   parseCmsToursFile,
   type CmsTourDocument,
 } from '../../../src/cms/cmsTourDocument.ts';
+import { cmsProgramPatchStepSchema } from '../../../src/cms/cmsProgramPatchStep.ts';
 import { BENTO_BLOCK_TYPES } from '../../../src/constants/tourBento/index.ts';
 import { unusedBentoPoolAssets } from '../../../src/cms/bentoPoolAssets.ts';
 import { cmsPublishBlockersForIntent } from '../../../src/cms/cmsPublishRules.ts';
@@ -112,7 +113,7 @@ const textPatchSchema = z.object({
   descriptionAside: z.string().optional(),
   prefaceAssetId: z.string().min(1).nullable(),
   included: z.array(z.object({ text: z.string(), iconKey: z.string().min(1) })),
-  program: z.array(z.object({ timeLabel: z.string(), description: z.string() })),
+  program: z.array(cmsProgramPatchStepSchema),
   programAdditionalNotes: z.array(z.string()).optional(),
   assetAlts: z.record(z.string(), z.string()).optional(),
 });

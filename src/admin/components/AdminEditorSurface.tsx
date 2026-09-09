@@ -11,7 +11,7 @@ type AdminEditorSurfaceProps = {
 };
 
 const AdminEditorSurface = ({ icon, title, hint, className = '', children }: AdminEditorSurfaceProps) => (
-  <section className={`admin-editor-surface flex flex-col gap-2 ${className}`.trim()}>
+  <section className={`admin-editor-surface min-w-0 flex flex-col gap-2 ${className}`.trim()}>
     <header className="flex items-start gap-2">
       <span className="admin-editor-icon-well">
         <AdminIcon icon={icon} size={16} />

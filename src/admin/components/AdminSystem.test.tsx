@@ -112,6 +112,10 @@ describe('AdminStickyContextBar', () => {
     );
 
     expect(screen.getByRole('button', { name: ADMIN_UI.openEditorActions })).toBeInTheDocument();
-    expect(screen.getByText('2 блокера')).toBeInTheDocument();
+    expect(screen.getByText('2 блокера', { selector: 'span:not(.sr-only)' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: ADMIN_UI.openEditorActions })).toHaveAttribute(
+      'aria-describedby',
+      'admin-mobile-editor-actions-status',
+    );
   });
 });

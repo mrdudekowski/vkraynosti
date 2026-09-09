@@ -41,6 +41,11 @@ const AdminStickyContextBar = ({
     };
   }, []);
 
+  const handleShowProblems = () => {
+    setMobileOpen(false);
+    onShowProblems?.();
+  };
+
   const statusContent = (
     <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-text-muted">
       {entityState}
@@ -56,7 +61,7 @@ const AdminStickyContextBar = ({
         <AdminDisabledHint id="admin-sticky-disabled-hint">{disabledHint}</AdminDisabledHint>
       ) : null}
       {onShowProblems != null && blockerCount > 0 ? (
-        <AdminButton type="button" variant="ghost" onClick={onShowProblems}>
+        <AdminButton type="button" variant="ghost" onClick={handleShowProblems}>
           {ADMIN_UI.showProblems}
         </AdminButton>
       ) : null}
@@ -68,7 +73,6 @@ const AdminStickyContextBar = ({
       {primary}
     </div>
   );
-
   return (
     <>
     <div className={`${mobileCompact ? 'hidden admin-desktop:block' : ''} sticky bottom-navbar z-season-dock border-t border-divider bg-surface-light px-4 py-2 md:bottom-0`.trim()}>
@@ -83,9 +87,15 @@ const AdminStickyContextBar = ({
           type="button"
           className="admin-desktop:hidden fixed right-4 top-20 z-season-dock flex h-12 w-12 items-center justify-center rounded-full border border-divider bg-surface-light text-text-primary shadow-admin-overlay"
           aria-label={ADMIN_UI.openEditorActions}
+          aria-describedby={blockerCount > 0 ? 'admin-mobile-editor-actions-status' : undefined}
           onClick={() => setMobileOpen(true)}
         >
           <AdminIcon icon={CircleAlert} size={24} />
+          {blockerCount > 0 ? (
+            <span id="admin-mobile-editor-actions-status" className="sr-only">
+              {formatAdminBlockerCount(blockerCount)}
+            </span>
+          ) : null}
           {blockerCount > 0 ? (
             <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-difficulty-medium-fg px-1 text-xs font-semibold text-text-inverse">
               {blockerCount}

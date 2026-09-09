@@ -118,6 +118,10 @@ describe('TourEditorPage publish actions', () => {
     expect(publish).toHaveClass('admin-btn-primary');
     expect(screen.queryByRole('button', { name: ADMIN_UI.save })).not.toBeInTheDocument();
     expect(screen.getByRole('tablist', { name: ADMIN_UI.editorSections })).toBeInTheDocument();
+    expect(document.querySelector('.admin-tour-editor')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: ADMIN_UI.identityHeading }).closest('section')).toHaveClass(
+      'min-w-0',
+    );
     expect(screen.getByTestId('admin-catalog-grid')).toHaveClass('xl:grid-cols-2');
     expect(screen.getByRole('heading', { name: ADMIN_UI.identityHeading })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: ADMIN_UI.catalogHeading })).toBeInTheDocument();

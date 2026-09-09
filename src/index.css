@@ -662,6 +662,20 @@
     @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary;
   }
 
+  .admin-tour-editor {
+    min-width: 0;
+  }
+
+  .admin-tour-editor > * {
+    min-width: 0;
+  }
+
+  @media (max-width: 1023px) {
+    .admin-tour-editor {
+      padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+    }
+  }
+
   .admin-editor-row {
     @apply flex min-w-0 gap-1 rounded-admin-control px-0.5
       transition-colors duration-admin motion-reduce:transition-none

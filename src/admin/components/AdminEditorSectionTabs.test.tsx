@@ -20,6 +20,7 @@ describe('AdminEditorSectionTabs', () => {
         value="admin-catalog"
         options={options}
         blockerIds={['admin-about']}
+        completedIds={['admin-catalog']}
         onChange={onChange}
       />,
     );
@@ -29,9 +30,19 @@ describe('AdminEditorSectionTabs', () => {
       'true',
     );
     expect(screen.getByRole('tablist')).not.toHaveClass('overflow-x-auto');
+    expect(screen.getByRole('tablist')).toHaveClass('grid-cols-1');
     expect(
       screen.getByRole('tab', { name: `${ADMIN_UI.sectionNav.about}, ${ADMIN_UI.tabHasBlocker}` }),
     ).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: ADMIN_UI.sectionNav.catalog })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(
+      screen.getByRole('tab', { name: `${ADMIN_UI.sectionNav.about}, ${ADMIN_UI.tabHasBlocker}` }),
+    ).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText(ADMIN_UI.editorSectionReady)).toBeInTheDocument();
+    expect(screen.getByText(ADMIN_UI.editorSectionProblem)).toBeInTheDocument();
 
     screen.getByRole('tab', { name: ADMIN_UI.sectionNav.catalog }).focus();
     await user.keyboard('{ArrowRight}');

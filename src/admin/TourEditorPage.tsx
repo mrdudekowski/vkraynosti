@@ -50,6 +50,7 @@ import {
   firstAttentionSectionId,
   parseEditorTabParam,
   sectionTabQuery,
+  SECTION_COMPLETION_KEY,
   tabBlockerSectionIds,
   type AdminEditorSectionId,
 } from './tourEditorTabs';
@@ -671,7 +672,7 @@ const TourEditorPage = () => {
 
   return (
     <div className="flex min-h-full flex-col">
-      <AdminPageFrame variant="wide" density="compact">
+      <AdminPageFrame variant="wide" density="compact" className="admin-tour-editor">
         <div className="flex flex-col gap-2">
         <Link
           to={ADMIN_PATHS.season(document.season)}
@@ -725,6 +726,13 @@ const TourEditorPage = () => {
                 sectionCompletion == null
                   ? []
                   : tabBlockerSectionIds(publishBlockers, sectionCompletion)
+              }
+              completedIds={
+                sectionCompletion == null
+                  ? []
+                  : EDITOR_SECTION_NAV.filter(
+                      (option) => sectionCompletion[SECTION_COMPLETION_KEY[option.id]],
+                    ).map((option) => option.id)
               }
               onChange={(id) => selectSection(id)}
             />

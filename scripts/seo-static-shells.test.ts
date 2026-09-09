@@ -21,6 +21,8 @@ describe('SEO static shells', () => {
     expect(html).not.toMatch(/id="app-boot-splash"[\s\S]*role="progressbar"/i);
 
     expect(html).toContain('#app-boot-splash[hidden]');
+    expect(html).not.toContain('Заряжаем powerbank на максимум');
+    expect(html).not.toMatch(/id="app-boot-splash"[\s\S]*aria-valuemin=/i);
 
   });
 

@@ -19,6 +19,7 @@ const run = async () => {
     seoSource,
     homeSource,
     seasonLayoutSource,
+    indexSource,
   ] = await Promise.all([
     read('src/components/shared/PageMeta.tsx'),
     read('src/pages/NotFoundPage.tsx'),
@@ -27,6 +28,7 @@ const run = async () => {
     read('src/constants/seo.ts'),
     read('src/pages/Home.tsx'),
     read('src/components/seasons/SeasonPageLayout.tsx'),
+    read('index.html'),
   ]);
 
   const checks = [
@@ -69,6 +71,12 @@ const run = async () => {
       seasonLayoutSource.includes('IMAGES.seasonSection[seasonKey]'),
       'season og image source',
       'SeasonPageLayout PageMeta must use seasonSection',
+    ),
+    assertCheck(
+      !indexSource.includes('Заряжаем powerbank на максимум') &&
+        !/id="app-boot-splash"[\s\S]*aria-valuemin=/i.test(indexSource),
+      'crawler-safe boot splash',
+      'Static HTML must not expose loading copy or progress semantics before browser runtime',
     ),
   ];
 

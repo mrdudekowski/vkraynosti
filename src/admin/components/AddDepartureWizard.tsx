@@ -67,8 +67,11 @@ const AddDepartureWizard = ({
     [excludedTourIds, pickableTours],
   );
   const initialSeason = defaultSeason(lockedStartsOn);
+  const initialSeasonWithTours = eligibleTours.some((tour) => tour.season === initialSeason)
+    ? initialSeason
+    : eligibleTours[0]?.season ?? initialSeason;
   const [step, setStep] = useState<WizardStep>(() => firstStep(lockedTourId, lockedStartsOn));
-  const [seasonFilter, setSeasonFilter] = useState<Season>(() => initialSeason);
+  const [seasonFilter, setSeasonFilter] = useState<Season>(() => initialSeasonWithTours);
   const seasonTours = useMemo(
     () => eligibleTours.filter((tour) => tour.season === seasonFilter),
     [eligibleTours, seasonFilter],
@@ -77,7 +80,7 @@ const AddDepartureWizard = ({
     if (lockedTourId != null) {
       return lockedTourId;
     }
-    const inSeason = eligibleTours.filter((tour) => tour.season === initialSeason);
+    const inSeason = eligibleTours.filter((tour) => tour.season === initialSeasonWithTours);
     return inSeason[0]?.id ?? eligibleTours[0]?.id ?? '';
   });
   const [startsOn, setStartsOn] = useState(lockedStartsOn ?? '');

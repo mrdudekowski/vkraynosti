@@ -70,4 +70,17 @@ describe('AddDepartureWizard', () => {
       seats: 8,
     });
   });
+
+  it('falls back to the first season with tours when the current season is empty', () => {
+    render(
+      <AddDepartureWizard
+        pickableTours={[{ id: 'summer-1', title: 'Летний маршрут', season: 'summer' }]}
+        lockedStartsOn="2026-09-09"
+        onClose={() => undefined}
+        onComplete={() => undefined}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Летний маршрут' })).toBeInTheDocument();
+  });
 });

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CmsTourDocument } from '../cms/cmsTourDocument';
 import { createCmsTourMeta } from '../cms/cmsTourMeta';
 import type { AdminDeparture, AdminSession } from './api';
+import { adminCalendarSeason } from './adminCalendarSeason';
 import { ADMIN_SCHEDULE_MODE_STORAGE_KEY, ADMIN_SCHEDULE_WEEK_LAYOUT_STORAGE_KEY } from '../constants/adminUiTokens';
 import { ADMIN_UI } from './constants/ui';
 import { formatScheduleOverflowDepartures, formatScheduleWeekdayDate } from './formatAdminCopy';
@@ -76,7 +77,7 @@ function listItem(
   title: string,
   published = true,
   status: 'draft' | 'active' = 'active',
-  season: 'winter' | 'spring' | 'summer' | 'fall' = 'summer',
+  season: 'winter' | 'spring' | 'summer' | 'fall' = adminCalendarSeason(),
 ) {
   return {
     id,

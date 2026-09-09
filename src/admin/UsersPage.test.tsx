@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ADMIN_UI } from './constants/ui';
 
@@ -36,9 +37,11 @@ function user(
 
 function renderUsers() {
   return render(
-    <AdminToastProvider>
-      <UsersPage session={session} />
-    </AdminToastProvider>,
+    <MemoryRouter>
+      <AdminToastProvider>
+        <UsersPage session={session} />
+      </AdminToastProvider>
+    </MemoryRouter>,
   );
 }
 
@@ -137,5 +140,35 @@ describe('UsersPage', () => {
     expect(screen.getByText(ADMIN_UI.usersRoleConfirm)).toBeInTheDocument();
     await userEvents.click(screen.getByRole('button', { name: ADMIN_UI.usersAccessConfirm }));
     expect(adminUpdateUser).toHaveBeenCalledWith('bob', { role: 'admin' });
+  });
+
+  it('фильтрует список пользователей по поиску и роли', async () => {
+    const userEvents = userEvent.setup();
+    vi.mocked(adminListUsers).mockResolvedValue([
+      user('alice', 'admin'),
+      user('bob', 'editor'),
+      user('cara', 'editor'),
+    ]);
+    renderUsers();
+
+    await screen.findByText('cara');
+    await userEvents.selectOptions(screen.getByLabelText('Роль'), 'editor');
+    expect(screen.queryByRole('button', { name: 'alice' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'bob' })).toBeInTheDocument();
+
+    await userEvents.type(screen.getByRole('searchbox', { name: 'Найти пользователя' }), 'cara');
+    expect(screen.queryByRole('button', { name: 'bob' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'cara' })).toBeInTheDocument();
+  });
+
+  it('показывает права публикации отдельными badges в списке', async () => {
+    vi.mocked(adminListUsers).mockResolvedValue([
+      user('bob', 'editor', { canPublishTours: true, canPublishSchedule: true }),
+    ]);
+    renderUsers();
+
+    await screen.findByText('bob');
+    expect(screen.getByText(ADMIN_UI.inboxTabTours)).toBeInTheDocument();
+    expect(screen.getByText(ADMIN_UI.inboxTabSchedule)).toBeInTheDocument();
   });
 });

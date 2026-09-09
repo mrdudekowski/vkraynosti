@@ -153,6 +153,73 @@ describe('TourList', () => {
     expect(onChangeGuestVisibility).toHaveBeenCalledWith('winter-1', 'hidden');
   });
 
+  it('фильтрует туры по готовности к публикации', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <TourList
+          tours={[
+            ...tours,
+            {
+              ...tours[0],
+              id: 'winter-3',
+              title: 'Блокированный тур',
+              slug: 'blokirovannyy-tur',
+              ready: false,
+              readyCount: 3,
+            },
+          ]}
+        />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.tourReadiness.blockers }));
+    expect(screen.getByRole('link', { name: /Блокированный тур/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Изюбриная/ })).not.toBeInTheDocument();
+  });
+
+  it('сортирует отфильтрованные туры по названию', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <TourList tours={tours} />
+      </MemoryRouter>,
+    );
+
+    await user.selectOptions(screen.getByLabelText(ADMIN_UI.tourSortFilter), 'titleAsc');
+    expect(screen.getAllByRole('article').map((article) => within(article).getByRole('heading').textContent)).toEqual([
+      'Изюбриная',
+      'Полуостров Краббе',
+      'Черновик зимы',
+    ]);
+  });
+
+  it('сортирует туры с блокерами выше готовых', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <TourList
+          tours={[
+            ...tours,
+            {
+              ...tours[0],
+              id: 'winter-3',
+              title: 'Блокированный тур',
+              slug: 'blokirovannyy-tur',
+              ready: false,
+              readyCount: 3,
+            },
+          ]}
+        />
+      </MemoryRouter>,
+    );
+
+    await user.selectOptions(screen.getByLabelText(ADMIN_UI.tourSortFilter), 'readinessAsc');
+    expect(within(screen.getAllByRole('article')[0]).getByRole('heading')).toHaveTextContent(
+      'Блокированный тур',
+    );
+  });
+
   it('передаёт выбранный тур в действие клонирования в карточках и списке', async () => {
     const user = userEvent.setup();
     const onClone = vi.fn();

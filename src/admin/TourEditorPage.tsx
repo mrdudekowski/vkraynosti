@@ -29,6 +29,7 @@ import IncludedSection from './components/IncludedSection';
 import ProgramSection from './components/ProgramSection';
 import TourCatalogFields from './components/TourCatalogFields';
 import TourIdentityFields from './components/TourIdentityFields';
+import TourPublishReviewDialog from './components/TourPublishReviewDialog';
 import AdminReadinessRing from './components/AdminReadinessRing';
 import { ADMIN_UI } from './constants/ui';
 import { formatAdminReadiness } from './formatAdminCopy';
@@ -166,6 +167,7 @@ const TourEditorPage = () => {
   const [publishing, setPublishing] = useState(false);
   const [addDepartureOpen, setAddDepartureOpen] = useState(false);
   const [problemsOpen, setProblemsOpen] = useState(false);
+  const [publishReviewOpen, setPublishReviewOpen] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
   const [status, setStatus] = useState<
     | 'saved'
@@ -886,7 +888,7 @@ const TourEditorPage = () => {
             <AdminButton
               disabled={saving || uploading || publishing || publishBlockers.length > 0}
               aria-describedby={publishDisabledHint != null ? 'admin-sticky-disabled-hint' : undefined}
-              onClick={() => void onPublish()}
+              onClick={() => setPublishReviewOpen(true)}
             >
               {publishing ? ADMIN_UI.publishing : ADMIN_UI.publish}
             </AdminButton>
@@ -927,6 +929,21 @@ const TourEditorPage = () => {
             ))}
           </ul>
         </AdminSheet>
+      ) : null}
+      {publishReviewOpen && document != null ? (
+        <TourPublishReviewDialog
+          title={editorTitle}
+          season={document.season}
+          publicHref={publicHref}
+          visibilityLabel={ADMIN_UI.tourLiveVisibility[guestVisibility]}
+          readinessLabel={readinessLabel ?? formatAdminReadiness(readyCount, readyTotal)}
+          hasUnpublishedChanges={dirty}
+          onConfirm={() => {
+            setPublishReviewOpen(false);
+            void onPublish();
+          }}
+          onClose={() => setPublishReviewOpen(false)}
+        />
       ) : null}
       {hideDeparturesConfirm ? (
         <AdminConfirmDialog

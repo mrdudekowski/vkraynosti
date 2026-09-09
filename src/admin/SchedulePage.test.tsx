@@ -430,7 +430,7 @@ describe('SchedulePage', () => {
 
   it('blocks a duplicate departure and keeps the wizard open with a notification', async () => {
     const user = userEvent.setup();
-    const today = vladivostokCalendarDate();
+    const today = '2026-07-01';
     vi.mocked(adminListDepartures).mockResolvedValue([
       {
         id: 'dep-1',
@@ -566,9 +566,7 @@ describe('SchedulePage', () => {
 
     renderSchedule();
 
-    expect(
-      await screen.findByRole('searchbox', { name: ADMIN_UI.scheduleSearchLabel }),
-    ).toBeDisabled();
+    expect(await screen.findByRole('button', { name: ADMIN_UI.scheduleFilter })).toBeDisabled();
     expect(screen.queryByRole('heading', { name: ADMIN_UI.scheduleNearestDepartures })).not.toBeInTheDocument();
     const departureButton = await screen.findByRole('button', { name: /Изюбриная/ });
     const cover = departureButton.querySelector('img');

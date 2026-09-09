@@ -158,7 +158,7 @@ describe('TourEditorPage publish actions', () => {
     expect(await screen.findByRole('button', { name: ADMIN_UI.scheduleAddFromTour })).toBeEnabled();
   });
 
-  it('публикует черновик сразу: не блокирует кнопку из‑за dirty и сначала сохраняет', async () => {
+  it('перед публикацией показывает сводку и запускает текущий save → publish после подтверждения', async () => {
     const user = userEvent.setup();
     renderEditor({
       login: 'alice',
@@ -171,6 +171,11 @@ describe('TourEditorPage publish actions', () => {
     const publish = screen.getByRole('button', { name: ADMIN_UI.publish });
     expect(publish).toBeEnabled();
     await user.click(publish);
+    expect(await screen.findByRole('dialog', { name: 'Проверка публикации' })).toBeInTheDocument();
+    expect(screen.getByText('Будет опубликовано на сайте')).toBeInTheDocument();
+    expect(adminSaveTour).not.toHaveBeenCalled();
+    expect(adminPublishTour).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Подтвердить публикацию' }));
     await waitFor(() => {
       expect(adminSaveTour).toHaveBeenCalled();
       expect(adminPublishTour).toHaveBeenCalledWith('winter-1', 2, {

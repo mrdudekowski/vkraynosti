@@ -26,6 +26,7 @@ import TourCoverImage from './components/TourCoverImage';
 import { ADMIN_PATHS } from './constants/routes';
 import { ADMIN_UI } from './constants/ui';
 import { crmDealStatusTone } from './crmAppearance';
+import { vladivostokCalendarDate } from './scheduleCalendar';
 
 function folderLabel(folder: string): string {
   return isBuiltInContactFolder(folder) ? ADMIN_UI.crmFolders[folder] : folder;
@@ -44,6 +45,9 @@ const LeadsPage = () => {
     ? (viewParam as CrmListView)
     : 'leads';
   const query = searchParams.get('q') ?? '';
+  const owner = searchParams.get('owner') ?? '';
+  const followUp = searchParams.get('followUp') === 'overdue' ? 'overdue' : 'all';
+  const todayIso = useMemo(() => vladivostokCalendarDate(), []);
   const setView = (nextView: CrmListView) => {
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
@@ -56,6 +60,22 @@ const LeadsPage = () => {
       const next = new URLSearchParams(current);
       if (nextQuery.length > 0) next.set('q', nextQuery);
       else next.delete('q');
+      return next;
+    }, { replace: true });
+  };
+  const setOwner = (nextOwner: string) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (nextOwner.length > 0) next.set('owner', nextOwner);
+      else next.delete('owner');
+      return next;
+    }, { replace: true });
+  };
+  const setFollowUp = (nextFollowUp: string) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (nextFollowUp === 'overdue') next.set('followUp', 'overdue');
+      else next.delete('followUp');
       return next;
     }, { replace: true });
   };
@@ -92,8 +112,18 @@ const LeadsPage = () => {
     if (file == null || view === 'contacts') {
       return [];
     }
-    return searchDealRows(listDealRows(file, view), query);
-  }, [file, query, view]);
+    return searchDealRows(listDealRows(file, view), query).filter(({ deal }) => {
+      if (owner.length > 0 && deal.ownerLogin !== owner) return false;
+      if (followUp === 'overdue') {
+        return deal.nextStepAt != null && deal.nextStepAt < todayIso;
+      }
+      return true;
+    });
+  }, [file, followUp, owner, query, todayIso, view]);
+  const owners = useMemo(
+    () => (file == null ? [] : [...new Set(file.deals.map((deal) => deal.ownerLogin))].sort()),
+    [file],
+  );
   const contacts = useMemo(() => {
     if (file == null) {
       return [];
@@ -125,6 +155,7 @@ const LeadsPage = () => {
         <AdminPageHeader
           title={ADMIN_UI.crmTitle}
           description={ADMIN_UI.crmDescription}
+          breadcrumbs={[{ label: ADMIN_UI.dashboardNav, to: ADMIN_PATHS.dashboard }, { label: ADMIN_UI.crmTitle }]}
           action={
             <AdminButton type="button" onClick={() => setCreating(true)}>
               {ADMIN_UI.crmAdd}
@@ -152,6 +183,24 @@ const LeadsPage = () => {
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
+        {view !== 'contacts' ? (
+          <div className="flex flex-wrap gap-3">
+            <label className="flex min-w-48 flex-col gap-1">
+              <span className="text-sm font-medium text-text-primary">{ADMIN_UI.crmOwnerFilter}</span>
+              <select className="admin-input" value={owner} onChange={(event) => setOwner(event.target.value)}>
+                <option value="">{ADMIN_UI.crmOwnerAll}</option>
+                {owners.map((item) => <option key={item} value={item}>{item}</option>)}
+              </select>
+            </label>
+            <label className="flex min-w-48 flex-col gap-1">
+              <span className="text-sm font-medium text-text-primary">{ADMIN_UI.crmFollowUpFilter}</span>
+              <select className="admin-input" value={followUp} onChange={(event) => setFollowUp(event.target.value)}>
+                <option value="all">{ADMIN_UI.crmFollowUpAll}</option>
+                <option value="overdue">{ADMIN_UI.crmFollowUpOverdue}</option>
+              </select>
+            </label>
+          </div>
+        ) : null}
         {error != null ? <AdminAlert tone="danger">{error}</AdminAlert> : null}
         {empty ? (
           <AdminEmptyState
@@ -207,6 +256,13 @@ const LeadsPage = () => {
                     <p className="text-sm text-text-muted">
                       {deal.tourTitle} · {deal.date}
                       {deal.nextStep.length > 0 ? ` · ${deal.nextStep}` : ''}
+                    </p>
+                    <p className="text-xs text-text-muted">
+                      {`${ADMIN_UI.crmOwner}: ${deal.ownerLogin}`}
+                      {deal.nextStep.length > 0
+                        ? ` · ${ADMIN_UI.crmFollowUp}: ${deal.nextStep}`
+                        : ` · ${ADMIN_UI.crmFollowUp}: —`}
+                      {deal.nextStepAt != null ? ` · ${deal.nextStepAt}` : ''}
                     </p>
                     {deal.comment.length > 0 || deal.pauseReason.length > 0 ? (
                       <p className="text-sm text-text-primary">{deal.pauseReason || deal.comment}</p>

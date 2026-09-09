@@ -46,6 +46,8 @@ type TourListProps = {
 };
 
 type TourListView = 'cards' | 'list';
+type TourReadinessFilter = 'all' | 'ready' | 'blockers';
+type TourSort = 'default' | 'titleAsc' | 'readinessAsc';
 
 const TOUR_VISIBILITY_ICON: Record<AdminTourVisibilityFilter, LucideIcon> = {
   all: Layers,
@@ -72,13 +74,34 @@ const TourList = ({
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [visibility, setVisibility] = useState<AdminTourVisibilityFilter>('all');
+  const [readiness, setReadiness] = useState<TourReadinessFilter>('all');
+  const [sort, setSort] = useState<TourSort>('default');
   const [storedView, setView] = useAdminStoredState(ADMIN_TOUR_LIST_VIEW_STORAGE_KEY, isTourListView);
   const [openMenuTourId, setOpenMenuTourId] = useState<string | null>(null);
   const view = storedView ?? 'cards';
 
   const visible = useMemo(
-    () => tours.filter((tour) => matchesAdminTourVisibility(tour, visibility, query)),
-    [query, tours, visibility],
+    () => {
+      const filtered = tours.filter((tour) => {
+        if (!matchesAdminTourVisibility(tour, visibility, query)) {
+          return false;
+        }
+        return readiness === 'all' || (readiness === 'ready' ? tour.ready : !tour.ready);
+      });
+      if (sort === 'titleAsc') {
+        return [...filtered].sort((left, right) => left.title.localeCompare(right.title, 'ru-RU'));
+      }
+      if (sort === 'readinessAsc') {
+        return [...filtered].sort((left, right) => {
+          if (left.ready !== right.ready) {
+            return left.ready ? 1 : -1;
+          }
+          return left.title.localeCompare(right.title, 'ru-RU');
+        });
+      }
+      return filtered;
+    },
+    [query, readiness, sort, tours, visibility],
   );
 
   if (tours.length === 0) {
@@ -153,6 +176,31 @@ const TourList = ({
             </AdminButton>
           ))}
         </div>
+        <div className="flex flex-wrap gap-1" role="group" aria-label={ADMIN_UI.tourReadinessFilter}>
+          {(Object.keys(ADMIN_UI.tourReadiness) as TourReadinessFilter[]).map((item) => (
+            <AdminButton
+              key={item}
+              type="button"
+              variant={readiness === item ? 'secondary' : 'ghost'}
+              aria-pressed={readiness === item}
+              onClick={() => setReadiness(item)}
+            >
+              {ADMIN_UI.tourReadiness[item]}
+            </AdminButton>
+          ))}
+        </div>
+        <label className="flex max-w-xl flex-col gap-1 text-sm font-medium text-text-primary">
+          {ADMIN_UI.tourSortFilter}
+          <select
+            className="admin-input"
+            value={sort}
+            onChange={(event) => setSort(event.target.value as TourSort)}
+          >
+            <option value="default">{ADMIN_UI.tourSort.default}</option>
+            <option value="titleAsc">{ADMIN_UI.tourSort.titleAsc}</option>
+            <option value="readinessAsc">{ADMIN_UI.tourSort.readinessAsc}</option>
+          </select>
+        </label>
       </div>
       {visible.length === 0 ? (
         <AdminEmptyState
@@ -165,6 +213,8 @@ const TourList = ({
               onClick={() => {
                 setQuery('');
                 setVisibility('all');
+                setReadiness('all');
+                setSort('default');
               }}
             >
               {ADMIN_UI.emptySearchReset}

@@ -21,6 +21,7 @@ import {
   refreshAdminTours,
 } from './adminDataCache';
 import { ADMIN_UI } from './constants/ui';
+import { ADMIN_PATHS } from './constants/routes';
 import { listSchedulePickableTours } from './schedulePickableTours';
 import AddDepartureWizard, {
   type AddDepartureWizardComplete,
@@ -553,6 +554,7 @@ const SchedulePage = () => {
         <AdminPageHeader
         title={ADMIN_UI.scheduleTitle}
         description={monthGrid ? undefined : ADMIN_UI.scheduleMoveHint}
+        breadcrumbs={[{ label: ADMIN_UI.dashboardNav, to: ADMIN_PATHS.dashboard }, { label: ADMIN_UI.scheduleNav }]}
         action={
           <AdminButton type="button" onClick={() => setWizard({})}>
             {ADMIN_UI.scheduleAdd}

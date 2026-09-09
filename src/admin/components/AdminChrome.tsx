@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react';
+import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search } from 'lucide-react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
@@ -12,6 +12,7 @@ import { useAdminViewport } from '../hooks/useAdminViewport';
 import AdminIcon from './AdminIcon';
 import CreateTourModal from './CreateTourModal';
 import AdminProfileMenu from './AdminProfileMenu';
+import AdminCommandMenu from './AdminCommandMenu';
 
 type AdminChromeProps = {
   session: AdminSession;
@@ -347,11 +348,26 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [createTourOpen, setCreateTourOpen] = useState(false);
+  const [commandOpen, setCommandOpen] = useState(false);
   const items = useMemo(() => visibleNavItems(session), [session]);
   const bottomItems = items.filter((item) => item.inBottomNav === true);
   const moreItems = items.filter((item) => item.inBottomNav !== true);
   const showSidebar = viewport !== 'mobile';
   const compact = viewport === 'desktop' && collapsed;
+
+  useEffect(() => {
+    const openFromShortcut = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setCommandOpen(true);
+      }
+      if (event.key === 'Escape' && commandOpen) {
+        setCommandOpen(false);
+      }
+    };
+    document.addEventListener('keydown', openFromShortcut);
+    return () => document.removeEventListener('keydown', openFromShortcut);
+  }, [commandOpen]);
 
   const openQuickTour = () => {
     setCreateTourOpen(true);
@@ -409,6 +425,15 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
         />
       ) : null}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <button
+          type="button"
+          className="fixed right-3 top-3 z-tooltip inline-flex min-h-9 items-center gap-2 rounded-admin-control border border-divider bg-surface-light px-3 text-sm text-text-primary shadow-admin-overlay"
+          aria-keyshortcuts="Control+K Meta+K"
+          onClick={() => setCommandOpen(true)}
+        >
+          <AdminIcon icon={Search} size={16} />
+          {ADMIN_UI.commandMenu}
+        </button>
         <main
           id="admin-main"
           className={`min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto ${
@@ -459,6 +484,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
           onQuickAddDeparture={openQuickDeparture}
         />
       ) : null}
+      {commandOpen ? <AdminCommandMenu items={items} onClose={() => setCommandOpen(false)} /> : null}
       {createTourOpen ? (
         <CreateTourModal
           onClose={() => setCreateTourOpen(false)}

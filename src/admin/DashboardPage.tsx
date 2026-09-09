@@ -207,6 +207,7 @@ const DashboardPage = () => {
       <AdminPageHeader
         title={ADMIN_UI.dashboardTitle}
         description={ADMIN_UI.dashboardDescription}
+        breadcrumbs={[{ label: ADMIN_UI.dashboardNav }]}
         action={
           <Link to={ADMIN_PATHS.inbox} className="admin-btn-primary no-underline">
             {ADMIN_UI.dashboardOpenInbox}

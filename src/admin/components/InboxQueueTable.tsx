@@ -1,4 +1,5 @@
 import { CalendarDays, Check, CircleAlert, Eye, Mountain, Send, Undo2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import type { AdminPublishQueueItem } from '../api';
 import { ADMIN_UI } from '../constants/ui';
 import { formatAdminAbsoluteTime, formatAdminRelativeTime } from '../formatAdminCopy';
@@ -17,10 +18,15 @@ import TourCoverImage from './TourCoverImage';
 type InboxQueueTableProps = {
   items: AdminPublishQueueItem[];
   tourImageUrls?: Record<string, string | null>;
+  selectedKeys: ReadonlySet<string>;
+  allItemsSelected: boolean;
+  someItemsSelected: boolean;
   busy: boolean;
   canPublishItem: (item: AdminPublishQueueItem) => boolean;
   canReturnItems?: boolean;
   onView: (item: AdminPublishQueueItem) => void;
+  onToggleSelected: (item: AdminPublishQueueItem) => void;
+  onToggleAll: () => void;
   onNavigate?: (item: AdminPublishQueueItem) => void;
   onPublish: (item: AdminPublishQueueItem) => void;
   onReturn: (item: AdminPublishQueueItem) => void;
@@ -29,23 +35,47 @@ type InboxQueueTableProps = {
 const InboxQueueTable = ({
   items,
   tourImageUrls = {},
+  selectedKeys,
+  allItemsSelected,
+  someItemsSelected,
   busy,
   canPublishItem,
   canReturnItems = false,
   onView,
+  onToggleSelected,
+  onToggleAll,
   onNavigate,
   onPublish,
   onReturn,
-}: InboxQueueTableProps) => (
+}: InboxQueueTableProps) => {
+  const selectAllRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (selectAllRef.current != null) {
+      selectAllRef.current.indeterminate = someItemsSelected && !allItemsSelected;
+    }
+  }, [allItemsSelected, someItemsSelected]);
+
+  return (
   <div>
-    <div className="admin-inbox-head">
-      <span>{ADMIN_UI.inboxColumnType}</span>
-      <span>{ADMIN_UI.inboxColumnName}</span>
-      <span>{ADMIN_UI.inboxColumnStatus}</span>
-      <span>{ADMIN_UI.inboxColumnAuthor}</span>
-      <span>{ADMIN_UI.inboxColumnSent}</span>
-      <span>{ADMIN_UI.inboxColumnReady}</span>
-      <span>{ADMIN_UI.inboxColumnActions}</span>
+        <div className="admin-inbox-head flex">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={allItemsSelected}
+              ref={selectAllRef}
+              aria-label={ADMIN_UI.inboxSelectAllVisible}
+              onChange={onToggleAll}
+            />
+            <span>{ADMIN_UI.inboxSelect}</span>
+          </label>
+      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnType}</span>
+      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnName}</span>
+      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnStatus}</span>
+      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnAuthor}</span>
+      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnSent}</span>
+      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnReady}</span>
+      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnActions}</span>
     </div>
     <ul className="flex flex-col gap-2 admin-desktop:gap-0">
       {items.map((item) => {
@@ -53,6 +83,14 @@ const InboxQueueTable = ({
         const canPublish = canPublishItem(item);
         return (
           <li key={`${item.kind}:${item.id}`} className="admin-inbox-row">
+            <label className="flex min-h-11 items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selectedKeys.has(`${item.kind}:${item.id}`)}
+                aria-label={`${ADMIN_UI.inboxSelectItem} ${item.kind === 'tour' ? ADMIN_UI.inboxTourItem : ADMIN_UI.inboxDepartureItem}: ${inboxQueueItemTitle(item)}`}
+                onChange={() => onToggleSelected(item)}
+              />
+            </label>
             <div className="flex items-center gap-2">
               <span className="admin-editor-icon-well">
                 <AdminIcon icon={item.kind === 'tour' ? Mountain : CalendarDays} size={16} />
@@ -130,6 +168,7 @@ const InboxQueueTable = ({
       })}
     </ul>
   </div>
-);
+  );
+};
 
 export default InboxQueueTable;

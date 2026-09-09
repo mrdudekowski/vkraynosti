@@ -62,7 +62,7 @@ function renderChrome(
       <Routes>
         <Route path={keepChromeOnAllRoutes ? '*' : '/'} element={chrome} />
         {!keepChromeOnAllRoutes ? <Route path="/schedule" element={<LocationProbe />} /> : null}
-        {!keepChromeOnAllRoutes ? <Route path="/inbox" element={<p>{ADMIN_UI.inboxTitle}</p>} /> : null}
+        {!keepChromeOnAllRoutes ? <Route path="/inbox" element={<LocationProbe />} /> : null}
       </Routes>
     </MemoryRouter>,
   );
@@ -73,7 +73,7 @@ describe('AdminChrome', () => {
     window.localStorage.clear();
   });
 
-  it('показывает ядро навигации и вторичные заявки с бейджем скоро', () => {
+  it('показывает ядро навигации и профиль администратора', () => {
     renderChrome(adminSession);
 
     expect(screen.getByRole('link', { name: ADMIN_UI.dashboardNav })).toBeInTheDocument();
@@ -82,7 +82,6 @@ describe('AdminChrome', () => {
     expect(screen.getByRole('link', { name: ADMIN_UI.inboxNav })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: ADMIN_UI.usersNav })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: ADMIN_UI.crmNav })).toBeInTheDocument();
-    expect(screen.getByText(ADMIN_UI.soon)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: ADMIN_UI.logout })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: ADMIN_UI.skipToContent })).toBeInTheDocument();
     expect(document.querySelector(`img[src="${ADMIN_SIDEBAR_LOGO}"]`)).toBeInTheDocument();
@@ -116,6 +115,28 @@ describe('AdminChrome', () => {
     await user.click(screen.getByRole('button', { name: ADMIN_UI.quickAdd }));
     await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.scheduleAddFromTour }));
     expect(screen.getByText('/schedule')).toBeInTheDocument();
+  });
+
+  it('открывает command menu и ведёт в найденный раздел', async () => {
+    const user = userEvent.setup();
+    renderChrome(adminSession);
+
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.commandMenu }));
+    const dialog = screen.getByRole('dialog', { name: ADMIN_UI.commandMenu });
+    await user.type(within(dialog).getByRole('searchbox'), 'публикации');
+    await user.click(within(dialog).getByRole('link', { name: ADMIN_UI.inboxNav }));
+
+    expect(screen.getByText('/inbox')).toBeInTheDocument();
+  });
+
+  it('открывает command menu по Ctrl+K и закрывает по Escape', async () => {
+    const user = userEvent.setup();
+    renderChrome(adminSession);
+
+    await user.keyboard('{Control>}k{/Control}');
+    expect(screen.getByRole('dialog', { name: ADMIN_UI.commandMenu })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog', { name: ADMIN_UI.commandMenu })).not.toBeInTheDocument();
   });
 
   it('закрывает быстрое создание по Escape и возвращает фокус на триггер', async () => {

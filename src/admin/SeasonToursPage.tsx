@@ -181,6 +181,11 @@ const SeasonToursPage = () => {
       <AdminPageHeader
         title={ADMIN_UI.listTitle}
         description={ADMIN_UI.listDescription}
+        breadcrumbs={[
+          { label: ADMIN_UI.dashboardNav, to: ADMIN_PATHS.dashboard },
+          { label: ADMIN_UI.toursNav, to: ADMIN_PATHS.tours },
+          { label: ADMIN_UI.seasons[season] },
+        ]}
         meta={formatAdminOnSiteCount(onSiteCount.onSite, onSiteCount.total)}
         toolbar={
           <AdminSeasonSwitcher

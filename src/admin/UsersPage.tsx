@@ -1,5 +1,5 @@
 import { UserPlus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CMS_PASSWORD_MIN_LENGTH } from '../cms/cmsUsers';
 import {
   adminDeleteUser,
@@ -9,6 +9,7 @@ import {
   type AdminUser,
 } from './api';
 import { ADMIN_UI } from './constants/ui';
+import { ADMIN_PATHS } from './constants/routes';
 import { useAdminToast } from './toast/adminToastContext';
 import AdminAlert from './components/AdminAlert';
 import AdminBadge from './components/AdminBadge';
@@ -41,6 +42,26 @@ function userAccessSummary(user: AdminUser): string {
     parts.push(ADMIN_UI.inboxTabSchedule);
   }
   return parts.length > 0 ? parts.join(', ') : ADMIN_UI.usersDraftOnly;
+}
+
+function userAccessBadges(user: AdminUser) {
+  if (user.role === 'admin') {
+    return <AdminBadge tone="info">{ADMIN_UI.fullAccess}</AdminBadge>;
+  }
+  const badges = [];
+  if (user.canPublishTours) {
+    badges.push(<AdminBadge key="tours" tone="success">{ADMIN_UI.inboxTabTours}</AdminBadge>);
+  }
+  if (user.canPublishSchedule) {
+    badges.push(
+      <AdminBadge key="schedule" tone="success">{ADMIN_UI.inboxTabSchedule}</AdminBadge>,
+    );
+  }
+  return badges.length > 0 ? (
+    <div className="flex flex-wrap gap-1">{badges}</div>
+  ) : (
+    <AdminBadge tone="neutral">{ADMIN_UI.usersDraftOnly}</AdminBadge>
+  );
 }
 
 type UsersPageProps = {
@@ -196,6 +217,8 @@ const UsersPage = ({ session }: UsersPageProps) => {
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [pendingAccess, setPendingAccess] = useState<PendingAccess | null>(null);
   const [selectedLogin, setSelectedLogin] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | AdminUser['role']>('all');
 
   useEffect(() => {
     let cancelled = false;
@@ -216,12 +239,24 @@ const UsersPage = ({ session }: UsersPageProps) => {
   }, []);
 
   const selected = users?.find((user) => user.login === selectedLogin) ?? null;
+  const filteredUsers = useMemo(() => {
+    if (users == null) {
+      return [];
+    }
+    const normalizedSearch = search.trim().toLocaleLowerCase();
+    return users.filter((user) => {
+      const matchesSearch = normalizedSearch.length === 0 || user.login.toLocaleLowerCase().includes(normalizedSearch);
+      const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+      return matchesSearch && matchesRole;
+    });
+  }, [roleFilter, search, users]);
 
   return (
     <AdminPageFrame variant="compact">
       <AdminPageHeader
         title={ADMIN_UI.usersTitle}
         description={ADMIN_UI.usersDescription}
+        breadcrumbs={[{ label: ADMIN_UI.dashboardNav, to: ADMIN_PATHS.dashboard }, { label: ADMIN_UI.usersNav }]}
         action={
           <AdminButton type="button" onClick={() => setCreating(true)}>
             {ADMIN_UI.addUser}
@@ -238,23 +273,54 @@ const UsersPage = ({ session }: UsersPageProps) => {
           icon={UserPlus}
         />
       ) : (
-        <AdminDataList
-          titleHeader={ADMIN_UI.loginLabel}
-          statusHeader={ADMIN_UI.columnRole}
-          metaHeader={ADMIN_UI.columnAccess}
-          items={users.map((user) => ({
-            id: user.login,
-            label: user.login,
-            title: user.login,
-            status: (
-              <AdminBadge tone={user.role === 'admin' ? 'info' : 'neutral'}>
-                {user.role === 'admin' ? ADMIN_UI.roleAdmin : ADMIN_UI.roleEditor}
-              </AdminBadge>
-            ),
-            meta: userAccessSummary(user),
-            onActivate: () => setSelectedLogin(user.login),
-          }))}
-        />
+        <div className="flex flex-col gap-3">
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+            <AdminTextInput
+              type="search"
+              aria-label={ADMIN_UI.usersSearch}
+              placeholder={ADMIN_UI.usersSearch}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+            <label className="flex items-center gap-2">
+              <span className="text-sm font-medium text-text-primary">{ADMIN_UI.usersRoleFilter}</span>
+              <AdminSelect
+                className="min-w-0 flex-1"
+                aria-label={ADMIN_UI.usersRoleFilter}
+                value={roleFilter}
+                onChange={(event) => {
+                  const nextRole = event.target.value;
+                  setRoleFilter(nextRole === 'admin' || nextRole === 'editor' ? nextRole : 'all');
+                }}
+              >
+                <option value="all">{ADMIN_UI.usersRoleAll}</option>
+                <option value="admin">{ADMIN_UI.roleAdmin}</option>
+                <option value="editor">{ADMIN_UI.roleEditor}</option>
+              </AdminSelect>
+            </label>
+          </div>
+          {filteredUsers.length === 0 ? (
+            <AdminEmptyState title={ADMIN_UI.usersFilterEmpty} />
+          ) : (
+            <AdminDataList
+              titleHeader={ADMIN_UI.loginLabel}
+              statusHeader={ADMIN_UI.columnRole}
+              metaHeader={ADMIN_UI.columnAccess}
+              items={filteredUsers.map((user) => ({
+                id: user.login,
+                label: user.login,
+                title: user.login,
+                status: (
+                  <AdminBadge tone={user.role === 'admin' ? 'info' : 'neutral'}>
+                    {user.role === 'admin' ? ADMIN_UI.roleAdmin : ADMIN_UI.roleEditor}
+                  </AdminBadge>
+                ),
+                meta: userAccessBadges(user),
+                onActivate: () => setSelectedLogin(user.login),
+              }))}
+            />
+          )}
+        </div>
       )}
       {selected != null ? (
         <UserDrawer

@@ -95,8 +95,9 @@ const InboxPage = () => {
   const [busy, setBusy] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
   const [detail, setDetail] = useState<AdminPublishQueueItem | null>(null);
-  const [returnFor, setReturnFor] = useState<AdminPublishQueueItem | null>(null);
+  const [returnFor, setReturnFor] = useState<AdminPublishQueueItem[] | null>(null);
   const [returnReason, setReturnReason] = useState('');
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [hideConfirmPayload, setHideConfirmPayload] = useState<{
     tourIds: string[];
     departureIds: string[];
@@ -154,11 +155,18 @@ const InboxPage = () => {
   );
   const publishable = visible.filter((item) => canPublishItem(session, item) && item.ready !== false);
   const canBulkPublish = publishable.length > 0;
+  const selectedItems = visible.filter((item) => selectedKeys.has(`${item.kind}:${item.id}`));
+  const selectedPublishable = selectedItems.filter(
+    (item) => canPublishItem(session, item) && item.ready !== false,
+  );
+  const allVisibleSelected = visible.length > 0 && selectedItems.length === visible.length;
+  const someVisibleSelected = selectedItems.length > 0;
 
   const refreshAfterMutation = () => {
     invalidateAdminTours();
     invalidateAdminDepartures();
     invalidateAdminPublishQueue();
+    setSelectedKeys(new Set());
     setItems(null);
     setReloadToken((current) => current + 1);
   };
@@ -201,6 +209,7 @@ const InboxPage = () => {
       <AdminPageHeader
         title={ADMIN_UI.inboxTitle}
         description={ADMIN_UI.inboxDescription}
+        breadcrumbs={[{ label: ADMIN_UI.dashboardNav, to: ADMIN_PATHS.dashboard }, { label: ADMIN_UI.inboxNav }]}
         action={
           canBulkPublish ? (
             <AdminButton
@@ -349,24 +358,86 @@ const InboxPage = () => {
                 }
               />
             ) : (
-              <InboxQueueTable
-                items={visible}
-                tourImageUrls={tourImageUrls}
-                busy={busy}
-                canPublishItem={(item) => canPublishItem(session, item)}
-                canReturnItems={session.role === 'admin'}
-                onView={setDetail}
-                onNavigate={(item) => {
-                  navigate(item.kind === 'tour' ? ADMIN_PATHS.tour(item.tourId) : ADMIN_PATHS.scheduleDeparture(item.id, item.startsOn ?? ''));
-                }}
-                onPublish={(item) => {
-                  runPayload(queuePayload([item]));
-                }}
-                onReturn={(item) => {
-                  setReturnFor(item);
-                  setReturnReason('');
-                }}
-              />
+              <>
+                {selectedItems.length > 0 ? (
+                  <div className="sticky bottom-0 z-season-dock flex flex-col gap-2 rounded-admin-surface border border-divider bg-surface-light p-3 shadow-admin-overlay sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm font-medium text-text-primary">
+                      {selectedItems.length} {ADMIN_UI.inboxSelectedCount}
+                    </p>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <AdminButton
+                        type="button"
+                        disabled={busy || selectedPublishable.length !== selectedItems.length}
+                        onClick={() => runPayload(queuePayload(selectedPublishable))}
+                      >
+                        {ADMIN_UI.inboxPublishSelected}
+                      </AdminButton>
+                      <AdminButton
+                        type="button"
+                        variant="ghost"
+                        disabled={busy}
+                        onClick={() => setSelectedKeys(new Set())}
+                      >
+                        {ADMIN_UI.inboxClearSelection}
+                      </AdminButton>
+                      {session.role === 'admin' ? (
+                        <AdminButton
+                          type="button"
+                          variant="ghost"
+                          disabled={busy}
+                          onClick={() => {
+                            setReturnFor(selectedItems);
+                            setReturnReason('');
+                          }}
+                        >
+                          {ADMIN_UI.inboxReturnSelected}
+                        </AdminButton>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+                <InboxQueueTable
+                  items={visible}
+                  tourImageUrls={tourImageUrls}
+                  selectedKeys={selectedKeys}
+                  allItemsSelected={allVisibleSelected}
+                  someItemsSelected={someVisibleSelected}
+                  busy={busy}
+                  canPublishItem={(item) => canPublishItem(session, item)}
+                  canReturnItems={session.role === 'admin'}
+                  onView={setDetail}
+                  onToggleSelected={(item) => {
+                    const key = `${item.kind}:${item.id}`;
+                    setSelectedKeys((current) => {
+                      const next = new Set(current);
+                      if (next.has(key)) next.delete(key);
+                      else next.add(key);
+                      return next;
+                    });
+                  }}
+                  onToggleAll={() => {
+                    setSelectedKeys((current) => {
+                      const next = new Set(current);
+                      if (allVisibleSelected) {
+                        visible.forEach((item) => next.delete(`${item.kind}:${item.id}`));
+                      } else {
+                        visible.forEach((item) => next.add(`${item.kind}:${item.id}`));
+                      }
+                      return next;
+                    });
+                  }}
+                  onNavigate={(item) => {
+                    navigate(item.kind === 'tour' ? ADMIN_PATHS.tour(item.tourId) : ADMIN_PATHS.scheduleDeparture(item.id, item.startsOn ?? ''));
+                  }}
+                  onPublish={(item) => {
+                    runPayload(queuePayload([item]));
+                  }}
+                  onReturn={(item) => {
+                    setReturnFor([item]);
+                    setReturnReason('');
+                  }}
+                />
+              </>
             )}
           </div>
         </>
@@ -459,8 +530,10 @@ const InboxPage = () => {
               setBusy(true);
               void adminReturnPublishQueue({
                 reason: returnReason.trim(),
-                tourIds: returnFor.kind === 'tour' ? [returnFor.id] : [],
-                departureIds: returnFor.kind === 'departure' ? [returnFor.id] : [],
+                tourIds: returnFor.filter((item) => item.kind === 'tour').map((item) => item.id),
+                departureIds: returnFor
+                  .filter((item) => item.kind === 'departure')
+                  .map((item) => item.id),
               })
                 .then(() => {
                   push({ message: ADMIN_UI.inboxReturned });

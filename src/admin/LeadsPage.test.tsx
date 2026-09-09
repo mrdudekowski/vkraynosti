@@ -94,6 +94,8 @@ describe('LeadsPage', () => {
     );
     expect(screen.getByText(/Изюбриная/)).toBeInTheDocument();
     expect(screen.getByText('дорого')).toBeInTheDocument();
+    expect(screen.getByText(/Ответственный: alice/)).toBeInTheDocument();
+    expect(screen.getByText(/Следующий шаг: перезвонить/)).toBeInTheDocument();
   });
 
   it('открывает форму создания, а не держит её на странице', async () => {
@@ -111,5 +113,38 @@ describe('LeadsPage', () => {
     await user.click(screen.getByRole('button', { name: ADMIN_UI.crmAdd }));
     expect(screen.getByRole('dialog', { name: ADMIN_UI.crmAddTitle })).toBeInTheDocument();
     expect(screen.getByLabelText(ADMIN_UI.crmName)).toBeInTheDocument();
+  });
+
+  it('фильтрует лиды по просроченному follow-up', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={['/leads']}>
+        <Routes>
+          <Route path="/leads" element={<LeadsPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByText('Анна');
+    await user.selectOptions(
+      screen.getByLabelText(ADMIN_UI.crmFollowUpFilter),
+      'overdue',
+    );
+    expect(screen.getByText('Анна')).toBeInTheDocument();
+  });
+
+  it('фильтрует лиды по ответственному', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={['/leads']}>
+        <Routes>
+          <Route path="/leads" element={<LeadsPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByText('Анна');
+    await user.selectOptions(screen.getByLabelText(ADMIN_UI.crmOwnerFilter), 'alice');
+    expect(screen.getByText('Анна')).toBeInTheDocument();
   });
 });

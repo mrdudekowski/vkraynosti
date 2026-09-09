@@ -125,6 +125,52 @@ describe('InboxPage', () => {
     });
   });
 
+  it('publishes only the selected queue items', async () => {
+    const user = userEvent.setup();
+    renderInbox(adminSession);
+    expect(await screen.findAllByText('Изюбриная')).not.toHaveLength(0);
+    await user.click(screen.getByRole('checkbox', { name: 'Выбрать Тур: Изюбриная' }));
+    expect(screen.getByRole('button', { name: ADMIN_UI.inboxPublishSelected })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxPublishSelected }));
+    expect(adminPublishQueue).toHaveBeenCalledWith({
+      tourIds: ['winter-2'],
+      departureIds: [],
+      tourRevs: { 'winter-2': 2 },
+    });
+  });
+
+  it('returns the selected queue items with one reason', async () => {
+    const user = userEvent.setup();
+    renderInbox(adminSession);
+    expect(await screen.findAllByText('Изюбриная')).not.toHaveLength(0);
+    await user.click(screen.getByRole('checkbox', { name: 'Выбрать Тур: Изюбриная' }));
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxReturnSelected }));
+    const sheet = screen.getByRole('dialog', { name: ADMIN_UI.inboxReturn });
+    await user.type(within(sheet).getByLabelText(ADMIN_UI.inboxReturnReason), 'Проверить цены');
+    await user.click(within(sheet).getByRole('button', { name: ADMIN_UI.inboxReturn }));
+    expect(adminReturnPublishQueue).toHaveBeenCalledWith({
+      reason: 'Проверить цены',
+      tourIds: ['winter-2'],
+      departureIds: [],
+    });
+  });
+
+  it('выбирает все видимые элементы очереди через select-all', async () => {
+    const user = userEvent.setup();
+    renderInbox(adminSession);
+    expect(await screen.findAllByText('Изюбриная')).not.toHaveLength(0);
+    const selectAll = screen.getByRole('checkbox', { name: 'Выбрать все видимые' });
+    expect(screen.getByText('Выбрать всё')).toBeInTheDocument();
+    await user.click(selectAll);
+    expect(screen.getAllByRole('checkbox', { name: /Выбрать (Тур|Выезд): Изюбриная/ })).toHaveLength(2);
+    expect(screen.getByText(`2 ${ADMIN_UI.inboxSelectedCount}`)).toBeInTheDocument();
+    expect(selectAll).toBeChecked();
+
+    await user.click(selectAll);
+    await user.click(screen.getByRole('checkbox', { name: 'Выбрать Тур: Изюбриная' }));
+    expect(selectAll).toHaveProperty('indeterminate', true);
+  });
+
   it('hides publish and return from an editor without publish rights', async () => {
     renderInbox(editorSession);
     expect(await screen.findByText(ADMIN_UI.inboxTourItem)).toBeInTheDocument();

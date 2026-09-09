@@ -105,7 +105,7 @@ const AdminTourActionsMenu = ({
             <button
               type="button"
               role="menuitem"
-              className="admin-btn-ghost w-full justify-start gap-2 text-danger"
+              className="admin-btn-destructive w-full justify-start gap-2"
               disabled={busy}
               onClick={(event) => {
                 event.preventDefault();

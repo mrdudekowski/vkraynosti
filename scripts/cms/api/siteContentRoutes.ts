@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Context, Hono } from 'hono';
+import { randomUUID } from 'node:crypto';
 import { createCmsTourMeta, parseCmsTourMeta, type CmsTourMeta } from '../../../src/cms/cmsTourMeta.ts';
 import {
   parseSiteContentDocument,
@@ -11,6 +12,7 @@ import {
   siteContentDraftKey,
   siteContentDraftMetaKey,
   siteContentPublishedKey,
+  siteContentMediaPrefix,
 } from '../../../src/cms/siteContentPackageKeys.ts';
 import { seedSiteContentDocuments } from '../../../src/cms/siteContentSeed.ts';
 import type { CmsApiEnv } from './env.ts';
@@ -19,7 +21,7 @@ import type { CmsJsonStore } from './store.ts';
 
 type SiteContentEnv = { Variables: { session: CmsSession } };
 type SiteContentContext = Context<SiteContentEnv>;
-type SiteContentApp = Pick<Hono<SiteContentEnv>, 'get' | 'put' | 'post'>;
+type SiteContentApp = Pick<Hono<SiteContentEnv>, 'get' | 'put' | 'post' | 'delete'>;
 
 const saveBodySchema = z.object({
   rev: z.number().int().positive(),
@@ -118,5 +120,33 @@ export function registerSiteContentRoutes(
     });
     await deps.store.putJson(siteContentDraftMetaKey(kind), meta);
     return c.json({ document: current.document, meta });
+  });
+
+  app.post('/api/cms/site-content/:kind/assets', async (c: SiteContentContext) => {
+    const kind = c.req.param('kind');
+    if (!isSiteContentKind(kind)) return invalidKind(c);
+    const session = c.get('session') as CmsSession;
+    if (!siteContentSessionCanEdit(session)) return c.json({ error: 'forbidden' }, 403);
+    const form = await c.req.parseBody();
+    const file = form.file;
+    if (!(file instanceof File)) return c.json({ error: 'file_required' }, 400);
+    const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'application/pdf']);
+    if (!allowed.has(file.type) || file.size > 10 * 1024 * 1024) return c.json({ error: 'invalid_file' }, 400);
+    const assetId = randomUUID();
+    const key = `${siteContentMediaPrefix(kind)}${assetId}`;
+    await deps.store.putBytes(key, new Uint8Array(await file.arrayBuffer()), file.type);
+    const asset = { assetId, url: `${deps.env.s3.publicBaseUrl.replace(/\/+$/, '')}/${key}`, mimeType: file.type, alt: typeof form.alt === 'string' ? form.alt.trim() : '' };
+    return c.json({ asset }, 201);
+  });
+
+  app.delete('/api/cms/site-content/:kind/assets/:assetId', async (c: SiteContentContext) => {
+    const kind = c.req.param('kind');
+    if (!isSiteContentKind(kind)) return invalidKind(c);
+    const session = c.get('session') as CmsSession;
+    if (!siteContentSessionCanEdit(session)) return c.json({ error: 'forbidden' }, 403);
+    const assetId = c.req.param('assetId');
+    if (!assetId || assetId.includes('/')) return c.json({ error: 'invalid_asset' }, 400);
+    await deps.store.deleteBytes(`${siteContentMediaPrefix(kind)}${assetId}`);
+    return c.body(null, 204);
   });
 }

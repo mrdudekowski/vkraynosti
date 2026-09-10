@@ -41,7 +41,7 @@ export async function ensureTelegramFriendlyOgImage(
   const sourcePath = resolve(distDir, logicalPath);
   const jpegPath = resolve(distDir, jpegLogical);
 
-  const useFallback = async (): Promise<string> => {
+  const resolveFallbackImage = async (): Promise<string> => {
     const fallbackPath = resolve(distDir, fallbackLogicalPath);
     if (!existsSync(fallbackPath)) {
       return logicalPath;
@@ -53,7 +53,7 @@ export async function ensureTelegramFriendlyOgImage(
   };
 
   if (!ffmpegStatic) {
-    const fallback = await useFallback();
+    const fallback = await resolveFallbackImage();
     process.stdout.write(
       `[og-asset] ${fallback === logicalPath ? 'warn: ffmpeg-static missing, keeping' : 'fallback: ffmpeg-static missing, using'} ${fallback}\n`,
     );
@@ -83,7 +83,7 @@ export async function ensureTelegramFriendlyOgImage(
     process.stdout.write(`[og-asset] jpeg ${jpegLogical} (${OG_SHELL_IMAGE_WIDTH}x${OG_SHELL_IMAGE_HEIGHT})\n`);
     return jpegLogical;
   } catch (error) {
-    const fallback = await useFallback();
+    const fallback = await resolveFallbackImage();
     process.stdout.write(
       `[og-asset] ${fallback === logicalPath ? 'warn: jpeg conversion failed, keeping source' : 'fallback: jpeg conversion failed, using'} ${fallback} (${error instanceof Error ? error.message : String(error)})\n`,
     );

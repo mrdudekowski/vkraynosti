@@ -2,7 +2,6 @@ import { CalendarOff } from 'lucide-react';
 import type { AdminDeparture, AdminTourListItem } from '../api';
 import type { DepartureQuickStatus } from '../departureQuickStatus';
 import { ADMIN_UI } from '../constants/ui';
-import AdminButton from './AdminButton';
 import AdminEmptyState from './AdminEmptyState';
 import ScheduleWeekDaysColumn from './ScheduleWeekDaysColumn';
 

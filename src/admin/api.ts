@@ -4,6 +4,7 @@ import type { CmsTourMeta } from '../cms/cmsTourMeta';
 import type { CmsTourTextPatch } from '../cms/applyTourTextPatch';
 import type { CmsTourLayoutPatch } from '../cms/applyTourLayoutPatch';
 import type { CrmDeal, CrmFile, CrmMessenger, CrmTouchKind } from '../crm/crmDocument';
+import type { SiteContentDocument, SiteContentDocumentKind } from '../cms/siteContentDocument';
 
 const cmsApiBaseUrl = (import.meta.env.VITE_CMS_API_BASE_URL ?? '').trim().replace(/\/+$/, '');
 
@@ -56,6 +57,43 @@ export type AdminDeparture = {
   updatedAt: string;
   publishedAt?: string | null;
 };
+
+export type AdminSiteContentResponse = { document: SiteContentDocument; meta: CmsTourMeta };
+
+async function readSiteContent(response: Response, fallback: string): Promise<AdminSiteContentResponse> {
+  if (response.status === 403) throw new Error('forbidden');
+  if (response.status === 409) throw new Error('rev_conflict');
+  if (!response.ok) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? fallback);
+  }
+  return readJson<AdminSiteContentResponse>(response);
+}
+
+export async function adminGetSiteContent(kind: SiteContentDocumentKind): Promise<AdminSiteContentResponse> {
+  return readSiteContent(await fetch(`/api/cms/site-content/${kind}`, { credentials: 'include' }), 'site_content_load_failed');
+}
+
+export async function adminSaveSiteContent(
+  kind: SiteContentDocumentKind,
+  rev: number,
+  document: SiteContentDocument,
+): Promise<AdminSiteContentResponse> {
+  return readSiteContent(await fetch(`/api/cms/site-content/${kind}`, {
+    method: 'PUT', credentials: 'include', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ rev, document }),
+  }), 'site_content_save_failed');
+}
+
+export async function adminPublishSiteContent(
+  kind: SiteContentDocumentKind,
+  rev: number,
+): Promise<AdminSiteContentResponse> {
+  return readSiteContent(await fetch(`/api/cms/site-content/${kind}/publish`, {
+    method: 'POST', credentials: 'include', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ rev }),
+  }), 'site_content_publish_failed');
+}
 
 async function readJson<T>(response: Response): Promise<T> {
   return (await response.json()) as T;

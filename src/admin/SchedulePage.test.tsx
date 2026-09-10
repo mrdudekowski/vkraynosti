@@ -299,7 +299,9 @@ describe('SchedulePage', () => {
   it('allows publishing the whole schedule even if the current month is empty', async () => {
     renderSchedule();
 
-    expect(await screen.findByRole('button', { name: ADMIN_UI.publishSchedule })).toBeEnabled();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: ADMIN_UI.publishSchedule })).toBeEnabled(),
+    );
     expect(screen.queryByText(ADMIN_UI.scheduleNoPublishableDepartures)).not.toBeInTheDocument();
   });
 

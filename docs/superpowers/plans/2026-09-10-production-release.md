@@ -15,7 +15,7 @@
 - Не использовать force-push и не переписывать `origin/cms-crm-phase1-staging`.
 - Не включать unrelated dirty-worktree files, SEO/showcase work и крупную snapshot-миграцию.
 - До production push пройти tests, typecheck, lint и production builds для frontend и admin.
-- Deployment workflow запускается push в `main`; перенос в `main` выполняется только после проверки release candidate.
+- Production обновляется двумя независимыми ветками: `cms-crm-phase1-staging` для frontend/backend и `codex/admin-app` для admin.
 
 ---
 
@@ -51,15 +51,16 @@
 - [ ] Run `npm run build` for the public frontend and `npm run build:admin` for admin.
 - [ ] Inspect generated diff and ensure no unrelated files are staged.
 
-### Task 4: Production integration gate
+### Task 4: Production branch gate
 
-- [ ] Compare release candidate against `origin/main` and confirm the production deployment workflow targets `main`.
-- [ ] Do not push `main` automatically if the repository has no approved merge path or if required live CMS smoke checks are unavailable.
-- [ ] If approved and all checks pass, integrate the release candidate with a normal non-force merge and push.
-- [ ] If integration is not safe, push the release candidate branch only and report the exact remaining gate.
+- [ ] Confirm the release candidate is based on the current `origin/cms-crm-phase1-staging` tip.
+- [ ] After all frontend/backend checks pass, update `cms-crm-phase1-staging` with a normal fast-forward push.
+- [ ] After all admin checks pass, update `codex/admin-app` with a normal fast-forward push.
+- [ ] Do not use force-push; if either remote branch advances, stop and rebase/merge only after reviewing the new commits.
+- [ ] Run the production smoke checks separately for the public site and admin.
 
 ### Task 5: Rollback evidence
 
-- [ ] Record the pre-release `main` SHA and release SHA.
-- [ ] Confirm rollback means reverting the release merge or redeploying the pre-release SHA; do not reset shared branches.
+- [ ] Record the pre-release SHA and release SHA for each of the two production branches.
+- [ ] Confirm rollback means reverting the release commit or redeploying the pre-release SHA; do not reset shared branches.
 - [ ] Report deployment result separately from local commit and Git push result.

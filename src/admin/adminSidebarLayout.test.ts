@@ -1,0 +1,115 @@
+import { describe, expect, it } from 'vitest';
+import type { AdminNavId, AdminNavItem } from './constants/nav';
+import {
+  ADMIN_SIDEBAR_VISIBLE_LIMIT,
+  createDefaultAdminSidebarLayout,
+  exchangeAdminSidebarItem,
+  normalizeAdminSidebarLayout,
+  reorderVisibleAdminSidebarItem,
+} from './adminSidebarLayout';
+
+const fixtureIds = [
+  'dashboard',
+  'tours',
+  'schedule',
+  'inbox',
+  'users',
+  'leads',
+  'site',
+  'reports',
+  'analytics',
+  'settings',
+] as const;
+
+const fixtureItems = fixtureIds.map((id) => ({
+  id,
+  to: `/${id}`,
+  label: id,
+  icon: (() => null) as unknown as AdminNavItem['icon'],
+  isActive: () => false,
+})) as unknown as readonly AdminNavItem[];
+
+const ids = fixtureIds as unknown as AdminNavId[];
+
+describe('adminSidebarLayout', () => {
+  it('defaults to eight visible items and puts the remainder in overflow', () => {
+    expect(ADMIN_SIDEBAR_VISIBLE_LIMIT).toBe(8);
+    expect(createDefaultAdminSidebarLayout(fixtureItems)).toEqual({
+      visibleOrder: ids.slice(0, 8),
+      overflowOrder: ids.slice(8),
+    });
+  });
+
+  it('normalizes malformed saved layout, duplicates, unknown IDs, and permission removal', () => {
+    const saved = {
+      visibleOrder: ['analytics', 'missing', 'analytics', 'dashboard', 'settings'],
+      overflowOrder: ['tours', 'dashboard', 'missing', 'settings'],
+    };
+    const removedIds = new Set<string>(['users', 'reports']);
+    const permitted = fixtureItems.filter(({ id }) => !removedIds.has(id));
+
+    const result = normalizeAdminSidebarLayout(saved, permitted);
+
+    expect(result).toEqual({
+      visibleOrder: ['analytics', 'dashboard', 'settings', 'tours', 'schedule', 'inbox', 'leads', 'site'],
+      overflowOrder: [],
+    });
+    expect([...result.visibleOrder, ...result.overflowOrder].sort()).toEqual(
+      permitted.map(({ id }) => id).sort(),
+    );
+  });
+
+  it('fills missing IDs canonically and caps the visible list at eight', () => {
+    const result = normalizeAdminSidebarLayout(
+      { visibleOrder: ['settings'], overflowOrder: ['analytics'] },
+      fixtureItems,
+    );
+
+    expect(result.visibleOrder).toEqual(['settings', 'analytics', ...ids.slice(0, 6)]);
+    expect(result.overflowOrder).toEqual(['site', 'reports']);
+  });
+
+  it('treats malformed saved values as an empty layout', () => {
+    expect(normalizeAdminSidebarLayout(null, fixtureItems)).toEqual(
+      createDefaultAdminSidebarLayout(fixtureItems),
+    );
+    expect(normalizeAdminSidebarLayout({ visibleOrder: 'bad' }, fixtureItems)).toEqual(
+      createDefaultAdminSidebarLayout(fixtureItems),
+    );
+  });
+
+  it('reorders visible items without changing the union', () => {
+    const layout = createDefaultAdminSidebarLayout(fixtureItems);
+
+    expect(reorderVisibleAdminSidebarItem(layout, 0, 3)).toEqual({
+      visibleOrder: [ids[1], ids[2], ids[3], ids[0], ...ids.slice(4, 8)],
+      overflowOrder: ids.slice(8),
+    });
+    expect(reorderVisibleAdminSidebarItem(layout, -1, 2)).toEqual(layout);
+    expect(reorderVisibleAdminSidebarItem(layout, 0, 8)).toEqual(layout);
+  });
+
+  it('exchanges an overflow item with the visible target and preserves overflow order', () => {
+    const layout = createDefaultAdminSidebarLayout(fixtureItems);
+
+    expect(exchangeAdminSidebarItem(layout, ids[8], 2)).toEqual({
+      visibleOrder: [...ids.slice(0, 2), ids[8], ...ids.slice(3, 8)],
+      overflowOrder: [ids[9], ids[2]],
+    });
+    expect(exchangeAdminSidebarItem(layout, 'missing' as AdminNavId, 2)).toEqual(layout);
+    expect(exchangeAdminSidebarItem(layout, ids[8], -1)).toEqual(layout);
+    expect(exchangeAdminSidebarItem(layout, ids[8], 8)).toEqual(layout);
+  });
+
+  it('returns a canonical reset layout', () => {
+    const layout = {
+      visibleOrder: [ids[7], ...ids.slice(0, 7)],
+      overflowOrder: [ids[8], ids[9]],
+    };
+    expect(createDefaultAdminSidebarLayout(fixtureItems)).not.toEqual(layout);
+    expect(createDefaultAdminSidebarLayout(fixtureItems)).toEqual({
+      visibleOrder: ids.slice(0, 8),
+      overflowOrder: ids.slice(8),
+    });
+  });
+});

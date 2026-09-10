@@ -18,6 +18,7 @@ export type CmsSession = {
   exp: number;
   canPublishTours: boolean;
   canPublishSchedule: boolean;
+  canEditSiteContent: boolean;
 };
 
 function toBase64Url(value: string): string {
@@ -74,13 +75,18 @@ export function verifyCmsSession(token: string, secret: string): CmsSession | nu
   }
 }
 
-export function createCmsSession(sub: string, role: CmsApiRole): CmsSession {
+export function createCmsSession(
+  sub: string,
+  role: CmsApiRole,
+  canEditSiteContent = role === 'admin',
+): CmsSession {
   return {
     sub,
     role,
     exp: Date.now() + CMS_SESSION_TTL_MS,
     canPublishTours: role === 'admin',
     canPublishSchedule: role === 'admin',
+    canEditSiteContent: role === 'admin' || canEditSiteContent,
   };
 }
 

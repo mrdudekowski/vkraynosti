@@ -11,6 +11,7 @@ export type UpdateUser = {
   isActive?: boolean;
   canPublishTours?: boolean;
   canPublishSchedule?: boolean;
+  canEditSiteContent?: boolean;
 };
 export type NewSession = { userId: string; tokenHash: string; expiresAt: Date };
 export type SessionWithUser = { session: SessionRecord; user: UserRecord };

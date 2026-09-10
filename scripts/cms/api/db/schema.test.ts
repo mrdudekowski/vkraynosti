@@ -24,7 +24,7 @@ describe('auth schema', () => {
 
   it('stores role and password hash on users', () => {
     expect(Object.keys(getTableColumns(users))).toEqual(expect.arrayContaining([
-      'login', 'passwordHash', 'role', 'isActive', 'canPublishTours', 'canPublishSchedule',
+      'login', 'passwordHash', 'role', 'isActive', 'canPublishTours', 'canPublishSchedule', 'canEditSiteContent',
     ]));
   });
 });

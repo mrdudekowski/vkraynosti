@@ -78,6 +78,7 @@ import {
 import type { CmsJsonStore } from './store.ts';
 import { CmsLastAdminError, type AuthRepository, type UserRecord } from './auth/authRepository.ts';
 import { registerCrmRoutes } from './crmRoutes.ts';
+import { registerSiteContentRoutes } from './siteContentRoutes.ts';
 import {
   CmsDepartureCompletedError,
   CmsDepartureDuplicateError,
@@ -149,13 +150,15 @@ const updateUserBodySchema = z
     password: z.string().min(CMS_PASSWORD_MIN_LENGTH).optional(),
     canPublishTours: z.boolean().optional(),
     canPublishSchedule: z.boolean().optional(),
+    canEditSiteContent: z.boolean().optional(),
   })
   .refine(
     (value) =>
       value.role != null ||
       value.password != null ||
       value.canPublishTours != null ||
-      value.canPublishSchedule != null,
+      value.canPublishSchedule != null ||
+      value.canEditSiteContent != null,
   );
 
 const submitQueueBodySchema = z.object({
@@ -238,12 +241,14 @@ function publicAuthUsers(records: UserRecord[]): Array<{
   role: UserRecord['role'];
   canPublishTours: boolean;
   canPublishSchedule: boolean;
+  canEditSiteContent: boolean;
 }> {
   return records.map((user) => ({
     login: user.login,
     role: user.role,
     canPublishTours: user.canPublishTours,
     canPublishSchedule: user.canPublishSchedule,
+    canEditSiteContent: user.role === 'admin' || user.canEditSiteContent,
   }));
 }
 
@@ -263,6 +268,7 @@ function publicActor(session: CmsSession) {
     role: session.role,
     canPublishTours: session.canPublishTours,
     canPublishSchedule: session.canPublishSchedule,
+    canEditSiteContent: session.canEditSiteContent,
   };
 }
 
@@ -873,6 +879,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       login: user.login,
       role: user.role,
       ...effectivePublishFlags(user),
+      canEditSiteContent: user.role === 'admin' || user.canEditSiteContent,
     });
   });
 
@@ -909,9 +916,12 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       role: found.user.role,
       exp: found.session.expiresAt.getTime(),
       ...effectivePublishFlags(found.user),
+      canEditSiteContent: found.user.role === 'admin' || found.user.canEditSiteContent,
     });
     await next();
   });
+
+  registerSiteContentRoutes(app, { store, env });
 
   app.get('/api/cms/me', (c) => {
     const session = c.get('session');
@@ -1757,6 +1767,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       parsed.data.password == null &&
       parsed.data.canPublishTours == null &&
       parsed.data.canPublishSchedule == null
+      && parsed.data.canEditSiteContent == null
     ) {
       return c.json({ error: 'invalid_body' }, 400);
     }
@@ -1775,6 +1786,9 @@ export function createCmsApiApp(deps: CmsApiDeps) {
           : {}),
         ...(parsed.data.canPublishSchedule != null
           ? { canPublishSchedule: parsed.data.canPublishSchedule }
+          : {}),
+        ...(parsed.data.canEditSiteContent != null
+          ? { canEditSiteContent: parsed.data.canEditSiteContent }
           : {}),
       });
     } catch (error: unknown) {

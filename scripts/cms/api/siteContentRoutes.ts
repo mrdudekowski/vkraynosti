@@ -15,6 +15,7 @@ import {
   siteContentMediaPrefix,
 } from '../../../src/cms/siteContentPackageKeys.ts';
 import { seedSiteContentDocuments } from '../../../src/cms/siteContentSeed.ts';
+import { SITE_CONTENT_KIND_LABELS, siteContentChanges, type SiteContentChangesItem } from '../../../src/cms/siteContentChanges.ts';
 import type { CmsApiEnv } from './env.ts';
 import type { CmsSession } from './session.ts';
 import type { CmsJsonStore } from './store.ts';
@@ -81,6 +82,21 @@ export function registerSiteContentRoutes(
     if (!siteContentSessionCanEdit(session)) return c.json({ error: 'forbidden' }, 403);
     const result = await loadDraft(deps.store, kind, session.sub);
     return c.json(result);
+  });
+
+  app.get('/api/cms/site-content-changes', async (c: SiteContentContext) => {
+    const session = c.get('session') as CmsSession;
+    if (!siteContentSessionCanEdit(session)) return c.json({ error: 'forbidden' }, 403);
+    const items: SiteContentChangesItem[] = [];
+    for (const kind of SITE_CONTENT_KINDS) {
+      const draft = await loadDraft(deps.store, kind, session.sub);
+      const rawPublished = await deps.store.getJson(siteContentPublishedKey(kind));
+      const published = rawPublished == null ? null : parseSiteContentDocument(kind, rawPublished);
+      const changes = siteContentChanges(kind, draft.document, published ?? seedSiteContentDocuments()[kind]);
+      if (changes.length === 0) continue;
+      items.push({ kind, title: SITE_CONTENT_KIND_LABELS[kind], author: draft.meta.editor, timestamp: draft.meta.updatedAt, rev: draft.meta.rev, changes });
+    }
+    return c.json({ items });
   });
 
   app.put('/api/cms/site-content/:kind', async (c: SiteContentContext) => {

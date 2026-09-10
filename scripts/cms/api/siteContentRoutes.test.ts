@@ -60,4 +60,21 @@ describe('site content routes', () => {
     expect(await store.getJson(siteContentPublishedKey('contacts'))).toBeNull();
     expect(await store.getJson(siteContentDraftKey('contacts'))).toBeNull();
   });
+
+  it('persists modal mode in the draft and reports the change', async () => {
+    const { app } = createSiteApp(session(true));
+    const initial = await app.request('/api/cms/site-content/modal');
+    const body = (await initial.json()) as { document: ReturnType<typeof seedSiteContentDocuments>['modal']; meta: { rev: number } };
+    const saved = await app.request('/api/cms/site-content/modal', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: body.meta.rev, document: { ...body.document, requestFormEnabled: false } }),
+    });
+    expect(saved.status).toBe(200);
+    const changes = await app.request('/api/cms/site-content-changes');
+    expect(changes.status).toBe(200);
+    expect(await changes.json()).toMatchObject({ items: [{ kind: 'modal', changes: [{ label: 'Режим CTA', to: 'контакты' }] }] });
+    const reloaded = await app.request('/api/cms/site-content/modal');
+    expect((await reloaded.json()).document.requestFormEnabled).toBe(false);
+  });
 });

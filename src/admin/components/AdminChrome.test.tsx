@@ -7,6 +7,7 @@ import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import type { AdminSession } from '../api';
 import { ADMIN_UI } from '../constants/ui';
 import AdminChrome from './AdminChrome';
+import { AdminToastProvider } from './AdminToast';
 
 const navState = vi.hoisted(() => ({
   items: null as null | unknown[],
@@ -72,9 +73,11 @@ function renderChrome(
 ) {
   mockViewportWidth(widthPx);
   const chrome = (
-    <AdminChrome session={session} onLogout={onLogout}>
-      <p>{ADMIN_UI.listTitle}</p>
-    </AdminChrome>
+    <AdminToastProvider>
+      <AdminChrome session={session} onLogout={onLogout}>
+        <p>{ADMIN_UI.listTitle}</p>
+      </AdminChrome>
+    </AdminToastProvider>
   );
   return render(
     <MemoryRouter initialEntries={[initialPath]}>
@@ -270,7 +273,7 @@ describe('AdminChrome', () => {
     expect(within(navigation).getAllByRole('link')).toHaveLength(8);
     await user.click(screen.getByRole('button', { name: ADMIN_UI.moreNav }));
     expect(screen.getByRole('dialog', { name: ADMIN_UI.overflowNavTitle })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
   });
 
   it('обменивает overflow-раздел с видимым и восстанавливает обмен после remount', async () => {
@@ -279,7 +282,7 @@ describe('AdminChrome', () => {
     const view = renderChrome(adminSession);
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.moreNav }));
-    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
     const visibleLink = screen.getByRole('link', { name: ADMIN_UI.dashboardNav });
     const data = new Map<string, string>();
     const dataTransfer = {
@@ -288,16 +291,16 @@ describe('AdminChrome', () => {
       setData: (type: string, value: string) => data.set(type, value),
       getData: (type: string) => data.get(type) ?? '',
     } as unknown as DataTransfer;
-    dataTransfer.setData('application/x-admin-sidebar-overflow', 'extra-1');
+    dataTransfer.setData('application/x-admin-sidebar-overflow', 'extra-2');
     fireEvent.drop(visibleLink, { dataTransfer });
 
-    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: ADMIN_UI.dashboardNav })).not.toBeInTheDocument();
-    expect(window.localStorage.getItem('admin.sidebar.layout.v1')).toContain('extra-1');
+    expect(window.localStorage.getItem('admin.sidebar.layout.v1')).toContain('extra-2');
 
     view.unmount();
     renderChrome(adminSession);
-    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: ADMIN_UI.dashboardNav })).not.toBeInTheDocument();
   });
 });

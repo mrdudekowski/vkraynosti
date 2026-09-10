@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import type { AdminNavId, AdminNavItem } from '../constants/nav';
-import { ADMIN_NAV_ITEMS } from '../constants/nav';
 import { ADMIN_UI } from '../constants/ui';
 import AdminDialog from './AdminDialog';
 import AdminIcon from './AdminIcon';
@@ -11,18 +10,17 @@ type AdminSidebarOverflowDialogProps = {
   items: readonly AdminNavItem[];
   onClose: () => void;
   onNavigate: (item: AdminNavItem) => void;
+  onDragStart?: (itemId: AdminNavId) => void;
   onDropOnVisible: (itemId: AdminNavId) => void;
   onReset: () => void;
   visibleItemCount: number;
 };
 
-const isAdminNavId = (value: string): value is AdminNavId =>
-  ADMIN_NAV_ITEMS.some((item) => item.id === value);
-
 const AdminSidebarOverflowDialog = ({
   items,
   onClose,
   onNavigate,
+  onDragStart,
   onDropOnVisible,
   onReset,
 }: AdminSidebarOverflowDialogProps) => {
@@ -55,7 +53,8 @@ const AdminSidebarOverflowDialog = ({
               onClose();
             }}
             onDragStart={(event) => {
-              if (!isAdminNavId(item.id)) return;
+              if (!overflowItemIds.has(item.id)) return;
+              onDragStart?.(item.id);
               event.dataTransfer.effectAllowed = 'move';
               event.dataTransfer.setData(ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE, item.id);
               event.dataTransfer.setData('text/plain', item.id);
@@ -64,10 +63,9 @@ const AdminSidebarOverflowDialog = ({
               const payload = event.dataTransfer.getData(ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE);
               if (
                 event.dataTransfer.dropEffect === 'move' &&
-                isAdminNavId(payload) &&
-                overflowItemIds.has(payload)
+                overflowItemIds.has(payload as AdminNavId)
               ) {
-                onDropOnVisible(payload);
+                onDropOnVisible(payload as AdminNavId);
               }
             }}
           >

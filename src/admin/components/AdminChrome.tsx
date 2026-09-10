@@ -10,6 +10,7 @@ import { ADMIN_UI } from '../constants/ui';
 import { useAdminSidebarCollapsed } from '../hooks/useAdminSidebarCollapsed';
 import { useAdminViewport } from '../hooks/useAdminViewport';
 import { useAdminSidebarLayout } from '../hooks/useAdminSidebarLayout';
+import { useAdminToast } from '../toast/adminToastContext';
 import AdminIcon from './AdminIcon';
 import AdminSidebarNav from './AdminSidebarNav';
 import AdminSidebarOverflowDialog from './AdminSidebarOverflowDialog';
@@ -77,6 +78,7 @@ type SidebarBodyProps = {
   onOpenOverflow?: () => void;
   onReorder?: (fromIndex: number, toIndex: number) => void;
   onDropOverflow?: (overflowId: AdminNavId, visibleIndex: number) => void;
+  overflowIds?: readonly AdminNavId[];
 };
 
 const SidebarBody = ({
@@ -94,6 +96,7 @@ const SidebarBody = ({
   onOpenOverflow,
   onReorder,
   onDropOverflow,
+  overflowIds,
 }: SidebarBodyProps) => {
   const [quickOpen, setQuickOpen] = useState(false);
   const quickAddRef = useRef<HTMLDivElement>(null);
@@ -199,6 +202,7 @@ const SidebarBody = ({
               onNavigate={onNavigate}
               onReorder={onReorder}
               onDropOverflow={onDropOverflow}
+              overflowIds={overflowItems.map((item) => item.id)}
             />
             {overflowItems.length > 0 ? (
               <button
@@ -416,6 +420,12 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
     });
   }, [items, layout.visibleOrder]);
   const [sidebarOverflowOpen, setSidebarOverflowOpen] = useState(false);
+  const overflowDragRef = useRef<{
+    itemId: AdminNavId;
+    visibleIndex: number | null;
+    exchanged: boolean;
+  } | null>(null);
+  const { push } = useAdminToast();
   const bottomItems = items.filter((item) => item.inBottomNav === true);
   const moreItems = items.filter((item) => item.inBottomNav !== true);
   const showSidebar = viewport !== 'mobile';
@@ -483,7 +493,16 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             onOpenOverflow={() => setSidebarOverflowOpen(true)}
             onReorder={setVisibleOrder}
             onDropOverflow={(overflowId, visibleIndex) => {
+              const drag = overflowDragRef.current;
+              if (drag == null || drag.itemId === overflowId) {
+                overflowDragRef.current = {
+                  itemId: overflowId,
+                  visibleIndex,
+                  exchanged: true,
+                };
+              }
               exchangeOverflowItem(overflowId, visibleIndex);
+              push({ message: ADMIN_UI.overflowNavMoved });
               setSidebarOverflowOpen(false);
             }}
           />
@@ -567,9 +586,21 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             setSidebarOverflowOpen(false);
             void navigate(item.to);
           }}
-          onDropOnVisible={() => setSidebarOverflowOpen(false)}
+          onDragStart={(itemId) => {
+            overflowDragRef.current = { itemId, visibleIndex: null, exchanged: false };
+          }}
+          onDropOnVisible={(itemId) => {
+            const drag = overflowDragRef.current;
+            if (drag?.itemId === itemId && drag.visibleIndex != null && !drag.exchanged) {
+              exchangeOverflowItem(itemId, drag.visibleIndex);
+              push({ message: ADMIN_UI.overflowNavMoved });
+            }
+            overflowDragRef.current = null;
+            setSidebarOverflowOpen(false);
+          }}
           onReset={() => {
             resetSidebarLayout();
+            push({ message: ADMIN_UI.listReordered });
             setSidebarOverflowOpen(false);
           }}
           visibleItemCount={visibleSidebarItems.length}

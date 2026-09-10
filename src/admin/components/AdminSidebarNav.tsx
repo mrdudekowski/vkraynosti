@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { ADMIN_NAV_ITEMS, type AdminNavId, type AdminNavItem } from '../constants/nav';
+import type { AdminNavId, AdminNavItem } from '../constants/nav';
 import { ADMIN_UI } from '../constants/ui';
 import AdminIcon from './AdminIcon';
 
@@ -14,6 +14,7 @@ type AdminSidebarNavProps = {
   onNavigate?: () => void;
   onReorder?: (fromIndex: number, toIndex: number) => void;
   onDropOverflow?: (overflowId: AdminNavId, visibleIndex: number) => void;
+  overflowIds?: readonly AdminNavId[];
 };
 
 type DragPayload =
@@ -21,13 +22,9 @@ type DragPayload =
   | { type: typeof ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE; value: AdminNavId }
   | null;
 
-function isAdminNavId(value: string): value is AdminNavId {
-  return ADMIN_NAV_ITEMS.some((item) => item.id === value);
-}
-
-function readDragPayload(dataTransfer: DataTransfer): DragPayload {
+function readDragPayload(dataTransfer: DataTransfer, overflowIds: ReadonlySet<AdminNavId>): DragPayload {
   const overflowId = dataTransfer.getData(ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE);
-  if (isAdminNavId(overflowId)) {
+  if (overflowIds.has(overflowId as AdminNavId)) {
     return { type: ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE, value: overflowId as AdminNavId };
   }
 
@@ -47,9 +44,11 @@ const AdminSidebarNav = ({
   onNavigate,
   onReorder,
   onDropOverflow,
+  overflowIds = [],
 }: AdminSidebarNavProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const suppressClick = useRef(false);
+  const permittedOverflowIds = new Set(overflowIds);
 
   return (
     <>
@@ -71,7 +70,7 @@ const AdminSidebarNav = ({
             }}
             onDrop={(event) => {
               event.preventDefault();
-              const payload = readDragPayload(event.dataTransfer);
+              const payload = readDragPayload(event.dataTransfer, permittedOverflowIds);
               if (payload?.type === ADMIN_SIDEBAR_ITEM_DRAG_TYPE) {
                 onReorder?.(payload.value, index);
               } else if (payload?.type === ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE) {

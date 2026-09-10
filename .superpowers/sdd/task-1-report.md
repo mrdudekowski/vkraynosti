@@ -44,7 +44,8 @@ No unrelated dirty files were modified or staged.
 
 ## Commit
 
-- `ecd07c9f0ad35e7e153de61fd4ba01b428ccbed3` — `feat(admin): add sidebar layout rules`
+- `c335d33c911c19a153695f0c5b1b742e2ecf71d0` — `feat(admin): add sidebar layout rules`
+- `c28ba32ab17e90932fbd6d97326aa49a7b59f33b` — `docs(admin): record sidebar layout task report`
 
 ## Self-review
 

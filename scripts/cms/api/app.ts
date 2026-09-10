@@ -1827,5 +1827,12 @@ export function createCmsApiApp(deps: CmsApiDeps) {
 
   registerCrmRoutes(app, store, env);
 
+  app.notFound((c) => {
+    if (c.req.path.startsWith('/api/cms/')) {
+      return c.json({ error: 'not_found' }, 404);
+    }
+    return c.text('Not Found', 404);
+  });
+
   return app;
 }

@@ -117,7 +117,7 @@ describe('AdminSidebarNav', () => {
 
   it('exchanges an overflow item when it is dropped on a visible row', () => {
     const onDropOverflow = vi.fn();
-    renderNav({ onDropOverflow });
+    renderNav({ onDropOverflow, overflowIds: ['site'] });
     const target = screen.getByRole('link', { name: 'Туры' });
     const dataTransfer = createDataTransfer('application/x-admin-sidebar-overflow', 'site');
     fireEvent.dragOver(target, { dataTransfer });

@@ -9,9 +9,11 @@ import {
 import {
   type AdminDeparture,
   type AdminPublishQueueItem,
+  type AdminSiteContentChangesItem,
   type AdminSession,
   type AdminTourListItem,
   adminUpdateDeparture,
+  adminListSiteContentChanges,
 } from './api';
 import {
   getAdminDepartures,
@@ -42,7 +44,7 @@ import { ADMIN_UI } from './constants/ui';
 import { ATTENTION_TAB_QUERY } from './tourEditorTabs';
 import { formatAdminCancelledThisWeek, formatAdminOnSiteCount } from './formatAdminCopy';
 import { addIsoDays, startOfIsoWeek, vladivostokCalendarDate } from './scheduleCalendar';
-import { CircleAlert } from 'lucide-react';
+import { CircleAlert, FilePenLine } from 'lucide-react';
 
 function weekCancelledCount(departures: AdminDeparture[], todayIso: string): number {
   const weekStart = startOfIsoWeek(todayIso);
@@ -71,6 +73,7 @@ const DashboardPage = () => {
     () => peekAdminDepartures(departureRange) ?? [],
   );
   const [queue, setQueue] = useState<AdminPublishQueueItem[]>(() => peekAdminPublishQueue() ?? []);
+  const [siteChanges, setSiteChanges] = useState<AdminSiteContentChangesItem[]>([]);
   const [listError, setListError] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
   const toursRef = useRef(tours);
@@ -91,6 +94,7 @@ const DashboardPage = () => {
       ? getAdminDepartures(departureRange)
       : refreshAdminDepartures(departureRange);
     const queueRequest = reloadToken === 0 ? getAdminPublishQueue() : refreshAdminPublishQueue();
+    const siteChangesRequest = adminListSiteContentChanges();
 
     void toursRequest
       .then((nextTours) => {
@@ -116,6 +120,9 @@ const DashboardPage = () => {
         }
       })
       .catch(() => undefined);
+    void siteChangesRequest.then((nextChanges) => {
+      if (!cancelled) setSiteChanges(nextChanges);
+    }).catch(() => undefined);
     return () => {
       cancelled = true;
     };
@@ -165,6 +172,9 @@ const DashboardPage = () => {
     session.role === 'editor'
       ? queue.filter((item) => item.author === session.login)
       : queue;
+  const mySiteChanges = session.role === 'editor'
+    ? siteChanges.filter((item) => item.author === session.login)
+    : siteChanges;
   const attentionItems: DashboardAttentionItem[] = [
     ...returned.map((tour) => ({
       id: `return-${tour.id}`,
@@ -283,6 +293,16 @@ const DashboardPage = () => {
               void changeQuickStatus(departure, status);
             }}
           />
+          <section className="border-y border-divider py-4" aria-labelledby="site-changes-title">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 id="site-changes-title" className="flex items-center gap-2 text-lg font-semibold text-text-primary"><FilePenLine size={18} aria-hidden="true" />Изменения «Сайт»</h2>
+                <p className="mt-1 text-sm text-text-muted">Правки черновиков команды, контактов, подвала и модалок до публикации.</p>
+              </div>
+              <Link to={ADMIN_PATHS.site} className="admin-btn-ghost no-underline">Открыть «Сайт»</Link>
+            </div>
+            {mySiteChanges.length === 0 ? <p className="mt-4 text-sm text-text-muted">Новых изменений нет.</p> : <div className="mt-4 grid gap-3 md:grid-cols-2">{mySiteChanges.map((item) => <article key={item.kind} className="admin-card min-w-0 p-3"><div className="flex items-start justify-between gap-3"><strong>{item.title}</strong><span className="text-xs text-text-muted">rev {item.rev}</span></div><ul className="mt-2 grid gap-1 text-sm text-text-muted">{item.changes.map((change) => <li key={`${item.kind}-${change.label}`}><span className="text-text-primary">{change.label}:</span> {change.from} → {change.to}</li>)}</ul></article>)}</div>}
+          </section>
         </div>
         <section className="flex min-w-0 flex-col gap-2">
           <h2 className="text-lg font-semibold text-text-primary">{ADMIN_UI.dashboardAttention}</h2>

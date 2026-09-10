@@ -10,10 +10,12 @@ vi.mock('./api', () => ({
   adminListTours: vi.fn(),
   adminListDepartures: vi.fn(),
   adminListPublishQueue: vi.fn(),
+  adminListSiteContentChanges: vi.fn(),
   adminUpdateDeparture: vi.fn(),
 }));
 
 import { adminListDepartures, adminListPublishQueue, adminListTours, adminUpdateDeparture } from './api';
+import { adminListSiteContentChanges } from './api';
 import { clearAdminDataCache } from './adminDataCache';
 import DashboardPage from './DashboardPage';
 import { addIsoDays, vladivostokCalendarDate } from './scheduleCalendar';
@@ -68,6 +70,7 @@ describe('DashboardPage', () => {
     ]);
     vi.mocked(adminListDepartures).mockResolvedValue([]);
     vi.mocked(adminListPublishQueue).mockResolvedValue([]);
+    vi.mocked(adminListSiteContentChanges).mockResolvedValue([]);
     vi.mocked(adminUpdateDeparture).mockImplementation(async (id, patch) => ({
       id,
       tourId: 'winter-1',

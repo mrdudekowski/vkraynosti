@@ -6,7 +6,9 @@ import { ADMIN_INBOX_SORT_STORAGE_KEY, ADMIN_INBOX_TAB_STORAGE_KEY } from '../co
 import {
   adminPublishQueue,
   adminReturnPublishQueue,
+  adminListSiteContentChanges,
   type AdminPublishQueueItem,
+  type AdminSiteContentChangesItem,
   type AdminSession,
 } from './api';
 import {
@@ -88,6 +90,7 @@ const InboxPage = () => {
   const { session } = useOutletContext<{ session: AdminSession }>();
   const { push } = useAdminToast();
   const [items, setItems] = useState<AdminPublishQueueItem[] | null>(() => peekAdminPublishQueue() ?? null);
+  const [siteChanges, setSiteChanges] = useState<AdminSiteContentChangesItem[]>([]);
   const [tourImageUrls, setTourImageUrls] = useState<Record<string, string | null>>(
     () => Object.fromEntries((peekAdminTours() ?? []).map((tour) => [tour.id, tour.imageUrl])),
   );
@@ -133,6 +136,9 @@ const InboxPage = () => {
           setTourImageUrls(Object.fromEntries(tours.map((tour) => [tour.id, tour.imageUrl])));
         }
       })
+      .catch(() => undefined);
+    void adminListSiteContentChanges()
+      .then((next) => { if (!cancelled) setSiteChanges(next); })
       .catch(() => undefined);
     return () => {
       cancelled = true;
@@ -254,6 +260,16 @@ const InboxPage = () => {
               setReadiness('blockers');
             }}
           />
+          <section className="admin-card flex min-w-0 flex-col gap-3 p-4" aria-labelledby="inbox-site-changes-title">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 id="inbox-site-changes-title" className="text-lg font-semibold text-text-primary">Изменения «Сайт»</h2>
+                <p className="mt-1 text-sm text-text-muted">Отдельный список всех изменений в черновиках страницы «Сайт».</p>
+              </div>
+              <AdminButton type="button" variant="ghost" onClick={() => navigate(ADMIN_PATHS.site)}>Открыть «Сайт»</AdminButton>
+            </div>
+            {siteChanges.length === 0 ? <p className="text-sm text-text-muted">Новых изменений нет.</p> : <div className="grid gap-3 md:grid-cols-2">{siteChanges.map((item) => <article key={item.kind} className="rounded-admin-control border border-divider p-3"><div className="flex items-start justify-between gap-3"><strong>{item.title}</strong><span className="text-xs text-text-muted">rev {item.rev}</span></div><ul className="mt-2 grid gap-1 text-sm text-text-muted">{item.changes.map((change) => <li key={`${item.kind}-${change.label}`}><span className="text-text-primary">{change.label}:</span> {change.from} → {change.to}</li>)}</ul></article>)}</div>}
+          </section>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
               <div className="flex min-w-0 flex-col gap-2">

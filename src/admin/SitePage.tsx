@@ -53,7 +53,22 @@ const SitePage = () => {
   const [revisions, setRevisions] = useState<Partial<Record<Kind, number>>>({});
   const [status, setStatus] = useState<Partial<Record<Kind, string>>>({});
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { let alive = true; void adminGetSiteContent(tab).then((result) => { if (alive) { setDocuments((current) => ({ ...current, [tab]: result.document })); setRevisions((current) => ({ ...current, [tab]: result.meta.rev })); setStatus((current) => ({ ...current, [tab]: 'saved' })); } }).catch((reason: unknown) => { if (alive) { setError(reason instanceof Error ? reason.message : 'site_content_load_failed'); setStatus((current) => ({ ...current, [tab]: 'error' })); } }); return () => { alive = false; }; }, [tab]);
+  useEffect(() => {
+    let alive = true;
+    const kinds: Kind[] = tab === 'modal' ? ['modal', 'contacts'] : [tab];
+    void Promise.all(kinds.map((kind) => adminGetSiteContent(kind))).then((results) => {
+      if (!alive) return;
+      setDocuments((current) => Object.fromEntries(results.map((result, index) => [kinds[index], result.document])) as Partial<Record<Kind, SiteContentDocument>> & typeof current);
+      setRevisions((current) => Object.fromEntries(results.map((result, index) => [kinds[index], result.meta.rev])) as Partial<Record<Kind, number>> & typeof current);
+      setStatus((current) => Object.fromEntries(kinds.map((kind) => [kind, 'saved'])) as Partial<Record<Kind, string>> & typeof current);
+    }).catch((reason: unknown) => {
+      if (alive) {
+        setError(reason instanceof Error ? reason.message : 'site_content_load_failed');
+        setStatus((current) => ({ ...current, [tab]: 'error' }));
+      }
+    });
+    return () => { alive = false; };
+  }, [tab]);
   const document = documents[tab];
   const setDocument = (next: SiteContentDocument) => { setDocuments((current) => ({ ...current, [tab]: next })); setStatus((current) => ({ ...current, [tab]: 'dirty' })); };
   const uploadTeamPhoto = async (memberId: string, file: File) => { try { const result = await adminUploadSiteAsset('team', file); const team = documents.team; if (team?.kind === 'team') setDocument({ ...team, members: team.members.map((member) => member.id === memberId ? { ...member, photo: result.asset } : member) }); } catch (reason: unknown) { setError(reason instanceof Error ? reason.message : 'site_asset_upload_failed'); } };

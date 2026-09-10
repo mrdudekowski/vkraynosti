@@ -8,13 +8,14 @@ import type { AdminSession } from './api';
 
 vi.mock('./api', () => ({
   adminListPublishQueue: vi.fn(),
+  adminListSiteContentChanges: vi.fn(),
   adminListTours: vi.fn(),
   adminSubmitPublishQueue: vi.fn(),
   adminPublishQueue: vi.fn(),
   adminReturnPublishQueue: vi.fn(),
 }));
 
-import { adminListPublishQueue, adminListTours, adminPublishQueue, adminReturnPublishQueue } from './api';
+import { adminListPublishQueue, adminListSiteContentChanges, adminListTours, adminPublishQueue, adminReturnPublishQueue } from './api';
 import { clearAdminDataCache } from './adminDataCache';
 import { AdminToastProvider } from './components/AdminToast';
 import InboxPage from './InboxPage';
@@ -52,6 +53,7 @@ describe('InboxPage', () => {
     window.localStorage.removeItem(ADMIN_INBOX_TAB_STORAGE_KEY);
     window.localStorage.removeItem(ADMIN_INBOX_SORT_STORAGE_KEY);
     clearAdminDataCache();
+    vi.mocked(adminListSiteContentChanges).mockResolvedValue([]);
     vi.mocked(adminListPublishQueue).mockResolvedValue([
       {
         kind: 'tour',
@@ -86,6 +88,16 @@ describe('InboxPage', () => {
 
     expect(await screen.findAllByText('Изюбриная')).not.toHaveLength(0);
     expect(screen.queryByRole('button', { name: ADMIN_UI.inboxSubmitAll })).not.toBeInTheDocument();
+  });
+
+  it('uses the same eight-column desktop grid for headers and queue rows', async () => {
+    renderInbox(adminSession);
+
+    expect(await screen.findByText(ADMIN_UI.inboxColumnType)).toBeInTheDocument();
+    expect(screen.getByText(ADMIN_UI.inboxColumnType).parentElement).toHaveClass('admin-inbox-grid');
+    expect(screen.getAllByRole('button', { name: ADMIN_UI.inboxView })[0]?.closest('li')).toHaveClass(
+      'admin-inbox-grid',
+    );
   });
 
   it('карточка выездов не записывает фильтр так, что вкладка Все прячет туры', async () => {

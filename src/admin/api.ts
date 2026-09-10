@@ -5,6 +5,7 @@ import type { CmsTourTextPatch } from '../cms/applyTourTextPatch';
 import type { CmsTourLayoutPatch } from '../cms/applyTourLayoutPatch';
 import type { CrmDeal, CrmFile, CrmMessenger, CrmTouchKind } from '../crm/crmDocument';
 import type { SiteContentDocument, SiteContentDocumentKind } from '../cms/siteContentDocument';
+import type { SiteContentChangesItem } from '../cms/siteContentChanges';
 
 const cmsApiBaseUrl = (import.meta.env.VITE_CMS_API_BASE_URL ?? '').trim().replace(/\/+$/, '');
 
@@ -107,6 +108,16 @@ export async function adminDeleteSiteAsset(kind: SiteContentDocumentKind, assetI
   const response = await fetch(`/api/cms/site-content/${kind}/assets/${encodeURIComponent(assetId)}`, { method: 'DELETE', credentials: 'include' });
   if (response.status === 403) throw new Error('forbidden');
   if (!response.ok) throw new Error('site_asset_delete_failed');
+}
+
+export type AdminSiteContentChangesItem = SiteContentChangesItem;
+
+export async function adminListSiteContentChanges(): Promise<AdminSiteContentChangesItem[]> {
+  const response = await fetch('/api/cms/site-content-changes', { credentials: 'include' });
+  if (response.status === 403) throw new Error('forbidden');
+  if (!response.ok) throw new Error('site_content_changes_load_failed');
+  const body = await readJson<{ items: AdminSiteContentChangesItem[] }>(response);
+  return body.items;
 }
 
 async function readJson<T>(response: Response): Promise<T> {

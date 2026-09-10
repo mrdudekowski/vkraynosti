@@ -4,13 +4,10 @@ import { UI } from '../../constants/ui';
 import {
   FOOTER_CONTACT_LINK_CLASS,
 } from '../../constants/footerContact';
-import { LEGAL_ENTITY } from '../../constants/legalEntity';
-import { LEGAL_DOCUMENTS_FOOTER } from '../../constants/legalDocuments';
 import { ROUTES } from '../../constants/routes';
-import LegalPdfLink from '../legal/LegalPdfLink';
 import { useCookieConsent } from '../../context/useCookieConsent';
 import type { Season } from '../../types';
-import FooterStudioCreditLink from './FooterStudioCreditLink';
+import type { FooterContentBlock, FooterContentRow } from '../../cms/siteContentDocument';
 import { useSiteContent } from '../../context/SiteContentContext';
 
 const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] = [
@@ -20,15 +17,45 @@ const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] 
   { season: 'fall', to: ROUTES.FALL, hoverClass: 'hover:text-season-fall' },
 ];
 
+const sortedVisibleRows = (block: FooterContentBlock | undefined): FooterContentRow[] =>
+  block?.visible === true
+    ? [...block.rows].filter((row) => row.visible).sort((a, b) => a.order - b.order)
+    : [];
+
+const FooterRowLink = ({ row, className }: { row: Extract<FooterContentRow, { type: 'link' | 'pdf' }>; className: string }) => {
+  const href = row.type === 'pdf' ? row.asset?.url ?? '#' : row.href;
+  const external = href.startsWith('http') || row.type === 'pdf';
+  return (
+    <a
+      href={href}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
+      download={row.type === 'pdf' ? true : undefined}
+      className={className}
+    >
+      {row.value}
+    </a>
+  );
+};
+
 const Footer = () => {
   const { openBanner } = useCookieConsent();
   const { contacts, footer } = useSiteContent();
-  const footerRows = new Map(footer.blocks.flatMap((block) => block.visible ? block.rows.map((row) => [row.id, row] as const) : []));
+  const footerBlocks = [...footer.blocks].filter((block) => block.visible).sort((a, b) => a.order - b.order);
+  const blocksById = new Map(footerBlocks.map((block) => [block.id, block] as const));
+  const footerRows = new Map(footerBlocks.flatMap((block) => block.rows.map((row) => [row.id, row] as const)));
   const footerRowValue = (id: string, fallback: string) => {
     const row = footerRows.get(id);
     return row == null ? fallback : row.visible ? row.value : '';
   };
   const contactChannels = contacts.channels.filter((channel) => channel.visible).sort((a, b) => a.order - b.order);
+  const legalBlock = blocksById.get('legal');
+  const navigationBlock = blocksById.get('navigation');
+  const contactsBlock = blocksById.get('contacts');
+  const legalRows = sortedVisibleRows(legalBlock);
+  const navigationRows = sortedVisibleRows(navigationBlock);
+  const footerContactRows = sortedVisibleRows(contactsBlock);
+  const extraBlocks = footerBlocks.filter((block) => !new Set(['brand', 'legal', 'navigation', 'contacts', 'bottom']).has(block.id));
 
   return (
   <footer className="bg-home-season-banner-stage text-text-inverse">
@@ -49,13 +76,11 @@ const Footer = () => {
         {/* Legal + documents */}
         <div className="flex flex-col gap-4">
           <div>
-            <h4 className="font-normal text-text-inverse mb-4">{UI.footer.legalHeading}</h4>
+            <h4 className="font-normal text-text-inverse mb-4">{legalBlock?.heading || UI.footer.legalHeading}</h4>
             <div className="flex flex-col gap-2 text-text-inverse/60 text-sm leading-relaxed">
-              <p>{footerRowValue('legal-name', LEGAL_ENTITY.fullName)}</p>
-              <p>
-                {UI.footer.innLabel} {footerRowValue('inn', LEGAL_ENTITY.inn)}
-              </p>
-              <p>{footerRowValue('legal-address', LEGAL_ENTITY.legalAddress)}</p>
+              {legalRows.filter((row) => row.type === 'text').map((row) => (
+                <p key={row.id}>{row.id === 'inn' ? `${row.label || UI.footer.innLabel} ${row.value}` : row.value}</p>
+              ))}
             </div>
           </div>
           <nav
@@ -63,72 +88,31 @@ const Footer = () => {
             className="pt-4 border-t border-white/10"
           >
             <ul className="flex flex-col gap-2">
-              {LEGAL_DOCUMENTS_FOOTER.map((doc) => (
-                <li key={doc.id}>
-                  {doc.id === 'offer-and-safety' ? (
-                    <Link
-                      to={ROUTES.SAFETY}
-                      className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
-                      prefetch="intent"
-                    >
-                      {doc.title}
-                    </Link>
-                  ) : (
-                    <LegalPdfLink
-                      documentId={doc.id}
-                      className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm underline-offset-2 hover:underline"
-                    >
-                      {doc.title}
-                    </LegalPdfLink>
-                  )}
-                </li>
-              ))}
+              {legalRows.filter((row) => row.type === 'pdf').map((row) => <li key={row.id}><FooterRowLink row={row} className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm underline-offset-2 hover:underline" /></li>)}
             </ul>
           </nav>
         </div>
 
         {/* Quick links */}
         <div>
-          <h4 className="font-normal text-text-inverse mb-4">{UI.footer.navHeading}</h4>
+          <h4 className="font-normal text-text-inverse mb-4">{navigationBlock?.heading || UI.footer.navHeading}</h4>
           <ul className="flex flex-col gap-2">
-            {UI.nav.links.map(link => (
-              <li key={link.hash}>
-                <Link
-                  to={{ pathname: ROUTES.HOME, hash: link.hash }}
-                  className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
-                  prefetch="none"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-            {FOOTER_SEASON_LINKS.map(({ season, to, hoverClass }) => (
-              <li key={season}>
-                <Link
-                  to={to}
-                  className={[
-                    'inline-flex items-center gap-1.5 text-text-inverse/60 transition-colors duration-hover text-sm',
-                    hoverClass,
-                  ].join(' ')}
-                  prefetch="intent"
-                >
-                  <SeasonLinkLabel season={season} />
-                </Link>
-              </li>
-            ))}
+            {navigationRows.filter((row): row is Extract<FooterContentRow, { type: 'link' }> => row.type === 'link').map((row) => <li key={row.id}><FooterRowLink row={row} className="text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm" /></li>)}
+            {navigationRows.length === 0 ? FOOTER_SEASON_LINKS.map(({ season, to, hoverClass }) => <li key={season}><Link to={to} className={['inline-flex items-center gap-1.5 text-text-inverse/60 transition-colors duration-hover text-sm', hoverClass].join(' ')} prefetch="intent"><SeasonLinkLabel season={season} /></Link></li>) : null}
           </ul>
         </div>
 
         {/* Contacts */}
-        <div>
-          <h4 className="font-normal text-text-inverse mb-4">{UI.footer.contactHeading}</h4>
-          <div className="flex flex-col gap-3">{contactChannels.map((channel) => <a key={channel.id} href={channel.href} target={channel.type === 'phone' ? undefined : '_blank'} rel={channel.type === 'phone' ? undefined : 'noopener noreferrer external'} className={FOOTER_CONTACT_LINK_CLASS}>{channel.label}</a>)}</div>
-        </div>
+          <div>
+            <h4 className="font-normal text-text-inverse mb-4">{contactsBlock?.heading || UI.footer.contactHeading}</h4>
+            <div className="flex flex-col gap-3">{footerContactRows.filter((row): row is Extract<FooterContentRow, { type: 'link' }> => row.type === 'link').map((row) => <FooterRowLink key={row.id} row={row} className={FOOTER_CONTACT_LINK_CLASS} />)}{footerContactRows.length === 0 ? contactChannels.map((channel) => <a key={channel.id} href={channel.href} target={channel.type === 'phone' ? undefined : '_blank'} rel={channel.type === 'phone' ? undefined : 'noopener noreferrer external'} className={FOOTER_CONTACT_LINK_CLASS}>{channel.label}</a>) : null}</div>
+          </div>
+          {extraBlocks.map((block) => <div key={block.id}><h4 className="font-normal text-text-inverse mb-4">{block.heading}</h4><div className="flex flex-col gap-2 text-text-inverse/60 text-sm leading-relaxed">{sortedVisibleRows(block).map((row) => row.type === 'text' ? <p key={row.id}>{row.value}</p> : <FooterRowLink key={row.id} row={row} className="hover:text-brand-secondary transition-colors duration-hover" />)}</div></div>)}
       </div>
 
       <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-text-inverse/40 text-sm" data-nosnippet>
-          {UI.footer.rights}
+          {footerRowValue('rights', UI.footer.rights)}
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
           <button
@@ -136,14 +120,17 @@ const Footer = () => {
             onClick={openBanner}
             className="text-text-inverse/40 hover:text-text-inverse text-sm transition-colors duration-hover"
           >
-            {UI.footer.cookieSettings}
+            {footerRowValue('cookie-settings', UI.footer.cookieSettings)}
           </button>
         </div>
       </div>
 
       <div className="border-t border-white/10 mt-6 pt-6 flex flex-col items-center gap-1 text-center">
-        <p className="text-text-inverse/40 text-sm">{UI.footer.studioCreditPrefix}</p>
-        <FooterStudioCreditLink />
+        <p className="text-text-inverse/40 text-sm">{footerRowValue('studio-prefix', UI.footer.studioCreditPrefix)}</p>
+        {(() => {
+          const studio = footerRows.get('studio');
+          return studio?.type === 'link' ? <FooterRowLink row={studio} className="text-text-inverse/60 hover:text-brand-secondary text-sm" /> : <span className="text-text-inverse/60 text-sm">{UI.footer.studioCreditName}</span>;
+        })()}
       </div>
     </div>
   </footer>

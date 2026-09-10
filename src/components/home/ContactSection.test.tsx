@@ -30,4 +30,12 @@ describe('ContactSection', () => {
     expect(screen.queryByText(UI.contact.max)).toBeNull();
     expect(document.querySelector('.home-contact-action-card')).toBeNull();
   });
+
+  it('keeps every visible CMS contact channel available in the section', () => {
+    render(<ContactSection />);
+    expect(screen.getByRole('link', { name: 'vkraynosti.prim@yandex.ru' })).toHaveAttribute(
+      'href',
+      'mailto:vkraynosti.prim@yandex.ru',
+    );
+  });
 });

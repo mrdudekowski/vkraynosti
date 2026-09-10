@@ -25,6 +25,15 @@ vi.mock('../../context/SiteContentContext', () => ({
             { id: 'legal-address', type: 'text', label: 'Адрес', value: 'Владивосток', visible: true, order: 2 },
           ],
         },
+        {
+          id: 'custom',
+          heading: 'Пользовательский блок',
+          visible: true,
+          order: 1,
+          rows: [
+            { id: 'custom-link', type: 'link', label: 'Новая ссылка', value: 'Новая ссылка', href: '/custom', visible: true, order: 0 },
+          ],
+        },
       ],
     },
   }),
@@ -36,5 +45,11 @@ describe('Footer', () => {
 
     expect(screen.getByText('ИП Чёрная Эльвира Константиновна')).toBeInTheDocument();
     expect(screen.queryByText('ИП Сапон Эльвира Константиновна')).not.toBeInTheDocument();
+  });
+
+  it('renders visible CMS footer link rows instead of static navigation only', () => {
+    render(<Footer />, { wrapper: MemoryRouter });
+
+    expect(screen.getByRole('link', { name: 'Новая ссылка' })).toHaveAttribute('href', '/custom');
   });
 });

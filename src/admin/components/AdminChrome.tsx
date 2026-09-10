@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search } from 'lucide-react';
+import { ChevronDown, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search } from 'lucide-react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 import type { AdminSession } from '../api';
-import { ADMIN_NAV_ITEMS, type AdminNavItem } from '../constants/nav';
+import { ADMIN_NAV_ITEMS, type AdminNavId, type AdminNavItem } from '../constants/nav';
 import { ADMIN_PATHS } from '../constants/routes';
 import { ADMIN_UI } from '../constants/ui';
 import { useAdminSidebarCollapsed } from '../hooks/useAdminSidebarCollapsed';
 import { useAdminViewport } from '../hooks/useAdminViewport';
+import { useAdminSidebarLayout } from '../hooks/useAdminSidebarLayout';
 import AdminIcon from './AdminIcon';
+import AdminSidebarNav from './AdminSidebarNav';
+import AdminSidebarOverflowDialog from './AdminSidebarOverflowDialog';
 import CreateTourModal from './CreateTourModal';
 import AdminProfileMenu from './AdminProfileMenu';
 import AdminCommandMenu from './AdminCommandMenu';
@@ -68,6 +71,12 @@ type SidebarBodyProps = {
   onQuickAddTour: () => void;
   onQuickAddDeparture: () => void;
   onNavigate?: () => void;
+  desktopLayout?: boolean;
+  visibleItems?: readonly AdminNavItem[];
+  overflowItems?: readonly AdminNavItem[];
+  onOpenOverflow?: () => void;
+  onReorder?: (fromIndex: number, toIndex: number) => void;
+  onDropOverflow?: (overflowId: AdminNavId, visibleIndex: number) => void;
 };
 
 const SidebarBody = ({
@@ -79,11 +88,18 @@ const SidebarBody = ({
   onQuickAddTour,
   onQuickAddDeparture,
   onNavigate,
+  desktopLayout = false,
+  visibleItems,
+  overflowItems = [],
+  onOpenOverflow,
+  onReorder,
+  onDropOverflow,
 }: SidebarBodyProps) => {
   const [quickOpen, setQuickOpen] = useState(false);
   const quickAddRef = useRef<HTMLDivElement>(null);
   const quickAddTriggerRef = useRef<HTMLButtonElement>(null);
   const items = useMemo(() => visibleNavItems(session), [session]);
+  const sidebarItems = visibleItems ?? items;
   const core = items.filter((item) => item.secondary !== true);
   const secondary = items.filter((item) => item.secondary === true);
   const collapseLabel = compact ? ADMIN_UI.expandNav : ADMIN_UI.collapseNav;
@@ -174,7 +190,36 @@ const SidebarBody = ({
         ) : null}
       </div>
       <nav aria-label={ADMIN_UI.primaryNav} className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-4">
-        {core.map((item) => (
+        {desktopLayout ? (
+          <>
+            <AdminSidebarNav
+              items={sidebarItems}
+              compact={compact}
+              pathname={pathname}
+              onNavigate={onNavigate}
+              onReorder={onReorder}
+              onDropOverflow={onDropOverflow}
+            />
+            {overflowItems.length > 0 ? (
+              <button
+                type="button"
+                className="admin-sidebar-nav mt-1 w-full"
+                aria-haspopup="dialog"
+                aria-label={ADMIN_UI.moreNav}
+                onClick={onOpenOverflow}
+                title={ADMIN_UI.moreNav}
+              >
+                <AdminIcon icon={ChevronDown} />
+                <span className={compact ? 'sr-only' : undefined}>{ADMIN_UI.moreNav}</span>
+                <span className={compact ? 'sr-only' : 'ml-auto text-xs text-text-inverse/70'}>
+                  {overflowItems.length}
+                </span>
+              </button>
+            ) : null}
+          </>
+        ) : (
+          <>
+            {core.map((item) => (
           <NavRow
             key={item.id}
             item={item}
@@ -196,6 +241,8 @@ const SidebarBody = ({
             ))}
           </div>
         ) : null}
+          </>
+        )}
       </nav>
       <div className="mt-auto flex flex-col gap-1 px-2 pb-3">
         <AdminProfileMenu session={session} onLogout={onLogout} />
@@ -348,11 +395,27 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   const navigate = useNavigate();
   const { collapsed, toggle } = useAdminSidebarCollapsed();
   const viewport = useAdminViewport();
+  const layoutEnabled = viewport === 'desktop';
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [createTourOpen, setCreateTourOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const items = useMemo(() => visibleNavItems(session), [session]);
+  const {
+    layout,
+    overflowItems,
+    setVisibleOrder,
+    exchangeOverflowItem,
+    reset: resetSidebarLayout,
+  } = useAdminSidebarLayout(items, layoutEnabled);
+  const visibleSidebarItems = useMemo(() => {
+    const itemById = new Map(items.map((item) => [item.id, item]));
+    return layout.visibleOrder.flatMap((id) => {
+      const item = itemById.get(id);
+      return item == null ? [] : [item];
+    });
+  }, [items, layout.visibleOrder]);
+  const [sidebarOverflowOpen, setSidebarOverflowOpen] = useState(false);
   const bottomItems = items.filter((item) => item.inBottomNav === true);
   const moreItems = items.filter((item) => item.inBottomNav !== true);
   const showSidebar = viewport !== 'mobile';
@@ -414,6 +477,15 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             onToggleCollapsed={onToggleCollapsed}
             onQuickAddTour={openQuickTour}
             onQuickAddDeparture={openQuickDeparture}
+            desktopLayout={layoutEnabled}
+            visibleItems={layoutEnabled ? visibleSidebarItems : undefined}
+            overflowItems={layoutEnabled ? overflowItems : undefined}
+            onOpenOverflow={() => setSidebarOverflowOpen(true)}
+            onReorder={setVisibleOrder}
+            onDropOverflow={(overflowId, visibleIndex) => {
+              exchangeOverflowItem(overflowId, visibleIndex);
+              setSidebarOverflowOpen(false);
+            }}
           />
         </aside>
       ) : null}
@@ -485,6 +557,22 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
           onLogout={onLogout}
           onQuickAddTour={openQuickTour}
           onQuickAddDeparture={openQuickDeparture}
+        />
+      ) : null}
+      {sidebarOverflowOpen && viewport === 'desktop' ? (
+        <AdminSidebarOverflowDialog
+          items={overflowItems}
+          onClose={() => setSidebarOverflowOpen(false)}
+          onNavigate={(item) => {
+            setSidebarOverflowOpen(false);
+            void navigate(item.to);
+          }}
+          onDropOnVisible={() => setSidebarOverflowOpen(false)}
+          onReset={() => {
+            resetSidebarLayout();
+            setSidebarOverflowOpen(false);
+          }}
+          visibleItemCount={visibleSidebarItems.length}
         />
       ) : null}
       {commandOpen ? <AdminCommandMenu items={items} onClose={() => setCommandOpen(false)} /> : null}

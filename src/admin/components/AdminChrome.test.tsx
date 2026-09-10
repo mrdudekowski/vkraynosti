@@ -1,12 +1,29 @@
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ADMIN_SIDEBAR_COLLAPSED_STORAGE_KEY } from '../../constants/adminUiTokens';
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import type { AdminSession } from '../api';
 import { ADMIN_UI } from '../constants/ui';
 import AdminChrome from './AdminChrome';
+
+const navState = vi.hoisted(() => ({
+  items: null as null | unknown[],
+  canonicalItems: null as null | unknown[],
+}));
+
+vi.mock('../constants/nav', async () => {
+  const actual = await vi.importActual<typeof import('../constants/nav')>('../constants/nav');
+  navState.canonicalItems = [...actual.ADMIN_NAV_ITEMS];
+  navState.items = actual.ADMIN_NAV_ITEMS as unknown as unknown[];
+  return {
+    ...actual,
+    get ADMIN_NAV_ITEMS() {
+      return navState.items ?? actual.ADMIN_NAV_ITEMS;
+    },
+  };
+});
 
 const adminSession: AdminSession = {
   login: 'admin',
@@ -73,7 +90,19 @@ function renderChrome(
 describe('AdminChrome', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    navState.items?.splice(0, navState.items.length, ...(navState.canonicalItems ?? []));
   });
+
+  const setPermittedItemCount = (count: 7 | 8 | 9) => {
+    const baseItems = [...(navState.canonicalItems ?? [])];
+    const extras = Array.from({ length: count - baseItems.length }, (_, index) => ({
+      ...baseItems[baseItems.length - 1],
+      id: `extra-${index + 1}`,
+      label: `Дополнительный раздел ${index + 1}`,
+      to: `/extra-${index + 1}`,
+    }));
+    navState.items?.splice(0, navState.items.length, ...baseItems, ...extras);
+  };
 
   it('показывает ядро навигации и профиль администратора', () => {
     renderChrome(adminSession);
@@ -214,5 +243,61 @@ describe('AdminChrome', () => {
     renderChrome(adminSession, () => undefined, 1920);
     expect(screen.getByRole('button', { name: ADMIN_UI.collapseNav })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: ADMIN_UI.moreNav })).not.toBeInTheDocument();
+  });
+
+  it('сохраняет canonical desktop-навигацию без overflow при семи разрешённых разделах', () => {
+    setPermittedItemCount(7);
+    renderChrome(adminSession);
+
+    expect(screen.getByRole('link', { name: ADMIN_UI.dashboardNav })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: ADMIN_UI.moreNav })).not.toBeInTheDocument();
+  });
+
+  it('показывает все восемь разрешённых разделов без overflow-триггера', () => {
+    setPermittedItemCount(8);
+    renderChrome(adminSession);
+
+    expect(within(screen.getByRole('navigation', { name: ADMIN_UI.primaryNav })).getAllByRole('link')).toHaveLength(8);
+    expect(screen.queryByRole('button', { name: ADMIN_UI.moreNav })).not.toBeInTheDocument();
+  });
+
+  it('ограничивает desktop-сайдбар восемью разделами и показывает девятый в диалоге', async () => {
+    const user = userEvent.setup();
+    setPermittedItemCount(9);
+    renderChrome(adminSession);
+
+    const navigation = screen.getByRole('navigation', { name: ADMIN_UI.primaryNav });
+    expect(within(navigation).getAllByRole('link')).toHaveLength(8);
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.moreNav }));
+    expect(screen.getByRole('dialog', { name: ADMIN_UI.overflowNavTitle })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+  });
+
+  it('обменивает overflow-раздел с видимым и восстанавливает обмен после remount', async () => {
+    const user = userEvent.setup();
+    setPermittedItemCount(9);
+    const view = renderChrome(adminSession);
+
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.moreNav }));
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+    const visibleLink = screen.getByRole('link', { name: ADMIN_UI.dashboardNav });
+    const data = new Map<string, string>();
+    const dataTransfer = {
+      dropEffect: 'none',
+      effectAllowed: 'none',
+      setData: (type: string, value: string) => data.set(type, value),
+      getData: (type: string) => data.get(type) ?? '',
+    } as unknown as DataTransfer;
+    dataTransfer.setData('application/x-admin-sidebar-overflow', 'extra-1');
+    fireEvent.drop(visibleLink, { dataTransfer });
+
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: ADMIN_UI.dashboardNav })).not.toBeInTheDocument();
+    expect(window.localStorage.getItem('admin.sidebar.layout.v1')).toContain('extra-1');
+
+    view.unmount();
+    renderChrome(adminSession);
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 1' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: ADMIN_UI.dashboardNav })).not.toBeInTheDocument();
   });
 });

@@ -88,6 +88,13 @@ async function materializeOgShellAsset(
     }
   }
 
+  if (logical !== DEFAULT_OG_SHELL_BANNER_LOGICAL) {
+    process.stdout.write(
+      `[og-asset] warn: ${logical} unavailable (CDN is unset), using fallback banner\n`,
+    );
+    return materializeOgShellAsset(distDir, rootDir, DEFAULT_OG_SHELL_BANNER_LOGICAL);
+  }
+
   throw new Error(
     `OG shell asset missing in public/ and VITE_PUBLIC_ASSET_BASE_URL is unset: ${logical}`,
   );

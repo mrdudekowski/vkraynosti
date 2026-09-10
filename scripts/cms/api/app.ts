@@ -21,6 +21,7 @@ import {
   parseCmsToursFile,
   type CmsTourDocument,
 } from '../../../src/cms/cmsTourDocument.ts';
+import { convertHeicToJpeg, isHeicStill } from './heic.ts';
 import { cmsProgramPatchStepSchema } from '../../../src/cms/cmsProgramPatchStep.ts';
 import { BENTO_BLOCK_TYPES } from '../../../src/constants/tourBento/index.ts';
 import { unusedBentoPoolAssets } from '../../../src/cms/bentoPoolAssets.ts';
@@ -1534,8 +1535,10 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     if (!(still instanceof File)) {
       return c.json({ error: 'still_required' }, 400);
     }
-    const stillMime = still.type || 'application/octet-stream';
-    const stillExt = stillExtensionForMime(stillMime);
+    const uploadedStillMime = still.type || 'application/octet-stream';
+    const heicStill = isHeicStill(still);
+    const stillMime = heicStill ? 'image/jpeg' : uploadedStillMime;
+    const stillExt = heicStill ? 'jpg' : stillExtensionForMime(stillMime);
     if (stillExt == null) {
       return c.json({ error: 'invalid_still_type' }, 400);
     }
@@ -1559,7 +1562,15 @@ export function createCmsApiApp(deps: CmsApiDeps) {
 
     const assetId = allocateUploadAssetId(document.assets.map((asset) => asset.id));
     const stillKey = cmsMediaObjectKey(tourId, `${assetId}.${stillExt}`);
-    const stillBytes = new Uint8Array(await still.arrayBuffer());
+    const sourceStillBytes = new Uint8Array(await still.arrayBuffer());
+    let stillBytes = sourceStillBytes;
+    if (heicStill) {
+      try {
+        stillBytes = await convertHeicToJpeg(sourceStillBytes);
+      } catch {
+        return c.json({ error: 'heic_conversion_failed' }, 400);
+      }
+    }
     await store.putBytes(stillKey, stillBytes, stillMime);
 
     let videoUrl: string | null = null;

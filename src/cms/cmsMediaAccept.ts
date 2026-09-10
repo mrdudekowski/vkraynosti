@@ -9,6 +9,8 @@ const STILL_EXT: Record<string, string> = {
   'image/webp': 'webp',
   'image/jpeg': 'jpg',
   'image/png': 'png',
+  'image/heic': 'heic',
+  'image/heif': 'heif',
 };
 
 const VIDEO_EXT: Record<string, string> = {

@@ -16,7 +16,6 @@ describe('ScheduleWeekListLayout', () => {
         todayIso="2026-09-01"
         onSelectDay={vi.fn()}
         onAddOnDate={vi.fn()}
-        onAddWeek={vi.fn()}
         onOpenDeparture={vi.fn()}
         onDropChip={vi.fn()}
       />,

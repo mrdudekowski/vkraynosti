@@ -90,7 +90,7 @@ describe('collectOgShellImageLogicalPaths', () => {
       'https://cdn.example.com/tours/summer-1/cover.webp',
       '/tours/summer-1/cover.webp',
     ]);
-    expect(paths).toContain('banners_summer/Summer.webp');
+    expect(paths).toContain('banners_summer/summer.jpg');
     expect(paths.filter((p) => p === 'tours/summer-1/cover.webp')).toHaveLength(1);
   });
 });

@@ -17,7 +17,7 @@ describe('generateStaticOgTestPage', () => {
     const distDir = await mkdtemp(join(tmpdir(), 'vkraynosti-og-dist-'));
     tempDirectories.push(rootDir, distDir);
     await mkdir(join(rootDir, 'public', 'banners_summer'), { recursive: true });
-    await writeFile(join(rootDir, 'public', 'banners_summer', 'Summer.webp'), 'webp-source');
+    await writeFile(join(rootDir, 'public', 'banners_summer', 'summer.jpg'), 'jpg-source');
     await writeFile(join(distDir, 'og-cover-prod.jpg'), Buffer.from([0xff, 0xd8, 0xff, 0xd9]));
 
     await generateStaticOgTestPage(distDir, rootDir, {

@@ -663,7 +663,6 @@ const SchedulePage = () => {
           todayIso={todayIso}
           onSelectDay={onSelectWeekDay}
           onAddOnDate={openWizardForCell}
-          onAddWeek={() => setWizard({})}
           onOpenDeparture={openExisting}
           onStatusChange={(departure, status) => {
             void changeQuickStatus(departure, status);
@@ -686,7 +685,6 @@ const SchedulePage = () => {
           className="admin-schedule-day-agenda"
           onSelectDay={onSelectWeekDay}
           onAddOnDate={openWizardForCell}
-          onAddWeek={() => openWizardForCell(cursorIso)}
           onOpenDeparture={openExisting}
           onStatusChange={(departure, status) => {
             void changeQuickStatus(departure, status);

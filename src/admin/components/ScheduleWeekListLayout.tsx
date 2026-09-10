@@ -19,7 +19,6 @@ type ScheduleWeekListLayoutProps = {
   className?: string;
   onSelectDay: (iso: string) => void;
   onAddOnDate: (iso: string) => void;
-  onAddWeek: () => void;
   onOpenDeparture: (departure: AdminDeparture) => void;
   onStatusChange?: (departure: AdminDeparture, status: DepartureQuickStatus) => void;
   onDropChip: (departureId: string, startsOn: string) => void;
@@ -38,7 +37,6 @@ const ScheduleWeekListLayout = ({
   className = 'admin-schedule-week-list',
   onSelectDay,
   onAddOnDate,
-  onAddWeek,
   onOpenDeparture,
   onStatusChange,
   onDropChip,
@@ -46,15 +44,7 @@ const ScheduleWeekListLayout = ({
   <div className={`${className} mt-3 overflow-y-auto overscroll-y-contain`}>
     {departures.length === 0 ? (
       <div className="mb-3">
-        <AdminEmptyState
-          title={emptyTitle}
-          icon={CalendarOff}
-          action={
-            <AdminButton type="button" onClick={onAddWeek}>
-              {ADMIN_UI.scheduleAdd}
-            </AdminButton>
-          }
-        />
+        <AdminEmptyState title={emptyTitle} icon={CalendarOff} />
       </div>
     ) : null}
     <ScheduleWeekDaysColumn

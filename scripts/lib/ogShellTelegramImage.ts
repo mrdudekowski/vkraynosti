@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process';
 import { readFile, unlink } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import ffmpegStatic from 'ffmpeg-static';
@@ -8,6 +9,7 @@ const execFileAsync = promisify(execFile);
 
 export const OG_SHELL_IMAGE_WIDTH = 1200 as const;
 export const OG_SHELL_IMAGE_HEIGHT = 630 as const;
+export const OG_FALLBACK_JPEG_LOGICAL = 'og-cover-prod.jpg' as const;
 
 const OG_JPEG_QUALITY = '2';
 const OG_FFMPEG_SCALE_FILTER = `scale=${OG_SHELL_IMAGE_WIDTH}:${OG_SHELL_IMAGE_HEIGHT}:force_original_aspect_ratio=increase,crop=${OG_SHELL_IMAGE_WIDTH}:${OG_SHELL_IMAGE_HEIGHT}`;
@@ -21,6 +23,7 @@ const toJpegLogicalPath = (logicalPath: string): string =>
 export async function ensureTelegramFriendlyOgImage(
   distDir: string,
   logicalPath: string,
+  fallbackLogicalPath: string = OG_FALLBACK_JPEG_LOGICAL,
 ): Promise<string> {
   const extension = extname(logicalPath).toLowerCase();
   if (!RASTER_EXTENSIONS.has(extension)) {
@@ -38,11 +41,23 @@ export async function ensureTelegramFriendlyOgImage(
   const sourcePath = resolve(distDir, logicalPath);
   const jpegPath = resolve(distDir, jpegLogical);
 
+  const useFallback = async (): Promise<string> => {
+    const fallbackPath = resolve(distDir, fallbackLogicalPath);
+    if (!existsSync(fallbackPath)) {
+      return logicalPath;
+    }
+    if (sourcePath !== fallbackPath) {
+      await unlink(sourcePath).catch(() => {});
+    }
+    return fallbackLogicalPath;
+  };
+
   if (!ffmpegStatic) {
+    const fallback = await useFallback();
     process.stdout.write(
-      `[og-asset] warn: ffmpeg-static missing, keeping ${logicalPath} for Telegram\n`,
+      `[og-asset] ${fallback === logicalPath ? 'warn: ffmpeg-static missing, keeping' : 'fallback: ffmpeg-static missing, using'} ${fallback}\n`,
     );
-    return logicalPath;
+    return fallback;
   }
 
   try {
@@ -68,10 +83,11 @@ export async function ensureTelegramFriendlyOgImage(
     process.stdout.write(`[og-asset] jpeg ${jpegLogical} (${OG_SHELL_IMAGE_WIDTH}x${OG_SHELL_IMAGE_HEIGHT})\n`);
     return jpegLogical;
   } catch (error) {
+    const fallback = await useFallback();
     process.stdout.write(
-      `[og-asset] warn: jpeg conversion failed for ${logicalPath} (${error instanceof Error ? error.message : String(error)}), keeping source\n`,
+      `[og-asset] ${fallback === logicalPath ? 'warn: jpeg conversion failed, keeping source' : 'fallback: jpeg conversion failed, using'} ${fallback} (${error instanceof Error ? error.message : String(error)})\n`,
     );
-    return logicalPath;
+    return fallback;
   }
 }
 

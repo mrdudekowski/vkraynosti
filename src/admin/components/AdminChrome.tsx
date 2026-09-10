@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ChevronDown, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search } from 'lucide-react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
@@ -79,6 +79,7 @@ type SidebarBodyProps = {
   onReorder?: (fromIndex: number, toIndex: number) => void;
   onDropOverflow?: (overflowId: AdminNavId, visibleIndex: number) => void;
   overflowIds?: readonly AdminNavId[];
+  overflowTriggerRef?: RefObject<HTMLButtonElement | null>;
 };
 
 const SidebarBody = ({
@@ -97,6 +98,7 @@ const SidebarBody = ({
   onReorder,
   onDropOverflow,
   overflowIds,
+  overflowTriggerRef,
 }: SidebarBodyProps) => {
   const [quickOpen, setQuickOpen] = useState(false);
   const quickAddRef = useRef<HTMLDivElement>(null);
@@ -206,6 +208,7 @@ const SidebarBody = ({
             />
             {overflowItems.length > 0 ? (
               <button
+                ref={overflowTriggerRef}
                 type="button"
                 className="admin-sidebar-nav mt-1 w-full"
                 aria-haspopup="dialog"
@@ -420,6 +423,8 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
     });
   }, [items, layout.visibleOrder]);
   const [sidebarOverflowOpen, setSidebarOverflowOpen] = useState(false);
+  const [overflowDragging, setOverflowDragging] = useState(false);
+  const overflowTriggerRef = useRef<HTMLButtonElement>(null);
   const overflowDragRef = useRef<{
     itemId: AdminNavId;
     visibleIndex: number | null;
@@ -491,6 +496,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             visibleItems={layoutEnabled ? visibleSidebarItems : undefined}
             overflowItems={layoutEnabled ? overflowItems : undefined}
             overflowIds={layoutEnabled ? overflowItems.map((item) => item.id) : undefined}
+            overflowTriggerRef={layoutEnabled ? overflowTriggerRef : undefined}
             onOpenOverflow={() => setSidebarOverflowOpen(true)}
             onReorder={setVisibleOrder}
             onDropOverflow={(overflowId, visibleIndex) => {
@@ -582,14 +588,20 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
       {sidebarOverflowOpen && viewport === 'desktop' ? (
         <AdminSidebarOverflowDialog
           items={overflowItems}
-          onClose={() => setSidebarOverflowOpen(false)}
+          onClose={() => {
+            setOverflowDragging(false);
+            setSidebarOverflowOpen(false);
+          }}
           onNavigate={(item) => {
+            setOverflowDragging(false);
             setSidebarOverflowOpen(false);
             void navigate(item.to);
           }}
           onDragStart={(itemId) => {
+            setOverflowDragging(true);
             overflowDragRef.current = { itemId, visibleIndex: null, exchanged: false };
           }}
+          onDragStateChange={setOverflowDragging}
           onDropOnVisible={(itemId) => {
             const drag = overflowDragRef.current;
             if (drag?.itemId === itemId && drag.visibleIndex != null && !drag.exchanged) {
@@ -597,13 +609,17 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
               push({ message: ADMIN_UI.overflowNavMoved });
             }
             overflowDragRef.current = null;
+            setOverflowDragging(false);
             setSidebarOverflowOpen(false);
           }}
           onReset={() => {
             resetSidebarLayout();
             push({ message: ADMIN_UI.listReordered });
+            setOverflowDragging(false);
             setSidebarOverflowOpen(false);
           }}
+          restoreFocusRef={overflowTriggerRef}
+          allowUnderlyingPointerEvents={overflowDragging}
           visibleItemCount={visibleSidebarItems.length}
         />
       ) : null}

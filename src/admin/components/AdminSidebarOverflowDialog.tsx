@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { NavLink } from 'react-router-dom';
 import type { AdminNavId, AdminNavItem } from '../constants/nav';
 import { ADMIN_UI } from '../constants/ui';
@@ -11,6 +12,9 @@ type AdminSidebarOverflowDialogProps = {
   onClose: () => void;
   onNavigate: (item: AdminNavItem) => void;
   onDragStart?: (itemId: AdminNavId) => void;
+  onDragStateChange?: (dragging: boolean) => void;
+  allowUnderlyingPointerEvents?: boolean;
+  restoreFocusRef?: RefObject<HTMLElement | null>;
   onDropOnVisible: (itemId: AdminNavId) => void;
   onReset: () => void;
   visibleItemCount: number;
@@ -21,6 +25,9 @@ const AdminSidebarOverflowDialog = ({
   onClose,
   onNavigate,
   onDragStart,
+  onDragStateChange,
+  allowUnderlyingPointerEvents = false,
+  restoreFocusRef,
   onDropOnVisible,
   onReset,
 }: AdminSidebarOverflowDialogProps) => {
@@ -35,6 +42,8 @@ const AdminSidebarOverflowDialog = ({
       closeLabel={ADMIN_UI.overflowNavClose}
       size="lg"
       onClose={onClose}
+      allowUnderlyingPointerEvents={allowUnderlyingPointerEvents}
+      restoreFocusRef={restoreFocusRef}
     >
       <p className="mb-3 text-sm text-text-secondary">{ADMIN_UI.overflowNavDragHint}</p>
       <div
@@ -55,6 +64,7 @@ const AdminSidebarOverflowDialog = ({
             onDragStart={(event) => {
               if (!overflowItemIds.has(item.id)) return;
               onDragStart?.(item.id);
+              onDragStateChange?.(true);
               event.dataTransfer.effectAllowed = 'move';
               event.dataTransfer.setData(ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE, item.id);
               event.dataTransfer.setData('text/plain', item.id);
@@ -67,6 +77,7 @@ const AdminSidebarOverflowDialog = ({
               ) {
                 onDropOnVisible(payload as AdminNavId);
               }
+              onDragStateChange?.(false);
             }}
           >
             <AdminIcon icon={item.icon} />

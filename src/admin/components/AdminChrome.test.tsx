@@ -285,7 +285,7 @@ describe('AdminChrome', () => {
     const view = renderChrome(adminSession);
 
     await user.click(screen.getByRole('button', { name: ADMIN_UI.moreNav }));
-    expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
+    const overflowLink = screen.getByRole('link', { name: 'Дополнительный раздел 2' });
     const visibleLink = screen.getByRole('link', { name: ADMIN_UI.dashboardNav });
     const data = new Map<string, string>();
     const dataTransfer = {
@@ -294,16 +294,40 @@ describe('AdminChrome', () => {
       setData: (type: string, value: string) => data.set(type, value),
       getData: (type: string) => data.get(type) ?? '',
     } as unknown as DataTransfer;
+    fireEvent.dragStart(overflowLink, { dataTransfer });
+    expect(screen.getByRole('dialog').parentElement).toHaveClass('pointer-events-none');
     dataTransfer.setData('application/x-admin-sidebar-overflow', 'extra-2');
+    fireEvent.dragOver(visibleLink, { dataTransfer });
     fireEvent.drop(visibleLink, { dataTransfer });
 
     expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: ADMIN_UI.dashboardNav })).not.toBeInTheDocument();
     expect(window.localStorage.getItem('admin.sidebar.layout.v1')).toContain('extra-2');
+    expect(screen.getByRole('button', { name: ADMIN_UI.moreNav })).toHaveFocus();
 
     view.unmount();
     renderChrome(adminSession);
     expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: ADMIN_UI.dashboardNav })).not.toBeInTheDocument();
   });
+
+  it('restores focus to the overflow trigger after reset, Escape, and close button', async () => {
+    const user = userEvent.setup();
+    setPermittedItemCount(9);
+    renderChrome(adminSession);
+    const trigger = screen.getByRole('button', { name: ADMIN_UI.moreNav });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.overflowNavReset }));
+    expect(trigger).toHaveFocus();
+
+    await user.click(trigger);
+    await user.keyboard('{Escape}');
+    expect(trigger).toHaveFocus();
+
+    await user.click(trigger);
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: ADMIN_UI.overflowNavClose }));
+    expect(trigger).toHaveFocus();
+  });
+
 });

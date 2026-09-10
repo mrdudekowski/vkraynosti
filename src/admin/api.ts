@@ -95,6 +95,20 @@ export async function adminPublishSiteContent(
   }), 'site_content_publish_failed');
 }
 
+export async function adminUploadSiteAsset(kind: SiteContentDocumentKind, file: File, alt = ''): Promise<{ asset: { assetId: string; url: string; mimeType: string; alt: string } }> {
+  const form = new FormData(); form.set('file', file); form.set('alt', alt);
+  const response = await fetch(`/api/cms/site-content/${kind}/assets`, { method: 'POST', credentials: 'include', body: form });
+  if (response.status === 403) throw new Error('forbidden');
+  if (!response.ok) throw new Error('site_asset_upload_failed');
+  return readJson(response);
+}
+
+export async function adminDeleteSiteAsset(kind: SiteContentDocumentKind, assetId: string): Promise<void> {
+  const response = await fetch(`/api/cms/site-content/${kind}/assets/${encodeURIComponent(assetId)}`, { method: 'DELETE', credentials: 'include' });
+  if (response.status === 403) throw new Error('forbidden');
+  if (!response.ok) throw new Error('site_asset_delete_failed');
+}
+
 async function readJson<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }

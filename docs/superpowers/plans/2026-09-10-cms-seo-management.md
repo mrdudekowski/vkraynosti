@@ -32,6 +32,7 @@
 - Create: `src/cms/siteSeoDocument.ts`
 - Test: `src/cms/cmsTourDocument.test.ts`
 - Test: `src/cms/siteSeoDocument.test.ts`
+- Mirror the same contract in `E:\Cursor Projects\Vkrainosti-cms-crm-phase1\src\cms\cmsTourDocument.ts` and its tests.
 
 **Interfaces:**
 - Produce `CmsTourSeo`, `SiteSeoPage`, `SiteSeoDocument`, `parseSiteSeoDocument(input: unknown)`.
@@ -69,11 +70,12 @@ git commit -m "feat(cms): add SEO document schemas"
 ### Task 2: Add draft/published site SEO storage and API
 
 **Files:**
-- Modify: `src/cms/siteContentPackageKeys.ts`
-- Modify: `scripts/cms/api/app.ts`
-- Modify: `src/admin/api.ts`
-- Test: `scripts/cms/api/app.test.ts`
-- Test: `src/admin/api.test.ts`
+- Backend repo: `E:\Cursor Projects\Vkrainosti-cms-crm-phase1\src\cms\siteContentPackageKeys.ts`
+- Backend repo: `E:\Cursor Projects\Vkrainosti-cms-crm-phase1\scripts\cms\api\siteContentRoutes.ts`
+- Backend repo: `E:\Cursor Projects\Vkrainosti-cms-crm-phase1\scripts\cms\api\app.ts`
+- Admin client: `src/admin/api.ts`
+- Backend test: `E:\Cursor Projects\Vkrainosti-cms-crm-phase1\scripts\cms\api\siteContentRoutes.test.ts`
+- Admin test: `src/admin/api.test.ts`
 
 **Interfaces:**
 - Add `cmsDraftSiteSeoKey()`, `cmsDraftSiteSeoMetaKey()`, and `cmsPublishedSiteSeoKey()`.
@@ -94,7 +96,7 @@ Expected: missing key helpers, client functions, or routes cause failures.
 
 - [ ] **Step 3: Implement storage and routes**
 
-Use the existing site-content draft/meta/publish flow and revision checks. Seed a valid default document for all five pages. Do not add a separate permission; reuse `canEditSiteContent`.
+Use the existing backend site-content draft/meta/publish flow and revision checks. Seed a valid default document for all five pages. Do not add a separate permission; reuse `canEditSiteContent`.
 
 - [ ] **Step 4: Run focused API tests and confirm pass**
 
@@ -103,7 +105,7 @@ Run the same command and verify the new route cases and existing API tests pass.
 - [ ] **Step 5: Commit only this task**
 
 ```powershell
-git add src/cms/siteContentPackageKeys.ts scripts/cms/api/app.ts scripts/cms/api/app.test.ts src/admin/api.ts src/admin/api.test.ts
+Stage backend files in `cms-crm-phase1-staging` and API client files in `admin-app` separately; do not stage unrelated existing changes.
 git commit -m "feat(cms): expose site SEO draft and publication API"
 ```
 

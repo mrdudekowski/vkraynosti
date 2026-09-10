@@ -20,6 +20,7 @@ import RouteFallback from '../shared/RouteFallback';
 import ModalLazyChunkFallback from '../shared/ModalLazyChunkFallback';
 
 const TourRequestModal = lazy(() => import('../modals/TourRequestModal'));
+const ContactModal = lazy(() => import('../modals/ContactModal'));
 
 function LayoutChrome() {
   const { pathname } = useLocation();
@@ -89,6 +90,11 @@ const Layout = () => {
       {modal.type === 'tourRequest' && (
         <Suspense fallback={<ModalLazyChunkFallback />}>
           <TourRequestModal key={modal.payload.tourId} payload={modal.payload} />
+        </Suspense>
+      )}
+      {modal.type === 'contact' && (
+        <Suspense fallback={<ModalLazyChunkFallback />}>
+          <ContactModal tourTitle={modal.payload?.title} />
         </Suspense>
       )}
     </div>

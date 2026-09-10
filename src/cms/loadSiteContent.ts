@@ -20,6 +20,7 @@ function parseDocument(
 ): SiteContentDocument {
   if (kind === 'team') return parseSiteContentDocument('team', input);
   if (kind === 'contacts') return parseSiteContentDocument('contacts', input);
+  if (kind === 'modal') return parseSiteContentDocument('modal', input);
   return parseSiteContentDocument('footer', input);
 }
 

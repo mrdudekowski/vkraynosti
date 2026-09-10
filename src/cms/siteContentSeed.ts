@@ -6,6 +6,7 @@ import { TEAM } from '../data/teamData';
 import type {
   ContactsContentDocument,
   FooterContentDocument,
+  ModalContentDocument,
   SiteContentAsset,
   TeamContentDocument,
 } from './siteContentDocument';
@@ -125,10 +126,19 @@ const footer: FooterContentDocument = {
   ],
 };
 
+const modal: ModalContentDocument = {
+  kind: 'modal',
+  schemaVersion: 1,
+  requestFormEnabled: true,
+  contactTitle: 'Свяжитесь с нами',
+  contactDescription: 'Выберите удобный канал связи.',
+  tourContactTitle: 'Свяжитесь с нами и забронируйте тур',
+};
+
 function locationOrigin(): string {
   return typeof window === 'undefined' ? 'http://localhost' : window.location.origin;
 }
 
-export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument } {
-  return { team, contacts, footer };
+export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument } {
+  return { team, contacts, footer, modal };
 }

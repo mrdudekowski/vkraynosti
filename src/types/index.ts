@@ -132,4 +132,5 @@ export interface TourRequestModalPayload {
 
 export type ModalState =
   | { type: null }
-  | { type: 'tourRequest'; payload: TourRequestModalPayload };
+  | { type: 'tourRequest'; payload: TourRequestModalPayload }
+  | { type: 'contact'; payload?: Pick<TourRequestModalPayload, 'title'> };

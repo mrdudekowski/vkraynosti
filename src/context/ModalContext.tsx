@@ -7,8 +7,10 @@ import {
 import type { ReactNode } from 'react';
 import type { ModalState, TourRequestModalPayload } from '../types';
 import { ModalContext } from './modal-context-definition';
+import { useSiteContent } from './SiteContentContext';
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
+  const { modal: modalConfig } = useSiteContent();
   const [modal, setModal] = useState<ModalState>({ type: null });
   const lastFocusRef = useRef<HTMLElement | null>(null);
 
@@ -20,9 +22,9 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   const openTourRequestModal = useCallback(
     (payload: TourRequestModalPayload) => {
-      captureFocusAndOpen({ type: 'tourRequest', payload });
+      captureFocusAndOpen(modalConfig.requestFormEnabled ? { type: 'tourRequest', payload } : { type: 'contact', payload: { title: payload.title } });
     },
-    [captureFocusAndOpen]
+    [captureFocusAndOpen, modalConfig.requestFormEnabled]
   );
 
   const closeModal = useCallback(() => {

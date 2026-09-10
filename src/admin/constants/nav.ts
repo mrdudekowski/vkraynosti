@@ -1,17 +1,18 @@
 import type { LucideIcon } from 'lucide-react';
-import { CalendarDays, LayoutDashboard, Map, Send, Users } from 'lucide-react';
+import { CalendarDays, LayoutDashboard, Map, Send, Users, Globe2 } from 'lucide-react';
 import {
   ADMIN_PATHS,
   isAdminDashboardSection,
   isAdminInboxSection,
   isAdminLeadsSection,
+  isAdminSiteSection,
   isAdminScheduleSection,
   isAdminToursSection,
   isAdminUsersSection,
 } from './routes';
 import { ADMIN_UI } from './ui';
 
-export type AdminNavId = 'dashboard' | 'tours' | 'schedule' | 'inbox' | 'users' | 'leads';
+export type AdminNavId = 'dashboard' | 'tours' | 'schedule' | 'inbox' | 'users' | 'leads' | 'site';
 
 export type AdminNavItem = {
   id: AdminNavId;
@@ -72,5 +73,12 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     label: ADMIN_UI.crmNav,
     icon: Users,
     isActive: isAdminLeadsSection,
+  },
+  {
+    id: 'site',
+    to: ADMIN_PATHS.site,
+    label: ADMIN_UI.siteNav,
+    icon: Globe2,
+    isActive: isAdminSiteSection,
   },
 ];

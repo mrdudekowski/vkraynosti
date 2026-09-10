@@ -17,6 +17,7 @@ export const ADMIN_PATHS = {
   leads: '/leads',
   lead: (personId: string) => `/leads/${personId}`,
   users: '/users',
+  site: '/site',
 } as const;
 
 export function isAdminSeasonParam(value: string | undefined): value is Season {
@@ -50,4 +51,8 @@ export function isAdminUsersSection(pathname: string): boolean {
 
 export function isAdminLeadsSection(pathname: string): boolean {
   return pathname === ADMIN_PATHS.leads || pathname.startsWith(`${ADMIN_PATHS.leads}/`);
+}
+
+export function isAdminSiteSection(pathname: string): boolean {
+  return pathname === ADMIN_PATHS.site || pathname.startsWith(`${ADMIN_PATHS.site}/`);
 }

@@ -20,18 +20,20 @@ const session = {
   role: 'admin' as const,
   canPublishTours: true,
   canPublishSchedule: true,
+  canEditSiteContent: true,
 };
 
 function user(
   login: string,
   role: 'admin' | 'editor',
-  flags: { canPublishTours?: boolean; canPublishSchedule?: boolean } = {},
+  flags: { canPublishTours?: boolean; canPublishSchedule?: boolean; canEditSiteContent?: boolean } = {},
 ) {
   return {
     login,
     role,
     canPublishTours: flags.canPublishTours ?? false,
     canPublishSchedule: flags.canPublishSchedule ?? false,
+    canEditSiteContent: flags.canEditSiteContent ?? false,
   };
 }
 
@@ -140,6 +142,19 @@ describe('UsersPage', () => {
     expect(screen.getByText(ADMIN_UI.usersRoleConfirm)).toBeInTheDocument();
     await userEvents.click(screen.getByRole('button', { name: ADMIN_UI.usersAccessConfirm }));
     expect(adminUpdateUser).toHaveBeenCalledWith('bob', { role: 'admin' });
+  });
+
+  it('edits the site content privilege for an editor', async () => {
+    const userEvents = userEvent.setup();
+    vi.mocked(adminListUsers).mockResolvedValue([user('bob', 'editor')]);
+    renderUsers();
+
+    await userEvents.click(await screen.findByText('bob'));
+    const checkbox = screen.getByRole('checkbox', { name: /Изменение сайта/i });
+    expect(checkbox).not.toBeChecked();
+    await userEvents.click(checkbox);
+    await userEvents.click(screen.getByRole('button', { name: ADMIN_UI.usersAccessConfirm }));
+    expect(adminUpdateUser).toHaveBeenCalledWith('bob', { canEditSiteContent: true });
   });
 
   it('фильтрует список пользователей по поиску и роли', async () => {

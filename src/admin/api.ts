@@ -22,6 +22,7 @@ export type AdminSession = {
   role: 'admin' | 'editor';
   canPublishTours: boolean;
   canPublishSchedule: boolean;
+  canEditSiteContent?: boolean;
 };
 
 export type AdminTourListItem = {
@@ -451,6 +452,7 @@ export type AdminUser = {
   role: AdminSession['role'];
   canPublishTours: boolean;
   canPublishSchedule: boolean;
+  canEditSiteContent?: boolean;
 };
 
 export async function adminListUsers(): Promise<AdminUser[]> {
@@ -493,6 +495,7 @@ export async function adminUpdateUser(
     password?: string;
     canPublishTours?: boolean;
     canPublishSchedule?: boolean;
+    canEditSiteContent?: boolean;
   }
 ): Promise<AdminUser[]> {
   const response = await fetch(`/api/cms/users/${encodeURIComponent(login)}`, {

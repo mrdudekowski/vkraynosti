@@ -41,6 +41,9 @@ function userAccessSummary(user: AdminUser): string {
   if (user.canPublishSchedule) {
     parts.push(ADMIN_UI.inboxTabSchedule);
   }
+  if (user.canEditSiteContent) {
+    parts.push(ADMIN_UI.siteNav);
+  }
   return parts.length > 0 ? parts.join(', ') : ADMIN_UI.usersDraftOnly;
 }
 
@@ -57,6 +60,9 @@ function userAccessBadges(user: AdminUser) {
       <AdminBadge key="schedule" tone="success">{ADMIN_UI.inboxTabSchedule}</AdminBadge>,
     );
   }
+  if (user.canEditSiteContent) {
+    badges.push(<AdminBadge key="site" tone="success">{ADMIN_UI.siteNav}</AdminBadge>);
+  }
   return badges.length > 0 ? (
     <div className="flex flex-wrap gap-1">{badges}</div>
   ) : (
@@ -72,6 +78,7 @@ type UserAccessPatch = {
   role?: AdminUser['role'];
   canPublishTours?: boolean;
   canPublishSchedule?: boolean;
+  canEditSiteContent?: boolean;
 };
 
 type PendingAccess = {
@@ -164,6 +171,21 @@ const UserDrawer = ({
                 }}
               />
               {ADMIN_UI.publishScheduleFlag}
+            </label>
+            <label className="flex items-center gap-2 text-sm text-text-primary">
+              <input
+                type="checkbox"
+                className="h-4 w-4"
+                checked={user.canEditSiteContent === true}
+                aria-label={`${user.login}: ${ADMIN_UI.siteContentPermission}`}
+                onChange={(event) => {
+                  onRequestAccess(
+                    { canEditSiteContent: event.target.checked },
+                    ADMIN_UI.usersPublishFlagConfirm,
+                  );
+                }}
+              />
+              {ADMIN_UI.siteContentPermission}
             </label>
           </div>
         )}

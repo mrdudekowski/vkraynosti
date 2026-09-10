@@ -21,7 +21,10 @@ type AdminChromeProps = {
 };
 
 function visibleNavItems(session: AdminSession): AdminNavItem[] {
-  return ADMIN_NAV_ITEMS.filter((item) => item.adminOnly !== true || session.role === 'admin');
+  return ADMIN_NAV_ITEMS.filter((item) => {
+    if (item.id === 'site') return session.role === 'admin' || session.canEditSiteContent;
+    return item.adminOnly !== true || session.role === 'admin';
+  });
 }
 
 type NavRowProps = {

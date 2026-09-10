@@ -18,6 +18,7 @@ const SeasonToursPage = lazy(() => import('./SeasonToursPage'));
 const TourEditorPage = lazy(() => import('./TourEditorPage'));
 const ToursPage = lazy(() => import('./ToursPage'));
 const UsersPage = lazy(() => import('./UsersPage'));
+const SitePage = lazy(() => import('./SitePage'));
 
 type AdminShellProps = {
   session: AdminSession;
@@ -118,6 +119,21 @@ const AdminApp = () => {
             element={
               session != null && session.role === 'admin' ? (
                 <UsersPage session={session} />
+              ) : (
+                <AdminPermissionState
+                  title={ADMIN_UI.permissionDeniedTitle}
+                  description={ADMIN_UI.usersPermissionDenied}
+                  returnTo={ADMIN_PATHS.dashboard}
+                  returnLabel={ADMIN_UI.returnToDashboard}
+                />
+              )
+            }
+          />
+          <Route
+            path={ADMIN_PATHS.site}
+            element={
+              session != null && (session.role === 'admin' || session.canEditSiteContent === true) ? (
+                <SitePage />
               ) : (
                 <AdminPermissionState
                   title={ADMIN_UI.permissionDeniedTitle}

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -13,6 +13,7 @@ const adminSession: AdminSession = {
   role: 'admin',
   canPublishTours: true,
   canPublishSchedule: true,
+  canEditSiteContent: true,
 };
 
 const editorSession: AdminSession = {
@@ -20,6 +21,7 @@ const editorSession: AdminSession = {
   role: 'editor',
   canPublishTours: false,
   canPublishSchedule: false,
+  canEditSiteContent: false,
 };
 
 const LocationProbe = () => {
@@ -81,10 +83,19 @@ describe('AdminChrome', () => {
     expect(screen.getByRole('link', { name: ADMIN_UI.scheduleNav })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: ADMIN_UI.inboxNav })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: ADMIN_UI.usersNav })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: ADMIN_UI.siteNav })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: ADMIN_UI.crmNav })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: ADMIN_UI.logout })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: ADMIN_UI.skipToContent })).toBeInTheDocument();
     expect(document.querySelector(`img[src="${ADMIN_SIDEBAR_LOGO}"]`)).toBeInTheDocument();
+  });
+
+  it('ограничивает открытое меню профиля шириной сайдбара', async () => {
+    const user = userEvent.setup();
+    renderChrome(adminSession);
+
+    await user.click(screen.getByRole('button', { name: /Администратор/ }));
+    expect(screen.getByRole('menu')).toHaveClass('min-w-0', 'max-w-full');
   });
 
   it('прячет людей от редактора', () => {
@@ -115,6 +126,14 @@ describe('AdminChrome', () => {
     await user.click(screen.getByRole('button', { name: ADMIN_UI.quickAdd }));
     await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.scheduleAddFromTour }));
     expect(screen.getByText('/schedule')).toBeInTheDocument();
+  });
+
+  it('показывает сайт редактору только с привилегией', () => {
+    renderChrome({ ...editorSession, canEditSiteContent: true });
+    expect(screen.getByRole('link', { name: ADMIN_UI.siteNav })).toBeInTheDocument();
+    cleanup();
+    renderChrome(editorSession);
+    expect(screen.queryByRole('link', { name: ADMIN_UI.siteNav })).not.toBeInTheDocument();
   });
 
   it('открывает command menu и ведёт в найденный раздел', async () => {

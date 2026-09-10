@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import SitePage from './SitePage';
-import { adminGetSiteContent, adminSaveSiteContent } from './api';
+import { adminGetSiteContent, adminPublishSiteContent, adminSaveSiteContent } from './api';
 
 vi.mock('./api', () => ({
   adminGetSiteContent: vi.fn(),
@@ -55,6 +55,17 @@ describe('SitePage', () => {
     fireEvent.click(screen.getByRole('radio', { name: 'Контакты' }));
     fireEvent.click(screen.getByRole('button', { name: /Сохранить черновик/ }));
     await waitFor(() => expect(adminSaveSiteContent).toHaveBeenCalledWith('modal', 1, expect.objectContaining({ requestFormEnabled: false })));
+  });
+
+  it('does not publish an unsaved site draft', async () => {
+    render(<SitePage />);
+    fireEvent.click(await screen.findByRole('tab', { name: 'Модалки' }));
+    await screen.findByRole('radiogroup', { name: 'Режим CTA' });
+    fireEvent.click(screen.getByRole('radio', { name: 'Контакты' }));
+
+    const publishButton = screen.getByRole('button', { name: /Опубликовать на сайте/ });
+    expect(publishButton).toBeDisabled();
+    expect(adminPublishSiteContent).not.toHaveBeenCalled();
   });
 
   it('switches the editable modal content with the mode selector', async () => {
@@ -112,6 +123,13 @@ describe('SitePage', () => {
     expect(await screen.findByText('Форма заявки')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('radio', { name: 'Контакты' }));
     expect(await screen.findByText(/Каналы контактов недоступны/)).toBeInTheDocument();
+  });
+
+  it('explains missing site-content permission', async () => {
+    vi.mocked(adminGetSiteContent).mockRejectedValue(new Error('forbidden'));
+    render(<SitePage />);
+
+    expect(await screen.findByText('У вас нет прав для редактирования или публикации этого раздела.')).toBeInTheDocument();
   });
 
   it('opens the modal tab from the site route query without replacing the route', async () => {

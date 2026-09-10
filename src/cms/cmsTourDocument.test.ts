@@ -63,6 +63,18 @@ describe('cmsToursFileSchema', () => {
     if (parsed.success) expect(parsed.data.tours[0]?.program[0]?.day).toBe(1);
   });
 
+  it('принимает SEO-поля тура и сохраняет legacy seoDescription', () => {
+    const parsed = cmsToursFileSchema.safeParse({
+      schemaVersion: 1,
+      tours: [{ ...validTour, seoDescription: 'Старое описание', seo: { title: 'SEO title', description: 'SEO description', h1: 'SEO H1' } }],
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.tours[0]?.seo).toEqual({ title: 'SEO title', description: 'SEO description', h1: 'SEO H1' });
+      expect(parsed.data.tours[0]?.seoDescription).toBe('Старое описание');
+    }
+  });
+
   it('сохраняет явный день программы и отклоняет день 0', () => {
     const accepted = cmsToursFileSchema.safeParse({
       schemaVersion: 1,

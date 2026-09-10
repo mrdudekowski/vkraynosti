@@ -43,6 +43,12 @@ export const cmsCoverCropSchema = z.object({
   heroLg: cmsMediaFocalPointSchema.optional(),
 });
 
+export const cmsTourSeoSchema = z.object({
+  title: z.string().default(''),
+  description: z.string().default(''),
+  h1: z.string().default(''),
+});
+
 export const cmsProgramStepSchema = z.object({
   day: z.number().int().min(1).default(1),
   timeLabel: z.string(),
@@ -74,6 +80,7 @@ export const cmsTourDocumentSchema = z.object({
   programAdditionalNotes: z.array(z.string()).optional(),
   included: z.array(z.object({ text: z.string(), iconKey: z.string().min(1) })).default([]),
   seoDescription: z.string().optional(),
+  seo: cmsTourSeoSchema.optional(),
   contentSourceTourId: z.string().min(1).optional(),
   coverAssetId: z.string().min(1).nullable(),
   prefaceAssetId: z.string().min(1).nullable(),
@@ -98,6 +105,7 @@ export type CmsTourAsset = z.infer<typeof cmsTourAssetSchema>;
 export type CmsBentoSlot = z.infer<typeof cmsBentoSlotSchema>;
 export type CmsBentoBlock = z.infer<typeof cmsBentoBlockSchema>;
 export type CmsCoverCrop = z.infer<typeof cmsCoverCropSchema>;
+export type CmsTourSeo = z.infer<typeof cmsTourSeoSchema>;
 export type CmsProgramStep = z.infer<typeof cmsProgramStepSchema>;
 export type CmsTourDocument = z.infer<typeof cmsTourDocumentSchema>;
 export type CmsToursFile = z.infer<typeof cmsToursFileSchema>;

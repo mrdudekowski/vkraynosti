@@ -60,3 +60,30 @@ No unrelated dirty files were modified or staged.
 - The current repository `AdminNavId` union contains 7 production IDs, while the brief requires a ten-item fixture. The test uses three local synthetic runtime IDs via a fixture-only cast; production types remain unchanged.
 - This task intentionally does not wire the helpers into `AdminChrome`, localStorage persistence, dialogs, or drag-and-drop. Those belong to later tasks in the implementation plan.
 - Git emitted normal LF-to-CRLF working-copy warnings for the new files; no content or test issue resulted.
+
+---
+
+# Task 1 fix report
+
+## Commit
+
+- `998ccebe978e5fe60a2aa114ed803b5bc50502f6` — `fix(admin): harden sidebar layout rules`
+
+## Changes
+
+- Reorder and exchange now return immutable no-ops for non-integer, `NaN`, and infinite indexes.
+- Canonical permitted IDs are deduplicated once and reused by defaults, normalization, and malformed-save fallback.
+- Added focused coverage for invalid indexes, newly permitted canonical append, exact-once unions, and duplicate permitted IDs.
+
+## Verification
+
+- `npm run test -- src/admin/adminSidebarLayout.test.ts` — passed: 1 file, 9 tests.
+- `npm run typecheck` — passed: `tsc -b`, exit code 0.
+- `git diff --check` — passed; only Git line-ending conversion warnings were emitted.
+
+## Self-review
+
+- Only `src/admin/adminSidebarLayout.ts` and `src/admin/adminSidebarLayout.test.ts` were included in the fix commit.
+- Existing unrelated dirty files remain unstaged and untouched.
+- The exported helpers preserve input layouts on invalid indexes by returning copied arrays, while valid operations still return new arrays.
+- Duplicate IDs in runtime `items` cannot appear in either output array, including when saved state is malformed.

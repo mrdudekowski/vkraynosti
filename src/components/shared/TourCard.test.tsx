@@ -48,10 +48,10 @@ describe('TourCard inDevelopment', () => {
 });
 
 describe('TourCard published', () => {
-  it('shows schedule price for a published tour', () => {
+  it('shows the published tour price when the schedule catalog is stale', () => {
     renderTourCard(spring3);
 
-    expect(screen.getByText('6 500 ₽')).toBeInTheDocument();
+    expect(screen.getByText(spring3.price)).toBeInTheDocument();
     expect(
       screen.queryByText(UI.tourDetail.inDevelopmentPageAriaLabel)
     ).not.toBeInTheDocument();

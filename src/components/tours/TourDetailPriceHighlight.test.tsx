@@ -62,7 +62,7 @@ const scheduleContextValue = (
 });
 
 describe('TourDetailPriceHighlight', () => {
-  it('shows schedule price and future departure dates in one card', () => {
+  it('shows the published tour price and future departure dates in one card', () => {
     render(
       <TourScheduleContext.Provider value={scheduleContextValue()}>
         <TourDetailPriceHighlight tour={spring3} />
@@ -70,7 +70,7 @@ describe('TourDetailPriceHighlight', () => {
     );
 
     expect(screen.getByText(UI.tourDetail.priceHighlightLead)).toBeInTheDocument();
-    expect(screen.getByText('6 500 ₽')).toBeInTheDocument();
+    expect(screen.getByText(spring3.price)).toBeInTheDocument();
     expect(screen.getByText(UI.tourDetail.departuresHeading)).toBeInTheDocument();
     expect(
       screen.getByRole('group', { name: UI.tourDepartureCalendar.calendarAriaLabel })
@@ -121,7 +121,6 @@ describe('TourDetailPriceHighlight', () => {
         <TourDetailPriceHighlight
           tour={summer13}
           forceDeparturesEmpty
-          preferCatalogPrice={false}
         />
       </TourScheduleContext.Provider>
     );

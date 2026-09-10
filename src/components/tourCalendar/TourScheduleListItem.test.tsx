@@ -16,7 +16,6 @@ const event: EnrichedScheduleEvent = {
   date: '2026-05-09',
   tourId: 'spring-3',
   durationType: 'однодневный',
-  priceRub: 6000,
   seats: 8,
   status: 'completed',
   comment: null,

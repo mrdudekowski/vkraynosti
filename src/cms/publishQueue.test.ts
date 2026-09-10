@@ -506,9 +506,33 @@ describe('toGuestTourDataFiles', () => {
         status: 'open',
         comment: null,
         durationType: 'однодневный',
-        overridePriceRub: 6000,
       },
     ]);
+  });
+
+  it('does not publish a price for a departure', () => {
+    const files = toGuestTourDataFiles(
+      [
+        {
+          tourId: 'winter-1',
+          startsOn: '2026-08-20',
+          seats: 8,
+          status: 'open',
+        },
+      ],
+      [readyTour()],
+      '2026-08-18',
+      '2026-08-18T12:00:00.000Z',
+    );
+
+    expect(parseSchedulePayload(files.schedule).events[0]).toEqual({
+      date: '2026-08-20',
+      tourId: 'winter-1',
+      seats: 8,
+      status: 'open',
+      comment: null,
+      durationType: 'однодневный',
+    });
   });
 
   it('keeps past dates of a hidden tour on the guest calendar', () => {
@@ -531,7 +555,6 @@ describe('toGuestTourDataFiles', () => {
         status: 'completed',
         comment: null,
         durationType: 'однодневный',
-        overridePriceRub: 6000,
       },
     ]);
   });

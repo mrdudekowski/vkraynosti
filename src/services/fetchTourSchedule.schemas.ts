@@ -8,7 +8,6 @@ export const tourScheduleEventSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   tourId: z.string().min(1),
   durationType: tourScheduleDurationTypeSchema,
-  priceRub: z.number().nullable(),
   seats: z.number().nullable(),
   status: tourScheduleStatusSchema,
   comment: z.string().nullable(),

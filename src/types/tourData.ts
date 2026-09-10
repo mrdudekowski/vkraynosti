@@ -23,7 +23,6 @@ export interface ScheduleEvent {
   seats: number | null;
   status: ScheduleEventStatus;
   comment: string | null;
-  overridePriceRub?: number;
   durationType?: TourDurationType;
 }
 

@@ -30,3 +30,10 @@ Verification:
 
 - `npx vitest run src/admin/components/AdminChrome.test.tsx --reporter=dot`: **18 passed**;
 - ESLint/typecheck/diff-check launch was interrupted by the user request to commit immediately; no pass is claimed for those commands.
+
+## Local verification follow-up
+
+- `SidebarBody` now forwards its current `overflowIds` prop to `AdminSidebarNav`;
+- the `AdminChrome` navigation mock uses an explicit test item type, avoiding TS2698 while preserving dynamic test IDs;
+- `npm run typecheck`: **passed**;
+- ESLint on the exact Task 5 files, including `src/admin/hooks/useAdminSidebarLayout.test.ts`: **passed**.

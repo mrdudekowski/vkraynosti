@@ -202,7 +202,7 @@ const SidebarBody = ({
               onNavigate={onNavigate}
               onReorder={onReorder}
               onDropOverflow={onDropOverflow}
-              overflowIds={overflowItems.map((item) => item.id)}
+              overflowIds={overflowIds}
             />
             {overflowItems.length > 0 ? (
               <button
@@ -490,6 +490,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             desktopLayout={layoutEnabled}
             visibleItems={layoutEnabled ? visibleSidebarItems : undefined}
             overflowItems={layoutEnabled ? overflowItems : undefined}
+            overflowIds={layoutEnabled ? overflowItems.map((item) => item.id) : undefined}
             onOpenOverflow={() => setSidebarOverflowOpen(true)}
             onReorder={setVisibleOrder}
             onDropOverflow={(overflowId, visibleIndex) => {

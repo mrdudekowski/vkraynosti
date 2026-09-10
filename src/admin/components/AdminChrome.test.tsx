@@ -6,18 +6,21 @@ import { ADMIN_SIDEBAR_COLLAPSED_STORAGE_KEY } from '../../constants/adminUiToke
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import type { AdminSession } from '../api';
 import { ADMIN_UI } from '../constants/ui';
+import type { AdminNavItem } from '../constants/nav';
 import AdminChrome from './AdminChrome';
 import { AdminToastProvider } from './AdminToast';
 
+type TestNavItem = Omit<AdminNavItem, 'id'> & { id: string };
+
 const navState = vi.hoisted(() => ({
-  items: null as null | unknown[],
-  canonicalItems: null as null | unknown[],
+  items: null as null | TestNavItem[],
+  canonicalItems: null as null | TestNavItem[],
 }));
 
 vi.mock('../constants/nav', async () => {
-  const actual = await vi.importActual<typeof import('../constants/nav')>('../constants/nav');
-  navState.canonicalItems = [...actual.ADMIN_NAV_ITEMS];
-  navState.items = actual.ADMIN_NAV_ITEMS as unknown as unknown[];
+  const actual = (await vi.importActual('../constants/nav')) as typeof import('../constants/nav');
+  navState.canonicalItems = [...actual.ADMIN_NAV_ITEMS] as TestNavItem[];
+  navState.items = [...actual.ADMIN_NAV_ITEMS] as TestNavItem[];
   return {
     ...actual,
     get ADMIN_NAV_ITEMS() {

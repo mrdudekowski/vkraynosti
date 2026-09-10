@@ -22,6 +22,22 @@ type DragPayload =
   | { type: typeof ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE; value: AdminNavId }
   | null;
 
+type DropPosition = {
+  index: number;
+  edge: 'before' | 'after';
+};
+
+function getFinalVisibleIndex(
+  fromIndex: number,
+  targetIndex: number,
+  edge: DropPosition['edge'],
+  itemCount: number,
+): number {
+  const insertionIndex = targetIndex + (edge === 'after' ? 1 : 0);
+  const adjustedIndex = fromIndex < insertionIndex ? insertionIndex - 1 : insertionIndex;
+  return Math.max(0, Math.min(itemCount - 1, adjustedIndex));
+}
+
 function readDragPayload(dataTransfer: DataTransfer, overflowIds: ReadonlySet<AdminNavId>): DragPayload {
   const overflowId = dataTransfer.getData(ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE);
   if (overflowIds.has(overflowId as AdminNavId)) {
@@ -46,39 +62,76 @@ const AdminSidebarNav = ({
   onDropOverflow,
   overflowIds = [],
 }: AdminSidebarNavProps) => {
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const suppressClick = useRef(false);
+  const [dropPosition, setDropPosition] = useState<DropPosition | null>(null);
+  const dropPositionRef = useRef<DropPosition | null>(null);
   const permittedOverflowIds = new Set(overflowIds);
 
   return (
     <>
       {items.map((item, index) => {
         const active = item.isActive(pathname);
-        const moveUpDisabled = index === 0;
-        const moveDownDisabled = index === items.length - 1;
         const navClassName = active ? 'admin-sidebar-nav-active' : 'admin-sidebar-nav';
 
         return (
           <div
             key={item.id}
-            className={`group flex min-w-0 items-center gap-1 rounded-admin-control ${
-              draggedIndex === index ? 'opacity-60' : ''
-            }`}
+            className="group relative flex min-w-0 items-center gap-1 rounded-admin-control"
             onDragOver={(event) => {
               event.preventDefault();
               event.dataTransfer.dropEffect = 'move';
+              const payload = readDragPayload(event.dataTransfer, permittedOverflowIds);
+              if (payload == null || (payload.type === ADMIN_SIDEBAR_ITEM_DRAG_TYPE && payload.value === index)) {
+                dropPositionRef.current = null;
+                setDropPosition(null);
+                return;
+              }
+              const rect = event.currentTarget.getBoundingClientRect();
+              const nextPosition = {
+                index,
+                edge: event.clientY < rect.top + rect.height / 2 ? 'before' : 'after',
+              } satisfies DropPosition;
+              dropPositionRef.current = nextPosition;
+              setDropPosition(nextPosition);
+            }}
+            onDragLeave={(event) => {
+              const relatedTarget = event.relatedTarget as Node | null;
+              if (relatedTarget != null && !event.currentTarget.contains(relatedTarget)) {
+                dropPositionRef.current = null;
+                setDropPosition(null);
+              }
             }}
             onDrop={(event) => {
               event.preventDefault();
               const payload = readDragPayload(event.dataTransfer, permittedOverflowIds);
               if (payload?.type === ADMIN_SIDEBAR_ITEM_DRAG_TYPE) {
-                onReorder?.(payload.value, index);
+                const rect = event.currentTarget.getBoundingClientRect();
+                const currentDropPosition = dropPositionRef.current;
+                const edge = currentDropPosition?.index === index
+                  ? currentDropPosition.edge
+                  : event.clientY < rect.top + rect.height / 2
+                    ? 'before'
+                    : 'after';
+                onReorder?.(
+                  payload.value,
+                  getFinalVisibleIndex(payload.value, index, edge, items.length),
+                );
               } else if (payload?.type === ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE) {
                 onDropOverflow?.(payload.value, index);
               }
-              setDraggedIndex(null);
+              dropPositionRef.current = null;
+              setDropPosition(null);
             }}
           >
+            {dropPosition?.index === index ? (
+              <span
+                data-testid="admin-sidebar-drop-indicator"
+                aria-hidden="true"
+                className={`pointer-events-none absolute inset-x-0 z-10 h-0.5 rounded-full bg-brand-accent ${
+                  dropPosition.edge === 'before' ? 'top-0' : 'bottom-0'
+                }`}
+              />
+            ) : null}
             <NavLink
               to={item.to}
               end={item.id === 'dashboard'}
@@ -92,13 +145,13 @@ const AdminSidebarNav = ({
               }}
               onDragStart={(event) => {
                 suppressClick.current = true;
-                setDraggedIndex(index);
                 event.dataTransfer.effectAllowed = 'move';
                 event.dataTransfer.setData(ADMIN_SIDEBAR_ITEM_DRAG_TYPE, String(index));
                 event.dataTransfer.setData('text/plain', String(index));
               }}
               onDragEnd={() => {
-                setDraggedIndex(null);
+                dropPositionRef.current = null;
+                setDropPosition(null);
                 window.setTimeout(() => {
                   suppressClick.current = false;
                 }, 0);
@@ -120,28 +173,6 @@ const AdminSidebarNav = ({
                 </span>
               ) : null}
             </NavLink>
-            <span className="hidden shrink-0 items-center group-focus-within:flex group-hover:flex sm:inline-flex">
-              <button
-                type="button"
-                className="rounded-admin-control p-1 text-text-inverse/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary disabled:opacity-40"
-                aria-label={`${ADMIN_UI.moveUp}: ${item.label}`}
-                title={`${ADMIN_UI.moveUp}: ${item.label}`}
-                disabled={moveUpDisabled}
-                onClick={() => onReorder?.(index, index - 1)}
-              >
-                ↑
-              </button>
-              <button
-                type="button"
-                className="rounded-admin-control p-1 text-text-inverse/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary disabled:opacity-40"
-                aria-label={`${ADMIN_UI.moveDown}: ${item.label}`}
-                title={`${ADMIN_UI.moveDown}: ${item.label}`}
-                disabled={moveDownDisabled}
-                onClick={() => onReorder?.(index, index + 1)}
-              >
-                ↓
-              </button>
-            </span>
           </div>
         );
       })}

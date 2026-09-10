@@ -1,10 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { LayoutDashboard, Map as MapIcon } from 'lucide-react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import type { AdminNavItem } from '../constants/nav';
-import { ADMIN_UI } from '../constants/ui';
 import AdminSidebarNav from './AdminSidebarNav';
 
 const items: AdminNavItem[] = [
@@ -126,23 +124,36 @@ describe('AdminSidebarNav', () => {
     expect(onDropOverflow).toHaveBeenCalledWith('site', 1);
   });
 
-  it('uses the same reorder callback for keyboard movement and disables boundary actions', async () => {
-    const user = userEvent.setup();
-    const onReorder = vi.fn();
-    renderNav({ onReorder });
+  it('does not render non-mouse reorder controls', () => {
+    renderNav();
 
-    const firstMoveUp = screen.getByRole('button', { name: `${ADMIN_UI.moveUp}: Обзор` });
-    const firstMoveDown = screen.getByRole('button', { name: `${ADMIN_UI.moveDown}: Обзор` });
-    const secondMoveUp = screen.getByRole('button', { name: `${ADMIN_UI.moveUp}: Туры` });
-    const secondMoveDown = screen.getByRole('button', { name: `${ADMIN_UI.moveDown}: Туры` });
-    expect(firstMoveUp).toBeDisabled();
-    expect(secondMoveDown).toBeDisabled();
-    await user.click(firstMoveDown);
-    await user.click(secondMoveUp);
-
-    expect(onReorder).toHaveBeenNthCalledWith(1, 0, 1);
-    expect(onReorder).toHaveBeenNthCalledWith(2, 1, 0);
-    expect(firstMoveUp).toHaveAttribute('aria-label', 'Выше: Обзор');
-    expect(secondMoveDown).toHaveAttribute('aria-label', 'Ниже: Туры');
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
+
+  it('renders a drop insertion line without dimming the dragged row', () => {
+    renderNav();
+    const source = screen.getByRole('link', { name: 'Обзор' });
+    const target = screen.getByRole('link', { name: 'Туры' });
+    const targetRow = target.parentElement!;
+    const dataTransfer = createDataTransfer('application/x-admin-sidebar-item', '0');
+
+    vi.spyOn(targetRow, 'getBoundingClientRect').mockReturnValue({
+      top: 100,
+      bottom: 160,
+      height: 60,
+      left: 0,
+      right: 300,
+      width: 300,
+      x: 0,
+      y: 100,
+      toJSON: () => ({}),
+    });
+
+    fireEvent.dragStart(source, { dataTransfer });
+    fireEvent.dragOver(targetRow, { dataTransfer, clientY: 145 });
+
+    expect(screen.getByTestId('admin-sidebar-drop-indicator')).toBeInTheDocument();
+    expect(source.parentElement).not.toHaveClass('opacity-60');
+  });
+
 });

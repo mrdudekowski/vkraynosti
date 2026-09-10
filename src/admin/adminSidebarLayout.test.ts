@@ -126,6 +126,16 @@ describe('adminSidebarLayout', () => {
     expect(reorderVisibleAdminSidebarItem(layout, 1.5, 2)).toEqual(layout);
   });
 
+  it('treats the destination index as the final index after removal', () => {
+    const layout = createDefaultAdminSidebarLayout(fixtureItems);
+
+    expect(reorderVisibleAdminSidebarItem(layout, 0, 1).visibleOrder.slice(0, 3)).toEqual([
+      ids[1],
+      ids[0],
+      ids[2],
+    ]);
+  });
+
   it('exchanges an overflow item with the visible target and preserves overflow order', () => {
     const layout = createDefaultAdminSidebarLayout(fixtureItems);
 

@@ -1,8 +1,8 @@
 .admin-modal-mode-switch {
-  --switch-bg: #70a9c5;
+  --switch-bg: #1a3c2e;
   --switch-padding: 4px;
-  --slider-bg: rgba(12, 74, 110, 0.7);
-  --slider-bg-on: rgba(12, 74, 110, 1);
+  --slider-bg: rgba(255, 255, 255, 0.18);
+  --slider-bg-on: rgba(255, 255, 255, 0.28);
   --slider-text: #fff;
   --label-padding: 0.65rem 1.25rem;
   --switch-easing: cubic-bezier(0.47, 1.64, 0.41, 0.8);

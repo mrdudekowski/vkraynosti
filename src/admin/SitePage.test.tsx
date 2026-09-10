@@ -52,7 +52,7 @@ describe('SitePage', () => {
     render(<SitePage />);
     fireEvent.click(await screen.findByRole('tab', { name: 'Модальная заявка' }));
     await screen.findByRole('tabpanel', { name: 'Модальная заявка' });
-    fireEvent.click(screen.getByText('Контакты', { selector: 'strong' }).closest('button')!);
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Активный режим модалки' }));
     fireEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
     await waitFor(() => expect(adminSaveSiteContent).toHaveBeenCalledWith('modal', 1, expect.objectContaining({ requestFormEnabled: false })));
   });
@@ -61,7 +61,7 @@ describe('SitePage', () => {
     render(<SitePage />);
     fireEvent.click(await screen.findByRole('tab', { name: 'Модальная заявка' }));
     await screen.findByText('Содержимое модалки «Заявка»');
-    fireEvent.click(screen.getByText('Контакты', { selector: 'strong' }).closest('button')!);
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Активный режим модалки' }));
     expect(await screen.findByText('Содержимое модалки «Контакты»')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('checkbox', { name: 'Активный режим модалки' }));
     expect(await screen.findByText('Содержимое модалки «Заявка»')).toBeInTheDocument();

@@ -9,7 +9,7 @@ const orderSchema = z.number().int().min(0).default(0);
 
 export const siteContentAssetSchema = z.object({
   assetId: z.string().min(1),
-  url: z.string().url(),
+  url: z.string().trim().min(1),
   mimeType: z.string().min(1),
   alt: z.string().default(''),
 });
@@ -131,9 +131,12 @@ export function parseSiteContentDocument(
 export function parseSiteContentDocument(
   kind: SiteContentDocumentKind,
   input: unknown,
+): SiteContentDocument;
+export function parseSiteContentDocument(
+  kind: SiteContentDocumentKind,
+  input: unknown,
 ): SiteContentDocument {
   if (kind === 'team') return teamContentDocumentSchema.parse(input);
   if (kind === 'contacts') return contactsContentDocumentSchema.parse(input);
   return footerContentDocumentSchema.parse(input);
 }
-

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const SITE_CONTENT_SCHEMA_VERSION = 1 as const;
-export const SITE_CONTENT_KINDS = ['team', 'contacts', 'footer'] as const;
+export const SITE_CONTENT_KINDS = ['team', 'contacts', 'footer', 'modal'] as const;
 export type SiteContentDocumentKind = (typeof SITE_CONTENT_KINDS)[number];
 
 const visibilitySchema = z.boolean().default(true);
@@ -62,6 +62,16 @@ export const contactsContentDocumentSchema = z.object({
 });
 export type ContactsContentDocument = z.infer<typeof contactsContentDocumentSchema>;
 
+export const modalContentDocumentSchema = z.object({
+  kind: z.literal('modal'),
+  schemaVersion: z.literal(SITE_CONTENT_SCHEMA_VERSION),
+  requestFormEnabled: z.boolean().default(true),
+  contactTitle: z.string().trim().min(1).default('Свяжитесь с нами'),
+  contactDescription: z.string().trim().default('Выберите удобный канал связи.'),
+  tourContactTitle: z.string().trim().min(1).default('Свяжитесь с нами и забронируйте тур'),
+});
+export type ModalContentDocument = z.infer<typeof modalContentDocumentSchema>;
+
 const footerRowBaseSchema = z.object({
   id: z.string().min(1),
   label: z.string().default(''),
@@ -114,7 +124,8 @@ export type FooterContentDocument = z.infer<typeof footerContentDocumentSchema>;
 export type SiteContentDocument =
   | TeamContentDocument
   | ContactsContentDocument
-  | FooterContentDocument;
+  | FooterContentDocument
+  | ModalContentDocument;
 
 export function parseSiteContentDocument(
   kind: 'team',
@@ -129,10 +140,15 @@ export function parseSiteContentDocument(
   input: unknown,
 ): FooterContentDocument;
 export function parseSiteContentDocument(
+  kind: 'modal',
+  input: unknown,
+): ModalContentDocument;
+export function parseSiteContentDocument(
   kind: SiteContentDocumentKind,
   input: unknown,
 ): SiteContentDocument {
   if (kind === 'team') return teamContentDocumentSchema.parse(input);
   if (kind === 'contacts') return contactsContentDocumentSchema.parse(input);
+  if (kind === 'modal') return modalContentDocumentSchema.parse(input);
   return footerContentDocumentSchema.parse(input);
 }

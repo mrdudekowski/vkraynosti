@@ -2,7 +2,9 @@ import { useState, type FormEvent } from 'react';
 import { slugFromTitle } from '../../cms/cmsTourSlug';
 import { SEASON_ORDER } from '../../constants/seasonNavbarAppearance';
 import type { Season } from '../../types';
+import { adminCalendarSeason } from '../adminCalendarSeason';
 import { adminCreateTour } from '../api';
+import { invalidateAdminTours, invalidateAdminPublishQueue } from '../adminDataCache';
 import { ADMIN_UI } from '../constants/ui';
 import AdminAlert from './AdminAlert';
 import AdminButton from './AdminButton';
@@ -24,7 +26,7 @@ const CreateTourModal = ({ lockedSeason, onClose, onCreated }: CreateTourModalPr
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [slugManual, setSlugManual] = useState(false);
-  const [season, setSeason] = useState<Season>(lockedSeason ?? SEASON_ORDER[0]);
+  const [season, setSeason] = useState<Season>(lockedSeason ?? adminCalendarSeason());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,6 +56,8 @@ const CreateTourModal = ({ lockedSeason, onClose, onCreated }: CreateTourModalPr
         season,
         slug: slug.trim().length > 0 ? slug.trim() : slugFromTitle(nextTitle),
       });
+      invalidateAdminTours();
+      invalidateAdminPublishQueue();
       onCreated(payload.document.id);
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : 'create_failed';
@@ -102,6 +106,7 @@ const CreateTourModal = ({ lockedSeason, onClose, onCreated }: CreateTourModalPr
         ) : null}
         <TourIdentityFields
           idPrefix="admin-create-tour"
+          surface={false}
           title={title}
           slug={slug}
           season={season}

@@ -1,4 +1,5 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react';
+import { ADMIN_UI } from '../constants/ui';
 
 type AdminTextInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> & {
   className?: string;
@@ -22,4 +23,21 @@ export const AdminTextArea = ({ className = '', hasError = false, ...props }: Ad
     className={`admin-textarea ${hasError ? 'admin-input-error' : ''} ${className}`.trim()}
     {...props}
   />
+);
+
+type AdminFieldLabelProps = {
+  htmlFor: string;
+  children: ReactNode;
+  required?: boolean;
+};
+
+export const AdminFieldLabel = ({ htmlFor, children, required = false }: AdminFieldLabelProps) => (
+  <span className="flex flex-wrap items-baseline gap-x-1">
+    <label htmlFor={htmlFor} className="text-sm font-medium text-text-primary">
+      {children}
+    </label>
+    {required ? (
+      <span className="text-tooltip font-normal text-text-muted">{ADMIN_UI.requiredForPublish}</span>
+    ) : null}
+  </span>
 );

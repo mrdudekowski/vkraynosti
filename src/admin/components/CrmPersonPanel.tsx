@@ -27,10 +27,12 @@ import AdminBadge from './AdminBadge';
 import AdminButton from './AdminButton';
 import { AdminTextInput } from './AdminFields';
 import AdminSelect from './AdminSelect';
+import TourCoverImage from './TourCoverImage';
 
 type CrmPersonPanelProps = {
   file: CrmFile;
   person: CrmPerson;
+  tourImageUrls?: Record<string, string | null>;
   onFile: (file: CrmFile) => void;
   onBack: () => void;
 };
@@ -39,7 +41,7 @@ function folderLabel(folder: string): string {
   return isBuiltInContactFolder(folder) ? ADMIN_UI.crmFolders[folder] : folder;
 }
 
-const CrmPersonPanel = ({ file, person, onFile, onBack }: CrmPersonPanelProps) => {
+const CrmPersonPanel = ({ file, person, tourImageUrls = {}, onFile, onBack }: CrmPersonPanelProps) => {
   const [name, setName] = useState(person.name);
   const [phone, setPhone] = useState(person.phone);
   const [messenger, setMessenger] = useState(person.messenger);
@@ -247,6 +249,7 @@ const CrmPersonPanel = ({ file, person, onFile, onBack }: CrmPersonPanelProps) =
           <DealEditor
             key={deal.id}
             deal={deal}
+            imageUrl={tourImageUrls[deal.tourId]}
             disabled={busy}
             onPatch={(patch) => void patchDeal(deal.id, patch)}
             onTouch={(kind) => void addTouch(deal.id, kind)}
@@ -260,14 +263,20 @@ const CrmPersonPanel = ({ file, person, onFile, onBack }: CrmPersonPanelProps) =
 
 type DealEditorProps = {
   deal: CrmDeal;
+  imageUrl?: string | null;
   disabled: boolean;
   onPatch: (patch: Parameters<typeof adminUpdateCrmDeal>[2]) => void;
   onTouch: (kind: 'called' | 'wrote') => void;
 };
 
-const DealEditor = ({ deal, disabled, onPatch, onTouch }: DealEditorProps) => (
+const DealEditor = ({ deal, imageUrl, disabled, onPatch, onTouch }: DealEditorProps) => (
   <li className="flex flex-col gap-2 border-b border-divider py-3 last:border-b-0">
     <div className="flex flex-wrap items-center gap-2">
+      <TourCoverImage
+        src={imageUrl}
+        alt={deal.tourTitle}
+        className="h-10 w-14 shrink-0 rounded-admin-control"
+      />
       <p className="min-w-0 font-medium text-text-primary">
         {deal.tourTitle}
         <span className="ml-2 text-sm text-text-muted">{deal.date}</span>

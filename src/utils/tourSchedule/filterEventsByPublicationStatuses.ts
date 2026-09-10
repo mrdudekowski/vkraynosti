@@ -1,8 +1,15 @@
 import type { TourPublicationStatus, TourScheduleEvent } from '../../types/tourSchedule';
 
-/** Убирает выезды скрытых туров (defense in depth к GAS). */
-export const filterEventsByPublicationStatuses = <T extends Pick<TourScheduleEvent, 'tourId'>>(
+/** Убирает будущие выезды скрытых туров (defense in depth к GAS). Прошедшие completed остаются. */
+export const filterEventsByPublicationStatuses = <
+  T extends Pick<TourScheduleEvent, 'tourId' | 'status'>,
+>(
   events: readonly T[],
   publicationStatuses: ReadonlyMap<string, TourPublicationStatus>,
 ): T[] =>
-  events.filter(event => publicationStatuses.get(event.tourId) !== 'hidden');
+  events.filter((event) => {
+    if (publicationStatuses.get(event.tourId) !== 'hidden') {
+      return true;
+    }
+    return event.status === 'completed';
+  });

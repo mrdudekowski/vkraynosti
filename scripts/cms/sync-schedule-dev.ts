@@ -10,7 +10,7 @@ import {
   parseToursListPayload,
 } from '../../src/services/tourData.ts';
 import { loadCmsApiEnv, readDotEnvFile } from './api/env.ts';
-import { createS3JsonStore } from './api/store.ts';
+import { createCmsJsonStore } from './api/store.ts';
 
 const rootDir = process.cwd();
 
@@ -60,12 +60,15 @@ async function writeLocalCmsCopy(fileName: string, value: unknown): Promise<void
 
 async function main(): Promise<void> {
   const localEnv = await readDotEnvFile(path.join(rootDir, '.env.local'));
+  const cmsEnv = await readDotEnvFile(path.join(rootDir, '.env.cms-dev'));
   const exampleEnv = await readDotEnvFile(path.join(rootDir, '.env'));
   const publicBase = (
     localEnv.VITE_PUBLIC_S3_BASE_URL ??
     exampleEnv.VITE_PUBLIC_S3_BASE_URL ??
     process.env.VITE_PUBLIC_S3_BASE_URL ??
-    ''
+    cmsEnv.CMS_SCHEDULE_SOURCE_BASE ??
+    cmsEnv.CMS_MEDIA_SOURCE_BASE ??
+    'https://4unja6slv5.cdn.twcstorage.ru/'
   ).trim();
 
   const toursList = parseToursListPayload(
@@ -75,8 +78,8 @@ async function main(): Promise<void> {
     await loadSourceJson(publicBase, TOUR_DATA_S3_PATHS.schedule, 'schedule.json')
   );
 
-  const cmsEnv = await loadCmsApiEnv(rootDir);
-  const store = createS3JsonStore(cmsEnv.s3);
+  const cmsApiEnv = await loadCmsApiEnv(rootDir);
+  const store = createCmsJsonStore(cmsApiEnv);
   await store.putJson(CMS_PUBLISHED_TOURS_LIST_KEY, toursList);
   await store.putJson(CMS_PUBLISHED_SCHEDULE_KEY, schedule);
   await writeLocalCmsCopy('tours_list.json', toursList);

@@ -1,10 +1,14 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createServer } from 'vite';
+import {
+  collectCmsMigrationMedia,
+  dedupeCmsMigrationMedia,
+} from '../../src/cms/collectCmsMigrationMedia.ts';
 
-const CMS_DEV_REWRITE_TOUR_ID = 'summer-8';
 const rootDir = process.cwd();
 const outDir = path.join(rootDir, 'tmp', 'cms-catalog');
+const fullMediaMigration = process.argv.includes('--full-media');
 
 const readDotEnv = async (filePath: string): Promise<Record<string, string>> => {
   const { readFile } = await import('node:fs/promises');
@@ -30,7 +34,7 @@ const writeJson = async (filePath: string, value: unknown): Promise<void> => {
   await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 };
 
-console.log('cms:export starting Vite SSR…');
+console.log(`cms:export starting Vite SSR (${fullMediaMigration ? 'full media' : 'pilot media'})…`);
 
 const server = await createServer({
   root: rootDir,
@@ -46,14 +50,15 @@ try {
     '/src/cms/buildCmsToursFile.ts'
   );
   const {
+    CMS_DRAFT_INDEX_KEY,
     CMS_LEGACY_DRAFT_CATALOG_KEY,
     CMS_PUBLISHED_CATALOG_KEY,
     cmsDraftDocumentKey,
     cmsDraftMetaKey,
     cmsPublishedDocumentKey,
   } = await server.ssrLoadModule('/src/cms/cmsPackageKeys.ts');
-  const { cmsObjectKeyFromPublicUrl: keyFromUrl, siteTourToCmsDocument } =
-    await server.ssrLoadModule('/src/cms/siteTourToCmsDocument.ts');
+  const { cmsDraftIndexFile } = await server.ssrLoadModule('/src/cms/cmsDraftIndex.ts');
+  const { siteTourToCmsDocument } = await server.ssrLoadModule('/src/cms/siteTourToCmsDocument.ts');
 
   if (!Array.isArray(TOURS) || TOURS.length === 0) {
     throw new Error('TOURS is empty');
@@ -66,15 +71,11 @@ try {
 
   const packages = buildCmsTourPackages(TOURS, {
     publicBaseUrl: publicBase,
+    rewriteAllTourMedia: fullMediaMigration,
     meta: { updatedAt: new Date().toISOString() },
   });
   const catalog = compilePublishedToursFile(packages);
-  const rewritten = packages.find((item: { tourId: string }) => item.tourId === CMS_DEV_REWRITE_TOUR_ID)
-    ?.document;
-  const original = TOURS.find((tour: { id: string }) => tour.id === CMS_DEV_REWRITE_TOUR_ID);
-  if (rewritten == null || original == null) {
-    throw new Error(`Rewritten tour ${CMS_DEV_REWRITE_TOUR_ID} missing from export`);
-  }
+  const draftIndex = cmsDraftIndexFile(packages.map((item: { tourId: string }) => item.tourId));
 
   await mkdir(outDir, { recursive: true });
   await mkdir(path.join(rootDir, 'public', 'data', 'cms'), { recursive: true });
@@ -88,6 +89,7 @@ try {
   };
 
   await addJson(CMS_PUBLISHED_CATALOG_KEY, catalog);
+  await addJson(CMS_DRAFT_INDEX_KEY, draftIndex);
   await writeJson(path.join(rootDir, 'public', 'data', 'cms', 'tours.json'), catalog);
 
   for (const item of packages) {
@@ -98,28 +100,38 @@ try {
     }
   }
 
-  const originalDoc = siteTourToCmsDocument(original);
-  const originalById = new Map(
-    originalDoc.assets.map((asset: { id: string }) => [asset.id, asset])
-  );
-  const mediaObjects = rewritten.assets.flatMap(
-    (asset: { id: string; stillUrl: string; videoUrl: string | null }) => {
-      const source = originalById.get(asset.id) as
-        | { stillUrl: string; videoUrl: string | null }
-        | undefined;
-      if (source == null) {
-        return [];
-      }
-      const rows = [{ sourceUrl: source.stillUrl, key: keyFromUrl(asset.stillUrl, publicBase) }];
-      if (source.videoUrl != null && asset.videoUrl != null) {
-        rows.push({
-          sourceUrl: source.videoUrl,
-          key: keyFromUrl(asset.videoUrl, publicBase),
-        });
-      }
-      return rows;
+  const mediaObjects = fullMediaMigration
+    ? dedupeCmsMigrationMedia(
+        packages.flatMap((item: { tourId: string; document: unknown }) => {
+          const original = TOURS.find((tour: { id: string }) => tour.id === item.tourId);
+          if (original == null) {
+            return [];
+          }
+          return collectCmsMigrationMedia(
+            siteTourToCmsDocument(original),
+            item.document,
+            publicBase
+          );
+        })
+      )
+    : [];
+
+  if (!fullMediaMigration) {
+    const CMS_DEV_REWRITE_TOUR_ID = 'summer-8';
+    const pilotPackage = packages.find(
+      (item: { tourId: string }) => item.tourId === CMS_DEV_REWRITE_TOUR_ID
+    );
+    const pilotOriginal = TOURS.find((tour: { id: string }) => tour.id === CMS_DEV_REWRITE_TOUR_ID);
+    if (pilotPackage != null && pilotOriginal != null) {
+      mediaObjects.push(
+        ...collectCmsMigrationMedia(
+          siteTourToCmsDocument(pilotOriginal),
+          pilotPackage.document,
+          publicBase
+        )
+      );
     }
-  );
+  }
 
   const bentoCount = catalog.tours.filter(
     (tour: { bento: { blocks: unknown[] } }) => tour.bento.blocks.length > 0
@@ -127,13 +139,26 @@ try {
 
   await writeJson(path.join(outDir, 'manifest.json'), {
     bucketHint: cmsEnv.S3_BUCKET ?? 'vkraynosti-cms-dev',
+    fullMediaMigration,
+    mediaSourceBase:
+      cmsEnv.CMS_MEDIA_SOURCE_BASE ??
+      cmsEnv.VITE_PUBLIC_ASSET_BASE_URL ??
+      'https://4unja6slv5.cdn.twcstorage.ru/',
     jsonObjects,
     mediaObjects,
     deleteKeys: [CMS_LEGACY_DRAFT_CATALOG_KEY],
   });
 
+  const bySeason = packages.reduce(
+    (counts: Record<string, number>, item: { document: { season: string } }) => {
+      counts[item.document.season] = (counts[item.document.season] ?? 0) + 1;
+      return counts;
+    },
+    {}
+  );
+
   console.log(
-    `CMS packages: ${packages.length} tours, catalog ${catalog.tours.length} active (${bentoCount} bento), ${jsonObjects.length} json keys, ${mediaObjects.length} cms-dev media`
+    `CMS packages: ${packages.length} tours (${JSON.stringify(bySeason)}), catalog ${catalog.tours.length} active (${bentoCount} bento), ${jsonObjects.length} json keys, ${mediaObjects.length} media objects`
   );
 } finally {
   await server.close();

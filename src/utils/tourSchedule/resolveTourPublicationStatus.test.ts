@@ -57,9 +57,10 @@ describe('isTourHiddenFromSite', () => {
     );
   });
 
-  it('returns true for hidden and for ids missing from non-empty catalog', () => {
-    const statuses = map({ 'summer-1': 'active' });
+  it('returns true for hidden, in_development, and ids missing from catalog', () => {
+    const statuses = map({ 'summer-1': 'active', 'summer-13': 'in_development' });
     expect(isTourHiddenFromSite('summer-18', statuses, true)).toBe(true);
+    expect(isTourHiddenFromSite('summer-13', statuses, true)).toBe(true);
     expect(isTourHiddenFromSite('summer-1', statuses, true)).toBe(false);
   });
 

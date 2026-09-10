@@ -57,6 +57,22 @@ function splitByTargetLength(units: string[]): DescriptionColumns {
   };
 }
 
+export type PersistedDescriptionColumns = {
+  description: string;
+  descriptionAside?: string;
+};
+
+export function persistTourDescriptionColumns(
+  description: string,
+  manualAside?: string
+): PersistedDescriptionColumns {
+  const columns = splitTourDescription(description, manualAside);
+  return {
+    description: columns.primaryText,
+    ...(columns.asideText != null ? { descriptionAside: columns.asideText } : {}),
+  };
+}
+
 export function splitTourDescription(
   description: string,
   manualAside?: string

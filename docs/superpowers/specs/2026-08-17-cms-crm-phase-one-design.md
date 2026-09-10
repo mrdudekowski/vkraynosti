@@ -2,6 +2,16 @@
 
 Дата: 17 августа 2026 года  
 Статус: дизайн согласован, реализация не начата  
+
+> **Release sequencing update (17 August 2026):** scope and acceptance for the first release are now governed by `docs/superpowers/plans/2026-08-17-cms-schedule-release-one.md` and the updated execution map. Release 1 is CMS + PostgreSQL + complete tour catalog + editable departures schedule + migration from Google Sheets + atomic publication. CRM sections below are retained as the next release design and must not be implemented before the Release 1 checkpoint is approved.
+> **Approved departure-status decision (17 August 2026):** `planned` is an independent operational status. The XLSX source label for planned must be preserved as `planned` and must not be converted to `open` or `paused`.
+
+The earlier references below to CRM as part of the first release, and to the schedule editor being deferred, are superseded by this update. The current order is:
+
+1. Release 1: CMS, database, tour catalog, schedule and publication.
+2. Explicit evidence review and user approval.
+3. Release 2: CRM intake, manager workflow and CRM migration.
+
 Горизонт первой фазы: 4–6 недель
 
 ## 1. Цель

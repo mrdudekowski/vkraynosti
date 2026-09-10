@@ -94,6 +94,12 @@ export function mediaObjectPositionCssVars(objectPosition: string | undefined): 
   return {};
 }
 
+/** Карусель на главной: `hero` до `lg`, `heroLg` с `lg`. */
+export const TOUR_HERO_OBJECT_POSITION_CLASS = 'tour-hero-object-position' as const;
+
+/** Hero страницы тура: `hero` до `md`, `heroLg` с планшета и десктопа. */
+export const TOUR_DETAIL_HERO_OBJECT_POSITION_CLASS = 'tour-detail-hero-object-position' as const;
+
 export function formatCoverCropCssVars(crop: TourCoverCrop | undefined): {
   ['--tour-hero-object-position']?: string;
   ['--tour-hero-object-position-lg']?: string;

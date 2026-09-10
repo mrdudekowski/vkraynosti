@@ -7,8 +7,14 @@ type AdminDialogProps = {
   titleId: string;
   closeLabel: string;
   initialFocusId?: string;
+  size?: 'md' | 'lg';
   onClose: () => void;
   children: ReactNode;
+};
+
+const PANEL_WIDTH: Record<NonNullable<AdminDialogProps['size']>, string> = {
+  md: 'max-w-md',
+  lg: 'max-w-xl',
 };
 
 const AdminDialog = ({
@@ -16,6 +22,7 @@ const AdminDialog = ({
   titleId,
   closeLabel,
   initialFocusId,
+  size = 'md',
   onClose,
   children,
 }: AdminDialogProps) => {
@@ -40,7 +47,7 @@ const AdminDialog = ({
   }, [initialFocusId]);
 
   return createPortal(
-    <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-modal-raised flex items-center justify-center p-4">
       <button
         type="button"
         className="absolute inset-0 z-overlay bg-surface-dark/70"
@@ -52,7 +59,7 @@ const AdminDialog = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-modal max-h-modal-body w-full max-w-md overflow-y-auto rounded-card border border-divider bg-surface-light p-4"
+        className={`relative z-modal-raised max-h-modal-body w-full ${PANEL_WIDTH[size]} overflow-y-auto rounded-admin-overlay border border-divider bg-surface-light p-4 shadow-admin-overlay`}
       >
         <h2 id={titleId} className="mb-3 text-base font-semibold text-text-primary">
           {title}

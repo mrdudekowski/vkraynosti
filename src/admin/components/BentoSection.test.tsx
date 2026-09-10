@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { CmsTourDocument } from '../../cms/cmsTourDocument';
 import { ADMIN_UI } from '../constants/ui';
+import { AdminToastProvider } from './AdminToast';
 import BentoSection from './BentoSection';
 
 const baseDocument: CmsTourDocument = {
@@ -35,23 +36,25 @@ const unusedAsset = {
 
 const renderBento = (document: CmsTourDocument, onBento = vi.fn()) =>
   render(
-    <BentoSection
-      document={document}
-      coverAssetId={null}
-      prefaceAssetId={null}
-      bento={document.bento}
-      onBento={onBento}
-      onPoolFiles={vi.fn()}
-      onDeleteAsset={vi.fn()}
-      onAssetAlt={vi.fn()}
-      uploading={false}
-    />,
+    <AdminToastProvider>
+      <BentoSection
+        document={document}
+        coverAssetId={null}
+        prefaceAssetId={null}
+        bento={document.bento}
+        onBento={onBento}
+        onPoolFiles={vi.fn()}
+        onDeleteAsset={vi.fn()}
+        uploading={false}
+      />
+    </AdminToastProvider>,
   );
 
 describe('BentoSection', () => {
   it('рисует чипы схем, чтобы редактор тура не падал на галерее', () => {
     renderBento(baseDocument);
     expect(screen.getByRole('heading', { name: ADMIN_UI.galleryHeading })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: ADMIN_UI.poolLabel })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: ADMIN_UI.blockTypes['bento-vert'] })).toBeInTheDocument();
   });
 
@@ -66,6 +69,22 @@ describe('BentoSection', () => {
     expect(existingBlock.compareDocumentPosition(addChip) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
+    expect(screen.getByRole('heading', { name: ADMIN_UI.addBlock })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: ADMIN_UI.changeBlockType })).toBeInTheDocument();
+  });
+
+  it('marks pool items as used or unused', () => {
+    renderBento({
+      ...baseDocument,
+      assets: [
+        unusedAsset,
+        { id: 'g-1', stillUrl: 'https://cdn.example/g-1.webp', videoUrl: null, alt: 'Свободный кадр' },
+      ],
+      bento: { blocks: [{ type: 'bento-single', slots: [{ assetId: unusedAsset.id }] }] },
+    });
+
+    expect(screen.getByText(ADMIN_UI.usedInGrid)).toBeInTheDocument();
+    expect(screen.getByText(ADMIN_UI.unusedInGrid)).toBeInTheDocument();
   });
 
   it('по плюсу в ячейке открывает свободные кадры пула, а не выбор с устройства', async () => {

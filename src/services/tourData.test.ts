@@ -105,4 +105,16 @@ describe('tourData service', () => {
       { cache: 'no-store' },
     );
   });
+
+  it('при CMS env не падает на прод-календарь, если снимок cms-dev не открылся', async () => {
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://s3.example/vkraynosti-cms-dev/');
+    vi.mocked(fetch).mockResolvedValue({
+      ok: false,
+      status: 404,
+    } as Response);
+
+    await expect(loadToursList()).rejects.toThrow();
+    const urls = vi.mocked(fetch).mock.calls.map((call) => call[0]);
+    expect(urls).not.toContain('https://cdn.example.test/tour-schedule/tours_list.json');
+  });
 });

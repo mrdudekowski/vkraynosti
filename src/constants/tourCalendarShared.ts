@@ -1,7 +1,10 @@
 /** Единый класс выбранного дня для всех `DayPicker` с корнем `.tour-calendar`. */
 export const TOUR_CALENDAR_DAY_SELECTED_CLASS = 'tour-calendar__day--selected' as const;
 
-/** Цифра дня внутри кнопки (hover scale в `index.css`). */
+/** Surface-карточка цифры дня (selected tile в `index.css`). */
+export const TOUR_CALENDAR_DAY_TILE_CLASS = 'tour-calendar__day-tile' as const;
+
+/** Цифра дня внутри tile. */
 export const TOUR_CALENDAR_DAY_NUMBER_CLASS = 'tour-calendar__day-num' as const;
 
 /** Маркер ячейки `<td>` с событиями (фон только на кнопке, через точки). */

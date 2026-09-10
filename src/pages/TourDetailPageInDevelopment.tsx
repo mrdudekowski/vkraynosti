@@ -13,6 +13,7 @@ import { useMatchMinWidth } from "../hooks/useMatchMinWidth";
 import { useModal } from "../context/useModal";
 import { useTourDisplayDuration } from "../hooks/useTourDisplayDuration";
 import { resolveTourHeroImageUrl } from "../utils/getTourPrefaceBackgroundUrl";
+import { tourHeroObjectProps } from "../utils/tourCoverPresentation";
 import {
   getTourBreadcrumbSchema,
   getTourSeoEntry,
@@ -33,6 +34,7 @@ const TourDetailPageInDevelopment = ({ tour }: TourDetailPageInDevelopmentProps)
     gridGalleryUrls,
     isLgOrAbove,
   });
+  const heroObject = tourHeroObjectProps(tour);
 
   const handleOpenTourRequest = () => {
     openTourRequestModal({
@@ -73,6 +75,9 @@ const TourDetailPageInDevelopment = ({ tour }: TourDetailPageInDevelopmentProps)
         subtitle={tour.subtitle}
         backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
         backLinkSeason={tour.season}
+        heroImageObjectClassName={heroObject.heroImageObjectClassName}
+        desktopHeroImgClassName={heroObject.desktopHeroImgClassName}
+        heroObjectStyle={heroObject.style}
       />
 
       <div className="tour-detail-page-gutter">

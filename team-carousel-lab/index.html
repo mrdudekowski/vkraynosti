@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Вкрайности — лаборатория карусели команды</title>
+    <style>
+      :root {
+        --ink: #162b23;
+        --muted: #687367;
+        --paper: #f7f3e9;
+        --card: #fffdf8;
+        --line: #d8ddd2;
+        --pine: #174636;
+        --pine-dark: #0d2b21;
+        --gold: #e3ab45;
+        --coral: #cf6e81;
+        --radius-lg: 28px;
+        --radius-md: 18px;
+        --shadow: 0 18px 42px rgb(22 43 35 / 12%);
+      }
+
+      * { box-sizing: border-box; }
+
+      html { background: var(--paper); }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        overflow-x: hidden;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 100% 0%, rgb(227 171 69 / 15%), transparent 26rem),
+          var(--paper);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button { font: inherit; }
+
+      button:focus-visible {
+        outline: 3px solid var(--gold);
+        outline-offset: 3px;
+      }
+
+      .page-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 72px; }
+
+      .hero { max-width: 760px; margin-bottom: 34px; }
+      .eyebrow, .variant-kicker { margin: 0 0 10px; color: #927034; font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { margin: 0; font-size: clamp(2rem, 5vw, 4.3rem); line-height: .98; letter-spacing: -.055em; }
+      .lead { max-width: 650px; margin: 20px 0 0; color: var(--muted); font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.58; }
+
+      .criteria { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; padding: 0; list-style: none; }
+      .criteria li { border: 1px solid var(--line); border-radius: 999px; padding: 7px 11px; background: rgb(255 253 248 / 72%); color: #415148; font-size: .85rem; }
+
+      .variant-list { display: grid; gap: 26px; }
+      .variant {
+        position: relative;
+        overflow: clip;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        padding: clamp(18px, 4vw, 34px);
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .variant-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: start; margin-bottom: 20px; }
+      .variant h2 { margin: 0; font-size: clamp(1.35rem, 3vw, 2rem); letter-spacing: -.035em; }
+      .variant-note { max-width: 440px; margin: 8px 0 0; color: var(--muted); line-height: 1.45; }
+      .counter { align-self: center; border-radius: 999px; padding: 7px 11px; background: #ecf2e9; color: var(--pine); font-size: .85rem; font-weight: 750; white-space: nowrap; }
+
+      .stage { min-height: 430px; }
+      .member-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .member-name { margin: 0; font-size: clamp(1.55rem, 3vw, 2.5rem); line-height: 1; letter-spacing: -.05em; }
+      .member-role { margin: 9px 0 0; color: var(--muted); font-weight: 650; line-height: 1.4; }
+      .member-bio { margin: 20px 0 0; line-height: 1.6; }
+      .microcopy { margin: 14px 0 0; color: var(--muted); font-size: .9rem; }
+
+      .controls { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+      .control-button, .pager-button, .passport-thumb, .trail-tab, .flip-card, .blur-card { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+      .control-button {
+        width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 50%;
+        color: var(--pine); background: var(--card); font-size: 1.45rem; line-height: 1;
+      }
+      .control-button:hover { background: #edf3eb; }
+      .pager { display: flex; flex: 1; justify-content: center; gap: 7px; }
+      .pager-button { width: 12px; height: 12px; padding: 0; border: 0; border-radius: 50%; background: #c7cec5; }
+      .pager-button[aria-current="true"] { width: 28px; border-radius: 9px; background: var(--coral); }
+
+      /* 1. Переворот */
+      .flip-wrap { display: grid; place-items: center; }
+      .flip-card { width: min(100%, 570px); min-height: 420px; padding: 0; border: 0; border-radius: 24px; perspective: 1200px; text-align: left; background: transparent; }
+      .flip-inner { position: relative; display: grid; min-height: inherit; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.2,.8,.2,1); }
+      .flip-card.is-flipped .flip-inner { transform: rotateY(180deg); }
+      .flip-face { position: absolute; inset: 0; display: grid; overflow: hidden; border-radius: 24px; backface-visibility: hidden; box-shadow: 0 16px 30px rgb(20 45 34 / 18%); }
+      .flip-front { grid-template-rows: 1fr auto; background: var(--pine-dark); color: #fff; }
+      .flip-front .portrait { min-height: 280px; }
+      .flip-front .caption { padding: 20px; background: linear-gradient(130deg, #154938, #0e2e23); }
+      .flip-front .member-role { color: #d7e3da; }
+      .flip-back { padding: clamp(24px, 5vw, 46px); transform: rotateY(180deg); align-content: center; background: linear-gradient(145deg, #fffdf7, #f0eadb); color: var(--ink); }
+      .flip-back::before { content: "«"; color: var(--gold); font-family: Georgia, serif; font-size: 5rem; line-height: .6; }
+      .flip-hint { margin: 20px 0 0; color: #8b6a33; font-size: .85rem; font-weight: 700; }
+
+      /* 2. Размытие */
+      .blur-card { position: relative; width: min(100%, 760px); height: 440px; margin: 0 auto; padding: 0; overflow: hidden; border: 0; border-radius: 24px; color: white; text-align: left; background: var(--pine-dark); box-shadow: 0 16px 30px rgb(20 45 34 / 16%); }
+      .blur-card img { transition: filter .5s ease, transform .7s ease; }
+      .blur-card:hover img { transform: scale(1.025); }
+      .blur-card.is-revealed img { filter: blur(10px) brightness(.45); transform: scale(1.09); }
+      .blur-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgb(7 27 20 / 82%), transparent 68%); pointer-events: none; }
+      .blur-caption, .blur-reveal { position: absolute; z-index: 1; left: clamp(18px, 4vw, 34px); right: clamp(18px, 4vw, 34px); transition: opacity .25s ease, transform .25s ease; }
+      .blur-caption { bottom: 26px; }
+      .blur-caption .member-role { color: #e4ece4; }
+      .blur-reveal { top: 50%; transform: translateY(-42%); opacity: 0; pointer-events: none; }
+      .blur-card.is-revealed .blur-caption { opacity: 0; transform: translateY(16px); }
+      .blur-card.is-revealed .blur-reveal { opacity: 1; pointer-events: auto; }
+      .blur-reveal .member-role { color: #f5d79c; }
+      .blur-reveal .member-bio { max-width: 570px; font-size: clamp(1rem, 2.4vw, 1.2rem); }
+
+      /* 3. Паспорт */
+      .passport-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(220px, .8fr); gap: 18px; max-width: 900px; margin: 0 auto; }
+      .passport-stage { display: grid; grid-template-columns: minmax(150px, .9fr) minmax(0, 1.1fr); min-height: 370px; overflow: hidden; border-radius: 24px; background: var(--pine-dark); color: #fff; }
+      .passport-motion-stage { will-change: opacity, transform; }
+      .passport-motion-stage.is-exiting { animation: passport-card-exit 220ms cubic-bezier(.4, 0, .2, 1) both; }
+      .passport-motion-stage.is-entering { animation: passport-card-enter 480ms cubic-bezier(.22, 1.35, .36, 1) both; }
+      .passport-stage .passport-copy { padding: clamp(20px, 4vw, 38px); align-content: center; }
+      .passport-stage .member-role { color: #d5e0d7; }
+      .passport-stage .member-bio { color: #f6f5ef; }
+      .passport-controls { display: grid; gap: 10px; margin-top: 18px; }
+      .passport-controls .controls { margin-top: 0; }
+      .passport-progress { height: 7px; overflow: hidden; border-radius: 99px; background: #e3e1d9; }
+      .passport-progress > span { display: block; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--coral), var(--gold)); transform: scaleX(var(--passport-progress, 0)); transform-origin: left center; will-change: transform; }
+      .passport-scroll {
+        max-height: 370px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 2px 5px 2px 2px;
+        cursor: grab;
+        scrollbar-width: none;
+        touch-action: pan-y;
+      }
+      .passport-scroll::-webkit-scrollbar { display: none; }
+      .passport-scroll.is-dragging { cursor: grabbing; user-select: none; }
+      .passport-deck { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .passport-thumb { position: relative; aspect-ratio: 1 / 1.14; padding: 0; overflow: hidden; border: 2px solid transparent; border-radius: 16px; background: #dfe5db; transition: transform 240ms ease, border-color 240ms ease, box-shadow 240ms ease; }
+      .passport-thumb img { transition: transform 240ms ease, filter 240ms ease; }
+      .passport-thumb:hover img, .passport-thumb[aria-pressed="true"] img { transform: scale(1.06); }
+      .passport-thumb[aria-pressed="true"] { border-color: var(--gold); box-shadow: 0 0 0 3px rgb(227 171 69 / 25%); transform: scale(1.04); }
+      .passport-thumb.is-promoting { animation: passport-thumb-promote 480ms cubic-bezier(.22, 1.35, .36, 1) both; }
+      .passport-thumb.is-demoting { animation: passport-thumb-demote 220ms ease-out both; }
+      .passport-thumb span { position: absolute; inset: auto 0 0; padding: 8px; background: linear-gradient(0deg, rgb(5 18 13 / 70%), transparent); color: #fff; font-size: .78rem; font-weight: 750; }
+
+      @keyframes passport-card-exit { to { opacity: 0; transform: translateY(-10px) scale(.985); } }
+      @keyframes passport-card-enter { from { opacity: 0; transform: translateY(16px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+      @keyframes passport-thumb-promote { from { opacity: .72; transform: scale(.94); } to { opacity: 1; transform: scale(1.04); } }
+      @keyframes passport-thumb-demote { to { opacity: .82; transform: scale(.96); } }
+
+      /* 4. Тропа */
+      .trail-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+      .trail-tab { min-height: 44px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: #fffdf8; color: var(--pine); font-size: .93rem; font-weight: 750; }
+      .trail-tab[aria-selected="true"] { border-color: var(--pine); background: var(--pine); color: white; }
+      .trail-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 400px; overflow: hidden; border-radius: 24px; background: #ede9de; }
+      .trail-panel .trail-image { min-height: 300px; }
+      .trail-copy { display: grid; align-content: center; padding: clamp(22px, 5vw, 54px); background: linear-gradient(145deg, #f6eddb, #e9e2d1); }
+      .trail-step { display: inline-flex; width: fit-content; margin-bottom: 20px; border-radius: 999px; padding: 7px 10px; background: #fffaf0; color: #8a6430; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+
+      .footer-note { margin: 30px 0 0; color: var(--muted); font-size: .9rem; text-align: center; }
+
+      @media (max-width: 700px) {
+        .page-shell { width: min(100% - 24px, 620px); padding-top: 26px; }
+        .variant { border-radius: 22px; }
+        .variant-header { grid-template-columns: 1fr; gap: 8px; }
+        .counter { justify-self: start; }
+        .stage { min-height: 390px; }
+        .flip-card { min-height: 390px; }
+        .blur-card { height: 410px; }
+        .passport-layout, .passport-stage, .trail-panel { grid-template-columns: 1fr; }
+        .passport-stage { min-height: 0; }
+        .passport-stage .portrait { height: 290px; }
+        .passport-scroll { max-height: 310px; }
+        .passport-deck { grid-template-columns: repeat(2, 1fr); }
+        .passport-thumb { border-radius: 12px; }
+        .passport-thumb span { display: none; }
+        .trail-panel .trail-image { min-height: 260px; }
+        .trail-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .trail-tabs::-webkit-scrollbar { display: none; }
+        .trail-tab { flex: 0 0 auto; }
+      }
+
+      @media (max-width: 390px) {
+        .page-shell { width: calc(100% - 20px); }
+        .variant { padding: 16px; }
+        .controls { gap: 7px; }
+        .flip-card { min-height: 365px; }
+        .blur-card { height: 380px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Вкрайности · UI laboratory</p>
+        <h1>Четыре способа рассказать о команде</h1>
+        <p class="lead">Интерактивный прототип без автопрокрутки: каждый вариант работает с теми же портретами и текстами, что и публичный сайт.</p>
+        <ul class="criteria" aria-label="Критерии прототипа">
+          <li>Тап-цели от 44 px</li><li>Клавиатура</li><li>Нет горизонтального overflow</li><li>Учитывает reduced motion</li>
+        </ul>
+      </header>
+      <div id="variants" class="variant-list"></div>
+      <p class="footer-note">Лаборатория предназначена для сравнения поведения и композиции до внедрения в основной сайт.</p>
+    </main>
+
+    <script>
+      const TEAM_ASSET_BASE = 'https://ypnmfvotln.cdn.twcstorage.ru/team/';
+      const REAL_TEAM = [
+        { id: 'team-1', name: 'Ярослав', role: 'Основатель, организатор поездок, гид', bio: 'Для меня «Вкрайности» — это не просто поездки, а возможность вытащить людей из рутины, вернуть им радость, живые эмоции и ощущение, что рядом есть свои. Я хочу, чтобы в наших поездках люди находили единомышленников, смеялись без повода, говорили у костра по-настоящему и снова чувствовали вкус жизни.' },
+        { id: 'team-2', name: 'Элина', role: 'Основатель, организатор авторских направлений, гид', bio: '«Вкрайности» родились из большой любви к этому краю и желания открывать его для других бережно, красиво и искренне. Мне очень хочется, чтобы наши путешествия помогали людям чаще останавливаться, замечать красоту вокруг, чувствовать жизнь глубже и сильнее любить этот мир.' },
+        { id: 'team-3', name: 'Елена', role: 'Координатор маршрутов и поездок', bio: '«Вкрайности» — это люди, в которых я верю. Я убеждена: однажды отправившись с нами, вы ощутите такое исключительное доверие, что не сможете найти нам равных.' },
+        { id: 'team-4', name: 'Павел', role: 'Специалист по обеспечению экспедиций', bio: 'Для меня «Вкрайности» — это сообщество людей, объединённых любовью к путешествиям. Мы создаём поездки, чтобы открывать наш край, показывать его скрытые жемчужины и делиться энергией природы. Но главное — это новые знакомства, истории и эмоции, которые остаются с нами надолго. Мы верим, что путешествия объединяют.' }
+      ].map(member => ({ ...member, image: TEAM_ASSET_BASE + member.id + '.webp' }));
+
+      const placeholderPortrait = (initials, color) => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460"><rect width="400" height="460" fill="${color}"/><circle cx="200" cy="145" r="76" fill="#f7f3e9" opacity=".9"/><path d="M70 420c18-110 92-163 130-163s112 53 130 163" fill="#f7f3e9" opacity=".9"/><text x="200" y="155" fill="${color}" font-family="Arial, sans-serif" font-size="54" font-weight="700" text-anchor="middle">${initials}</text></svg>`)}`;
+      const PLACEHOLDER_TEAM = [
+        { id: 'placeholder-1', name: 'Люба', role: 'Тестовая карточка команды', bio: 'Нейтральный тестовый профиль: помогает проверить поведение колоды, когда участников больше четырёх.', image: placeholderPortrait('ЛГ', '#80704e'), isPlaceholder: true },
+        { id: 'placeholder-2', name: 'Максим', role: 'Тестовая карточка команды', bio: 'Нейтральный тестовый профиль: помогает проверить поведение колоды, когда участников больше четырёх.', image: placeholderPortrait('МР', '#536f67'), isPlaceholder: true },
+        { id: 'placeholder-3', name: 'София', role: 'Тестовая карточка команды', bio: 'Нейтральный тестовый профиль: помогает проверить поведение колоды, когда участников больше четырёх.', image: placeholderPortrait('СВ', '#856877'), isPlaceholder: true },
+        { id: 'placeholder-4', name: 'Илья', role: 'Тестовая карточка команды', bio: 'Нейтральный тестовый профиль: помогает проверить поведение колоды, когда участников больше четырёх.', image: placeholderPortrait('ИН', '#596779'), isPlaceholder: true }
+      ];
+      const TEAM = [...REAL_TEAM, ...PLACEHOLDER_TEAM];
+
+      const root = document.querySelector('#variants');
+      const state = { flip: 0, flipped: false, blur: 0, revealed: false, passport: 0, passportScrollTop: 0, trail: 0 };
+      const passportDeckMotion = { element: null, frame: 0, resumeTimer: 0, paused: false, direction: 1, lastFrame: 0, pointerId: null, startY: 0, startTop: 0, dragged: false, ignoreClick: false, autoScrollUntil: 0 };
+      const PASSPORT_DWELL_MS = 5000;
+      const PASSPORT_PROGRESS_FINISH_MS = 180;
+      const PASSPORT_EXIT_MS = 220;
+      const PASSPORT_ENTRY_MS = 480;
+      const passportCarouselMotion = { frame: 0, resumeTimer: 0, transitionTimer: 0, paused: false, isTransitioning: false, progress: 0, startedAt: 0, pendingIndex: null };
+      const wrapIndex = value => (value + TEAM.length) % TEAM.length;
+      const image = member => `<img class="member-image" src="${member.image}" alt="${member.name}" loading="lazy">`;
+      const controls = (variant, active) => `
+        <div class="controls" aria-label="Навигация по команде">
+          <button class="control-button" type="button" data-action="previous" data-variant="${variant}" aria-label="Предыдущий участник">←</button>
+          <div class="pager" aria-label="Выбор участника">
+            ${TEAM.map((member, index) => `<button class="pager-button" type="button" data-action="select" data-variant="${variant}" data-index="${index}" aria-label="${member.name}" aria-current="${index === active}"></button>`).join('')}
+          </div>
+          <button class="control-button" type="button" data-action="next" data-variant="${variant}" aria-label="Следующий участник">→</button>
+        </div>`;
+      const header = (number, title, note, active) => `
+        <div class="variant-header"><div><p class="variant-kicker">Вариант ${number}</p><h2>${title}</h2><p class="variant-note">${note}</p></div><span class="counter">${active + 1} / ${TEAM.length}</span></div>`;
+
+      function renderFlip() {
+        const member = TEAM[state.flip];
+        return `<section class="variant" data-variant="flip" tabindex="0">${header('01', 'Карточка-переворот', 'На лицевой стороне — портрет, имя и роль. По тапу открывается личный текст.', state.flip)}
+          <div class="stage flip-wrap"><button type="button" class="flip-card ${state.flipped ? 'is-flipped' : ''}" data-action="flip" aria-pressed="${state.flipped}" aria-label="${state.flipped ? 'Показать портрет ' : 'Показать описание '}${member.name}"><span class="flip-inner"><span class="flip-face flip-front"><span class="portrait">${image(member)}</span><span class="caption"><span class="member-name">${member.name}</span><span class="member-role">${member.role}</span></span></span><span class="flip-face flip-back"><span class="member-name">${member.name}</span><span class="member-role">${member.role}</span><span class="member-bio">${member.bio}</span><span class="flip-hint">Тапните, чтобы вернуться к портрету</span></span></span></button></div>${controls('flip', state.flip)}</section>`;
+      }
+
+      function renderBlur() {
+        const member = TEAM[state.blur];
+        return `<section class="variant" data-variant="blur" tabindex="0">${header('02', 'Портрет с мягким раскрытием', 'Тап по фотографии оставляет человека в кадре, но переводит внимание на его историю.', state.blur)}
+          <div class="stage"><button type="button" class="blur-card ${state.revealed ? 'is-revealed' : ''}" data-action="reveal" aria-pressed="${state.revealed}" aria-label="${state.revealed ? 'Скрыть' : 'Открыть'} описание ${member.name}">${image(member)}<span class="blur-caption"><span class="member-name">${member.name}</span><span class="member-role">${member.role}</span><span class="microcopy">Тапните по портрету, чтобы узнать больше</span></span><span class="blur-reveal"><span class="member-name">${member.name}</span><span class="member-role">${member.role}</span><span class="member-bio">${member.bio}</span><span class="microcopy">Тапните, чтобы снова увидеть портрет</span></span></button></div>${controls('blur', state.blur)}</section>`;
+      }
+
+      function renderPassport() {
+        const member = TEAM[state.passport];
+        return `<section class="variant" data-variant="passport" tabindex="0">${header('03', 'Паспорт команды', 'Главный портрет рассказывает историю; компактная колода быстро переключает участника.', state.passport)}
+          <div class="stage passport-layout"><article class="passport-stage passport-motion-stage" data-motion="idle"><div class="portrait">${image(member)}</div><div class="passport-copy"><p class="variant-kicker">Команда Вкрайности</p><h3 class="member-name">${member.name}</h3><p class="member-role">${member.role}</p><p class="member-bio">${member.bio}</p></div></article><div class="passport-scroll" tabindex="0" aria-label="Колода участников команды"><div class="passport-deck">${TEAM.map((person, index) => `<button type="button" class="passport-thumb" data-action="select" data-variant="passport" data-index="${index}" aria-label="Показать ${person.name}${person.isPlaceholder ? ', тестовая карточка' : ''}" aria-pressed="${index === state.passport}" data-placeholder="${Boolean(person.isPlaceholder)}">${image(person)}<span>${person.name}${person.isPlaceholder ? ' · тест' : ''}</span></button>`).join('')}</div></div></div><div class="passport-controls">${controls('passport', state.passport)}<div class="passport-progress" aria-hidden="true"><span></span></div></div></section>`;
+      }
+
+      function renderTrail() {
+        const member = TEAM[state.trail];
+        return `<section class="variant" data-variant="trail" tabindex="0">${header('04', 'Тропа людей', 'Участники — равные остановки на маршруте. Выбор открыт и особенно ясен на мобильном.', state.trail)}
+          <div class="stage"><div class="trail-tabs" role="tablist" aria-label="Команда">${TEAM.map((person, index) => `<button class="trail-tab" type="button" role="tab" id="trail-tab-${index}" aria-controls="trail-panel" data-action="select" data-variant="trail" data-index="${index}" aria-selected="${index === state.trail}" tabindex="${index === state.trail ? 0 : -1}">${index + 1}. ${person.name}</button>`).join('')}</div><article class="trail-panel" role="tabpanel" id="trail-panel" aria-labelledby="trail-tab-${state.trail}"><div class="trail-image">${image(member)}</div><div class="trail-copy"><span class="trail-step">Остановка ${state.trail + 1}</span><h3 class="member-name">${member.name}</h3><p class="member-role">${member.role}</p><p class="member-bio">${member.bio}</p></div></article></div>${controls('trail', state.trail)}</section>`;
+      }
+
+      function render() {
+        teardownPassportDeck();
+        teardownPassportCarouselMotion();
+        root.innerHTML = [renderFlip(), renderBlur(), renderPassport(), renderTrail()].join('');
+        setupPassportDeck();
+        setupPassportCarouselMotion();
+      }
+
+      const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+      function setPassportProgress(progress) {
+        passportCarouselMotion.progress = Math.max(0, Math.min(progress, 1));
+        root.querySelector('.passport-progress')?.style.setProperty('--passport-progress', passportCarouselMotion.progress);
+      }
+
+      function teardownPassportCarouselMotion() {
+        if (passportCarouselMotion.frame && window.cancelAnimationFrame) window.cancelAnimationFrame(passportCarouselMotion.frame);
+        passportCarouselMotion.frame = 0;
+      }
+
+      function pausePassportCarousel() {
+        passportCarouselMotion.paused = true;
+        teardownPassportCarouselMotion();
+      }
+
+      function resumePassportCarouselLater() {
+        window.clearTimeout(passportCarouselMotion.resumeTimer);
+        if (reducedMotion()) return;
+        passportCarouselMotion.resumeTimer = window.setTimeout(() => {
+          passportCarouselMotion.paused = false;
+          setPassportProgress(0);
+          startPassportCarousel();
+        }, PASSPORT_DWELL_MS);
+      }
+
+      function startPassportCarousel() {
+        if (reducedMotion() || passportCarouselMotion.paused || passportCarouselMotion.isTransitioning || passportCarouselMotion.frame || !window.requestAnimationFrame) return;
+        passportCarouselMotion.startedAt = performance.now();
+        const tick = now => {
+          if (passportCarouselMotion.paused || passportCarouselMotion.isTransitioning || reducedMotion()) {
+            passportCarouselMotion.frame = 0;
+            return;
+          }
+          const elapsed = now - passportCarouselMotion.startedAt;
+          const finishStart = PASSPORT_DWELL_MS - PASSPORT_PROGRESS_FINISH_MS;
+          const progress = elapsed < finishStart
+            ? .9 * (elapsed / finishStart)
+            : .9 + .1 * Math.min((elapsed - finishStart) / PASSPORT_PROGRESS_FINISH_MS, 1);
+          setPassportProgress(progress);
+          if (elapsed >= PASSPORT_DWELL_MS) {
+            passportCarouselMotion.frame = 0;
+            transitionPassportMember(state.passport + 1, 'autoplay');
+            return;
+          }
+          passportCarouselMotion.frame = window.requestAnimationFrame(tick);
+        };
+        passportCarouselMotion.frame = window.requestAnimationFrame(tick);
+      }
+
+      function scrollPassportThumbIntoView(index) {
+        const scroller = root.querySelector('.passport-scroll');
+        const thumb = scroller?.querySelector(`.passport-thumb[data-index="${index}"]`);
+        thumb?.scrollIntoView?.({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
+      }
+
+      function transitionPassportMember(index, source = 'manual') {
+        const nextIndex = wrapIndex(index);
+        if (source !== 'autoplay') {
+          pausePassportCarousel();
+          resumePassportCarouselLater();
+        }
+        if (nextIndex === state.passport && !passportCarouselMotion.isTransitioning) {
+          setPassportProgress(0);
+          return;
+        }
+        if (passportCarouselMotion.isTransitioning) {
+          passportCarouselMotion.pendingIndex = nextIndex;
+          return;
+        }
+        passportCarouselMotion.isTransitioning = true;
+        const stage = root.querySelector('.passport-motion-stage');
+        const currentThumb = root.querySelector(`.passport-thumb[data-index="${state.passport}"]`);
+        const nextThumb = root.querySelector(`.passport-thumb[data-index="${nextIndex}"]`);
+        stage?.classList.add('is-exiting');
+        currentThumb?.classList.add('is-demoting');
+        nextThumb?.classList.add('is-promoting');
+        window.clearTimeout(passportCarouselMotion.transitionTimer);
+        passportCarouselMotion.transitionTimer = window.setTimeout(() => {
+          state.passport = nextIndex;
+          passportCarouselMotion.isTransitioning = false;
+          render();
+          const nextStage = root.querySelector('.passport-motion-stage');
+          nextStage?.classList.add('is-entering');
+          window.setTimeout(() => nextStage?.classList.remove('is-entering'), PASSPORT_ENTRY_MS);
+          scrollPassportThumbIntoView(nextIndex);
+          const pendingIndex = passportCarouselMotion.pendingIndex;
+          passportCarouselMotion.pendingIndex = null;
+          if (pendingIndex !== null && pendingIndex !== nextIndex) transitionPassportMember(pendingIndex, 'manual');
+        }, reducedMotion() ? 0 : PASSPORT_EXIT_MS);
+      }
+
+      function setupPassportCarouselMotion() {
+        setPassportProgress(0);
+        if (!passportCarouselMotion.paused) startPassportCarousel();
+      }
+
+      function teardownPassportDeck() {
+        if (passportDeckMotion.frame && window.cancelAnimationFrame) window.cancelAnimationFrame(passportDeckMotion.frame);
+        window.clearTimeout(passportDeckMotion.resumeTimer);
+        passportDeckMotion.element = null;
+        passportDeckMotion.frame = 0;
+      }
+
+      function setupPassportDeck() {
+        const scroller = root.querySelector('.passport-scroll');
+        if (!scroller) return;
+        passportDeckMotion.element = scroller;
+        passportDeckMotion.paused = false;
+        passportDeckMotion.lastFrame = 0;
+        scroller.scrollTop = state.passportScrollTop;
+
+        const canAutoScroll = () => scroller.scrollHeight - scroller.clientHeight > 2 && !reducedMotion();
+        const pauseDeck = () => {
+          passportDeckMotion.paused = true;
+          if (passportDeckMotion.frame && window.cancelAnimationFrame) window.cancelAnimationFrame(passportDeckMotion.frame);
+          passportDeckMotion.frame = 0;
+        };
+        const resumeDeckLater = () => {
+          window.clearTimeout(passportDeckMotion.resumeTimer);
+          passportDeckMotion.resumeTimer = window.setTimeout(() => {
+            passportDeckMotion.paused = false;
+            startAutoscroll();
+          }, 4000);
+        };
+        const pause = () => { pausePassportCarousel(); pauseDeck(); };
+        const resumeLater = () => { resumePassportCarouselLater(); resumeDeckLater(); };
+        const startAutoscroll = () => {
+          if (!canAutoScroll() || passportDeckMotion.paused || passportDeckMotion.frame || !window.requestAnimationFrame) return;
+          const tick = now => {
+            if (passportDeckMotion.element !== scroller || passportDeckMotion.paused || !canAutoScroll()) {
+              passportDeckMotion.frame = 0;
+              return;
+            }
+            const elapsed = passportDeckMotion.lastFrame ? Math.min((now - passportDeckMotion.lastFrame) / 1000, .1) : 0;
+            passportDeckMotion.lastFrame = now;
+            const maxScroll = scroller.scrollHeight - scroller.clientHeight;
+            let next = scroller.scrollTop + passportDeckMotion.direction * elapsed * 11;
+            if (next >= maxScroll) { next = maxScroll; passportDeckMotion.direction = -1; }
+            if (next <= 0) { next = 0; passportDeckMotion.direction = 1; }
+            passportDeckMotion.autoScrollUntil = performance.now() + 100;
+            scroller.scrollTop = next;
+            state.passportScrollTop = next;
+            passportDeckMotion.frame = window.requestAnimationFrame(tick);
+          };
+          passportDeckMotion.frame = window.requestAnimationFrame(tick);
+        };
+
+        scroller.addEventListener('scroll', () => {
+          state.passportScrollTop = scroller.scrollTop;
+          if (performance.now() > passportDeckMotion.autoScrollUntil) { pause(); resumeLater(); }
+        }, { passive: true });
+        scroller.addEventListener('wheel', () => { pause(); resumeLater(); }, { passive: true });
+        scroller.addEventListener('mouseenter', pauseDeck);
+        scroller.addEventListener('mouseleave', resumeDeckLater);
+        scroller.addEventListener('focusin', pause);
+        scroller.addEventListener('focusout', resumeLater);
+        scroller.addEventListener('pointerdown', event => {
+          pause();
+          if (event.pointerType !== 'mouse' || event.button !== 0) return;
+          passportDeckMotion.pointerId = event.pointerId;
+          passportDeckMotion.startY = event.clientY;
+          passportDeckMotion.startTop = scroller.scrollTop;
+          passportDeckMotion.dragged = false;
+          scroller.classList.add('is-dragging');
+          scroller.setPointerCapture?.(event.pointerId);
+          event.preventDefault();
+        });
+        scroller.addEventListener('pointermove', event => {
+          if (event.pointerId !== passportDeckMotion.pointerId) return;
+          const offset = event.clientY - passportDeckMotion.startY;
+          if (Math.abs(offset) > 4) passportDeckMotion.dragged = true;
+          scroller.scrollTop = passportDeckMotion.startTop - offset;
+          event.preventDefault();
+        });
+        const finishPointer = event => {
+          if (event.pointerId !== passportDeckMotion.pointerId) { resumeLater(); return; }
+          passportDeckMotion.ignoreClick = passportDeckMotion.dragged;
+          passportDeckMotion.pointerId = null;
+          scroller.classList.remove('is-dragging');
+          scroller.releasePointerCapture?.(event.pointerId);
+          window.setTimeout(() => { passportDeckMotion.ignoreClick = false; }, 0);
+          resumeLater();
+        };
+        scroller.addEventListener('pointerup', finishPointer);
+        scroller.addEventListener('pointercancel', finishPointer);
+        scroller.addEventListener('click', event => {
+          if (!passportDeckMotion.ignoreClick) return;
+          event.preventDefault();
+          event.stopPropagation();
+          passportDeckMotion.ignoreClick = false;
+        }, true);
+        window.requestAnimationFrame?.(startAutoscroll);
+      }
+
+      function setMember(variant, index, options = {}) {
+        if (variant === 'passport') return transitionPassportMember(index, options.source ?? 'manual');
+        state[variant] = wrapIndex(index);
+        if (variant === 'flip') state.flipped = false;
+        if (variant === 'blur') state.revealed = false;
+        render();
+      }
+
+      root.addEventListener('click', event => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        const action = button.dataset.action;
+        const variant = button.dataset.variant;
+        if (action === 'flip') { state.flipped = !state.flipped; render(); return; }
+        if (action === 'reveal') { state.revealed = !state.revealed; render(); return; }
+        if (action === 'previous') { setMember(variant, state[variant] - 1); return; }
+        if (action === 'next') { setMember(variant, state[variant] + 1); return; }
+        if (action === 'select') { setMember(variant, Number(button.dataset.index)); }
+      });
+
+      root.addEventListener('keydown', event => {
+        const section = event.target.closest('[data-variant]');
+        if (!section || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        const variant = section.dataset.variant;
+        if (event.key === 'ArrowLeft') { event.preventDefault(); setMember(variant, state[variant] - 1); }
+        if (event.key === 'ArrowRight') { event.preventDefault(); setMember(variant, state[variant] + 1); }
+        if (event.key === 'Home') { event.preventDefault(); setMember(variant, 0); }
+        if (event.key === 'End') { event.preventDefault(); setMember(variant, TEAM.length - 1); }
+      });
+
+      render();
+      console.assert(document.querySelectorAll('section[data-variant]').length === 4, 'Должно быть четыре варианта карусели');
+      console.assert(document.querySelectorAll('.member-image').length >= 4, 'Портреты команды должны быть отрисованы');
+    </script>
+  </body>
+</html>

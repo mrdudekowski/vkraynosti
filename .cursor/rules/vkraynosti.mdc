@@ -28,6 +28,7 @@ alwaysApply: true
 | Файл правила | Зона |
 |--------------|------|
 | `vkraynosti-pages.mdc` | `src/pages/` |
+| `vkraynosti-admin.mdc` | админка `src/admin/` (UX-инварианты экрана) |
 | `vkraynosti-tours-media.mdc` | туры, карточка, плейсхолдеры, медиа-утилиты, `images.ts` |
 | `vkraynosti-data.mdc` | `src/data/` |
 | `vkraynosti-design-system.mdc` | `tailwind.config.ts`, `src/index.css` |

@@ -24,9 +24,20 @@ export const mergeTourDataToSchedulePayload = (
 
   for (const event of schedule.events) {
     const tour = tourById.get(event.tourId);
-    if (!tour || tour.publicationStatus !== 'active') continue;
-
-    events.push(hydrateScheduleEvent(event, tour));
+    if (tour != null && tour.publicationStatus === 'active') {
+      events.push(hydrateScheduleEvent(event, tour));
+      continue;
+    }
+    const offSite = hydrateOffSiteScheduleEvent(event);
+    if (offSite == null) {
+      continue;
+    }
+    catalogPublicationStatuses[event.tourId] = 'hidden';
+    catalogDurationTypes[event.tourId] = offSite.durationType;
+    if (offSite.priceRub != null) {
+      catalogPrices[event.tourId] = offSite.priceRub;
+    }
+    events.push(offSite);
   }
 
   return {
@@ -49,3 +60,18 @@ export const hydrateScheduleEvent = (
   status: event.status,
   comment: event.comment,
 });
+
+const hydrateOffSiteScheduleEvent = (event: ScheduleEvent): TourScheduleEvent | null => {
+  if (event.durationType == null) {
+    return null;
+  }
+  return {
+    date: event.date,
+    tourId: event.tourId,
+    durationType: event.durationType,
+    priceRub: event.overridePriceRub ?? null,
+    seats: event.seats,
+    status: event.status,
+    comment: event.comment,
+  };
+};

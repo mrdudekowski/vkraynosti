@@ -11,6 +11,7 @@ import { HOME_HERO_SECTION_ELEMENT_ID } from '../../constants/homeHeroSnap';
 import { getTourPublicPath } from '../../constants/routes';
 import { BREAKPOINT_LG_PX } from '../../constants/reveal';
 import { resolveContentSourceTourId } from '../../data/seasonTourRegistry';
+import { TOUR_HERO_OBJECT_POSITION_CLASS } from '../../utils/mediaObjectPosition';
 import { tourHeroObjectProps } from '../../utils/tourCoverPresentation';
 import { resolveTourHeroCoverBackgroundPosition } from '../../constants/tourCoverCropByCanonicalId';
 import { TOUR_SPRING_3_COVER_LAYOUT_MIN_WIDTH_PX } from '../../constants/tourSpring3CoverCrop';
@@ -19,6 +20,10 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useSeason } from '../../context/useSeason';
 import { useVisibleToursBySeason } from '../../hooks/useVisibleToursBySeason';
 import type { Season } from '../../types';
+import {
+  HERO_CAROUSEL_CAPTION_STACK_CLASS,
+  HeroCarouselCaptionBody,
+} from './HeroCarouselCaption';
 
 const HERO_PAGINATION_ACTIVE_DOT_CLASS: Record<Season, string> = {
   winter: 'bg-season-winter',
@@ -77,7 +82,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
                     spring3Lg
                   )
             }
-            backgroundClassName={usesCmsHeroCrop ? 'tour-hero-object-position' : undefined}
+            backgroundClassName={usesCmsHeroCrop ? TOUR_HERO_OBJECT_POSITION_CLASS : undefined}
             backgroundStyle={heroObject.style}
             onAdvanceNext={next}
             onAdvancePrev={prev}
@@ -90,17 +95,12 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
             <div className="flex w-full max-w-home-hero-phrase mx-auto justify-center px-12 pb-24 sm:px-8 md:px-6 lg:px-home-hero-carousel-text-gutter-x">
               <Link
                 to={getTourPublicPath(tour)}
-                className="text-center group flex min-w-0 w-full max-w-full flex-col items-center gap-hero-phrase-cta-gap"
+                className={`${HERO_CAROUSEL_CAPTION_STACK_CLASS} group`}
                 tabIndex={idx === current ? 0 : -1}
                 aria-label={`${tour.title}. ${UI.hero.viewTour}`}
                 prefetch="intent"
               >
-                <p
-                  className="font-hero-carousel-phrase text-home-hero-carousel-phrase font-normal text-text-inverse hero-carousel-phrase-text-shadow w-full min-w-0 max-w-full hyphens-none text-balance"
-                >
-                  {tour.heroPhrase}
-                </p>
-                <span className="btn-primary text-base">{UI.hero.viewTour}</span>
+                <HeroCarouselCaptionBody phrase={tour.heroPhrase} />
               </Link>
             </div>
           </CarouselSlide>

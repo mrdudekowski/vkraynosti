@@ -1,6 +1,7 @@
 import type { CmsTourLayoutPatch } from '../cms/applyTourLayoutPatch';
 import type { CmsTourTextPatch } from '../cms/applyTourTextPatch';
 import type { CmsTourDocument } from '../cms/cmsTourDocument';
+import { persistTourDescriptionColumns } from '../utils/splitTourDescription';
 
 export function layoutFromDocument(document: CmsTourDocument): CmsTourLayoutPatch {
   return {
@@ -20,13 +21,14 @@ export function layoutFromDocument(document: CmsTourDocument): CmsTourLayoutPatc
   };
 }
 
-export function patchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
+function textPatchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
   return {
     title: document.title,
     slug: document.slug,
     subtitle: document.subtitle,
     heroPhrase: document.heroPhrase,
     duration: document.duration,
+    durationDays: document.durationDays,
     difficulty: document.difficulty,
     difficultyDisplayLabel: document.difficultyDisplayLabel ?? '',
     metaAudienceLabel: document.metaAudienceLabel ?? '',
@@ -48,5 +50,19 @@ export function patchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
     })),
     programAdditionalNotes: [...(document.programAdditionalNotes ?? [])],
     assetAlts: Object.fromEntries(document.assets.map((asset) => [asset.id, asset.alt])),
+  };
+}
+
+export function storedTextPatchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
+  return textPatchFromDocument(document);
+}
+
+export function patchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
+  const patch = textPatchFromDocument(document);
+  const columns = persistTourDescriptionColumns(patch.description, patch.descriptionAside);
+  return {
+    ...patch,
+    description: columns.description,
+    descriptionAside: columns.descriptionAside ?? '',
   };
 }

@@ -1,13 +1,23 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { CmsApiRole } from './env';
 
 export const CMS_SESSION_COOKIE = 'vkr_cms_session';
 export const CMS_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 
+export function createRawSessionToken(): string {
+  return randomBytes(32).toString('base64url');
+}
+
+export function hashSessionToken(raw: string): string {
+  return createHash('sha256').update(raw).digest('hex');
+}
+
 export type CmsSession = {
   sub: string;
   role: CmsApiRole;
   exp: number;
+  canPublishTours: boolean;
+  canPublishSchedule: boolean;
 };
 
 function toBase64Url(value: string): string {
@@ -69,6 +79,8 @@ export function createCmsSession(sub: string, role: CmsApiRole): CmsSession {
     sub,
     role,
     exp: Date.now() + CMS_SESSION_TTL_MS,
+    canPublishTours: role === 'admin',
+    canPublishSchedule: role === 'admin',
   };
 }
 

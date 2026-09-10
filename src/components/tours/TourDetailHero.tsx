@@ -11,6 +11,7 @@ import {
   TOUR_DETAIL_HERO_CAPTION_SHELL_CLASS,
   TOUR_DETAIL_HERO_GRADIENT_OVERLAY_CLASS,
 } from '../../constants/tourDetailHeroStack';
+import { TOUR_DETAIL_HERO_OBJECT_POSITION_CLASS } from '../../utils/mediaObjectPosition';
 
 interface TourDetailHeroProps {
   imageUrl: string;
@@ -22,11 +23,11 @@ interface TourDetailHeroProps {
   /** Классы `object-position` на `lg+` (токены `object-tour-detail-hero-desktop*` из темы). */
   desktopHeroImgClassName?: string;
   /**
-   * Полный набор классов `object-position` для `<img>` (все брейкпоинты). Если задан — вместо
-   * `object-center` + `desktopHeroImgClassName` / дефолтного `lg:object-tour-detail-hero-desktop`.
+   * Легаси-классы `object-position` для `<img>`, если нет CMS `coverCrop`.
+   * При CMS-кадре не вешается на img — рамка использует `tour-detail-hero-object-position`.
    */
   heroImageObjectClassName?: string;
-  /** CSS-переменные кадрирования hero из CMS (`--tour-hero-object-position`). */
+  /** CSS-переменные кадрирования hero из CMS (`--tour-hero-object-position` / `-lg`). */
   heroObjectStyle?: CSSProperties;
 }
 
@@ -40,40 +41,54 @@ const TourDetailHeroComponent = ({
   desktopHeroImgClassName,
   heroImageObjectClassName,
   heroObjectStyle,
-}: TourDetailHeroProps) => (
-  <div className="relative h-tour-detail-hero overflow-hidden" style={heroObjectStyle}>
-    <PlaceholderImage
-      src={imageUrl}
-      alt={imageAlt}
-      className="h-full w-full min-h-0"
-      imgClassName={
-        heroImageObjectClassName ??
-        `object-center ${desktopHeroImgClassName ?? 'lg:object-tour-detail-hero-desktop'}`
-      }
-      loading="eager"
-      fetchPriority="high"
-    />
-    <div className={TOUR_DETAIL_HERO_GRADIENT_OVERLAY_CLASS} />
-    <div className={TOUR_DETAIL_HERO_CAPTION_SHELL_CLASS}>
-      <div className="tour-detail-page-measure flex flex-col gap-4">
-        <Link
-          to={backLinkTo}
-          className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors duration-hover"
-          prefetch="intent"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} aria-hidden />
-          <SeasonLinkLabel season={backLinkSeason} />
-        </Link>
-        <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-white">
-          {title}
-        </ScrollScrubFade>
-        <p className="text-tour-detail-hero-subtitle text-white/80 mt-1">
-          {subtitle}
-        </p>
+}: TourDetailHeroProps) => {
+  const usesCmsHeroCrop = heroObjectStyle != null;
+
+  return (
+    <div
+      className={[
+        'relative h-tour-detail-hero overflow-hidden',
+        usesCmsHeroCrop ? TOUR_DETAIL_HERO_OBJECT_POSITION_CLASS : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      style={heroObjectStyle}
+    >
+      <PlaceholderImage
+        src={imageUrl}
+        alt={imageAlt}
+        className="h-full w-full min-h-0"
+        imgClassName={
+          usesCmsHeroCrop
+            ? undefined
+            : (heroImageObjectClassName ??
+              `object-center ${desktopHeroImgClassName ?? 'lg:object-tour-detail-hero-desktop'}`)
+        }
+        loading="eager"
+        fetchPriority="high"
+      />
+      <div className={TOUR_DETAIL_HERO_GRADIENT_OVERLAY_CLASS} />
+      <div className={TOUR_DETAIL_HERO_CAPTION_SHELL_CLASS}>
+        <div className="tour-detail-page-measure flex flex-col gap-4">
+          <Link
+            to={backLinkTo}
+            className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors duration-hover"
+            prefetch="intent"
+          >
+            <FontAwesomeIcon icon={faArrowLeft} aria-hidden />
+            <SeasonLinkLabel season={backLinkSeason} />
+          </Link>
+          <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-white">
+            {title}
+          </ScrollScrubFade>
+          <p className="text-tour-detail-hero-subtitle text-white/80 mt-1">
+            {subtitle}
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const TourDetailHero = memo(TourDetailHeroComponent);
 

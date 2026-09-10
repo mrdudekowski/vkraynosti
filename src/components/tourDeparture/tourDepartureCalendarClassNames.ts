@@ -29,7 +29,7 @@ export const tourDepartureCalendarClassNames: Partial<ClassNames> = {
   hidden: 'invisible',
 };
 
-/** На `<td>` — без фона (круг рисуется только на кнопке). */
+/** На `<td>` — без фона (selected tile рисуется на `.tour-calendar__day-tile`). */
 export const tourDepartureModifierClassNames = {
   hasDeparture: 'tour-departure-calendar__day-cell',
 } as const;

@@ -54,9 +54,11 @@ const ScheduleWeekDayPanel = ({
             {departures.length > 0 ? ` · ${formatScheduleSeatsTotal(seatsTotal)}` : ''}
           </p>
         </div>
-        <AdminButton type="button" variant="secondary" onClick={onAdd}>
-          {ADMIN_UI.scheduleAddDeparture}
-        </AdminButton>
+        {departures.length > 0 ? (
+          <AdminButton type="button" variant="secondary" onClick={onAdd}>
+            {ADMIN_UI.scheduleAddDeparture}
+          </AdminButton>
+        ) : null}
       </div>
       {departures.length === 0 ? (
         <div className="mt-4">

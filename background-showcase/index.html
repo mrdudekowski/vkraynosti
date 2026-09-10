@@ -1,18 +1,80 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f7f5f0"><title>Вкрайности — демонстрация нового фона</title><link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./site-style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#092a35">
+  <title>Вкрайности — карта мыса Тобизина</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./site-style.css">
 </head>
 <body>
-<a class="skip-link" href="#main">К содержанию</a>
-<div class="ocean-backdrop" aria-hidden="true"><div class="island-backdrop"></div><div class="backdrop-glow backdrop-glow--one"></div><div class="backdrop-glow backdrop-glow--two"></div></div>
-<svg class="filter-defs" width="0" height="0" aria-hidden="true" focusable="false"><filter id="handDrawnNoise"><feTurbulence result="noise" numOctaves="5" baseFrequency="0.0065" type="fractalNoise"></feTurbulence><feDisplacementMap yChannelSelector="G" xChannelSelector="R" scale="900" in2="noise" in="SourceGraphic"></feDisplacementMap></filter></svg>
-<header class="site-header"><a class="brand" href="#top" aria-label="Вкрайности — в начало"><span class="brand-mark">В</span><span>вкрайности<span class="brand-dot">.</span></span></a><nav class="site-nav" aria-label="Основная навигация"><a href="#safety">Безопасность</a><a href="#tours">Туры</a><a href="#tour-detail">Страница тура</a></nav><a class="header-cta" href="#tours">Смотреть маршруты <span aria-hidden="true">↘</span></a></header>
-<main id="main">
-<section class="hero section-shell" id="top"><div class="hero-copy"><p class="eyebrow"><span class="eyebrow-line"></span> Приморье, которое остаётся с тобой</p><h1>Воздух<br><em>становится</em><br>событием.</h1><p class="hero-lead">Демонстрация нового фона внутри знакомого интерфейса Вкрайности.</p><a class="button button--primary" href="#safety">Перейти к секциям <span aria-hidden="true">↘</span></a></div><div class="hero-note glass-panel"><span class="hero-note-index">BACKGROUND / 01</span><p>Сайт сохраняет<br><strong>свою систему</strong></p><span class="hero-note-arrow" aria-hidden="true">↓</span></div><div class="hero-orbit" aria-hidden="true"><span class="orbit-ring orbit-ring--one"></span><span class="orbit-ring orbit-ring--two"></span><span class="orbit-dot"></span></div></section>
-<section class="section-shell site-section safety-section" id="safety"><div class="section-heading"><div><p class="eyebrow"><span class="eyebrow-line"></span> SafetySection</p><h2>Безопасность<br><em>в поездках.</em></h2></div><p class="section-intro">Ваша безопасность — наш приоритет</p></div><div class="safety-layout"><a class="safety-hero-card" href="#tour-detail"><img src="../public/safety/safety.webp" alt="Инструктаж и проверка снаряжения перед выходом группы на маршрут"><span class="safety-hero-scrim"></span><span class="safety-hero-copy"><strong>Безопасность<br>в поездках</strong><small>Узнать больше <span aria-hidden="true">↗</span></small></span></a><div class="safety-status-stack" aria-label="Статусы подготовки маршрута"><div class="safety-plaque"><img src="../public/safety/icons/1.svg" alt=""><span>Формируем маршрут</span><b aria-hidden="true">✓</b></div><div class="safety-plaque"><img src="../public/safety/icons/2.svg" alt=""><span>Отслеживаем погоду</span><b aria-hidden="true">✓</b></div><div class="safety-plaque"><img src="../public/safety/icons/3.svg" alt=""><span>Проверяем снаряжение</span><b aria-hidden="true">✓</b></div><div class="safety-plaque"><img src="../public/safety/icons/4.svg" alt=""><span>Готовимся к «бездорожью»</span><b aria-hidden="true">✓</b></div><div class="safety-plaque"><img src="../public/safety/icons/5.svg" alt=""><span>Ищем колышки от палатки</span><b aria-hidden="true">✓</b></div><div class="safety-plaque"><img src="../public/safety/icons/6.svg" alt=""><span>Наполняем фляги водичкой</span><b aria-hidden="true">✓</b></div></div></div></section>
-<section class="section-shell site-section tours-section" id="tours"><div class="section-heading section-heading--tours"><div><p class="eyebrow"><span class="eyebrow-line"></span> Home · SeasonToursSection</p><h2>Туры<br><em>Вкрайности.</em></h2></div><div class="tours-meta"><p class="section-intro">Выбирайте маршрут и отправляйтесь навстречу приключениям</p><p class="source-note" data-source-note>Загрузка каталога…</p></div></div><div class="filter-bar glass-panel" aria-label="Фильтры туров"><label>Сезон<select data-season-filter><option value="all">Все сезоны</option><option value="spring">Весна</option><option value="summer">Лето</option><option value="fall">Осень</option><option value="winter">Зима</option></select></label><label>Формат<select data-type-filter><option value="all">Любой формат</option><option value="однодневный">Однодневный</option><option value="многодневный">Многодневный</option></select></label><button class="reset-button" type="button" data-reset-filters>Сбросить ↺</button><p class="filter-count" aria-live="polite"><strong data-tour-count>—</strong> маршрутов</p></div><div class="tour-grid" data-tours-grid></div><div class="empty-state" data-empty-state hidden>По этим параметрам маршрутов пока нет. Попробуйте изменить фильтры.</div></section>
-<section class="section-shell site-section tour-detail-preview" id="tour-detail"><div class="tour-detail-hero"><img src="https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/hero.webp" alt="Восхождение на Изюбриную"><div class="tour-detail-hero-overlay"></div><div class="tour-detail-hero-caption"><a href="#tours">← Зима · к турам</a><h2>Восхождение<br><em>на Изюбриную</em></h2><p>Снежные покровы в тайге Сихоте-Алиня</p></div></div><div class="tour-detail-body"><div class="tour-detail-main"><div class="detail-facts"><span>16 часов</span><span>Средний уровень</span><span>6 000 ₽</span></div><p class="detail-prose"><strong>Гора Изюбриная (1433 м)</strong> — живописная вершина в Чугуевском районе Приморского края на пересечении хребтов Белки и Лугового. «Самая снежная» вершина известна своими сказочными заснеженными елями.</p><a class="button button--primary" href="#tours">Выбрать дату <span aria-hidden="true">↗</span></a><h3 class="detail-heading">Что включено</h3><div class="included-grid"><span>Трансфер</span><span>Питание и глинтвейн</span><span>Ледоступы / кошки</span><span>Гид-проводник</span></div><div class="detail-gallery"><img src="https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.peoplewalk.webp" alt="Группа на маршруте"><img src="https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/trees2.webp" alt="Заснеженные ели"><img src="https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/winter-1/iz.top.webp" alt="Вид с Изюбриной"></div></div><aside class="program-card"><h3 class="detail-heading">Программа тура</h3><ol><li><b>04:30</b><span>Выезд из Владивостока навстречу приключениям!</span></li><li><b>10:00</b><span>Прибытие к подножию самой зимней горы Приморья</span></li><li><b>10:00–13:30</b><span>Бодрое восхождение</span></li><li><b>13:30–14:00</b><span>Отдых на вершине, фото- и видео-фиксация успеха</span></li><li><b>17:00–00:00</b><span>Возвращение в город</span></li></ol></aside></div></section>
-<section class="closing-section section-shell"><p class="eyebrow"><span class="eyebrow-line"></span> До встречи на краю карты</p><h2>Твой следующий<br><em>поворот</em> уже здесь.</h2><a class="button button--light" href="#tours">Смотреть маршруты <span aria-hidden="true">↗</span></a></section>
-</main><footer class="site-footer"><span>Вкрайности<span class="brand-dot">.</span></span><span>HTML showcase · current CMS snapshot</span><a href="#top">Наверх ↑</a></footer><div class="data-status" data-data-status role="status" aria-live="polite"></div><script type="module" src="./script.js"></script>
-</body></html>
+  <svg class="filter-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="handDrawnNoise">
+      <feTurbulence result="noise" numOctaves="5" baseFrequency="0.0065" type="fractalNoise" />
+      <feDisplacementMap yChannelSelector="G" xChannelSelector="R" scale="900" in2="noise" in="SourceGraphic" />
+    </filter>
+  </svg>
+
+  <main class="map-showcase">
+    <section class="map-picker section-shell" aria-labelledby="picker-title">
+      <div class="map-section-heading">
+        <p class="eyebrow"><span class="eyebrow-line"></span> Вкрайности · локация</p>
+        <h1 id="picker-title">Выберите<br><em>точку.</em></h1>
+        <p class="map-section-intro">Выберите точку на мини-карте, подтвердите её галочкой и добавьте следующую.</p>
+      </div>
+      <div class="map-card map-card--mini">
+        <div class="map-stage" data-mini-map role="application" aria-label="Мини-карта для выбора точки">
+          <div class="map-water" aria-hidden="true"></div>
+          <div class="map-land" aria-hidden="true"></div>
+          <button class="map-marker" data-mini-marker type="button" hidden>
+            <span class="map-marker__ring"></span><span class="map-marker__dot"></span>
+            <span class="map-marker__label" data-marker-label></span>
+          </button>
+        </div>
+        <div class="map-card__meta"><span>Мыс Тобизина</span><span data-picker-status>Нажмите на карту</span></div>
+      </div>
+      <div class="point-controls glass-panel">
+        <div class="point-controls__row point-controls__row--selection">
+          <button class="button button--primary point-action" data-point-new type="button">Новая точка <span>＋</span></button>
+          <button class="button button--accept point-action" data-point-accept type="button" disabled>Accept последнюю <span>✓</span></button>
+          <button class="point-action point-action--quiet" data-point-cancel type="button" disabled>Отменить</button>
+          <button class="point-action point-action--danger" data-point-clear type="button">Очистить всё</button>
+        </div>
+        <div class="point-draft" data-point-draft hidden>
+          <label>Название последней точки <input type="text" data-point-name maxlength="80" placeholder="Например, грот"></label>
+          <span data-point-draft-status>Кликните по мини-карте</span>
+        </div>
+        <div class="point-list" data-point-list aria-live="polite"></div>
+        <div class="animation-settings" aria-labelledby="animation-settings-title">
+          <div><p class="animation-settings__eyebrow">Настройки</p><h3 id="animation-settings-title">Анимация точек</h3></div>
+          <label>Задержка между точками <span><input type="number" min="0" max="5000" step="100" value="500" data-animation-gap> мс</span></label>
+          <label class="switch-control"><input type="checkbox" data-animation-loop checked><span class="switch-control__track"></span><span>Повторять последовательность</span></label>
+          <button class="button button--primary point-preview" data-point-preview type="button">Preview анимации <span>▶</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="map-view section-shell" aria-labelledby="view-title">
+      <div class="map-section-heading map-section-heading--view">
+        <p class="eyebrow"><span class="eyebrow-line"></span> Preview · selected location</p>
+        <h2 id="view-title">Точка<br><em>на карте.</em></h2>
+      </div>
+      <div class="map-card map-card--large">
+        <div class="map-stage" data-large-map role="img" aria-label="Большая карта мыса Тобизина с выбранной точкой">
+          <div class="map-water" aria-hidden="true"></div>
+          <div class="map-land" aria-hidden="true"></div>
+          <div class="map-marker" data-large-marker hidden>
+            <span class="map-marker__ring"></span><span class="map-marker__dot"></span>
+            <span class="map-marker__label" data-large-label></span>
+          </div>
+        </div>
+        <div class="map-card__meta"><span data-selected-name>Точка не выбрана</span><span data-selected-position>—</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./animation-order.js"></script>
+  <script src="./points.js"></script>
+</body>
+</html>

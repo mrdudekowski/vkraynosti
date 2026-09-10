@@ -18,6 +18,7 @@ node_modules/
 node_modules.partial/
 
 dist
+dist-admin/
 coverage
 dist-ssr
 *.local

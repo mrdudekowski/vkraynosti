@@ -85,8 +85,34 @@ import {
   BREAKPOINT_XL_PX,
   BREAKPOINT_XS_PX,
 } from './src/constants/breakpoints'
+import {
+  ADMIN_BREAKPOINT_DESKTOP_PX,
+  ADMIN_BREAKPOINT_WIDE_PX,
+  ADMIN_DRAFT_BG_HEX,
+  ADMIN_DRAFT_FG_HEX,
+  ADMIN_INFO_BG_HEX,
+  ADMIN_INFO_FG_HEX,
+  ADMIN_INTERACTIVE_MS,
+  ADMIN_LAYOUT_COMPACT_PX,
+  ADMIN_LAYOUT_CONTENT_PX,
+  ADMIN_LAYOUT_WIDE_PX,
+  ADMIN_OVERLAY_RADIUS_REM,
+  ADMIN_PAGE_TITLE_REM,
+  ADMIN_SECTION_TITLE_REM,
+  ADMIN_SIDEBAR_EXPANDED_PX,
+  ADMIN_SIDEBAR_RAIL_PX,
+  ADMIN_STICKY_BAR_MIN_PX,
+  ADMIN_SURFACE_RADIUS_REM,
+} from './src/constants/adminUiTokens'
 import { MEDIA_PLACEHOLDER_SHIMMER_MS } from './src/constants/mediaPlaceholderShimmer'
 import { TOUR_CARD_SKELETON_SHIMMER_MS } from './src/constants/tourCardSkeletonShimmer'
+import {
+  TOUR_CARD_COVER_ASPECT_RATIO,
+  TOUR_CARD_MAX_WIDTH_REM,
+  TOUR_COVER_HERO_LG_ASPECT_RATIO,
+  TOUR_COVER_HERO_PHONE_ASPECT_RATIO,
+  TOUR_COVER_PREVIEW_PHONE_MAX_WIDTH_REM,
+} from './src/constants/tourCoverCropPreview'
 import {
   SAFETY_STATUS_CHECKBOX_GROW_MS,
   SAFETY_STATUS_FADE_MS,
@@ -507,6 +533,10 @@ const config: Config = {
           muted:   '#6B7280',
           inverse: THEME_TEXT_INVERSE_HEX,
         },
+        admin: {
+          info: { bg: ADMIN_INFO_BG_HEX, fg: ADMIN_INFO_FG_HEX },
+          draft: { bg: ADMIN_DRAFT_BG_HEX, fg: ADMIN_DRAFT_FG_HEX },
+        },
         season: {
           winter: SEASON_ACCENT_HEX.winter,
           /** Акцент весны в UI (иконки сезона и т.п.): приглушённая роза. */
@@ -600,6 +630,8 @@ const config: Config = {
           { lineHeight: '1.2' },
         ],
         'tooltip': ['0.875rem', { lineHeight: '1.25' }],
+        'admin-page': [`${ADMIN_PAGE_TITLE_REM}rem`, { lineHeight: '2rem', fontWeight: '600' }],
+        'admin-section': [`${ADMIN_SECTION_TITLE_REM}rem`, { lineHeight: '1.75rem', fontWeight: '600' }],
         /** Словесное лого navbar: `text-xl` (1.25rem) +15%. */
         'brand-wordmark-nav': ['1.4375rem', { lineHeight: '2.0125rem' }],
         /** SILA в подписи footer: 2× `text-lg` (1.125rem). */
@@ -776,6 +808,12 @@ const config: Config = {
         'gallery-tile-2x1': '2 / 1',
         /** Баннер 10 колонок внутри `max-w-7xl`: шире колонки, умеренная высота. */
         'home-season-banner-inner': '10 / 3.25',
+        /** Обложка карточки тура: `max-w-tour-card` / `h-48`. */
+        'tour-card-cover': TOUR_CARD_COVER_ASPECT_RATIO,
+        /** Вертикальный hero — кадр телефона. */
+        'tour-hero-phone': TOUR_COVER_HERO_PHONE_ASPECT_RATIO,
+        /** Hero на большом экране. */
+        'tour-hero-lg': TOUR_COVER_HERO_LG_ASPECT_RATIO,
       },
       backgroundPosition: {
         /**
@@ -903,8 +941,13 @@ const config: Config = {
         'tour-detail-preface-pt-sm': '2rem',
         /** Совпадает с `h-16` у фиксированного Navbar. */
         'navbar': '4rem',
+        /** Оболочка админки: expanded sidebar / rail (спека 208–224 / 64–72). */
+        'admin-sidebar': `${ADMIN_SIDEBAR_EXPANDED_PX / 16}rem`,
+        'admin-rail': `${ADMIN_SIDEBAR_RAIL_PX / 16}rem`,
+        'admin-sticky-bar': `${ADMIN_STICKY_BAR_MIN_PX / 16}rem`,
         /** Safe area inset top (iOS notch / Dynamic Island). */
         'safe-top': 'env(safe-area-inset-top, 0px)',
+        'safe-bottom': 'env(safe-area-inset-bottom, 0px)',
         /** Navbar + safe area: отступ `main`, `top` dock/overlay. */
         'navbar-chrome': 'calc(4rem + env(safe-area-inset-top, 0px))',
         /** `absolute` top у h1 в `HeroCarousel`: высота navbar + бывший зазор `top-6`. */
@@ -1105,7 +1148,9 @@ const config: Config = {
         'home-team-contact-bridge-mark': 'min(92vw, 36rem)',
         /** Плашка CTA в `#contact` (`homeContactSection`). */
         /** Единая максимальная ширина карточки тура в сетке главной. */
-        'tour-card': '22rem',
+        'tour-card': `${TOUR_CARD_MAX_WIDTH_REM}rem`,
+        /** Превью вертикального hero в админке (телефон). */
+        'tour-cover-preview-phone': `${TOUR_COVER_PREVIEW_PHONE_MAX_WIDTH_REM}rem`,
         /** Блок подписи/CTA карусели в hero: не шире контента и вьюпорта. */
         'home-hero-phrase': 'min(100%, min(44rem, 96vw))',
         /** Слайд team-hero на sm+: центрирование, колонка bio получает `1fr` внутри заданной ширины. */
@@ -1114,6 +1159,9 @@ const config: Config = {
         'tour-calendar-day-cell': TOUR_CALENDAR_DAY_CELL_MAX_WIDTH,
         /** Ячейка дня мини-календаря выездов. */
         'tour-departure-day-cell': TOUR_DEPARTURE_DAY_CELL_MAX_WIDTH,
+        'admin-compact': `${ADMIN_LAYOUT_COMPACT_PX / 16}rem`,
+        'admin-content': `${ADMIN_LAYOUT_CONTENT_PX / 16}rem`,
+        'admin-wide': `${ADMIN_LAYOUT_WIDE_PX / 16}rem`,
       },
       minHeight: {
         /** Минимальная высота круглой кнопки «к hero» на воротах (`min-w-home-gate-scroll-hint-target`). */
@@ -1154,6 +1202,8 @@ const config: Config = {
         'home-sky-parallax-inner': '-7.5%',
       },
       boxShadow: {
+        /** Overlay админки (drawer / sheet) — на canvas теней нет. */
+        'admin-overlay': '0 8px 24px color-mix(in srgb, #0D0D0D 18%, transparent)',
         /**
          * CTA: лёгкая тень с оттенком `colors.cta.sweep` — визуальная связка с hover-заливкой.
          * Дублирование hex намеренно (Tailwind не резолвит theme() внутри значения).
@@ -1214,6 +1264,8 @@ const config: Config = {
         cta: '0.3125rem',
         /** Контролы CMS: input/button/badge, не card витрины. */
         'admin-control': '0.5rem',
+        'admin-surface': `${ADMIN_SURFACE_RADIUS_REM}rem`,
+        'admin-overlay': `${ADMIN_OVERLAY_RADIUS_REM}rem`,
       },
       scale: {
         /** Зимние `*.banner-loop`: +20% к кадру внутри колонки (`HomeSeasonBannerColumn`, обрезка `overflow-hidden`). */
@@ -1230,6 +1282,8 @@ const config: Config = {
         'tooltip':     '150',
         'modal':       '200',
         'overlay':     '199',
+        /** Диалог поверх sheet/drawer: подтверждения, вложенные оверлеи админки. */
+        'modal-raised': '210',
         /** Вспышка при смене сезона (overlay); `seasonFlash` — то же значение. */
         'season-flash': '300',
         'seasonFlash': '300',
@@ -1264,6 +1318,8 @@ const config: Config = {
         /** Crossfade шагов «дата» ↔ «форма» в `TourRequestModal`; синхронно с `TOUR_REQUEST_STEP_CROSSFADE_MS`. */
         'tour-request-step-crossfade': `${TOUR_REQUEST_STEP_CROSSFADE_MS}ms`,
         'hover':         '200ms',
+        /** Интерактив админки (спека 120–180ms). */
+        admin: `${ADMIN_INTERACTIVE_MS}ms`,
         'season-change': '600ms',
         /** Scroll-reveal: opacity + transform. */
         'reveal':        '500ms',
@@ -1591,6 +1647,9 @@ const config: Config = {
         'team-hero-desktop': `${BREAKPOINT_TEAM_HERO_DESKTOP_PX}px`,
         /** Сетка карточек расписания: 1 колонка ≤580px, 2 колонки от 581px. */
         'tour-calendar-day-events': `${BREAKPOINT_TOUR_CALENDAR_DAY_EVENTS_GRID_PX}px`,
+        /** Админка: sidebar (desktop) vs rail (tablet). */
+        'admin-desktop': `${ADMIN_BREAKPOINT_DESKTOP_PX}px`,
+        'admin-wide': `${ADMIN_BREAKPOINT_WIDE_PX}px`,
       },
     },
   },

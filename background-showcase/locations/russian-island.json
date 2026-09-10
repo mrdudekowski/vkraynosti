@@ -1,0 +1,9 @@
+{
+  "id": "russian-island-42-945389-131-871056",
+  "label": "Русский, Приморский край",
+  "latitude": 42.945389,
+  "longitude": 131.871056,
+  "source": "user-coordinate",
+  "geometryStatus": "art-directed-prototype",
+  "geometryNote": "Контур в витрине временный; его можно заменить на очищенный GeoJSON/SVG из OSM или GPX маршрута."
+}

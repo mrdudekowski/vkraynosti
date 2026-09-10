@@ -1,15 +1,23 @@
-import { useEffect, useState } from 'react';
-import { HashRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { HashRouter, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import { adminLogout, adminMe, type AdminSession } from './api';
+import { clearAdminDataCache } from './adminDataCache';
 import AdminChrome from './components/AdminChrome';
+import AdminPermissionState from './components/AdminPermissionState';
+import { AdminToastProvider } from './components/AdminToast';
+import { ADMIN_PATHS, isAdminSeasonParam } from './constants/routes';
 import { ADMIN_UI } from './constants/ui';
-import IndividualToursPage from './IndividualToursPage';
-import LeadsPage from './LeadsPage';
-import LoginPage from './LoginPage';
-import SeasonToursPage from './SeasonToursPage';
-import TourEditorPage from './TourEditorPage';
-import ToursPage from './ToursPage';
-import UsersPage from './UsersPage';
+
+const DashboardPage = lazy(() => import('./DashboardPage'));
+const InboxPage = lazy(() => import('./InboxPage'));
+const IndividualToursPage = lazy(() => import('./IndividualToursPage'));
+const LeadsPage = lazy(() => import('./LeadsPage'));
+const LoginPage = lazy(() => import('./LoginPage'));
+const SchedulePage = lazy(() => import('./SchedulePage'));
+const SeasonToursPage = lazy(() => import('./SeasonToursPage'));
+const TourEditorPage = lazy(() => import('./TourEditorPage'));
+const ToursPage = lazy(() => import('./ToursPage'));
+const UsersPage = lazy(() => import('./UsersPage'));
 
 type AdminShellProps = {
   session: AdminSession;
@@ -17,13 +25,34 @@ type AdminShellProps = {
 };
 
 const AdminShell = ({ session, onLogout }: AdminShellProps) => (
-  <div className="flex min-h-screen flex-col bg-surface-dark">
-    <AdminChrome session={session} onLogout={onLogout} />
-    <main className="min-w-0 flex-1 bg-surface-light">
+  <AdminChrome session={session} onLogout={onLogout}>
+    <Suspense
+      fallback={
+        <p className="p-6 text-text-muted" role="status">
+          {ADMIN_UI.loading}
+        </p>
+      }
+    >
       <Outlet context={{ session }} />
-    </main>
-  </div>
+    </Suspense>
+  </AdminChrome>
 );
+
+const TourOrSeasonRoute = () => {
+  const { tourId } = useParams<{ tourId: string }>();
+  if (isAdminSeasonParam(tourId)) {
+    return <SeasonToursPage />;
+  }
+  return <TourEditorPage />;
+};
+
+const LegacySeasonRedirect = () => {
+  const { season } = useParams<{ season: string }>();
+  if (!isAdminSeasonParam(season)) {
+    return <Navigate to={ADMIN_PATHS.tours} replace />;
+  }
+  return <Navigate to={ADMIN_PATHS.season(season)} replace />;
+};
 
 const AdminApp = () => {
   const [session, setSession] = useState<AdminSession | null | undefined>(undefined);
@@ -45,11 +74,18 @@ const AdminApp = () => {
 
   return (
     <HashRouter>
+      <AdminToastProvider>
       <Routes>
         <Route
           path="/login"
           element={
-            session ? <Navigate to="/" replace /> : <LoginPage onLoggedIn={setSession} />
+            session ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Suspense fallback={null}>
+                <LoginPage onLoggedIn={setSession} />
+              </Suspense>
+            )
           }
         />
         <Route
@@ -58,6 +94,7 @@ const AdminApp = () => {
               <AdminShell
                 session={session}
                 onLogout={() => {
+                  clearAdminDataCache();
                   setSession(null);
                   void adminLogout();
                 }}
@@ -67,24 +104,33 @@ const AdminApp = () => {
             )
           }
         >
-          <Route path="/" element={<ToursPage />} />
-          <Route path="/seasons/:season" element={<SeasonToursPage />} />
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/tours" element={<ToursPage />} />
+          <Route path="/tours/:tourId" element={<TourOrSeasonRoute />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/inbox" element={<InboxPage />} />
+          <Route path="/seasons/:season" element={<LegacySeasonRedirect />} />
           <Route path="/individual" element={<IndividualToursPage />} />
           <Route path="/leads" element={<LeadsPage />} />
           <Route path="/leads/:personId" element={<LeadsPage />} />
-          <Route path="/tours/:tourId" element={<TourEditorPage />} />
           <Route
             path="/users"
             element={
               session != null && session.role === 'admin' ? (
                 <UsersPage session={session} />
               ) : (
-                <Navigate to="/" replace />
+                <AdminPermissionState
+                  title={ADMIN_UI.permissionDeniedTitle}
+                  description={ADMIN_UI.usersPermissionDenied}
+                  returnTo={ADMIN_PATHS.dashboard}
+                  returnLabel={ADMIN_UI.returnToDashboard}
+                />
               )
             }
           />
         </Route>
       </Routes>
+      </AdminToastProvider>
     </HashRouter>
   );
 };

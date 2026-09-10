@@ -24,6 +24,7 @@ export interface ScheduleEvent {
   status: ScheduleEventStatus;
   comment: string | null;
   overridePriceRub?: number;
+  durationType?: TourDurationType;
 }
 
 export interface ToursListPayload {

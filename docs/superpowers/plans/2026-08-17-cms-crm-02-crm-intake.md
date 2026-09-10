@@ -10,7 +10,8 @@
 
 ## Global Constraints
 
-- Plan 1 exit gate is green before starting.
+- Release 1 exit gate in `2026-08-17-cms-schedule-release-one.md` is green before starting.
+- CRM consumes existing `tours.id` and `tour_departures.id`; it does not re-own or reimplement catalog/schedule publication.
 - Phone identity uses E.164; only an exact normalized phone is auto-merged.
 - Money uses `BIGINT` kopecks and RUB; JavaScript API serializes money as decimal strings.
 - Payments are immutable; corrections use a compensating payment/refund.
@@ -26,7 +27,7 @@
 **Files:**
 - Modify: `scripts/cms/api/db/schema.ts`
 - Modify: `scripts/cms/api/db/schema.test.ts`
-- Create: `drizzle/0001_crm_core.sql`
+- Create: `drizzle/0003_crm_core.sql`
 
 **Interfaces:**
 - Produces tables `people`, `deals`, `touches`, `payments`, `inbound_requests`, `notification_outbox`.
@@ -85,7 +86,7 @@ Required database constraints and indexes:
 
 Run: `npm.cmd run db:generate`
 
-Expected: `drizzle/0001_crm_core.sql` contains all six tables, FKs, checks, unique constraints and queue indexes.
+Expected: `drizzle/0003_crm_core.sql` contains all six tables, FKs, checks, unique constraints and queue indexes.
 
 - [ ] **Step 5: Apply and verify**
 
@@ -96,7 +97,7 @@ Expected: migration and tests PASS with no drift.
 - [ ] **Step 6: Proposed commit checkpoint**
 
 ```bash
-git add scripts/cms/api/db/schema.ts scripts/cms/api/db/schema.test.ts drizzle/0001_crm_core.sql
+git add scripts/cms/api/db/schema.ts scripts/cms/api/db/schema.test.ts drizzle/0003_crm_core.sql
 git commit -m "feat: add relational crm schema"
 ```
 

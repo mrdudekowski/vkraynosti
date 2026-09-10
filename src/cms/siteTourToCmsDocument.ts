@@ -1,8 +1,10 @@
 import type { Tour } from '../types';
 import { getTourGalleryLayoutVariant } from '../constants/tourGalleryLayoutVariant';
+import { persistTourDescriptionColumns } from '../utils/splitTourDescription';
 import { resolveTourBentoLayout } from '../utils/tourBento/resolveTourBentoLayout';
 import { getTourGalleryGridUrls } from '../utils/tourGalleryUrls';
 import { includedIconKey } from './includedIconCatalog';
+import { durationDaysFromLabel } from './durationDays';
 import type { CmsTourAsset, CmsTourDocument } from './cmsTourDocument';
 
 function fileStemFromUrl(url: string, fallback: string): string {
@@ -79,7 +81,7 @@ export function siteTourToCmsDocument(tour: Tour): CmsTourDocument {
     slots: block.slots.map((slot, slotIndex) => {
       const src = slot.src;
       const stillFromGallery =
-        stills.find((still, index) => index >= 2 && gridUrls[index] === src) ??
+        stills.find((_, index) => index >= 2 && gridUrls[index] === src) ??
         (isVideoUrl(src) ? stills[gridUrls.indexOf(src)] : src);
       const stillUrl = stillFromGallery && !isVideoUrl(stillFromGallery) ? stillFromGallery : src;
       const videoUrl = isVideoUrl(src) ? src : null;
@@ -94,6 +96,12 @@ export function siteTourToCmsDocument(tour: Tour): CmsTourDocument {
     }),
   }));
 
+  const durationDays = durationDaysFromLabel(tour.duration);
+  const descriptionColumns = persistTourDescriptionColumns(
+    tour.description,
+    tour.descriptionAside
+  );
+
   return {
     id: tour.id,
     slug: tour.slug ?? tour.id,
@@ -102,12 +110,15 @@ export function siteTourToCmsDocument(tour: Tour): CmsTourDocument {
     title: tour.title,
     subtitle: tour.subtitle,
     heroPhrase: tour.heroPhrase,
-    description: tour.description,
+    description: descriptionColumns.description,
     ...(tour.descriptionLeadBold != null
       ? { descriptionLeadBold: tour.descriptionLeadBold }
       : {}),
-    ...(tour.descriptionAside != null ? { descriptionAside: tour.descriptionAside } : {}),
+    ...(descriptionColumns.descriptionAside != null
+      ? { descriptionAside: descriptionColumns.descriptionAside }
+      : {}),
     duration: tour.duration,
+    ...(durationDays != null ? { durationDays } : {}),
     difficulty: tour.difficulty,
     ...(tour.difficultyDisplayLabel != null
       ? { difficultyDisplayLabel: tour.difficultyDisplayLabel }

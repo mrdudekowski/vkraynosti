@@ -3,7 +3,7 @@ import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 import { SEASON_ACCENT_HEX } from '../../constants/seasonAccentHex';
 
 interface TourCalendarDayEventDotsProps {
-  events: EnrichedScheduleEvent[];
+  events: readonly EnrichedScheduleEvent[];
 }
 
 const TourCalendarDayEventDots = ({ events }: TourCalendarDayEventDotsProps) => {

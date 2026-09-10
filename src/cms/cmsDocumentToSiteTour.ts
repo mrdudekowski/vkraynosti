@@ -1,6 +1,7 @@
 import type { Tour } from '../types';
 import type { TourBentoGalleryLayout } from '../types/tourBento';
 import type { CmsTourAsset, CmsTourDocument } from './cmsTourDocument';
+import { publicDurationFromDays } from './durationDays';
 import { resolveIncludedIcon } from './includedIconCatalog';
 
 function assetById(document: CmsTourDocument, id: string | null): CmsTourAsset | undefined {
@@ -99,7 +100,8 @@ export function cmsDocumentToSiteTour(document: CmsTourDocument): Tour {
     title: document.title,
     subtitle: document.subtitle,
     heroPhrase: document.heroPhrase,
-    duration: document.duration,
+    duration:
+      document.durationDays != null ? publicDurationFromDays(document.durationDays) : document.duration,
     difficulty: document.difficulty,
     ...(document.difficultyDisplayLabel != null
       ? { difficultyDisplayLabel: document.difficultyDisplayLabel }

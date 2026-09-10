@@ -1,11 +1,13 @@
+import { ListPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminEmptyState from './components/AdminEmptyState';
+import AdminPageFrame from './components/AdminPageFrame';
 import AdminPageHeader from './components/AdminPageHeader';
 import { ADMIN_PATHS } from './constants/routes';
 import { ADMIN_UI } from './constants/ui';
 
 const IndividualToursPage = () => (
-  <div className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
+  <AdminPageFrame variant="compact">
     <Link
       to={ADMIN_PATHS.tours}
       className="inline-flex min-h-11 w-fit items-center rounded-admin-control px-2 text-sm no-underline admin-nav-item"
@@ -19,8 +21,9 @@ const IndividualToursPage = () => (
     <AdminEmptyState
       title={ADMIN_UI.individualEmpty}
       description={ADMIN_UI.individualEmptyHint}
+      icon={ListPlus}
     />
-  </div>
+  </AdminPageFrame>
 );
 
 export default IndividualToursPage;

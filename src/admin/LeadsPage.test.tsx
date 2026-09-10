@@ -16,6 +16,7 @@ vi.mock('./api', () => ({
 }));
 
 import { adminCreateCrmPerson, adminGetCrm, adminListTours } from './api';
+import { clearAdminDataCache } from './adminDataCache';
 import LeadsPage from './LeadsPage';
 
 const file: CrmFile = {
@@ -58,6 +59,7 @@ const file: CrmFile = {
 
 describe('LeadsPage', () => {
   beforeEach(() => {
+    clearAdminDataCache();
     vi.mocked(adminGetCrm).mockResolvedValue(file);
     vi.mocked(adminListTours).mockResolvedValue([
       {
@@ -66,7 +68,11 @@ describe('LeadsPage', () => {
         season: 'winter',
         status: 'active',
         published: true,
+        slug: 'izubrinaya',
         imageUrl: null,
+        ready: true,
+        readyCount: 5,
+        readyTotal: 5,
       },
     ]);
     vi.mocked(adminCreateCrmPerson).mockResolvedValue({ ...file, personId: 'p1' });
@@ -82,6 +88,10 @@ describe('LeadsPage', () => {
     );
 
     expect(await screen.findByText('Анна')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Изюбриная' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: ADMIN_UI.crmViews.leads })).toHaveClass(
+      'admin-btn-secondary',
+    );
     expect(screen.getByText(/Изюбриная/)).toBeInTheDocument();
     expect(screen.getByText('дорого')).toBeInTheDocument();
   });

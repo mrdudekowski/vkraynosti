@@ -19,7 +19,8 @@ export const enrichScheduleEvents = (
 
     if (
       resolveTourPublicationStatus(event.tourId, publicationStatuses, { scheduleLoaded }) ===
-      'hidden'
+      'hidden' &&
+      event.status !== 'completed'
     ) {
       continue;
     }

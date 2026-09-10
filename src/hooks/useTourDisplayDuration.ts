@@ -1,17 +1,15 @@
-import { formatTourDurationDisplayLabel } from '../utils/tourSchedule/formatTourDurationDisplayLabel';
-import type { TourScheduleDurationType } from '../types/tourSchedule';
+import {
+  resolveTourDisplayDuration,
+  type TourDisplayDuration,
+} from '../utils/tourSchedule/resolveTourDisplayDuration';
 import { useTourSchedule } from './useTourSchedule';
+
+export type { TourDisplayDuration };
 
 export interface TourDisplayDurationSource {
   id: string;
   /** @deprecated для UI — длительность из `durationTypes` каталога расписания */
   duration?: string;
-}
-
-export interface TourDisplayDuration {
-  displayDuration: string;
-  durationType: TourScheduleDurationType | null;
-  fromCatalog: boolean;
 }
 
 export const useTourDisplayDuration = (
@@ -20,21 +18,9 @@ export const useTourDisplayDuration = (
   const { durationTypes, status } = useTourSchedule();
   const durationType = durationTypes.get(tour.id) ?? null;
 
-  if (durationType != null) {
-    return {
-      displayDuration: formatTourDurationDisplayLabel(durationType),
-      durationType,
-      fromCatalog: true,
-    };
-  }
-
-  if (status !== 'loading') {
+  if (durationType == null && status !== 'loading') {
     console.warn(`[tourSchedule] Missing catalog durationType for tourId: ${tour.id}`);
   }
 
-  return {
-    displayDuration: '',
-    durationType: null,
-    fromCatalog: false,
-  };
+  return resolveTourDisplayDuration(durationType, tour.duration);
 };

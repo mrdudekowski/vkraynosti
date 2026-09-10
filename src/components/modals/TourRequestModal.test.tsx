@@ -10,6 +10,7 @@ import { getTourById } from '../../data/toursData';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
 
 const mockClose = vi.fn();
+const testNow = new Date('2026-08-01T12:00:00.000Z');
 
 vi.mock('../../context/useModal', () => ({
   useModal: () => ({
@@ -76,6 +77,8 @@ const RouterWrap = ({ children }: { children: React.ReactNode }) => (
 
 describe('TourRequestModal', () => {
   beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(testNow);
     mockClose.mockClear();
     vi.mocked(sendTourRequestLead).mockReset();
     vi.mocked(sendTourRequestLead).mockResolvedValue(undefined);
@@ -84,6 +87,7 @@ describe('TourRequestModal', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.useRealTimers();
   });
 
   it('opens form with pre-filled date when tour has a single future departure', async () => {

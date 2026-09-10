@@ -66,6 +66,22 @@ describe('buildCmsToursFile', () => {
     expect(file.tours[1]?.legacyGalleryVariant).toBe('default');
   });
 
+  it('переписывает медиа всех туров при полной миграции', () => {
+    const file = buildCmsToursFile(
+      [
+        tourWithId('summer-8', 'summer', 'summer-8'),
+        tourWithId('winter-2', 'winter', 'winter-2'),
+      ],
+      {
+        publicBaseUrl: 'https://s3.twcstorage.ru/vkraynosti-cms-dev',
+        rewriteAllTourMedia: true,
+      }
+    );
+
+    expect(file.tours[0]?.assets[0]?.stillUrl).toContain('media/tours/summer-8/');
+    expect(file.tours[1]?.assets[0]?.stillUrl).toContain('media/tours/winter-2/');
+  });
+
   it('в витрину попадают только active-пакеты', () => {
     const packages = buildCmsTourPackages(
       [

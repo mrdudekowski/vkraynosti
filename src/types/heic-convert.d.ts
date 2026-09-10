@@ -1,0 +1,10 @@
+declare module 'heic-convert' {
+  type ConvertOptions = {
+    buffer: Uint8Array;
+    format: 'JPEG' | 'PNG';
+    quality?: number;
+  };
+
+  function convert(options: ConvertOptions): Promise<Uint8Array>;
+  export default convert;
+}

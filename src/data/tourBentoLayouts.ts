@@ -6,6 +6,7 @@
  * - summer-8 (Краббе) → `buildSummer8CrabbeBentoLayout` (center-top + vert×2)
  * - summer-9 (Неожиданный) → `buildSummer9NeozhidannyBentoLayout` (center-top + single + left)
  * - summer-11 (Ежовая/Спокойная) → `buildSummer11RelaxBentoLayout` (center-top + single + left)
+ * - summer-14 (Остров Петрова) → `buildSummer14PetrovaBentoLayout` (left + center-bottom)
  * - summer-10 (Робинзонада - Приморское Бали) → `buildSummer10EzhSestraBentoLayout` (9 блоков, 19 слотов)
  * - `shkota` (spring-11) → `buildSpring11ShkotaBentoLayout` (left + right + single + center-bottom + vert)
  * - `gamova` (spring-13) → `buildSpring13GamovaBentoLayout` (single + left×2 + vert + left)
@@ -43,6 +44,10 @@ import {
   TOUR_SPRING_13_GALLERY_VIEW7_OBJECT_CLASS,
   TOUR_WINTER_1_GALLERY_REST4_OBJECT_CLASS,
   TOUR_WINTER_4_GALLERY_GORA_OBJECT_CLASS,
+  TOUR_SUMMER_14_BOARDWALK_OBJECT_POSITION,
+  TOUR_SUMMER_14_CLIFFS_OBJECT_POSITION,
+  TOUR_SUMMER_14_COVE_OBJECT_POSITION,
+  TOUR_SUMMER_14_SUNSET_PIER_OBJECT_POSITION,
 } from '../constants/images';
 import { TOUR_SUMMER_1_CLIP4_GRID_VIDEO_OBJECT_CLASS } from '../constants/tourSummer1GalleryCrop';
 import { TOUR_SUMMER_11_CLIP2_WIDE_OBJECT_CLASS } from '../constants/tourSummer11CoverCrop';
@@ -316,6 +321,46 @@ export function buildSummer10EzhSestraBentoLayout(
 }
 
 const SUMMER_11_GRID_IMAGE_COUNT = 7;
+
+const SUMMER_14_GRID_IMAGE_COUNT = 6;
+
+/**
+ * «Остров Петрова» (summer-14).
+ * `gridImages` после `slice(2)`: cove, spit, trail-group, cliffs, sunset-pier, boardwalk.
+ * Стек CMS: bento-left → bento-center-bottom.
+ */
+export function buildSummer14PetrovaBentoLayout(
+  gridImages: string[]
+): TourBentoGalleryLayout {
+  if (gridImages.length !== SUMMER_14_GRID_IMAGE_COUNT) {
+    throw new Error(
+      `buildSummer14PetrovaBentoLayout: expected ${SUMMER_14_GRID_IMAGE_COUNT} grid images, got ${gridImages.length}`
+    );
+  }
+
+  const layout = validateTourBentoGalleryLayout({
+    blocks: [
+      {
+        type: 'bento-left',
+        slots: [
+          slot(gridImages[0], { objectPosition: TOUR_SUMMER_14_COVE_OBJECT_POSITION }),
+          slot(gridImages[1]),
+          slot(gridImages[2]),
+        ],
+      },
+      {
+        type: 'bento-center-bottom',
+        slots: [
+          slot(gridImages[3], { objectPosition: TOUR_SUMMER_14_CLIFFS_OBJECT_POSITION }),
+          slot(gridImages[4], { objectPosition: TOUR_SUMMER_14_SUNSET_PIER_OBJECT_POSITION }),
+          slot(gridImages[5], { objectPosition: TOUR_SUMMER_14_BOARDWALK_OBJECT_POSITION }),
+        ],
+      },
+    ],
+  });
+
+  return layout;
+}
 
 /**
  * «Релакс-тур в бухту Ежовую / Спокойную» (summer-11).
@@ -924,6 +969,7 @@ export const TOUR_BENTO_LAYOUT_BUILDER_IDS = [
   'summer-9',
   'summer-10',
   'summer-11',
+  'summer-14',
 ] as const;
 
 export type TourBentoLayoutBuilderId = (typeof TOUR_BENTO_LAYOUT_BUILDER_IDS)[number];
@@ -956,6 +1002,7 @@ const tourBentoLayoutBuilders: Record<
   'summer-9': buildSummer9NeozhidannyBentoLayout,
   'summer-10': buildSummer10EzhSestraBentoLayout,
   'summer-11': buildSummer11RelaxBentoLayout,
+  'summer-14': buildSummer14PetrovaBentoLayout,
 };
 
 export function buildTourBentoLayoutForId(

@@ -10,7 +10,8 @@
 
 ## Global Constraints
 
-- Plans 1 and 2 exit gates are green before starting.
+- Plan 1 PostgreSQL/auth exit gate is green before starting; CRM is not a prerequisite.
+- This plan runs before `2026-08-17-cms-schedule-release-one.md`; the schedule plan extends its publisher into the complete Release 1 bundle.
 - Lifecycle is `draft -> review -> published`; review may return to draft; published content may be unpublished or archived.
 - Slug becomes immutable after the first successful publication.
 - A failed build/upload never replaces the last good public artifact.
@@ -25,7 +26,7 @@
 **Files:**
 - Modify: `scripts/cms/api/db/schema.ts`
 - Modify: `scripts/cms/api/db/schema.test.ts`
-- Create: `drizzle/0002_cms_revisions.sql`
+- Create: `drizzle/0001_cms_revisions.sql`
 
 **Interfaces:**
 - Produces tables `tours`, `tour_revisions`, `tour_publications`, `publication_jobs`.
@@ -79,7 +80,7 @@ Required constraints:
 
 Run: `npm.cmd run db:generate` then `npm.cmd run db:migrate` then `npm.cmd run db:check`.
 
-Expected: `drizzle/0002_cms_revisions.sql` creates four tables and all constraints with no drift.
+Expected: `drizzle/0001_cms_revisions.sql` creates four tables and all constraints with no drift.
 
 - [ ] **Step 5: Verify schema tests**
 
@@ -90,7 +91,7 @@ Expected: all schema tests PASS.
 - [ ] **Step 6: Proposed commit checkpoint**
 
 ```bash
-git add scripts/cms/api/db/schema.ts scripts/cms/api/db/schema.test.ts drizzle/0002_cms_revisions.sql
+git add scripts/cms/api/db/schema.ts scripts/cms/api/db/schema.test.ts drizzle/0001_cms_revisions.sql
 git commit -m "feat: add cms revision schema"
 ```
 

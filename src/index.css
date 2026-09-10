@@ -589,33 +589,39 @@
    * Подключаются из `src/admin/`; здесь, потому что отдельный CSS без `@tailwind components` ломает PostCSS.
    */
   .admin-btn {
-    @apply inline-flex min-h-11 items-center justify-center rounded-admin-control px-3 text-sm font-medium
-      transition-colors duration-hover
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center rounded-admin-control px-3 text-sm font-medium
+      transition-colors duration-admin
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
-      disabled:pointer-events-none disabled:opacity-50;
+      disabled:pointer-events-none disabled:opacity-50
+      motion-reduce:transition-none;
   }
 
   .admin-btn-primary {
-    @apply admin-btn bg-brand-primary text-text-inverse hover:brightness-110;
+    @apply admin-btn bg-brand-primary text-text-inverse hover:bg-brand-primary/90 active:bg-brand-primary/80;
   }
 
   .admin-btn-secondary {
-    @apply admin-btn border border-divider bg-surface-light text-text-primary hover:bg-brand-primary/15;
+    @apply admin-btn border border-divider bg-surface-light text-text-primary hover:bg-surface-dark/5 active:bg-surface-dark/10;
   }
 
   .admin-btn-ghost {
-    @apply admin-btn text-text-muted hover:bg-brand-primary/15 hover:text-text-primary;
+    @apply admin-btn text-text-muted hover:bg-surface-dark/5 hover:text-text-primary active:bg-surface-dark/10;
   }
 
   .admin-btn-destructive {
-    @apply admin-btn text-difficulty-hard-fg hover:bg-difficulty-hard-bg;
+    @apply admin-btn text-difficulty-hard-fg hover:bg-difficulty-hard-bg active:bg-difficulty-hard-bg/80;
   }
 
   .admin-icon-btn {
-    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-admin-control text-text-muted
-      transition-colors duration-hover hover:bg-brand-primary/15 hover:text-text-primary
+    @apply inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-admin-control text-text-muted
+      transition-colors duration-admin hover:bg-surface-dark/5 hover:text-text-primary active:bg-surface-dark/10
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
-      disabled:pointer-events-none disabled:opacity-50;
+      disabled:pointer-events-none disabled:opacity-50
+      motion-reduce:transition-none;
+  }
+
+  .admin-icon-btn-compact {
+    @apply admin-icon-btn h-7 w-7;
   }
 
   .admin-icon-btn-danger {
@@ -625,15 +631,54 @@
   .admin-input {
     @apply w-full rounded-admin-control border border-divider bg-white px-2 py-1.5 text-sm text-text-primary
       placeholder:text-text-muted/70
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+      transition-colors duration-admin
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      motion-reduce:transition-none;
   }
 
   .admin-input-error {
     @apply border-difficulty-hard-fg;
   }
 
+  .admin-row-warning {
+    @apply rounded-admin-control border border-difficulty-medium-fg/40 bg-difficulty-medium-bg;
+  }
+
+  .admin-tab-blocker-dot {
+    @apply ml-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-difficulty-medium-fg;
+  }
+
   .admin-textarea {
     @apply admin-input min-h-16 resize-y;
+  }
+
+  .admin-editor-surface {
+    @apply rounded-card border border-divider bg-surface-light p-3
+      transition-shadow duration-admin motion-reduce:transition-none
+      hover:shadow-admin-overlay;
+  }
+
+  .admin-editor-icon-well {
+    @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary;
+  }
+
+  .admin-editor-row {
+    @apply flex gap-1 rounded-admin-control px-0.5
+      transition-colors duration-admin motion-reduce:transition-none
+      hover:bg-surface-dark/5;
+  }
+
+  .admin-editor-list {
+    @apply max-h-[min(28rem,calc(100dvh-18rem))] overflow-y-auto overscroll-y-contain pr-1;
+  }
+
+  .admin-readiness-track {
+    @apply h-1.5 overflow-hidden rounded-full bg-surface-dark/15;
+  }
+
+  .admin-readiness-fill {
+    @apply h-full origin-left rounded-full bg-brand-primary
+      transition-transform duration-admin motion-reduce:transition-none;
   }
 
   .admin-badge {
@@ -657,7 +702,11 @@
   }
 
   .admin-badge-info {
-    @apply admin-badge bg-brand-primary/15 text-text-primary;
+    @apply admin-badge bg-admin-info-bg text-admin-info-fg;
+  }
+
+  .admin-badge-draft {
+    @apply admin-badge bg-admin-draft-bg text-admin-draft-fg;
   }
 
   .admin-alert {
@@ -681,12 +730,24 @@
   }
 
   .admin-alert-info {
-    @apply admin-alert border-brand-primary/30 bg-brand-primary/15 text-text-primary;
+    @apply admin-alert border-admin-info-fg/30 bg-admin-info-bg text-admin-info-fg;
   }
 
   .admin-nav-item {
-    @apply text-text-primary hover:bg-brand-primary/10
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+    @apply text-text-primary transition-colors duration-admin hover:bg-surface-dark/5
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      motion-reduce:transition-none;
+  }
+
+  .admin-sidebar-nav {
+    @apply flex min-h-11 items-center gap-2 rounded-admin-control px-2 text-sm text-text-inverse/80 no-underline
+      transition-colors duration-admin hover:bg-text-inverse/10 hover:text-text-inverse
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-inverse/50
+      motion-reduce:transition-none;
+  }
+
+  .admin-sidebar-nav-active {
+    @apply admin-sidebar-nav bg-text-inverse/15 font-medium text-text-inverse;
   }
 
   /**
@@ -699,12 +760,37 @@
     object-position: var(--media-object-position, 50% 50%);
   }
 
-  .tour-hero-object-position {
+  /**
+   * Hero карусели на главной: `--tour-hero-object-position` (mobile),
+   * с `lg` — `--tour-hero-object-position-lg` (кадр «Hero большой»).
+   */
+  .tour-hero-object-position,
+  .tour-hero-object-position img {
     object-position: var(--tour-hero-object-position, 50% 50%);
   }
 
   @screen lg {
-    .tour-hero-object-position {
+    .tour-hero-object-position,
+    .tour-hero-object-position img {
+      object-position: var(
+        --tour-hero-object-position-lg,
+        var(--tour-hero-object-position, 50% 50%)
+      );
+    }
+  }
+
+  /**
+   * Hero страницы тура — те же CMS-кадры, но широкий кадр с `md`:
+   * на планшете блок уже широкий (`h-tour-detail-hero`), как вкладка «Hero большой».
+   */
+  .tour-detail-hero-object-position,
+  .tour-detail-hero-object-position img {
+    object-position: var(--tour-hero-object-position, 50% 50%);
+  }
+
+  @screen md {
+    .tour-detail-hero-object-position,
+    .tour-detail-hero-object-position img {
       object-position: var(
         --tour-hero-object-position-lg,
         var(--tour-hero-object-position, 50% 50%)
@@ -722,6 +808,368 @@
   .admin-nav-active {
     @apply bg-brand-primary/15 font-medium text-text-primary
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+  }
+
+  .admin-nav-complete {
+    @apply bg-difficulty-easy-bg font-medium text-difficulty-easy-fg
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+  }
+
+  .admin-data-row {
+    @apply flex flex-col rounded-admin-surface border border-divider bg-surface-light p-3 text-left
+      transition-colors duration-admin
+      md:rounded-none md:border-x-0 md:border-t-0 md:bg-transparent md:px-1 md:py-3
+      admin-desktop:grid admin-desktop:grid-cols-[minmax(0,1.4fr)_auto_minmax(0,1fr)_auto] admin-desktop:items-center admin-desktop:gap-3
+      motion-reduce:transition-none;
+  }
+
+  .admin-inbox-head {
+    @apply mb-2 hidden items-center gap-3 px-3 text-xs font-medium leading-tight text-text-muted
+      admin-desktop:grid admin-desktop:grid-cols-[5rem_minmax(14rem,1fr)_11rem_6rem_10rem_9rem_13rem];
+  }
+
+  .admin-inbox-row {
+    @apply flex flex-col gap-2 rounded-admin-surface border border-divider bg-surface-light p-3
+      transition-shadow duration-admin hover:shadow-admin-overlay
+      admin-desktop:grid admin-desktop:grid-cols-[5rem_minmax(14rem,1fr)_11rem_6rem_10rem_9rem_13rem]
+      admin-desktop:items-center admin-desktop:gap-3 admin-desktop:rounded-none
+      admin-desktop:border-x-0 admin-desktop:border-t-0 admin-desktop:bg-transparent admin-desktop:px-3 admin-desktop:py-3
+      admin-desktop:shadow-none admin-desktop:hover:bg-surface-dark/5 admin-desktop:hover:shadow-none
+      motion-reduce:transition-none;
+  }
+
+  .admin-schedule-toolbar {
+    @apply flex flex-wrap items-center justify-between gap-3;
+  }
+
+  .admin-schedule-toolbar-wrap {
+    @apply flex flex-col gap-3;
+  }
+
+  .admin-schedule-toolbar-meta {
+    @apply flex flex-wrap items-center justify-between gap-3 border-b border-divider pb-3;
+  }
+
+  .admin-schedule-toolbar-actions {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .admin-schedule-legend-item {
+    @apply inline-flex cursor-default;
+  }
+
+  .admin-schedule-nav-btn {
+    @apply min-h-9 min-w-9;
+  }
+
+  .admin-schedule-mode-switch {
+    @apply inline-flex flex-wrap gap-0.5 rounded-admin-control border border-divider bg-surface-light p-0.5;
+  }
+
+  .admin-schedule-month {
+    @apply overflow-hidden rounded-admin-surface border border-divider bg-surface-light;
+  }
+
+  .admin-schedule-weekdays {
+    @apply grid grid-cols-7 border-b border-divider bg-surface-light;
+  }
+
+  .admin-schedule-weekday {
+    @apply px-1 py-2 text-center text-tooltip font-medium uppercase tracking-wide text-text-muted;
+  }
+
+  .admin-schedule-grid {
+    @apply grid grid-cols-7 auto-rows-[minmax(5.5rem,1fr)];
+  }
+
+  .admin-schedule-day {
+    @apply relative flex min-h-[5.5rem] flex-col border-b border-r border-divider bg-surface-light
+      transition-colors duration-admin motion-reduce:transition-none;
+  }
+
+  .admin-schedule-day:nth-child(7n) {
+    @apply border-r-0;
+  }
+
+  .admin-schedule-day-outside {
+    @apply bg-surface-dark/[0.03];
+  }
+
+  .admin-schedule-day-today .admin-schedule-day-number {
+    @apply font-semibold text-brand-primary;
+  }
+
+  .admin-schedule-day-selected {
+    @apply bg-brand-primary/[0.06] ring-1 ring-inset ring-brand-primary/25;
+  }
+
+  .admin-schedule-day-header {
+    @apply flex items-start justify-between gap-1 px-1.5 pt-1.5;
+  }
+
+  .admin-schedule-day-number {
+    @apply min-w-0 flex-1 text-left text-tooltip font-medium text-text-primary;
+  }
+
+  .admin-schedule-day-number-outside {
+    @apply text-text-muted;
+  }
+
+  .admin-schedule-day-add {
+    @apply admin-icon-btn-compact h-6 w-6 opacity-0 transition-opacity duration-admin
+      focus-visible:opacity-100 motion-reduce:transition-none;
+  }
+
+  .group:hover .admin-schedule-day-add,
+  .group:focus-within .admin-schedule-day-add,
+  .admin-schedule-day-add-visible {
+    @apply opacity-100;
+  }
+
+  @media (pointer: coarse) {
+    .admin-schedule-day-add {
+      @apply opacity-100;
+    }
+  }
+
+  .admin-schedule-day-items {
+    @apply flex min-h-0 flex-1 flex-col gap-0.5 px-1 pb-1;
+  }
+
+  .admin-schedule-departure-item {
+    @apply flex w-full min-w-0 items-start gap-1.5 rounded-admin-control border border-transparent
+      px-1 py-1 text-left transition-colors duration-admin
+      hover:border-divider hover:bg-surface-dark/[0.04] focus-visible:border-brand-primary/40
+      focus-visible:bg-surface-dark/[0.04] focus-visible:outline-none motion-reduce:transition-none;
+  }
+
+  .admin-schedule-departure-item-selected {
+    @apply border-brand-primary/30 bg-brand-primary/10;
+  }
+
+  .admin-schedule-departure-item-cancelled .admin-schedule-departure-thumb {
+    @apply opacity-60;
+  }
+
+  .admin-schedule-departure-item-cancelled span {
+    @apply text-text-muted;
+  }
+
+  .admin-schedule-departure-thumb {
+    @apply h-7 w-7 shrink-0 rounded-admin-control object-cover;
+  }
+
+  .admin-schedule-overflow-link {
+    @apply w-full px-1 py-0.5 text-left text-tooltip text-text-muted underline-offset-2
+      hover:text-text-primary hover:underline focus-visible:text-text-primary focus-visible:underline
+      focus-visible:outline-none;
+  }
+
+  .admin-schedule-draggable {
+    @apply cursor-grab active:cursor-grabbing;
+  }
+
+  .admin-schedule-draggable:active {
+    @apply opacity-80;
+  }
+
+  .admin-schedule-footer {
+    @apply mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-divider pt-3;
+  }
+
+  .admin-schedule-legend {
+    @apply flex flex-wrap items-center gap-x-4 gap-y-1;
+  }
+
+  .admin-schedule-agenda-day {
+    @apply relative flex min-h-24 flex-col gap-1 rounded-card border border-divider bg-surface-light p-2;
+  }
+
+  .admin-schedule-agenda-day-today {
+    @apply border-brand-primary/40 bg-brand-primary/5;
+  }
+
+  /* Неделя и день: без полосы документа — скролл секций. Месяц оставляет скролл страницы. */
+  html:has(body[data-admin-schedule-sections]) {
+    overflow: hidden;
+    scrollbar-width: none;
+  }
+
+  html:has(body[data-admin-schedule-sections])::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  body[data-admin-schedule-sections] #admin-main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .admin-schedule-section-frame {
+    @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden;
+  }
+
+  .admin-schedule-section-stack {
+    @apply flex min-h-0 flex-1 flex-col gap-5 overflow-hidden;
+  }
+
+  .admin-schedule-section-board {
+    @apply grid min-h-0 min-w-0 flex-1 overflow-hidden;
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .admin-schedule-section-board-rail {
+    grid-template-rows: none;
+  }
+
+  @screen xl {
+    .admin-schedule-section-board-rail {
+      grid-template-rows: minmax(0, 1fr);
+    }
+
+    .admin-schedule-section-rail {
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .admin-schedule-section-rail::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .admin-schedule-section-workspace {
+    @apply flex min-h-0 min-w-0 flex-col overflow-hidden;
+  }
+
+  .admin-schedule-section-board:not(.admin-schedule-section-board-rail) .admin-schedule-section-workspace {
+    @apply h-full;
+  }
+
+  @screen xl {
+    .admin-schedule-section-workspace {
+      @apply h-full;
+    }
+  }
+
+  .admin-schedule-section-workspace
+    > :not(.admin-schedule-week-split):not(.admin-schedule-week-list):not(.admin-schedule-day-agenda) {
+    @apply shrink-0;
+  }
+
+  .admin-schedule-section-workspace .admin-schedule-week-split,
+  .admin-schedule-section-workspace .admin-schedule-week-list,
+  .admin-schedule-section-workspace .admin-schedule-day-agenda {
+    @apply mt-3 min-h-0 flex-1;
+  }
+
+  .admin-schedule-section-board-rail .admin-schedule-week-list,
+  .admin-schedule-section-board-rail .admin-schedule-day-agenda {
+    overflow: visible;
+    flex: none;
+  }
+
+  @screen xl {
+    .admin-schedule-section-board-rail .admin-schedule-week-list,
+    .admin-schedule-section-board-rail .admin-schedule-day-agenda {
+      @apply min-h-0 flex-1 overflow-y-auto;
+    }
+  }
+
+  .admin-schedule-week-split {
+    @apply grid min-h-0 min-w-0 flex-1 gap-5 xl:grid-cols-[minmax(16rem,34%)_minmax(0,1fr)];
+  }
+
+  .admin-schedule-week-split-days {
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .admin-schedule-week-split-days::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .admin-schedule-week-section {
+    @apply border-b border-divider py-1;
+  }
+
+  .admin-schedule-week-section-today .admin-schedule-week-day-button {
+    @apply text-brand-primary;
+  }
+
+  .admin-schedule-week-section-selected {
+    @apply bg-brand-primary/[0.06];
+  }
+
+  .admin-schedule-week-section-header {
+    @apply flex min-h-9 items-center justify-between gap-2;
+  }
+
+  .admin-schedule-week-day-button {
+    @apply flex min-h-9 min-w-0 flex-1 items-baseline gap-2 rounded-admin-control px-1 text-left text-sm
+      hover:bg-surface-dark/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/30;
+  }
+
+  .admin-schedule-week-day-add {
+    @apply admin-icon-btn-compact h-8 w-8 shrink-0 opacity-70 hover:opacity-100 focus-visible:opacity-100;
+  }
+
+  .admin-schedule-week-row {
+    @apply flex min-w-0 items-center gap-2 rounded-admin-control px-1 py-1
+      hover:bg-surface-dark/[0.03];
+  }
+
+  .admin-schedule-week-row-selected {
+    @apply bg-brand-primary/10;
+  }
+
+  .admin-schedule-week-row-open {
+    @apply flex min-w-0 flex-1 items-center gap-2 text-left text-sm text-text-primary;
+  }
+
+  .admin-schedule-week-row-detail {
+    @apply gap-3 border border-divider bg-surface-light p-3 hover:bg-surface-light;
+  }
+
+  .admin-schedule-week-row-detail .admin-schedule-week-row-open {
+    @apply items-start gap-3;
+  }
+
+  .admin-schedule-week-panel {
+    @apply flex min-h-0 flex-col rounded-admin-surface border border-divider bg-surface-light p-4;
+  }
+
+  .admin-schedule-day-detail-item {
+    @apply flex w-full items-start gap-3 rounded-admin-control border border-divider bg-surface-light p-3 text-left
+      transition-colors duration-admin hover:bg-surface-dark/[0.03] focus-visible:outline-none
+      focus-visible:ring-2 focus-visible:ring-brand-primary/30 motion-reduce:transition-none;
+  }
+
+  .admin-schedule-day-detail-item-selected {
+    @apply border-brand-primary/30 bg-brand-primary/5;
+  }
+
+  .admin-toast-stack {
+    @apply pointer-events-none fixed right-4 z-modal flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2
+      bottom-[calc(theme(spacing.navbar)+theme(spacing.safe-bottom)+0.75rem)]
+      md:bottom-4;
+  }
+
+  body[data-admin-sticky-bar] .admin-toast-stack {
+    @apply bottom-[calc(theme(spacing.navbar)+theme(spacing.safe-bottom)+theme(spacing.admin-sticky-bar)+0.75rem)]
+      md:bottom-[calc(theme(spacing.admin-sticky-bar)+0.75rem)];
   }
 
   /**
@@ -1247,11 +1695,17 @@
     --rdp-accent-color: theme('colors.season.spring');
     --rdp-day-height: 2.75rem;
     --rdp-day-width: 2.75rem;
+    --tour-calendar-day-tile-size: theme('spacing.8');
+    --tour-calendar-day-accent-size: theme('spacing.3');
+    --tour-calendar-day-accent-inset: theme('spacing.1');
   }
 
   .tour-calendar-mini {
     --rdp-day-height: 2rem;
     --rdp-day-width: 2rem;
+    --tour-calendar-day-tile-size: theme('spacing.6');
+    --tour-calendar-day-accent-size: theme('spacing.2');
+    --tour-calendar-day-accent-inset: theme('spacing[0.5]');
   }
 
   .tour-calendar.rdp-root:not(.tour-departure-calendar) {
@@ -1285,71 +1739,92 @@
     background-color: transparent;
   }
 
-  .tour-calendar .rdp-day.rdp-today:not(.tour-calendar__day--selected) > .tour-calendar__day-btn {
-    box-shadow: 0 0 0 1px theme('colors.divider');
-  }
-
-  .tour-calendar.rdp-root:not(.tour-departure-calendar)
-    .tour-calendar__day-btn.tour-calendar__day--selected
-    .tour-calendar__day-num,
-  .tour-departure-calendar--select
-    .tour-calendar__day-btn.tour-calendar__day--selected
-    .tour-calendar__day-num {
+  .tour-calendar__day-tile {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 1.75rem;
-    min-height: 1.75rem;
-    border-radius: 9999px;
-    box-shadow: 0 0 0 2px var(--rdp-accent-color);
+    width: var(--tour-calendar-day-tile-size);
+    height: var(--tour-calendar-day-tile-size);
+    border-radius: theme('borderRadius.lg');
+    color: inherit;
+    background-color: transparent;
+    box-shadow: none;
+    transition-property: background-color, color, box-shadow;
+    transition-duration: theme('transitionDuration.hover');
+    transition-timing-function: theme('transitionTimingFunction.standard');
   }
 
   .tour-calendar__day-num {
     display: inline-block;
-    transition: transform theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+    font-weight: inherit;
   }
 
-  /** Главный #kalendar: корень без `.tour-departure-calendar`. */
+  .tour-calendar .rdp-day.rdp-today:not(.tour-calendar__day--selected) .tour-calendar__day-tile {
+    box-shadow: 0 0 0 1px theme('colors.divider');
+  }
+
   .tour-calendar.rdp-root:not(.tour-departure-calendar)
     .rdp-day:not(.tour-calendar__day--selected)
     .tour-calendar__day-btn:hover:not(:disabled)
-    .tour-calendar__day-num,
-  /** Модалка заявки (select); не мини display на странице тура. */
+    .tour-calendar__day-tile,
   .tour-departure-calendar--select
     .rdp-day:not(.tour-calendar__day--selected)
     .tour-calendar__day-btn:hover:not(:disabled)
-    .tour-calendar__day-num {
-    transform: scale(1.1) translateY(-1px);
+    .tour-calendar__day-tile {
+    background-color: color-mix(in srgb, theme('colors.surface.dark') 5%, transparent);
   }
 
-  .tour-departure-calendar--display
-    .tour-calendar__day-btn:hover
-    .tour-calendar__day-num {
-    transform: none;
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile,
+  .tour-departure-calendar--select
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile {
+    background-color: color-mix(
+      in srgb,
+      theme('colors.surface.dark') 88%,
+      theme('colors.surface.light') 12%
+    );
+    color: theme('colors.text.inverse');
+    font-weight: theme('fontWeight.semibold');
+    box-shadow: 0 1px 2px color-mix(in srgb, theme('colors.surface.dark') 16%, transparent);
   }
 
-  .tour-calendar .tour-calendar__day-btn.tour-calendar__day--selected:hover .tour-calendar__day-num,
-  .tour-calendar
-    .rdp-day.tour-calendar__day--selected
-    .tour-calendar__day-btn:hover
-    .tour-calendar__day-num {
-    transform: none;
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile::after,
+  .tour-departure-calendar--select
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile::after {
+    content: '';
+    position: absolute;
+    right: var(--tour-calendar-day-accent-inset);
+    bottom: var(--tour-calendar-day-accent-inset);
+    width: var(--tour-calendar-day-accent-size);
+    height: var(--tour-calendar-day-accent-size);
+    pointer-events: none;
+    border-right: 2px solid theme('colors.cta.fill');
+    border-bottom: 2px solid theme('colors.cta.fill');
+    border-bottom-right-radius: theme('borderRadius.sm');
+  }
+
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .tour-calendar__day-btn.tour-calendar__day--selected:hover
+    .tour-calendar__day-tile,
+  .tour-departure-calendar--select
+    .tour-calendar__day-btn.tour-calendar__day--selected:hover
+    .tour-calendar__day-tile {
+    background-color: color-mix(
+      in srgb,
+      theme('colors.surface.dark') 78%,
+      theme('colors.surface.light') 22%
+    );
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tour-calendar__day-num {
+    .tour-calendar__day-tile {
       transition: none;
-    }
-
-    .tour-calendar.rdp-root:not(.tour-departure-calendar)
-      .rdp-day:not(.tour-calendar__day--selected)
-      .tour-calendar__day-btn:hover:not(:disabled)
-      .tour-calendar__day-num,
-    .tour-departure-calendar--select
-      .rdp-day:not(.tour-calendar__day--selected)
-      .tour-calendar__day-btn:hover:not(:disabled)
-      .tour-calendar__day-num {
-      transform: none;
     }
   }
 

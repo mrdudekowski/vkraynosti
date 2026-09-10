@@ -13,7 +13,13 @@
  *
  * Tablet UX (намеренные зоны, не баг):
  * - 500–1159: season switcher в navbar + burger, без desktop links (`season-md` / `nav-desktop`).
+ * Админка (спека UI/UX): tablet md…1023, desktop ≥1024, wide ≥1440 — `admin-desktop` / `admin-wide`.
  */
+import {
+  ADMIN_BREAKPOINT_DESKTOP_PX,
+  ADMIN_BREAKPOINT_WIDE_PX,
+} from './adminUiTokens';
+
 export const BREAKPOINT_SM_PX = 576 as const;
 export const BREAKPOINT_MD_PX = 768 as const;
 export const BREAKPOINT_LG_PX = 992 as const;
@@ -85,6 +91,8 @@ export const TAILWIND_SCREEN_MIN_WIDTH_PX = {
   'mobile-nav-drawer-compact': BREAKPOINT_MOBILE_NAV_DRAWER_COMPACT_PX,
   'team-hero-desktop': BREAKPOINT_TEAM_HERO_DESKTOP_PX,
   'tour-calendar-day-events': BREAKPOINT_TOUR_CALENDAR_DAY_EVENTS_GRID_PX,
+  'admin-desktop': ADMIN_BREAKPOINT_DESKTOP_PX,
+  'admin-wide': ADMIN_BREAKPOINT_WIDE_PX,
 } as const;
 
 /**

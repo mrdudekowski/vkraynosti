@@ -1,12 +1,9 @@
 import type { DayButtonProps } from 'react-day-picker';
 import type { EnrichedScheduleEvent } from '../../types/tourSchedule';
-import {
-  TOUR_CALENDAR_DAY_NUMBER_CLASS,
-  TOUR_CALENDAR_DAY_SELECTED_CLASS,
-} from '../../constants/tourCalendarShared';
+import { TOUR_CALENDAR_DAY_SELECTED_CLASS } from '../../constants/tourCalendarShared';
 import { buildDayAriaLabel } from '../../utils/tourSchedule/buildDayAriaLabel';
 import { toIsoDate } from '../../utils/tourSchedule/toIsoDate';
-import TourCalendarDayEventDots from './TourCalendarDayEventDots';
+import TourCalendarDayFace from './TourCalendarDayFace';
 
 interface TourCalendarDayButtonProps extends DayButtonProps {
   eventsByDate: Map<string, EnrichedScheduleEvent[]>;
@@ -41,8 +38,7 @@ const TourCalendarDayButton = ({
       aria-selected={modifiers.selected || undefined}
       className={mergedClassName}
     >
-      <span className={TOUR_CALENDAR_DAY_NUMBER_CLASS}>{day.date.getDate()}</span>
-      {events.length > 0 && <TourCalendarDayEventDots events={events} />}
+      <TourCalendarDayFace dayOfMonth={day.date.getDate()} events={events} />
     </button>
   );
 };

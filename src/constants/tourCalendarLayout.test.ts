@@ -43,7 +43,10 @@ describe('tourCalendarLayout', () => {
   it('exposes class strings without arbitrary max-w/min-h', () => {
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('tour-calendar__day-btn');
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('max-w-tour-calendar-day-cell');
-    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('overflow-hidden');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('cursor-pointer');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).toContain('rounded-lg');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).not.toContain('rounded-full');
+    expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).not.toContain('overflow-hidden');
     expect(TOUR_CALENDAR_DAY_BUTTON_CLASS).not.toContain('max-w-[');
     expect(TOUR_CALENDAR_DAY_CELL_CLASS).toContain('align-middle');
     expect(TOUR_CALENDAR_DAY_CELL_CLASS).not.toContain('flex');

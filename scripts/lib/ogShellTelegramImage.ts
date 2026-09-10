@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { unlink } from 'node:fs/promises';
+import { readFile, unlink } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import ffmpegStatic from 'ffmpeg-static';
@@ -24,6 +24,13 @@ export async function ensureTelegramFriendlyOgImage(
 ): Promise<string> {
   const extension = extname(logicalPath).toLowerCase();
   if (!RASTER_EXTENSIONS.has(extension)) {
+    return logicalPath;
+  }
+
+  // JPGs uploaded as OG assets are already in the crawler-friendly format.
+  // Do not invoke ffmpeg for them; this keeps static builds independent of
+  // whether the optional ffmpeg binary was installed in the build container.
+  if (extension === '.jpg' || extension === '.jpeg') {
     return logicalPath;
   }
 
@@ -75,11 +82,41 @@ export const isJpegOgImagePath = (logicalPath: string): boolean =>
 export async function probeJpegDimensions(
   filePath: string,
 ): Promise<{ width: number; height: number } | null> {
-  if (!ffmpegStatic) {
+  const bytes = await readFile(filePath);
+  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) {
     return null;
   }
 
+  const sofMarkers = new Set([
+    0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7,
+    0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf,
+  ]);
+  let offset = 2;
+  while (offset + 3 < bytes.length) {
+    if (bytes[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    while (offset < bytes.length && bytes[offset] === 0xff) offset += 1;
+    const marker = bytes[offset++];
+    if (marker === undefined) return null;
+    if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7) || marker === 0x01) {
+      continue;
+    }
+    if (offset + 1 >= bytes.length) return null;
+    const segmentLength = bytes.readUInt16BE(offset);
+    if (segmentLength < 2 || offset + segmentLength > bytes.length) return null;
+    if (sofMarkers.has(marker) && segmentLength >= 7) {
+      return {
+        height: bytes.readUInt16BE(offset + 3),
+        width: bytes.readUInt16BE(offset + 5),
+      };
+    }
+    offset += segmentLength;
+  }
+
   try {
+    if (!ffmpegStatic) return null;
     await execFileAsync(ffmpegStatic, ['-hide_banner', '-i', filePath], {
       maxBuffer: 1024 * 1024,
     });

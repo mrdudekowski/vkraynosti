@@ -90,6 +90,9 @@ jobs:
       - name: Verify OG shells
         run: npm run verify:og-shells
 
+      - name: Verify SEO route integrity
+        run: npm run verify:seo-routes
+
       - name: Verify CDN origin in CSP
         if: github.ref == 'refs/heads/web-vkr' && github.event_name == 'push'
         env:

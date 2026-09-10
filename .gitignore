@@ -69,6 +69,10 @@ docs/.tmp-manager-guide-preview.html
 
 # web-vkr only: tour media on S3 — SSOT and public/ copies live on main (npm run sync:s3)
 public/tours/
+!public/tours/
+public/tours/*
+!public/tours/**/
+!public/tours/**/*.jpg
 public/team/
 public/banners_winter/
 public/banners_spring/

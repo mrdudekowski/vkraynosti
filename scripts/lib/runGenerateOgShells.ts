@@ -15,6 +15,7 @@ import { patch404OgShell } from './patch404OgShell.ts';
 import { generateOgTestShell, generateTelegramOgTestShell20260610, OG_TEST_IMAGE_LOGICAL, TELEGRAM_OG_TEST_IMAGE_LOGICAL } from './generateOgTestShell.ts';
 import { injectOgShellIntoHtml } from './renderOgShellHead.ts';
 import { renderLegacyTourRedirectShell } from './renderLegacyTourRedirectShell.ts';
+import { renderLegacyRedirectRules } from './renderLegacyRedirectRules.ts';
 import { resolveOgShellMeta } from './resolveOgShellMeta.ts';
 import { routePathToDistFile } from './seoRoutes.mjs';
 
@@ -67,6 +68,7 @@ export async function runGenerateOgShells(): Promise<void> {
   }
 
   const legacyRoutes = getTourLegacyRedirectPaths();
+  const legacyRedirectRules: Array<{ from: string; to: string }> = [];
   for (const legacyPath of legacyRoutes) {
     const match = LEGACY_TOUR_PATH_PATTERN.exec(legacyPath);
     if (match == null) {
@@ -78,12 +80,15 @@ export async function runGenerateOgShells(): Promise<void> {
       throw new Error(`Unknown legacy tour path: ${legacyPath}`);
     }
     const canonicalUrl = getTourCanonicalUrl(tour);
+    legacyRedirectRules.push({ from: legacyPath, to: new URL(canonicalUrl).pathname });
     const html = renderLegacyTourRedirectShell(canonicalUrl, tour.title);
     const filePath = routePathToDistFile(legacyPath, distDir);
     await mkdir(dirname(filePath), { recursive: true });
     await writeFile(filePath, html, 'utf8');
     process.stdout.write(`[og-shell-legacy] ${legacyPath} -> ${canonicalUrl}\n`);
   }
+
+  await writeFile(resolve(distDir, 'legacy-redirects.caddy'), renderLegacyRedirectRules(legacyRedirectRules), 'utf8');
 
   await patch404OgShell(distDir);
   process.stdout.write(

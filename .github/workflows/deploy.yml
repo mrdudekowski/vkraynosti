@@ -171,6 +171,11 @@ jobs:
         run: npm run verify:og-shells
 
 
+      - name: Verify SEO route integrity
+
+        run: npm run verify:seo-routes
+
+
 
       - name: Setup Pages
 

@@ -23,7 +23,11 @@ const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] 
 const Footer = () => {
   const { openBanner } = useCookieConsent();
   const { contacts, footer } = useSiteContent();
-  const footerRows = new Map(footer.blocks.flatMap((block) => block.visible ? block.rows.filter((row) => row.visible).map((row) => [row.id, row] as const) : []));
+  const footerRows = new Map(footer.blocks.flatMap((block) => block.visible ? block.rows.map((row) => [row.id, row] as const) : []));
+  const footerRowValue = (id: string, fallback: string) => {
+    const row = footerRows.get(id);
+    return row == null ? fallback : row.visible ? row.value : '';
+  };
   const contactChannels = contacts.channels.filter((channel) => channel.visible).sort((a, b) => a.order - b.order);
 
   return (
@@ -39,7 +43,7 @@ const Footer = () => {
           >
             {UI.nav.brand}
           </Link>
-          <p className="mt-3 text-text-inverse/60 text-sm leading-relaxed">{footerRows.get('tagline')?.value ?? UI.footer.tagline}</p>
+          <p className="mt-3 text-text-inverse/60 text-sm leading-relaxed">{footerRowValue('tagline', UI.footer.tagline)}</p>
         </div>
 
         {/* Legal + documents */}
@@ -47,11 +51,11 @@ const Footer = () => {
           <div>
             <h4 className="font-normal text-text-inverse mb-4">{UI.footer.legalHeading}</h4>
             <div className="flex flex-col gap-2 text-text-inverse/60 text-sm leading-relaxed">
-              <p>{LEGAL_ENTITY.fullName}</p>
+              <p>{footerRowValue('legal-name', LEGAL_ENTITY.fullName)}</p>
               <p>
-                {UI.footer.innLabel} {LEGAL_ENTITY.inn}
+                {UI.footer.innLabel} {footerRowValue('inn', LEGAL_ENTITY.inn)}
               </p>
-              <p>{LEGAL_ENTITY.legalAddress}</p>
+              <p>{footerRowValue('legal-address', LEGAL_ENTITY.legalAddress)}</p>
             </div>
           </div>
           <nav

@@ -2,6 +2,7 @@ import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { DEFAULT_OG_SHELL_BANNER_LOGICAL } from '../../src/constants/images.ts';
+import { OG_SHELL_FALLBACK_SOURCE_LOGICAL } from './copyOgShellAssets.ts';
 import { buildCanonicalUrl } from '../../src/constants/canonicalUrl.ts';
 import { normalizeMetaContent } from '../../src/constants/metaContent.ts';
 import type { OgShellMeta } from './resolveOgShellMeta.ts';
@@ -30,6 +31,12 @@ async function materializeSourceImage(
   const localBanner = resolve(rootDir, 'public', DEFAULT_OG_SHELL_BANNER_LOGICAL);
   if (existsSync(localBanner)) {
     await copyFile(localBanner, targetPath);
+    return;
+  }
+
+  const fallbackSource = resolve(rootDir, 'public', OG_SHELL_FALLBACK_SOURCE_LOGICAL);
+  if (existsSync(fallbackSource)) {
+    await copyFile(fallbackSource, targetPath);
     return;
   }
 

@@ -6,6 +6,7 @@ import { resolveOgShellLogicalImagePath } from '../../src/constants/seo.ts';
 import { ensureTelegramFriendlyOgImage } from './ogShellTelegramImage.ts';
 
 export const OG_SHELL_ASSET_MANIFEST = '.og-shell-assets.json' as const;
+export const OG_SHELL_FALLBACK_SOURCE_LOGICAL = 'tours/fall-13/cover.jpg' as const;
 
 export interface OgShellAssetManifest {
   allowedRelativePaths: string[];
@@ -59,6 +60,14 @@ async function materializeOgShellAsset(
   if (existsSync(localPath)) {
     await copyLocalAsset(localPath, targetPath, logical);
     return ensureTelegramFriendlyOgImage(distDir, logical);
+  }
+
+  if (logical === DEFAULT_OG_SHELL_BANNER_LOGICAL) {
+    const fallbackSourcePath = resolve(rootDir, 'public', OG_SHELL_FALLBACK_SOURCE_LOGICAL);
+    if (existsSync(fallbackSourcePath)) {
+      await copyLocalAsset(fallbackSourcePath, targetPath, logical);
+      return logical;
+    }
   }
 
   const cdnUrl = buildCdnAssetUrl(logical);

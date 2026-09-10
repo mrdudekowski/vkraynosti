@@ -1,4 +1,5 @@
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { TOURS } from '../../src/data/toursData.ts';
 import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
@@ -8,6 +9,7 @@ import { getRenderableRoutePaths, getTourStatusByPublicPath } from './seoRoutes.
 import {
   collectOgShellImageLogicalPaths,
   copyOgShellAssets,
+  OG_SHELL_FALLBACK_SOURCE_LOGICAL,
   resolveOgShellImageForMeta,
   writeOgShellAssetManifest,
 } from './copyOgShellAssets.ts';
@@ -36,9 +38,14 @@ export async function runGenerateOgShells(): Promise<void> {
     throw new Error('dist/index.html not found — run `npm run build` first');
   }
 
+  const fallbackJpegSource = resolve(rootDir, OG_FALLBACK_JPEG_LOGICAL);
+  const fallbackJpegPath = resolve(distDir, OG_FALLBACK_JPEG_LOGICAL);
+  await mkdir(dirname(fallbackJpegPath), { recursive: true });
   await copyFile(
-    resolve(rootDir, OG_FALLBACK_JPEG_LOGICAL),
-    resolve(distDir, OG_FALLBACK_JPEG_LOGICAL),
+    existsSync(fallbackJpegSource)
+      ? fallbackJpegSource
+      : resolve(rootDir, 'public', OG_SHELL_FALLBACK_SOURCE_LOGICAL),
+    fallbackJpegPath,
   );
 
   const routes = await getRenderableRoutePaths(rootDir);

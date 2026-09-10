@@ -293,7 +293,8 @@ export async function adminUploadTourAsset(
     throw new Error('rev_conflict');
   }
   if (!response.ok) {
-    throw new Error('upload_failed');
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? 'upload_failed');
   }
   return readJson(response);
 }

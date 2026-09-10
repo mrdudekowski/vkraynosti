@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyCmsMediaFile, prepareCmsUploads } from './prepareCmsUploads';
+import { classifyCmsMediaFile, isHeicCmsFile, prepareCmsUploads } from './prepareCmsUploads';
 
 describe('classifyCmsMediaFile', () => {
   it('отличает фото, видео и мусор', () => {
@@ -14,6 +14,12 @@ describe('classifyCmsMediaFile', () => {
 });
 
 describe('prepareCmsUploads', () => {
+  it('identifies HEIC files for the conversion modal', () => {
+    expect(isHeicCmsFile(new File([], 'a.heic', { type: 'image/heic' }))).toBe(true);
+    expect(isHeicCmsFile(new File([], 'a.heif'))).toBe(true);
+    expect(isHeicCmsFile(new File([], 'a.jpg', { type: 'image/jpeg' }))).toBe(false);
+  });
+
   it('фото идёт как still, видео получает постер', async () => {
     const poster = new File([new Uint8Array([1])], 'poster.jpg', { type: 'image/jpeg' });
     const photo = new File([new Uint8Array([2])], 'shot.webp', { type: 'image/webp' });

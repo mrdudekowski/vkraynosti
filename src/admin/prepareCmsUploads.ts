@@ -24,6 +24,11 @@ function mimeFromFile(file: File): string {
   return 'application/octet-stream';
 }
 
+export function isHeicCmsFile(file: File): boolean {
+  const mime = mimeFromFile(file).toLowerCase();
+  return mime === 'image/heic' || mime === 'image/heif';
+}
+
 export function classifyCmsMediaFile(file: File): 'still' | 'video' | 'reject' {
   const mime = mimeFromFile(file);
   if (stillExtensionForMime(mime) != null) {

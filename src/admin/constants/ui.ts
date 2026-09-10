@@ -550,7 +550,7 @@ export const ADMIN_UI = {
   confirmDeleteAsset: 'Удалить этот кадр с cms-dev? Файл нельзя вернуть.',
   dragBlock: 'Переставить блок',
   closePicker: 'Закрыть',
-  uploadStill: 'Кадр (webp, jpg, png)',
+  uploadStill: 'Кадр (webp, jpg, png, heic, heif)',
   uploadVideo: 'Видео к кадру (необязательно)',
   uploadAlt: 'Подпись кадра',
   uploadSubmit: 'Загрузить на cms-dev',

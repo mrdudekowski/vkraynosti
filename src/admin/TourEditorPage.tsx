@@ -31,6 +31,7 @@ import TourCatalogFields from './components/TourCatalogFields';
 import TourIdentityFields from './components/TourIdentityFields';
 import TourPublishReviewDialog from './components/TourPublishReviewDialog';
 import AdminReadinessRing from './components/AdminReadinessRing';
+import MediaConversionModal from './components/MediaConversionModal';
 import { ADMIN_UI } from './constants/ui';
 import { formatAdminReadiness } from './formatAdminCopy';
 import { useAdminAutosave } from './hooks/useAdminAutosave';
@@ -42,7 +43,7 @@ import {
 } from './patchFromDocument';
 import { adminTourHasPublicPage, adminTourPublicHref } from './adminTourPublicHref';
 import { adminTourLiveVisibility, adminTourLiveVisibilityTone } from './tourLiveVisibility';
-import { prepareCmsUploads } from './prepareCmsUploads';
+import { isHeicCmsFile, prepareCmsUploads } from './prepareCmsUploads';
 import {
   ATTENTION_TAB_QUERY,
   EDITOR_SECTION_NAV,
@@ -164,6 +165,11 @@ const TourEditorPage = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ completed: number; total: number } | null>(null);
+  const [mediaConversion, setMediaConversion] = useState<{
+    file: File;
+    progress: number;
+    error: 'conversion' | 'upload' | null;
+  } | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [addDepartureOpen, setAddDepartureOpen] = useState(false);
   const [problemsOpen, setProblemsOpen] = useState(false);
@@ -439,7 +445,13 @@ const TourEditorPage = () => {
       const assetIds: string[] = [];
       const failedFiles: File[] = [];
       for (const item of prepared) {
+        const heic = isHeicCmsFile(item.still);
         try {
+          if (heic) {
+            setMediaConversion({ file: item.still, progress: 0, error: null });
+            await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+            setMediaConversion({ file: item.still, progress: 15, error: null });
+          }
           const payload = await adminUploadTourAsset(
             nextDocument.id,
             rev,
@@ -451,7 +463,16 @@ const TourEditorPage = () => {
           nextDocument = payload.document;
           nextMeta = payload.meta;
           assetIds.push(payload.assetId);
+          if (heic) setMediaConversion({ file: item.still, progress: 40, error: null });
         } catch (error) {
+          if (heic) {
+            setMediaConversion({
+              file: item.still,
+              progress: 40,
+              error: error instanceof Error && error.message === 'heic_conversion_failed' ? 'conversion' : 'upload',
+            });
+            throw error;
+          }
           if (!options.continueOnError) throw error;
           failedFiles.push(item.still);
         } finally {
@@ -460,8 +481,16 @@ const TourEditorPage = () => {
           );
         }
       }
+      if (prepared.some((item) => isHeicCmsFile(item.still))) {
+        setMediaConversion((current) => current == null ? current : { ...current, progress: 80 });
+      }
       setDocument(nextDocument);
       setMeta(nextMeta);
+      if (prepared.some((item) => isHeicCmsFile(item.still))) {
+        setMediaConversion((current) => current == null ? current : { ...current, progress: 95 });
+        setMediaConversion((current) => current == null ? current : { ...current, progress: 100 });
+        window.setTimeout(() => setMediaConversion(null), 250);
+      }
       invalidateAdminTours();
       invalidateAdminPublishQueue();
       setPatch((current) => ({
@@ -986,6 +1015,19 @@ const TourEditorPage = () => {
               setAddDepartureOpen(false);
             })();
           }}
+        />
+      ) : null}
+      {mediaConversion != null ? (
+        <MediaConversionModal
+          open
+          progress={mediaConversion.progress}
+          error={mediaConversion.error}
+          onRetry={() => {
+            const file = mediaConversion.file;
+            setMediaConversion(null);
+            void uploadFiles([file]);
+          }}
+          onClose={() => setMediaConversion(null)}
         />
       ) : null}
     </div>

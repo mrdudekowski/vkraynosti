@@ -110,7 +110,13 @@ export async function adminDeleteSiteAsset(kind: SiteContentDocumentKind, assetI
 }
 
 async function readJson<T>(response: Response): Promise<T> {
-  return (await response.json()) as T;
+  const text = await response.text();
+  if (text.trim().length === 0) return {} as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(`invalid_api_response_${response.status}`);
+  }
 }
 
 async function readDeparture(response: Response): Promise<AdminDeparture> {

@@ -57,10 +57,21 @@ describe('applyTourTextPatch', () => {
     expect(next.descriptionAside).toBeUndefined();
     expect(next.prefaceAssetId).toBe('cover');
     expect(next.included).toEqual([{ text: 'Гид', iconKey: 'user-tie' }]);
-    expect(next.program).toEqual([{ timeLabel: '05:00', description: 'Сбор' }]);
+    expect(next.program).toEqual([{ day: 1, timeLabel: '05:00', description: 'Сбор' }]);
     expect(next.programAdditionalNotes).toEqual(['Тайминг ориентировочный']);
     expect(next.bento).toEqual(document.bento);
     expect(next.title).toBe(document.title);
+  });
+
+  it('сохраняет день пункта программы при сохранении патча', () => {
+    const next = applyTourTextPatch(document, {
+      description: 'x',
+      prefaceAssetId: 'preface',
+      included: [],
+      program: [{ day: 2, timeLabel: '09:00', description: 'Старт' }],
+    });
+
+    expect(next.program).toEqual([{ day: 2, timeLabel: '09:00', description: 'Старт' }]);
   });
 
   it('отклоняет неизвестную иконку и чужой preface', () => {

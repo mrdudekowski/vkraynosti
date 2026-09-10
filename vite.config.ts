@@ -10,7 +10,10 @@ import {
 } from './src/constants/contentSecurityPolicy.ts'
 import { pruneDistForCdn as pruneDistForCdnFromLib } from './scripts/lib/pruneDistForCdn.ts'
 import { rewriteAdminDevUrl } from './scripts/lib/rewriteAdminDevUrl.ts'
-import { stripGithubPagesSpaRedirectScript } from './scripts/lib/stripGithubPagesScripts.ts'
+import {
+  sanitizeTimeweb404Html,
+  stripGithubPagesSpaRedirectScript,
+} from './scripts/lib/stripGithubPagesScripts.ts'
 
 const projectRoot = realpathSync.native(process.cwd())
 const loadedViteEnv = loadEnv(
@@ -45,6 +48,19 @@ function stripGithubPagesScriptForTimewebPlugin(): Plugin {
         return html
       }
       return stripGithubPagesSpaRedirectScript(html)
+    },
+    async closeBundle() {
+      if (!isTimeweb) return
+      const filePath = path.resolve(projectRoot, 'dist', '404.html')
+      try {
+        const html = await fs.readFile(filePath, 'utf8')
+        const sanitized = sanitizeTimeweb404Html(html, { VITE_BASE_PATH: base })
+        if (sanitized !== html) {
+          await fs.writeFile(filePath, sanitized, 'utf8')
+        }
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+      }
     },
   }
 }

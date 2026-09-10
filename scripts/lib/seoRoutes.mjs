@@ -172,3 +172,96 @@ export function routePathToDistFile(routePath, distDir) {
   const segments = normalized.replace(/^\//, '').replace(/\/+$/, '').split('/');
   return resolve(distDir, ...segments, 'index.html');
 }
+
+/**
+ * Validate the route-set contracts shared by the catalog, Sitemap, generated output,
+ * and internal links. This function is intentionally pure so CI and unit tests use
+ * exactly the same rules.
+ */
+export function auditSeoRouteIntegrity({
+  activePaths = [],
+  hiddenPaths = [],
+  inDevelopmentPaths = [],
+  sitemapPaths = [],
+  renderablePaths = [],
+  legacyRedirectPaths = [],
+  legacyGeneratedPaths = legacyRedirectPaths,
+  legacyHttpRedirectPaths = legacyRedirectPaths,
+  internalLinks = [],
+}) {
+  const active = new Set(activePaths);
+  const hidden = new Set(hiddenPaths);
+  const inDevelopment = new Set(inDevelopmentPaths);
+  const sitemap = new Set(sitemapPaths);
+  const renderable = new Set(renderablePaths);
+  const legacy = new Set(legacyRedirectPaths);
+  const legacyGenerated = new Set(legacyGeneratedPaths);
+  const legacyHttpRedirects = new Set(legacyHttpRedirectPaths);
+  const knownRoutes = new Set([
+    ...active,
+    ...hidden,
+    ...inDevelopment,
+    ...sitemap,
+    ...renderable,
+    ...legacy,
+  ]);
+  const violations = [];
+  const add = (code, path, detail) => violations.push({ code, path, detail });
+
+  for (const path of active) {
+    if (!sitemap.has(path)) {
+      add('active_not_in_sitemap', path, 'active route is missing from Sitemap');
+    }
+    if (!renderable.has(path)) {
+      add('active_not_renderable', path, 'active route is missing from generated output');
+    }
+  }
+
+  for (const path of hidden) {
+    if (sitemap.has(path)) {
+      add('hidden_in_sitemap', path, 'hidden route must not be in Sitemap');
+    }
+  }
+
+  for (const path of inDevelopment) {
+    if (sitemap.has(path)) {
+      add('in_development_in_sitemap', path, 'in-development route must not be in Sitemap');
+    }
+    if (!renderable.has(path)) {
+      add(
+        'in_development_not_renderable',
+        path,
+        'in-development route must exist in generated output for a noindex page',
+      );
+    }
+  }
+
+  for (const path of sitemap) {
+    if (!renderable.has(path)) {
+      add('sitemap_not_renderable', path, 'Sitemap route is missing from generated output');
+    }
+  }
+
+  for (const path of legacy) {
+    if (!legacyGenerated.has(path)) {
+      add('legacy_redirect_not_generated', path, 'legacy route has no generated redirect shell');
+    }
+    if (!legacyHttpRedirects.has(path)) {
+      add('legacy_http_redirect_not_generated', path, 'legacy route has no generated HTTP 301 rule');
+    }
+  }
+
+  for (const link of internalLinks) {
+    const from = link?.from ?? '';
+    const to = link?.to ?? '';
+    if (hidden.has(to)) {
+      add('hidden_internal_link', to, `${from} links to a hidden route`);
+    } else if (legacy.has(to)) {
+      add('legacy_internal_link', to, `${from} links to a legacy redirect route`);
+    } else if (!knownRoutes.has(to)) {
+      add('unknown_internal_link', to, `${from} links to an unknown route`);
+    }
+  }
+
+  return { violations };
+}

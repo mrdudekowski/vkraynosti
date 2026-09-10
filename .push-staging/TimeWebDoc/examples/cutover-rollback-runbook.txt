@@ -1,0 +1,30 @@
+Vkraynosti — cutover и rollback
+================================
+
+--- Cutover (prod) ---
+
+1. Green CI на web-vkr, S3 sync актуален, staging smoke подписан.
+2. DNS на TimeWeb App; TLS активен.
+3. TimeWeb env:
+   VITE_PUBLIC_ASSET_BASE_URL = CDN origin
+   VITE_BASE_PATH = /
+   VITE_SITE_URL = https://prod-domain/
+   VITE_TOUR_REQUEST_ENDPOINT_URL, расписание, Метрика
+4. Ручной Deploy в панели TimeWeb.
+5. npm run generate:sitemap (локально с VITE_SITE_URL) → commit robots/sitemap или CI на web-vkr.
+6. 48h мониторинг → отключить prod GitHub Pages (deploy.yml) или оставить staging.
+
+--- Rollback (на Pages) ---
+
+1. DNS обратно на GitHub Pages (или временно указать staging URL).
+2. web-vkr / TimeWeb: очистить VITE_PUBLIC_ASSET_BASE_URL (медиа снова с BASE_URL).
+3. main: deploy.yml → Pages artifact с полным public/ в dist.
+4. Проверить SITE_URL и base /vkraynosti/ в contacts + vite.config.
+5. S3 бакет не удалять — только перестать ссылаться из сборки.
+
+--- Env сводка ---
+
+| Режим | VITE_PUBLIC_ASSET_BASE_URL | base | SITE_URL |
+|-------|----------------------------|------|----------|
+| Pages dev | пусто | /vkraynosti/ | github.io/vkraynosti |
+| TimeWeb prod | CDN | / | prod domain |

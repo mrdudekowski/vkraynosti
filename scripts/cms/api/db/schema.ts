@@ -34,6 +34,7 @@ export const users = pgTable('users', {
   isActive: boolean('is_active').notNull().default(true),
   canPublishTours: boolean('can_publish_tours').notNull().default(false),
   canPublishSchedule: boolean('can_publish_schedule').notNull().default(false),
+  canEditSiteContent: boolean('can_edit_site_content').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [uniqueIndex('users_login_ci_uq').on(sql`lower(${table.login})`)]);

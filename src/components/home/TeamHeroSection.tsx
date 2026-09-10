@@ -66,7 +66,7 @@ const TeamHeroSection = forwardRef<HTMLElement>(function TeamHeroSection(_, ref)
           key={pageIndex}
           className="relative overflow-visible flex flex-col gap-team-hero-members-stack-mobile team-hero-desktop:gap-team-hero-members lg:gap-team-hero-members-lg"
         >
-          {currentPair.map((member, index) => {
+          {currentPair.filter((member): member is NonNullable<typeof member> => member != null).map((member, index) => {
             const layoutVariant = TEAM_MEMBER_LAYOUT_VARIANTS[index] ?? 'photo-start';
 
             return (

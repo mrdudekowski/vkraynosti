@@ -12,6 +12,9 @@ vkraynosti.ru {
 
 	root * /var/www/vkraynosti/dist
 
+	# Generated exact 301 rules for old tour IDs/slugs.
+	import /var/www/vkraynosti/dist/legacy-redirects.caddy
+
 	@canonicalized path_regexp trailingSlash ^(.+[^/])$
 	redir @canonicalized {path}/ 308
 

@@ -30,7 +30,7 @@ export const HOME_SEASON_BANNER_MEDIA_BASE: Record<Season, string> = {
 } as const;
 
 /** Logical path under `public/` for default OG / 404 preview (copied to dist by og:shells). */
-export const DEFAULT_OG_SHELL_BANNER_LOGICAL = 'banners_summer/Summer.webp' as const;
+export const DEFAULT_OG_SHELL_BANNER_LOGICAL = 'banners_summer/summer.jpg' as const;
 
 const TOUR_WINTER_1 = `${TOURS_ASSET_BASE}/winter-1`;
 export const TOUR_WINTER_1_COVER = `${TOUR_WINTER_1}/hero.webp` as const;
@@ -1621,10 +1621,10 @@ export const IMAGES = {
   },
   /** Статичные постеры колонок баннера на стартовом экране (без видео-лупов). */
   seasonSection: {
-    winter: `${HOME_SEASON_BANNER_MEDIA_BASE.winter}/winter.webp`,
-    spring: `${HOME_SEASON_BANNER_MEDIA_BASE.spring}/spring.webp`,
-    summer: `${HOME_SEASON_BANNER_MEDIA_BASE.summer}/Summer.webp`,
-    fall:   `${HOME_SEASON_BANNER_MEDIA_BASE.fall}/fall.webp`,
+    winter: `${HOME_SEASON_BANNER_MEDIA_BASE.winter}/winter.jpg`,
+    spring: `${HOME_SEASON_BANNER_MEDIA_BASE.spring}/spring.jpg`,
+    summer: `${HOME_SEASON_BANNER_MEDIA_BASE.summer}/summer.jpg`,
+    fall:   `${HOME_SEASON_BANNER_MEDIA_BASE.fall}/fall.jpg`,
   },
   team: {
     placeholder: `${BASE}/400x500/1A3C2E/C8A96E?text=Эксперт`,

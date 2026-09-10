@@ -1,0 +1,270 @@
+Vkraynosti — orphan / missing media report
+Generated from: TimeWebDoc\audit-phase2-inventory.json
+Date: 2026-06-04T15:09:01.763Z
+
+Orphan dirs (0): (none)
+Orphan files: 149
+SSOT missing on disk: 7
+
+--- Missing (SSOT without file) ---
+- public/tours/summer-12/cover.webp (summer-12)
+- public/tours/summer-12/preface.webp (summer-12)
+- public/tours/summer-12/beach.webp (summer-12)
+- public/tours/summer-12/camp.webp (summer-12)
+- public/tours/summer-12/cliff.webp (summer-12)
+- public/tours/summer-12/sunset.webp (summer-12)
+- public/tours/summer-12/nazimova.webp (summer-12)
+
+--- Orphan files by tour folder (top groups) ---
+
+[spring-10] 11 files
+  - public/tours/spring-10/ask.clip1.grid.webm
+  - public/tours/spring-10/ask.clip1.poster.webp
+  - public/tours/spring-10/ask.clip2.poster.mobile.webp
+  - public/tours/spring-10/ask.clip3.grid.webm
+  - public/tours/spring-10/ask.clip3.poster.webp
+  - public/tours/spring-10/ask.clip4.poster.mobile.webp
+  - public/tours/spring-10/ask.clip5.poster.mobile.webp
+  - public/tours/spring-10/ask.clip6.poster.mobile.webp
+  - public/tours/spring-10/beach.mobile.webp
+  - public/tours/spring-10/hero.mobile.webp
+  - public/tours/spring-10/view.mobile.webp
+
+[fall-4] 10 files
+  - public/tours/fall-4/cover.mobile.webp
+  - public/tours/fall-4/hero.webp
+  - public/tours/fall-4/pd.clip1.grid.webm
+  - public/tours/fall-4/pd.clip1.poster.webp
+  - public/tours/fall-4/ss.camp.webp
+  - public/tours/fall-4/ss.clip7.grid.webm
+  - public/tours/fall-4/ss.clip7.poster.webp
+  - public/tours/fall-4/ss.hike.webp
+  - public/tours/fall-4/ss.mug.webp
+  - public/tours/fall-4/ss.obelisk.webp
+
+[fall-13] 9 files
+  - public/tours/fall-13/cover.mobile.webp
+  - public/tours/fall-13/gam.clip2.grid.webm
+  - public/tours/fall-13/gam.clip2.poster.webp
+  - public/tours/fall-13/gam.clip4.grid.webm
+  - public/tours/fall-13/gam.clip4.poster.webp
+  - public/tours/fall-13/gamov-panorama.webp
+  - public/tours/fall-13/gamov-view.webp
+  - public/tours/fall-13/sosna.webp
+  - public/tours/fall-13/vityaz-bay.webp
+
+[spring-13] 9 files
+  - public/tours/spring-13/cover.mobile.webp
+  - public/tours/spring-13/gam.clip2.grid.webm
+  - public/tours/spring-13/gam.clip2.poster.webp
+  - public/tours/spring-13/gam.clip4.grid.webm
+  - public/tours/spring-13/gam.clip4.poster.webp
+  - public/tours/spring-13/gamov-panorama.webp
+  - public/tours/spring-13/gamov-view.webp
+  - public/tours/spring-13/sosna.webp
+  - public/tours/spring-13/vityaz-bay.webp
+
+[spring-4] 9 files
+  - public/tours/spring-4/hero.mobile.webp
+  - public/tours/spring-4/pd.clip1.grid.webm
+  - public/tours/spring-4/pd.clip1.poster.webp
+  - public/tours/spring-4/ss.camp.webp
+  - public/tours/spring-4/ss.clip7.grid.webm
+  - public/tours/spring-4/ss.clip7.poster.webp
+  - public/tours/spring-4/ss.hike.webp
+  - public/tours/spring-4/ss.mug.webp
+  - public/tours/spring-4/ss.obelisk.webp
+
+[summer-5] 9 files
+  - public/tours/summer-5/cover.mobile.webp
+  - public/tours/summer-5/gam.clip2.grid.webm
+  - public/tours/summer-5/gam.clip2.poster.webp
+  - public/tours/summer-5/gam.clip4.grid.webm
+  - public/tours/summer-5/gam.clip4.poster.webp
+  - public/tours/summer-5/gamov-panorama.webp
+  - public/tours/summer-5/gamov-view.webp
+  - public/tours/summer-5/sosna.webp
+  - public/tours/summer-5/vityaz-bay.webp
+
+[fall-10] 8 files
+  - public/tours/fall-10/ask.clip1.grid.webm
+  - public/tours/fall-10/ask.clip1.poster.webp
+  - public/tours/fall-10/ask.clip3.grid.webm
+  - public/tours/fall-10/ask.clip3.poster.webp
+  - public/tours/fall-10/beach.mobile.webp
+  - public/tours/fall-10/cover.mobile.webp
+  - public/tours/fall-10/hero.webp
+  - public/tours/fall-10/view.mobile.webp
+
+[spring-6] 7 files
+  - public/tours/spring-6/deerlol.mobile.webp
+  - public/tours/spring-6/hero.mobile.webp
+  - public/tours/spring-6/hills2.webp
+  - public/tours/spring-6/mnd.clip1.poster.mobile.webp
+  - public/tours/spring-6/mnd.clip2.poster.mobile.webp
+  - public/tours/spring-6/mnd.clip3.poster.mobile.webp
+  - public/tours/spring-6/mnd.clip4.poster.mobile.webp
+
+[summer-3] 7 files
+  - public/tours/summer-3/ask.clip1.grid.webm
+  - public/tours/summer-3/ask.clip1.poster.webp
+  - public/tours/summer-3/ask.clip3.grid.webm
+  - public/tours/summer-3/ask.clip3.poster.webp
+  - public/tours/summer-3/beach.mobile.webp
+  - public/tours/summer-3/hero.mobile.webp
+  - public/tours/summer-3/view.mobile.webp
+
+[spring-9] 5 files
+  - public/tours/spring-9/hero.mobile.webp
+  - public/tours/spring-9/top3.mobile.webp
+  - public/tours/spring-9/vrb.clip1.poster.mobile.webp
+  - public/tours/spring-9/vrb.clip2.poster.mobile.webp
+  - public/tours/spring-9/vrb.clip3.poster.mobile.webp
+
+[fall-6] 4 files
+  - public/tours/fall-6/cover.mobile.webp
+  - public/tours/fall-6/deerlol.mobile.webp
+  - public/tours/fall-6/hero.webp
+  - public/tours/fall-6/hills2.webp
+
+[summer-1] 4 files
+  - public/tours/summer-1/cave.webp
+  - public/tours/summer-1/first.mobile.webp
+  - public/tours/summer-1/hero.webp
+  - public/tours/summer-1/shiroki2.webp
+
+[winter-4] 4 files
+  - public/tours/winter-4/hero.mobile.webp
+  - public/tours/winter-4/hs.clip1.poster.mobile.webp
+  - public/tours/winter-4/hs.clip2.poster.mobile.webp
+  - public/tours/winter-4/hs.doggos2.webp
+
+[fall-2] 3 files
+  - public/tours/fall-2/cover.mobile.webp
+  - public/tours/fall-2/hero.webp
+  - public/tours/fall-2/top.webp
+
+[fall-3] 3 files
+  - public/tours/fall-3/cover.mobile.webp
+  - public/tours/fall-3/hero.webp
+  - public/tours/fall-3/top.webp
+
+[fall-5] 3 files
+  - public/tours/fall-5/cover.mobile.webp
+  - public/tours/fall-5/hero.webp
+  - public/tours/fall-5/peak.webp
+
+[fall-7] 3 files
+  - public/tours/fall-7/cover.mobile.webp
+  - public/tours/fall-7/exit.webp
+  - public/tours/fall-7/hero.webp
+
+[fall-9] 3 files
+  - public/tours/fall-9/cover.mobile.webp
+  - public/tours/fall-9/hero.webp
+  - public/tours/fall-9/top3.mobile.webp
+
+[fall-1] 2 files
+  - public/tours/fall-1/cover.mobile.webp
+  - public/tours/fall-1/hero.webp
+
+[fall-8] 2 files
+  - public/tours/fall-8/cover.mobile.webp
+  - public/tours/fall-8/hero.webp
+
+[spring-2] 2 files
+  - public/tours/spring-2/hero.mobile.webp
+  - public/tours/spring-2/top.webp
+
+[spring-3] 2 files
+  - public/tours/spring-3/hero.mobile.webp
+  - public/tours/spring-3/top.webp
+
+[spring-5] 2 files
+  - public/tours/spring-5/hero.mobile.webp
+  - public/tours/spring-5/peak.webp
+
+[spring-7] 2 files
+  - public/tours/spring-7/exit.webp
+  - public/tours/spring-7/hero.mobile.webp
+
+[summer-6] 2 files
+  - public/tours/summer-6/exit.webp
+  - public/tours/summer-6/hero.mobile.webp
+
+[winter-3] 2 files
+  - public/tours/winter-3/gr.boarder.mobile.webp
+  - public/tours/winter-3/hero.mobile.webp
+
+[fall-11] 1 files
+  - public/tours/fall-11/cover.mobile.webp
+
+[fall-12] 1 files
+  - public/tours/fall-12/cover.mobile.webp
+
+[spring-1] 1 files
+  - public/tours/spring-1/hero.mobile.webp
+
+[spring-11] 1 files
+  - public/tours/spring-11/hero.mobile.webp
+
+[spring-12] 1 files
+  - public/tours/spring-12/cover.mobile.webp
+
+[spring-8] 1 files
+  - public/tours/spring-8/hero.mobile.webp
+
+[summer-10] 1 files
+  - public/tours/summer-10/cover.mobile.webp
+
+[summer-11] 1 files
+  - public/tours/summer-11/cover.mobile.webp
+
+[summer-13] 1 files
+  - public/tours/summer-13/cover.mobile.webp
+
+[summer-14] 1 files
+  - public/tours/summer-14/cover.mobile.webp
+
+[summer-15] 1 files
+  - public/tours/summer-15/cover.mobile.webp
+
+[summer-16] 1 files
+  - public/tours/summer-16/cover.mobile.webp
+
+[summer-17] 1 files
+  - public/tours/summer-17/cover.mobile.webp
+
+[summer-19] 1 files
+  - public/tours/summer-19/cover.mobile.webp
+
+[summer-2] 1 files
+  - public/tours/summer-2/cover.mobile.webp
+
+[summer-4] 1 files
+  - public/tours/summer-4/hero.mobile.webp
+
+[summer-7] 1 files
+  - public/tours/summer-7/bazi.mobile.webp
+
+[summer-8] 1 files
+  - public/tours/summer-8/cover.mobile.webp
+
+[summer-9] 1 files
+  - public/tours/summer-9/cover.mobile.webp
+
+[winter-1] 1 files
+  - public/tours/winter-1/hero.mobile.webp
+
+[winter-2] 1 files
+  - public/tours/winter-2/hero.mobile.webp
+
+[winter-5] 1 files
+  - public/tours/winter-5/hero.mobile.webp
+
+Actions (require product approval):
+- delete: file not referenced in images.ts / toursData
+- wire: add to images.ts if intentional asset
+- keep: generated variant (e.g. cover.mobile.webp) pending SSOT update
+
+Regenerate: npm run media:inventory && npm run media:orphan-report

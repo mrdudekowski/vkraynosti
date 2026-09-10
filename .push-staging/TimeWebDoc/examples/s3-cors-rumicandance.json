@@ -1,0 +1,12 @@
+[
+  {
+    "AllowedOrigins": [
+      "https://YOUR-TIMEWEB-APP-DOMAIN",
+      "https://mrdudekowski.github.io"
+    ],
+    "AllowedMethods": ["GET", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]

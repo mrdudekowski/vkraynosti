@@ -1,0 +1,1892 @@
+/* Веб-шрифты: локальный Nord — `@font-face` в `bootstrap-fonts.ts` (URL с `BASE_URL`); Google — там же. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Полоса прокрутки: тонкая, цвет бегунка = `colors.season.*` по `data-season` на `<html>`
+   * (ставит `SeasonProvider`). Работает для страницы и для `overflow-y-auto` в модалках.
+   */
+  /**
+   * Полоса документа: `html` + модалки через классы overflow-* ниже. Не `*` — иначе второй overflow-контейнер
+   * получает такой же кастомный бегунок и визуально «двойной» скролл.
+   */
+  html {
+    /** SSOT значения: `documentColorScheme.ts` — opt-out из forced dark mode браузера. */
+    color-scheme: light only;
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --navbar-chrome-height: calc(theme('spacing.navbar') + var(--safe-area-top));
+    --scrollbar-thumb: theme('colors.season.spring');
+    --scrollbar-track: color-mix(in srgb, theme('colors.surface.light') 94%, theme('colors.divider'));
+    /** `.btn-primary` fill до/без `data-season` — осень (`btnPrimary.fall`, 78% accent + 22% surface.light). */
+    --btn-primary-bg: theme('colors.btnPrimary.fall.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.fall.fg');
+    background-color: theme('colors.surface.light');
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+  html[data-season='winter'] {
+    --scrollbar-thumb: theme('colors.season.winter');
+    --btn-primary-bg: theme('colors.btnPrimary.winter.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.winter.fg');
+  }
+  html[data-season='spring'] {
+    --scrollbar-thumb: theme('colors.season.spring');
+    --btn-primary-bg: theme('colors.btnPrimary.spring.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.spring.fg');
+  }
+  html[data-season='summer'] {
+    --scrollbar-thumb: theme('colors.season.summer');
+    --btn-primary-bg: theme('colors.btnPrimary.summer.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.summer.fg');
+  }
+  html[data-season='fall'] {
+    --scrollbar-thumb: theme('colors.season.fall');
+    --btn-primary-bg: theme('colors.btnPrimary.fall.bg');
+    --btn-primary-fg: theme('colors.btnPrimary.fall.fg');
+  }
+
+  html::-webkit-scrollbar {
+    width: theme('spacing.1.5');
+    height: theme('spacing.1.5');
+  }
+  html::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: theme('borderRadius.full');
+  }
+  html::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: theme('borderRadius.full');
+    /** Обводка вокруг бегунка: `surface.dark` из темы, толщина `spacing.px`. */
+    box-shadow: 0 0 0 theme('spacing.px') theme('colors.surface.dark');
+    transition: background-color theme('transitionDuration.season-change')
+      theme('transitionTimingFunction.standard');
+  }
+  html::-webkit-scrollbar-thumb:hover {
+    filter: brightness(0.9);
+  }
+
+  /**
+   * Mobile/tablet (`screens.below-nav-desktop`, <1160px): полоса документа скрыта, прокрутка сохраняется.
+   * Иначе при `body { overflow: hidden }` (бургер) исчезает gutter и контент сдвигается.
+   */
+  @screen below-nav-desktop {
+    html {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .overflow-y-auto,
+  .overflow-y-scroll,
+  .overflow-auto {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .overflow-y-auto::-webkit-scrollbar,
+  .overflow-y-scroll::-webkit-scrollbar,
+  .overflow-auto::-webkit-scrollbar {
+    width: theme('spacing.1.5');
+    height: theme('spacing.1.5');
+  }
+  .overflow-y-auto::-webkit-scrollbar-track,
+  .overflow-y-scroll::-webkit-scrollbar-track,
+  .overflow-auto::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: theme('borderRadius.full');
+  }
+  .overflow-y-auto::-webkit-scrollbar-thumb,
+  .overflow-y-scroll::-webkit-scrollbar-thumb,
+  .overflow-auto::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: theme('borderRadius.full');
+    box-shadow: 0 0 0 theme('spacing.px') theme('colors.surface.dark');
+    transition: background-color theme('transitionDuration.season-change')
+      theme('transitionTimingFunction.standard');
+  }
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+  .overflow-y-scroll::-webkit-scrollbar-thumb:hover,
+  .overflow-auto::-webkit-scrollbar-thumb:hover {
+    filter: brightness(0.9);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html::-webkit-scrollbar-thumb,
+    .overflow-y-auto::-webkit-scrollbar-thumb,
+    .overflow-y-scroll::-webkit-scrollbar-thumb,
+    .overflow-auto::-webkit-scrollbar-thumb {
+      transition: none;
+    }
+  }
+
+  @supports not (height: 100svh) {
+    .h-hero-viewport,
+    .min-h-home-gate-viewport,
+    .min-h-app-viewport {
+      min-height: 100vh;
+    }
+
+    .h-hero-viewport {
+      height: 100vh;
+    }
+  }
+
+  body {
+    @apply font-body text-text-primary bg-surface-light;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    min-width: 0;
+  }
+  /* Dela Gothic One: в Google Fonts одно начертание 400 — без font-bold рядом с font-brand-wordmark. */
+  .font-brand-wordmark {
+    font-weight: 400;
+    font-synthesis: none;
+  }
+  /* Satyr SP Basic: один файл в `public/fonts/satyr-sp-basic.otf` — без синтетических начертаний. */
+  .font-home-season-banner {
+    font-weight: 400;
+    font-synthesis: none;
+  }
+}
+
+@layer components {
+  /**
+   * Строка заголовка секций страницы тура (`TourDetailSectionHeading`):
+   * `border-divider` как у бывшей «Фотогалерее»; акцент — сезонный градиент в JSX.
+   */
+  .tour-detail-section-heading-row {
+    @apply flex items-stretch gap-4 border-b border-divider pb-4;
+  }
+
+  .tour-detail-section-heading-accent {
+    @apply hidden sm:block shrink-0 self-stretch rounded-full w-tour-detail-heading-accent;
+  }
+
+  /** Каскадный fade-in текста team-hero при scroll reveal (`teamHeroAnimation.ts`). */
+  .team-hero-text-stagger {
+    @apply motion-safe:animate-team-hero-text-stagger-in motion-reduce:animate-none opacity-0;
+  }
+
+  /**
+   * Icon-only контакты (`HomeHeroContactRail`): radial-свечение под иконкой на hover/focus.
+   * Градиенты — `backgroundImage.home-contact-messenger-glow-*`; модификаторы `--phone` / `--telegram` / `--max`.
+   */
+  .home-contact-messenger-btn {
+    @apply relative isolate overflow-visible;
+  }
+
+  .home-contact-messenger-btn::before {
+    content: '';
+    @apply pointer-events-none absolute -z-10 rounded-full opacity-0 transition-opacity duration-hover;
+    inset: -7.5%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+  }
+
+  .home-contact-messenger-btn:hover::before,
+  .home-contact-messenger-btn:focus-visible::before {
+    @apply opacity-100;
+  }
+
+  .home-contact-messenger-btn--phone::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-phone');
+  }
+
+  .home-contact-messenger-btn--telegram::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-telegram');
+  }
+
+  .home-contact-messenger-btn--max::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-max');
+  }
+
+  .home-contact-messenger-btn--whatsapp::before {
+    background-image: theme('backgroundImage.home-contact-messenger-glow-whatsapp');
+  }
+
+  .home-contact-messenger-icon-well {
+    @apply relative isolate overflow-hidden bg-transparent transition-colors duration-hover;
+  }
+
+  .home-contact-messenger-btn:hover .home-contact-messenger-icon-well,
+  .home-contact-messenger-btn:focus-visible .home-contact-messenger-icon-well {
+    @apply bg-surface-dark;
+  }
+
+  .home-contact-messenger-icon-well::after {
+    content: '';
+    @apply pointer-events-none absolute rounded-full opacity-0 transition-opacity duration-hover;
+    inset: 20%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+  }
+
+  .home-contact-messenger-btn:hover .home-contact-messenger-icon-well::after,
+  .home-contact-messenger-btn:focus-visible .home-contact-messenger-icon-well::after {
+    @apply opacity-100;
+  }
+
+  .home-contact-messenger-btn--phone .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-phone');
+  }
+
+  .home-contact-messenger-btn--telegram .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-telegram');
+  }
+
+  .home-contact-messenger-btn--max .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-max');
+  }
+
+  .home-contact-messenger-btn--whatsapp .home-contact-messenger-icon-well::after {
+    background-image: theme('backgroundImage.home-contact-messenger-icon-fill-whatsapp');
+  }
+
+  /**
+   * Модалка заявки: без hover/focus; glow и заливка иконки только при :checked.
+   * Без focus-within outline при клике; кольцо — только `:focus-visible` (клавиатура).
+   */
+  .home-contact-messenger-btn--selectable {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .home-contact-messenger-btn--selectable:focus-within {
+    outline: none;
+  }
+
+  .home-contact-messenger-btn--selectable:has(:focus-visible) {
+    @apply outline outline-2 outline-offset-2 outline-brand-primary;
+  }
+
+  .home-contact-messenger-btn--selectable:hover::before,
+  .home-contact-messenger-btn--selectable:focus-visible::before {
+    @apply opacity-0;
+  }
+
+  .home-contact-messenger-btn--selectable:hover .home-contact-messenger-icon-well,
+  .home-contact-messenger-btn--selectable:focus-visible .home-contact-messenger-icon-well {
+    @apply bg-transparent;
+  }
+
+  .home-contact-messenger-btn--selectable:hover .home-contact-messenger-icon-well::after,
+  .home-contact-messenger-btn--selectable:focus-visible .home-contact-messenger-icon-well::after {
+    @apply opacity-0;
+  }
+
+  .home-contact-messenger-btn--selectable:has(:checked)::before {
+    @apply opacity-100;
+  }
+
+  .home-contact-messenger-btn--selectable:has(:checked) .home-contact-messenger-icon-well::after {
+    @apply opacity-100;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-contact-messenger-btn::before,
+    .home-contact-messenger-icon-well,
+    .home-contact-messenger-icon-well::after {
+      transition: none;
+    }
+  }
+
+  /**
+   * Футер: постоянный чёрный круг и белые логотипы мессенджеров (`ContactMessengerLogo`).
+   */
+  .footer-contact-messenger-icon-well {
+    @apply relative isolate flex h-home-hero-contact-rail-icon w-home-hero-contact-rail-icon shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-dark;
+  }
+
+  .footer-contact-messenger-icon-well .footer-contact-messenger-icon,
+  .footer-contact-messenger-icon-well img {
+    @apply h-[70%] w-[70%] object-contain brightness-0 invert;
+  }
+
+  /**
+   * Страница тура: горизонтальный gutter как у Navbar/Footer (`px-4 sm:px-6 lg:px-8`).
+   * Внешний слой на всю ширину viewport — нужен для левого выравнивания от `xl` без «центрированного» padding.
+   */
+  .tour-detail-page-gutter {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /** Ширина колонки контента + центрирование до `xl`, с `xl` — прижатие влево внутри gutter. */
+  .tour-detail-page-measure {
+    @apply w-full max-w-tourDetail mx-auto xl:mx-0 xl:mr-auto;
+  }
+
+  /** Тело страницы тура под hero: compact — без боковых pl/pr; с `lg` — асимметричные отступы. */
+  .tour-detail-page-inner {
+    @apply w-full pt-tour-detail-page-inner-pt pb-tour-detail-page-inner-pb
+      lg:pl-tour-detail-page-inner-pl lg:pr-tour-detail-page-inner-pr;
+  }
+
+  /**
+   * Мета-факты между hero и блоком `tour-detail-preface-bg` (фон сезона, не скрим).
+   * Вертикальный зазор до префейса — `mb-tour-detail-meta-to-preface` в JSX.
+   */
+  .tour-detail-meta-below-hero {
+    @apply min-w-0 max-w-full;
+  }
+
+  /** Основная колонка: правый отступ и разделитель до сайдбара только с `lg` (≥992px). */
+  .tour-detail-main-column {
+    @apply lg:pr-tour-detail-col-divider-gap lg:border-r lg:border-divider;
+  }
+
+  /**
+   * Секция «О туре»: compact — без pl; с `lg` — ступенчатый pl как на desktop.
+   */
+  .tour-detail-about-section {
+    @apply grid grid-cols-1 gap-y-tour-detail-about-section-row-gap mb-tour-detail-about-section-mb min-w-0
+      lg:pl-4 lg:sm:pl-8 lg:lg:pl-12;
+  }
+
+  /** Верхняя часть: основной текст/CTA и при необходимости aside в двух колонках (от `md`). */
+  .tour-detail-about-top {
+    @apply min-w-0;
+  }
+
+  /**
+   * Две колонки с `md`: на мобильном — одна колонка сеткой, иначе aside прилипает к CTA без зазора.
+   */
+  .tour-detail-about-top--with-aside {
+    @apply grid grid-cols-1 gap-y-tour-detail-about-top-stack-gap md:grid-cols-2 md:gap-x-0 md:gap-y-0 md:items-start md:divide-x md:divide-tour-detail-heading-rule;
+  }
+
+  /** Правая колонка верхнего ряда (`descriptionAside`). */
+  .tour-detail-about-aside-column {
+    @apply min-w-0 pl-4 lg:sm:pl-8 lg:lg:pl-12;
+  }
+
+  /** Ячейка полосы «Что включено» под верхним блоком. */
+  .tour-detail-about-included-slot {
+    @apply min-w-0;
+  }
+
+  /**
+   * Фон блока «О туре» — внутри `.tour-detail-main-column` (без отрицательных margin).
+   * Слои `__image` / `__scrim` — absolute внутри relative-обёртки; контент в `__content`.
+   */
+  .tour-detail-preface-bg {
+    @apply relative isolate mb-10 w-full min-w-0 max-w-full overflow-hidden rounded-card pb-10 pt-tour-detail-preface-pt sm:pb-12 sm:pt-tour-detail-preface-pt-sm;
+  }
+
+  .tour-detail-preface-bg__image {
+    @apply absolute inset-0 z-0 bg-cover bg-center bg-no-repeat;
+  }
+
+  .tour-detail-preface-bg__scrim {
+    @apply absolute inset-0 z-stack-base bg-surface-dark/70;
+  }
+
+  .tour-detail-preface-bg__content {
+    @apply relative z-10 min-w-0 px-4 lg:sm:px-6 lg:lg:px-8;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-section {
+    @apply mb-0 pl-0;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-top--with-aside {
+    @apply md:divide-white/25;
+  }
+
+  .tour-detail-preface-bg .tour-detail-section-heading-row {
+    @apply border-white/25;
+  }
+
+  .tour-detail-preface-bg .tour-detail-section-heading-row .text-tour-detail-section {
+    @apply text-text-inverse;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-column p {
+    @apply text-text-inverse/90;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-column strong {
+    @apply text-text-inverse;
+  }
+
+  /**
+   * «Что включено» на фото-префейсе: отдельный класс вместо `.tour-detail-included-panel`
+   * (без `bg-tour-included-panel` / тени). Палитра: светлый текст, акцент `brand.secondary`.
+   */
+  .tour-detail-preface-bg .tour-detail-included-on-preface {
+    @apply bg-transparent shadow-none;
+  }
+
+  .tour-detail-preface-bg .tour-detail-included-on-preface .tour-detail-section-heading-accent {
+    @apply bg-brand-secondary;
+  }
+
+  .tour-detail-preface-bg .tour-included-icon-strip {
+    @apply rounded-lg bg-tourIncludedIconStripPreface p-tour-included-icon-strip-padding;
+  }
+
+  .tour-detail-preface-bg .tour-included-icon-btn .text-text-primary {
+    @apply text-text-inverse;
+  }
+
+  .tour-detail-preface-bg .h-tour-included-description .text-text-muted {
+    @apply text-text-inverse/90;
+  }
+
+  /** Колонка «О туре»: compact — pr-4; с `lg` — ступенчатый pr к разделителю. */
+  .tour-detail-about-column {
+    @apply min-w-0 pr-4 lg:sm:pr-8 lg:lg:pr-12;
+  }
+
+  /** Обёртка `RevealBox` для «Что включено» (полоса на всю ширину секции «О туре»). */
+  .tour-detail-included-column {
+    @apply min-w-0;
+  }
+
+  /** Дополнительный текст в правой колонке верхнего блока деталей тура. */
+  .tour-detail-about-aside-copy {
+    @apply mb-6 text-tour-detail-prose text-text-muted;
+  }
+
+  .tour-detail-preface-bg .tour-detail-about-aside-copy {
+    @apply text-text-inverse/90;
+  }
+
+  /** Полупрозрачная плашка блока «Что включено» (`RevealBox` на странице тура): градиент + тень. */
+  .tour-detail-included-panel {
+    @apply rounded-card bg-tour-included-panel p-card-p shadow-tourIncludedPanel;
+  }
+
+  /**
+   * Подложка ряда иконок: `flex-wrap` + `justify-center` в JSX — перенос на следующий ряд при нехватке ширины, без горизонтального скролла.
+   * Ширина по контенту (`w-max`), не шире колонки (`max-w-full`), по центру поперечной оси flex-колонки родителя (`self-center`).
+   */
+  .tour-included-icon-strip {
+    @apply w-max max-w-full self-center min-w-0 overflow-visible rounded-lg bg-tourIncludedIconStrip p-tour-included-icon-strip-padding;
+  }
+
+  /**
+   * Кнопка-иконка в сетке «Что включено» (`TourIncludedIconList`, перенос по рядам).
+   * Квадрат хит-лейбла; без `w-full`, чтобы flex-wrap раскладывал иконки по строкам.
+   */
+  .tour-included-icon-btn {
+    @apply inline-flex h-tour-included-row-min-h w-tour-included-row-min-h shrink-0 items-center justify-center rounded-lg p-1;
+  }
+
+  /**
+   * Срок и уровень над текстом тура (`TourDetailMetaFacts`): сетка без рамки,
+   * нижняя граница отделяет от абзаца; появление по очереди (`animate-tour-meta-stagger-in`).
+   * Ниже 320px — один столбец; от `meta-min` (320px) — две колонки в ряд.
+   */
+  .tour-detail-key-facts {
+    @apply mb-6 grid grid-cols-1 gap-6 border-b border-divider pb-6 meta-min:grid-cols-2 meta-min:gap-8;
+  }
+
+  /** Акцентный блок стоимости (под галереей или под программой на мобильных). */
+  .tour-detail-price-highlight {
+    @apply rounded-card border border-divider bg-surface-light p-card-p shadow-tourIncludedPanel;
+  }
+
+  .tour-detail-price-highlight__accent {
+    @apply mx-auto mb-4 h-1 w-12 rounded-full sm:mx-0;
+  }
+
+  .tour-detail-key-facts__item {
+    @apply flex min-w-0 flex-col gap-1.5 opacity-0 animate-tour-meta-stagger-in;
+  }
+
+  .tour-detail-key-facts__item--delay-0 {
+    @apply delay-tour-meta-0;
+  }
+
+  .tour-detail-key-facts__item--delay-1 {
+    @apply delay-tour-meta-1;
+  }
+
+  .tour-detail-key-facts__item--delay-2 {
+    @apply delay-tour-meta-2;
+  }
+
+  /**
+   * Подписи над длительностью и сложностью (`TourDetailMetaFacts`):
+   * полупрозрачный текст и тонкая линия под заголовком на ширину колонки.
+   */
+  .tour-detail-key-facts__meta-title {
+    @apply w-full border-b border-divider pb-1.5 text-tooltip font-medium text-text-muted opacity-70;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-detail-key-facts__item {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
+  /** Нижний блок CTA страницы тура (не конкурирует с `.btn-cta-tour`). */
+  .tour-detail-footer-cta-block {
+    @apply mt-10 rounded-card border border-divider bg-surface-light p-card-p shadow-tourIncludedPanel;
+  }
+
+  .btn-tour-detail-footer-cta {
+    @apply inline-flex max-w-full min-w-48 items-center justify-center gap-2 rounded-cta border-2 border-brand-primary
+           bg-transparent px-8 py-3 font-semibold text-brand-primary transition-all duration-hover
+           hover:bg-brand-primary hover:text-text-inverse
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary
+           active:scale-95;
+  }
+
+  /** Карточка «Программа тура»: контур на фоне страницы. */
+  .tour-detail-program-card {
+    @apply border border-divider bg-surface-light rounded-card p-card-p sticky top-24;
+  }
+
+  .tour-detail-program-card-reveal {
+    @apply flex flex-col overflow-hidden;
+    max-height: calc(100vh - theme('spacing.24') - theme('spacing.6'));
+  }
+
+  .tour-detail-program-card-reveal .tour-detail-program-viewport {
+    @apply min-h-0 overflow-hidden;
+    flex: 1 1 auto;
+  }
+
+  .tour-detail-program-track {
+    position: relative;
+  }
+
+  .tour-detail-program-card-reveal .tour-detail-program-track {
+    transform: translateY(var(--tour-program-track-offset-y, 0px));
+    transition: transform theme('transitionDuration.reveal-program') theme('transitionTimingFunction.reveal-out');
+    will-change: transform;
+  }
+
+  .btn-primary {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-fg);
+    transition:
+      background-color theme('transitionDuration.season-change') theme('transitionTimingFunction.standard'),
+      color theme('transitionDuration.season-change') theme('transitionTimingFunction.standard'),
+      transform theme('transitionDuration.hover') theme('transitionTimingFunction.standard'),
+      filter theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+    @apply inline-flex w-fit max-w-full items-center justify-center whitespace-nowrap
+           font-semibold px-6 py-3 rounded-full
+           hover:brightness-110 hover:scale-105 active:scale-95;
+  }
+
+  /**
+   * Кнопки и поля MPA админки — без pill `.btn-primary` витрины.
+   * Подключаются из `src/admin/`; здесь, потому что отдельный CSS без `@tailwind components` ломает PostCSS.
+   */
+  .admin-btn {
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center rounded-admin-control px-3 text-sm font-medium
+      transition-colors duration-admin
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      disabled:pointer-events-none disabled:opacity-50
+      motion-reduce:transition-none;
+  }
+
+  .admin-btn-primary {
+    @apply admin-btn bg-brand-primary text-text-inverse hover:bg-brand-primary/90 active:bg-brand-primary/80;
+  }
+
+  .admin-btn-secondary {
+    @apply admin-btn border border-divider bg-surface-light text-text-primary hover:bg-surface-dark/5 active:bg-surface-dark/10;
+  }
+
+  .admin-btn-ghost {
+    @apply admin-btn text-text-muted hover:bg-surface-dark/5 hover:text-text-primary active:bg-surface-dark/10;
+  }
+
+  .admin-btn-destructive {
+    @apply admin-btn text-difficulty-hard-fg hover:bg-difficulty-hard-bg active:bg-difficulty-hard-bg/80;
+  }
+
+  .admin-icon-btn {
+    @apply inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-admin-control text-text-muted
+      transition-colors duration-admin hover:bg-surface-dark/5 hover:text-text-primary active:bg-surface-dark/10
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      disabled:pointer-events-none disabled:opacity-50
+      motion-reduce:transition-none;
+  }
+
+  .admin-icon-btn-compact {
+    @apply admin-icon-btn h-7 w-7;
+  }
+
+  .admin-icon-btn-danger {
+    @apply admin-icon-btn text-difficulty-hard-fg hover:bg-difficulty-hard-bg hover:text-difficulty-hard-fg;
+  }
+
+  .admin-input {
+    @apply w-full rounded-admin-control border border-divider bg-white px-2 py-1.5 text-sm text-text-primary
+      placeholder:text-text-muted/70
+      transition-colors duration-admin
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      motion-reduce:transition-none;
+  }
+
+  .admin-input-error {
+    @apply border-difficulty-hard-fg;
+  }
+
+  .admin-row-warning {
+    @apply rounded-admin-control border border-difficulty-medium-fg/40 bg-difficulty-medium-bg;
+  }
+
+  .admin-tab-blocker-dot {
+    @apply ml-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-difficulty-medium-fg;
+  }
+
+  .admin-textarea {
+    @apply admin-input min-h-16 resize-y;
+  }
+
+  .admin-editor-surface {
+    @apply rounded-card border border-divider bg-surface-light p-3
+      transition-shadow duration-admin motion-reduce:transition-none
+      hover:shadow-admin-overlay;
+  }
+
+  .admin-editor-icon-well {
+    @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary;
+  }
+
+  .admin-editor-row {
+    @apply flex gap-1 rounded-admin-control px-0.5
+      transition-colors duration-admin motion-reduce:transition-none
+      hover:bg-surface-dark/5;
+  }
+
+  .admin-editor-list {
+    @apply max-h-[min(28rem,calc(100dvh-18rem))] overflow-y-auto overscroll-y-contain pr-1;
+  }
+
+  .admin-readiness-track {
+    @apply h-1.5 overflow-hidden rounded-full bg-surface-dark/15;
+  }
+
+  .admin-readiness-fill {
+    @apply h-full origin-left rounded-full bg-brand-primary
+      transition-transform duration-admin motion-reduce:transition-none;
+  }
+
+  .admin-badge {
+    @apply inline-flex shrink-0 items-center rounded-admin-control px-2 py-0.5 text-tooltip font-medium;
+  }
+
+  .admin-badge-neutral {
+    @apply admin-badge border border-divider text-text-muted;
+  }
+
+  .admin-badge-success {
+    @apply admin-badge bg-difficulty-easy-bg text-difficulty-easy-fg;
+  }
+
+  .admin-badge-warning {
+    @apply admin-badge bg-difficulty-medium-bg text-difficulty-medium-fg;
+  }
+
+  .admin-badge-danger {
+    @apply admin-badge bg-difficulty-hard-bg text-difficulty-hard-fg;
+  }
+
+  .admin-badge-info {
+    @apply admin-badge bg-admin-info-bg text-admin-info-fg;
+  }
+
+  .admin-badge-draft {
+    @apply admin-badge bg-admin-draft-bg text-admin-draft-fg;
+  }
+
+  .admin-alert {
+    @apply rounded-admin-control border px-3 py-2 text-sm;
+  }
+
+  .admin-alert-neutral {
+    @apply admin-alert border-divider text-text-muted;
+  }
+
+  .admin-alert-success {
+    @apply admin-alert border-difficulty-easy-fg/30 bg-difficulty-easy-bg text-difficulty-easy-fg;
+  }
+
+  .admin-alert-warning {
+    @apply admin-alert border-difficulty-medium-fg/30 bg-difficulty-medium-bg text-difficulty-medium-fg;
+  }
+
+  .admin-alert-danger {
+    @apply admin-alert border-difficulty-hard-fg/30 bg-difficulty-hard-bg text-difficulty-hard-fg;
+  }
+
+  .admin-alert-info {
+    @apply admin-alert border-admin-info-fg/30 bg-admin-info-bg text-admin-info-fg;
+  }
+
+  .admin-nav-item {
+    @apply text-text-primary transition-colors duration-admin hover:bg-surface-dark/5
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40
+      motion-reduce:transition-none;
+  }
+
+  .admin-sidebar-nav {
+    @apply flex min-h-11 items-center gap-2 rounded-admin-control px-2 text-sm text-text-inverse/80 no-underline
+      transition-colors duration-admin hover:bg-text-inverse/10 hover:text-text-inverse
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-inverse/50
+      motion-reduce:transition-none;
+  }
+
+  .admin-sidebar-nav-active {
+    @apply admin-sidebar-nav bg-text-inverse/15 font-medium text-text-inverse;
+  }
+
+  /**
+   * Фокус кадра из CMS (`object-position` процентами). Tailwind-классы `object-*` по-прежнему
+   * вешаются на img/video; этот класс — для значений вроде `50% 40%`.
+   */
+  .media-object-position,
+  .media-object-position img,
+  .media-object-position video {
+    object-position: var(--media-object-position, 50% 50%);
+  }
+
+  /**
+   * Hero карусели на главной: `--tour-hero-object-position` (mobile),
+   * с `lg` — `--tour-hero-object-position-lg` (кадр «Hero большой»).
+   */
+  .tour-hero-object-position,
+  .tour-hero-object-position img {
+    object-position: var(--tour-hero-object-position, 50% 50%);
+  }
+
+  @screen lg {
+    .tour-hero-object-position,
+    .tour-hero-object-position img {
+      object-position: var(
+        --tour-hero-object-position-lg,
+        var(--tour-hero-object-position, 50% 50%)
+      );
+    }
+  }
+
+  /**
+   * Hero страницы тура — те же CMS-кадры, но широкий кадр с `md`:
+   * на планшете блок уже широкий (`h-tour-detail-hero`), как вкладка «Hero большой».
+   */
+  .tour-detail-hero-object-position,
+  .tour-detail-hero-object-position img {
+    object-position: var(--tour-hero-object-position, 50% 50%);
+  }
+
+  @screen md {
+    .tour-detail-hero-object-position,
+    .tour-detail-hero-object-position img {
+      object-position: var(
+        --tour-hero-object-position-lg,
+        var(--tour-hero-object-position, 50% 50%)
+      );
+    }
+  }
+
+  .admin-dropzone {
+    @apply flex min-h-11 cursor-pointer flex-col items-center justify-center rounded-admin-control border border-dashed
+      border-divider bg-surface-light px-3 py-3 text-center text-sm text-text-muted
+      transition-colors duration-hover hover:border-brand-primary hover:text-text-primary
+      focus-within:ring-2 focus-within:ring-brand-primary/40;
+  }
+
+  .admin-nav-active {
+    @apply bg-brand-primary/15 font-medium text-text-primary
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+  }
+
+  .admin-nav-complete {
+    @apply bg-difficulty-easy-bg font-medium text-difficulty-easy-fg
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/40;
+  }
+
+  .admin-data-row {
+    @apply flex flex-col rounded-admin-surface border border-divider bg-surface-light p-3 text-left
+      transition-colors duration-admin
+      md:rounded-none md:border-x-0 md:border-t-0 md:bg-transparent md:px-1 md:py-3
+      admin-desktop:grid admin-desktop:grid-cols-[minmax(0,1.4fr)_auto_minmax(0,1fr)_auto] admin-desktop:items-center admin-desktop:gap-3
+      motion-reduce:transition-none;
+  }
+
+  .admin-inbox-head {
+    @apply mb-2 hidden items-center gap-3 px-3 text-xs font-medium leading-tight text-text-muted
+      admin-desktop:grid admin-desktop:grid-cols-[5rem_minmax(14rem,1fr)_11rem_6rem_10rem_9rem_13rem];
+  }
+
+  .admin-inbox-row {
+    @apply flex flex-col gap-2 rounded-admin-surface border border-divider bg-surface-light p-3
+      transition-shadow duration-admin hover:shadow-admin-overlay
+      admin-desktop:grid admin-desktop:grid-cols-[5rem_minmax(14rem,1fr)_11rem_6rem_10rem_9rem_13rem]
+      admin-desktop:items-center admin-desktop:gap-3 admin-desktop:rounded-none
+      admin-desktop:border-x-0 admin-desktop:border-t-0 admin-desktop:bg-transparent admin-desktop:px-3 admin-desktop:py-3
+      admin-desktop:shadow-none admin-desktop:hover:bg-surface-dark/5 admin-desktop:hover:shadow-none
+      motion-reduce:transition-none;
+  }
+
+  .admin-schedule-toolbar {
+    @apply flex flex-wrap items-center justify-between gap-3;
+  }
+
+  .admin-schedule-toolbar-wrap {
+    @apply flex flex-col gap-3;
+  }
+
+  .admin-schedule-toolbar-meta {
+    @apply flex flex-wrap items-center justify-between gap-3 border-b border-divider pb-3;
+  }
+
+  .admin-schedule-toolbar-actions {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .admin-schedule-legend-item {
+    @apply inline-flex cursor-default;
+  }
+
+  .admin-schedule-nav-btn {
+    @apply min-h-9 min-w-9;
+  }
+
+  .admin-schedule-mode-switch {
+    @apply inline-flex flex-wrap gap-0.5 rounded-admin-control border border-divider bg-surface-light p-0.5;
+  }
+
+  .admin-schedule-month {
+    @apply overflow-hidden rounded-admin-surface border border-divider bg-surface-light;
+  }
+
+  .admin-schedule-weekdays {
+    @apply grid grid-cols-7 border-b border-divider bg-surface-light;
+  }
+
+  .admin-schedule-weekday {
+    @apply px-1 py-2 text-center text-tooltip font-medium uppercase tracking-wide text-text-muted;
+  }
+
+  .admin-schedule-grid {
+    @apply grid grid-cols-7 auto-rows-[minmax(5.5rem,1fr)];
+  }
+
+  .admin-schedule-day {
+    @apply relative flex min-h-[5.5rem] flex-col border-b border-r border-divider bg-surface-light
+      transition-colors duration-admin motion-reduce:transition-none;
+  }
+
+  .admin-schedule-day:nth-child(7n) {
+    @apply border-r-0;
+  }
+
+  .admin-schedule-day-outside {
+    @apply bg-surface-dark/[0.03];
+  }
+
+  .admin-schedule-day-today .admin-schedule-day-number {
+    @apply font-semibold text-brand-primary;
+  }
+
+  .admin-schedule-day-selected {
+    @apply bg-brand-primary/[0.06] ring-1 ring-inset ring-brand-primary/25;
+  }
+
+  .admin-schedule-day-header {
+    @apply flex items-start justify-between gap-1 px-1.5 pt-1.5;
+  }
+
+  .admin-schedule-day-number {
+    @apply min-w-0 flex-1 text-left text-tooltip font-medium text-text-primary;
+  }
+
+  .admin-schedule-day-number-outside {
+    @apply text-text-muted;
+  }
+
+  .admin-schedule-day-add {
+    @apply admin-icon-btn-compact h-6 w-6 opacity-0 transition-opacity duration-admin
+      focus-visible:opacity-100 motion-reduce:transition-none;
+  }
+
+  .group:hover .admin-schedule-day-add,
+  .group:focus-within .admin-schedule-day-add,
+  .admin-schedule-day-add-visible {
+    @apply opacity-100;
+  }
+
+  @media (pointer: coarse) {
+    .admin-schedule-day-add {
+      @apply opacity-100;
+    }
+  }
+
+  .admin-schedule-day-items {
+    @apply flex min-h-0 flex-1 flex-col gap-0.5 px-1 pb-1;
+  }
+
+  .admin-schedule-departure-item {
+    @apply flex w-full min-w-0 items-start gap-1.5 rounded-admin-control border border-transparent
+      px-1 py-1 text-left transition-colors duration-admin
+      hover:border-divider hover:bg-surface-dark/[0.04] focus-visible:border-brand-primary/40
+      focus-visible:bg-surface-dark/[0.04] focus-visible:outline-none motion-reduce:transition-none;
+  }
+
+  .admin-schedule-departure-item-selected {
+    @apply border-brand-primary/30 bg-brand-primary/10;
+  }
+
+  .admin-schedule-departure-item-cancelled .admin-schedule-departure-thumb {
+    @apply opacity-60;
+  }
+
+  .admin-schedule-departure-item-cancelled span {
+    @apply text-text-muted;
+  }
+
+  .admin-schedule-departure-thumb {
+    @apply h-7 w-7 shrink-0 rounded-admin-control object-cover;
+  }
+
+  .admin-schedule-overflow-link {
+    @apply w-full px-1 py-0.5 text-left text-tooltip text-text-muted underline-offset-2
+      hover:text-text-primary hover:underline focus-visible:text-text-primary focus-visible:underline
+      focus-visible:outline-none;
+  }
+
+  .admin-schedule-draggable {
+    @apply cursor-grab active:cursor-grabbing;
+  }
+
+  .admin-schedule-draggable:active {
+    @apply opacity-80;
+  }
+
+  .admin-schedule-footer {
+    @apply mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-divider pt-3;
+  }
+
+  .admin-schedule-legend {
+    @apply flex flex-wrap items-center gap-x-4 gap-y-1;
+  }
+
+  .admin-schedule-agenda-day {
+    @apply relative flex min-h-24 flex-col gap-1 rounded-card border border-divider bg-surface-light p-2;
+  }
+
+  .admin-schedule-agenda-day-today {
+    @apply border-brand-primary/40 bg-brand-primary/5;
+  }
+
+  /* Неделя и день: без полосы документа — скролл секций. Месяц оставляет скролл страницы. */
+  html:has(body[data-admin-schedule-sections]) {
+    overflow: hidden;
+    scrollbar-width: none;
+  }
+
+  html:has(body[data-admin-schedule-sections])::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  body[data-admin-schedule-sections] #admin-main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .admin-schedule-section-frame {
+    @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden;
+  }
+
+  .admin-schedule-section-stack {
+    @apply flex min-h-0 flex-1 flex-col gap-5 overflow-hidden;
+  }
+
+  .admin-schedule-section-board {
+    @apply grid min-h-0 min-w-0 flex-1 overflow-hidden;
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .admin-schedule-section-board-rail {
+    grid-template-rows: none;
+  }
+
+  @screen xl {
+    .admin-schedule-section-board-rail {
+      grid-template-rows: minmax(0, 1fr);
+    }
+
+    .admin-schedule-section-rail {
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .admin-schedule-section-rail::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .admin-schedule-section-workspace {
+    @apply flex min-h-0 min-w-0 flex-col overflow-hidden;
+  }
+
+  .admin-schedule-section-board:not(.admin-schedule-section-board-rail) .admin-schedule-section-workspace {
+    @apply h-full;
+  }
+
+  @screen xl {
+    .admin-schedule-section-workspace {
+      @apply h-full;
+    }
+  }
+
+  .admin-schedule-section-workspace
+    > :not(.admin-schedule-week-split):not(.admin-schedule-week-list):not(.admin-schedule-day-agenda) {
+    @apply shrink-0;
+  }
+
+  .admin-schedule-section-workspace .admin-schedule-week-split,
+  .admin-schedule-section-workspace .admin-schedule-week-list,
+  .admin-schedule-section-workspace .admin-schedule-day-agenda {
+    @apply mt-3 min-h-0 flex-1;
+  }
+
+  .admin-schedule-section-board-rail .admin-schedule-week-list,
+  .admin-schedule-section-board-rail .admin-schedule-day-agenda {
+    overflow: visible;
+    flex: none;
+  }
+
+  @screen xl {
+    .admin-schedule-section-board-rail .admin-schedule-week-list,
+    .admin-schedule-section-board-rail .admin-schedule-day-agenda {
+      @apply min-h-0 flex-1 overflow-y-auto;
+    }
+  }
+
+  .admin-schedule-week-split {
+    @apply grid min-h-0 min-w-0 flex-1 gap-5 xl:grid-cols-[minmax(16rem,34%)_minmax(0,1fr)];
+  }
+
+  .admin-schedule-week-split-days {
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .admin-schedule-week-split-days::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .admin-schedule-week-section {
+    @apply border-b border-divider py-1;
+  }
+
+  .admin-schedule-week-section-today .admin-schedule-week-day-button {
+    @apply text-brand-primary;
+  }
+
+  .admin-schedule-week-section-selected {
+    @apply bg-brand-primary/[0.06];
+  }
+
+  .admin-schedule-week-section-header {
+    @apply flex min-h-9 items-center justify-between gap-2;
+  }
+
+  .admin-schedule-week-day-button {
+    @apply flex min-h-9 min-w-0 flex-1 items-baseline gap-2 rounded-admin-control px-1 text-left text-sm
+      hover:bg-surface-dark/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/30;
+  }
+
+  .admin-schedule-week-day-add {
+    @apply admin-icon-btn-compact h-8 w-8 shrink-0 opacity-70 hover:opacity-100 focus-visible:opacity-100;
+  }
+
+  .admin-schedule-week-row {
+    @apply flex min-w-0 items-center gap-2 rounded-admin-control px-1 py-1
+      hover:bg-surface-dark/[0.03];
+  }
+
+  .admin-schedule-week-row-selected {
+    @apply bg-brand-primary/10;
+  }
+
+  .admin-schedule-week-row-open {
+    @apply flex min-w-0 flex-1 items-center gap-2 text-left text-sm text-text-primary;
+  }
+
+  .admin-schedule-week-row-detail {
+    @apply gap-3 border border-divider bg-surface-light p-3 hover:bg-surface-light;
+  }
+
+  .admin-schedule-week-row-detail .admin-schedule-week-row-open {
+    @apply items-start gap-3;
+  }
+
+  .admin-schedule-week-panel {
+    @apply flex min-h-0 flex-col rounded-admin-surface border border-divider bg-surface-light p-4;
+  }
+
+  .admin-schedule-day-detail-item {
+    @apply flex w-full items-start gap-3 rounded-admin-control border border-divider bg-surface-light p-3 text-left
+      transition-colors duration-admin hover:bg-surface-dark/[0.03] focus-visible:outline-none
+      focus-visible:ring-2 focus-visible:ring-brand-primary/30 motion-reduce:transition-none;
+  }
+
+  .admin-schedule-day-detail-item-selected {
+    @apply border-brand-primary/30 bg-brand-primary/5;
+  }
+
+  .admin-toast-stack {
+    @apply pointer-events-none fixed right-4 z-modal flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2
+      bottom-[calc(theme(spacing.navbar)+theme(spacing.safe-bottom)+0.75rem)]
+      md:bottom-4;
+  }
+
+  body[data-admin-sticky-bar] .admin-toast-stack {
+    @apply bottom-[calc(theme(spacing.navbar)+theme(spacing.safe-bottom)+theme(spacing.admin-sticky-bar)+0.75rem)]
+      md:bottom-[calc(theme(spacing.admin-sticky-bar)+0.75rem)];
+  }
+
+  /**
+   * CTA страницы тура: апельсиновый `cta.fill`, начальный текст — `text.inverse` (кремовый белый: читаемо на оранжевом).
+   * `cta.sweep` при hover; dual — те же правила, шрифт как у одиночной CTA (`font-body`).
+   */
+  .btn-cta-tour {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: theme('borderRadius.cta');
+    background-color: theme('colors.cta.fill');
+    box-shadow: theme('boxShadow.cta');
+    letter-spacing: theme('letterSpacing.cta');
+    @apply inline-flex items-center justify-center gap-3 px-6 py-3
+           text-left no-underline border-0 cursor-pointer
+           transition-shadow duration-hover ease-standard
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cta-sweep
+           focus-visible:ring-offset-2 focus-visible:ring-offset-cta-fill;
+  }
+
+  .btn-cta-tour:not(.btn-cta-tour--dual) {
+    @apply font-body font-semibold;
+  }
+
+  .btn-cta-tour::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    width: 0%;
+    height: 100%;
+    background-color: theme('colors.cta.sweep');
+    transition:
+      width theme('transitionDuration.cta-sweep') ease-in-out,
+      left theme('transitionDuration.cta-sweep') ease-in-out,
+      right theme('transitionDuration.cta-sweep') ease-in-out;
+  }
+
+  .btn-cta-tour:hover:not(:disabled):not([aria-disabled='true'])::after,
+  .btn-cta-tour:focus-visible:not(:disabled):not([aria-disabled='true'])::after {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+
+  .btn-cta-tour:not(.btn-cta-tour--dual) > * {
+    position: relative;
+    z-index: 10;
+    color: theme('colors.text.inverse');
+    transition: color theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+  }
+
+  .btn-cta-tour:not(.btn-cta-tour--dual):hover:not(:disabled):not([aria-disabled='true']) > *,
+  .btn-cta-tour:not(.btn-cta-tour--dual):focus-visible:not(:disabled):not([aria-disabled='true']) > * {
+    color: theme('colors.text.inverse');
+    animation: theme('animation.scale-up-cta');
+  }
+
+  .btn-cta-tour--dual {
+    @apply font-body font-semibold;
+  }
+
+  .btn-cta-tour--dual::after {
+    background-color: theme('colors.home-gate-start-screen');
+  }
+
+  .btn-cta-tour--dual > .btn-cta-tour__layer {
+    position: relative;
+    z-index: 1;
+    display: inline-grid;
+    place-items: center;
+    min-width: max-content;
+  }
+
+  .btn-cta-tour__default,
+  .btn-cta-tour__hover {
+    grid-area: 1 / 1;
+  }
+
+  .btn-cta-tour__default {
+    color: theme('colors.text.inverse');
+    transition: opacity calc(theme('transitionDuration.cta-sweep') / 2) ease-in-out;
+  }
+
+  .btn-cta-tour__hover {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity theme('transitionDuration.cta-sweep') ease-in-out;
+  }
+
+  .btn-cta-tour__hover-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: theme('spacing.2');
+    /** Не наследовать `letterSpacing.cta` с кнопки — wordmark задаёт свой tracking. */
+    letter-spacing: normal;
+  }
+
+  .btn-cta-tour__arrow {
+    @apply inline-flex shrink-0 items-center justify-center;
+    opacity: 0;
+    color: theme('colors.text.inverse');
+    transition: opacity theme('transitionDuration.cta-sweep') ease-in-out;
+  }
+
+  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__default,
+  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__default {
+    opacity: 0;
+  }
+
+  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__hover,
+  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__hover {
+    opacity: 1;
+    transition-duration: 0ms;
+  }
+
+  .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow,
+  .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow {
+    opacity: 1;
+    transition-delay: calc(theme('transitionDuration.cta-sweep') / 2);
+  }
+
+  .btn-cta-tour:disabled,
+  .btn-cta-tour[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .btn-cta-tour:disabled::after,
+  .btn-cta-tour[aria-disabled='true']::after {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-cta-tour::after {
+      transition: none;
+    }
+
+    .btn-cta-tour:hover:not(:disabled):not([aria-disabled='true'])::after,
+    .btn-cta-tour:focus-visible:not(:disabled):not([aria-disabled='true'])::after {
+      right: auto;
+      left: 0;
+      width: 100%;
+    }
+
+    .btn-cta-tour:not(.btn-cta-tour--dual):hover:not(:disabled):not([aria-disabled='true']) > *,
+    .btn-cta-tour:not(.btn-cta-tour--dual):focus-visible:not(:disabled):not([aria-disabled='true']) > * {
+      animation: none;
+    }
+
+    .btn-cta-tour--dual:hover:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow,
+    .btn-cta-tour--dual:focus-visible:not(:disabled):not([aria-disabled='true']) .btn-cta-tour__arrow {
+      transition: none;
+      opacity: 1;
+    }
+
+  }
+  .btn-ghost {
+    @apply border border-current px-6 py-3 rounded-full
+           transition-all duration-hover hover:bg-white/10;
+  }
+  .section-title {
+    font-family: theme('fontFamily.heading');
+    @apply text-section font-normal;
+  }
+  .card-base {
+    @apply bg-white rounded-card shadow-md overflow-hidden
+           transition-all duration-hover hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  /**
+   * Оболочка скелетона карточки: те же max-size / radius / shadow / фон, что у `TourCard` в покое,
+   * без hover-трансформа `card-base`.
+   */
+  .tour-card-skeleton-card {
+    @apply h-full w-full max-h-tour-card max-w-tour-card justify-self-center overflow-hidden rounded-card bg-white shadow-md;
+  }
+
+  .tour-card-skeleton-line {
+    @apply relative block overflow-hidden rounded-full bg-skeleton-line;
+  }
+
+  .tour-card-skeleton-line-muted {
+    @apply relative block overflow-hidden rounded-full bg-skeleton-lineMuted;
+  }
+
+  /** Плейсхолдер до `src` у `PlaceholderImage` и крупных блоков в `RouteFallback`: только мягкий пульс opacity. */
+  .tour-card-skeleton-media {
+    @apply bg-skeleton-media;
+  }
+
+  /**
+   * Обложка в `TourCardSkeleton`: тот же слот высоты, что у обложки карточки, плюс горизонтальный sheen.
+   */
+  .tour-card-skeleton-card-cover {
+    @apply relative h-full w-full overflow-hidden rounded-t-card bg-skeleton-media;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tour-card-skeleton-media {
+      animation: theme('animation.media-placeholder-shimmer');
+    }
+
+    .tour-card-skeleton-line::after,
+    .tour-card-skeleton-line-muted::after,
+    .tour-card-skeleton-card-cover::after {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      width: 45%;
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, theme('colors.skeleton.sheen') 0%, transparent),
+        theme('colors.skeleton.sheen'),
+        color-mix(in srgb, theme('colors.skeleton.sheen') 0%, transparent)
+      );
+      will-change: transform;
+      animation: theme('animation.tour-card-skeleton-sheen');
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-card-skeleton-media {
+      opacity: 1;
+    }
+  }
+
+  /** Scroll-reveal: только opacity + transform (композитинг). */
+  .reveal-base {
+    @apply transition-[opacity,transform,filter] duration-reveal ease-reveal-out;
+  }
+  .reveal-hidden {
+    @apply opacity-0 translate-y-reveal-y invisible pointer-events-none;
+    filter: brightness(0.7);
+  }
+  .reveal-visible {
+    @apply opacity-100 translate-y-0 visible pointer-events-auto;
+    filter: brightness(1);
+  }
+
+  /** Directional reveal variants (scroll direction aware). */
+  .reveal-visible-from-bottom,
+  .reveal-visible-from-top {
+    @apply opacity-100 translate-y-0 visible pointer-events-auto;
+    filter: brightness(1);
+  }
+
+  .reveal-hidden-to-bottom {
+    @apply opacity-0 translate-y-reveal-y invisible pointer-events-none;
+    filter: brightness(0.7);
+  }
+
+  .reveal-hidden-to-top {
+    @apply opacity-0 -translate-y-reveal-y invisible pointer-events-none;
+    filter: brightness(0.7);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-base {
+      transition: none !important;
+    }
+    .reveal-hidden {
+      @apply opacity-100 translate-y-0 visible pointer-events-auto;
+    }
+  }
+
+  /** Этапы программы тура: fade in/out при scroll-reveal (lg+). */
+  .reveal-program-step-base {
+    @apply transition-[opacity,transform,filter] duration-reveal-program ease-reveal-out;
+  }
+  .reveal-program-step-hidden {
+    @apply pointer-events-none opacity-0 translate-y-reveal-y;
+    filter: brightness(0.7);
+    animation: none !important;
+  }
+  .reveal-program-step-visible {
+    @apply pointer-events-auto opacity-100 translate-y-0;
+    animation: reveal-program-item-in theme('transitionDuration.reveal-program') theme('transitionTimingFunction.reveal-out') both;
+    filter: brightness(1);
+  }
+
+  .reveal-program-footer {
+    @apply transition-[opacity,transform,filter] duration-reveal-program ease-reveal-out;
+  }
+
+  @keyframes reveal-program-item-in {
+    0% {
+      opacity: 0;
+      transform: translateY(theme('spacing.reveal-y'));
+      filter: brightness(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: brightness(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-program-step-base {
+      transition: none !important;
+    }
+    .reveal-program-step-hidden {
+      @apply opacity-100 translate-y-0;
+    }
+    .reveal-program-step-visible,
+    .reveal-program-footer {
+      animation: none !important;
+    }
+    .tour-detail-program-card-reveal {
+      max-height: none;
+      overflow: visible;
+    }
+    .tour-detail-program-card-reveal .tour-detail-program-viewport {
+      overflow: visible;
+    }
+    .tour-detail-program-card-reveal .tour-detail-program-track {
+      transform: none !important;
+      transition: none !important;
+      will-change: auto;
+    }
+  }
+
+  /** Анимированный бургер (Navbar): пути и dash — как в референсе; цвет — currentColor с родителя. */
+  .hamburger-icon-svg {
+    transition: transform theme('transitionDuration.carousel') theme('transitionTimingFunction.standard');
+  }
+
+  .hamburger-line {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: theme('hamburger.stroke');
+    transition:
+      stroke-dasharray theme('transitionDuration.carousel') theme('transitionTimingFunction.standard'),
+      stroke-dashoffset theme('transitionDuration.carousel') theme('transitionTimingFunction.standard');
+  }
+
+  .hamburger-line-top-bottom {
+    stroke-dasharray: theme('hamburger.dashCollapsed');
+  }
+
+  .hamburger-menu-btn[aria-expanded='true'] .hamburger-icon-svg {
+    transform: rotate(theme('hamburger.rotate'));
+  }
+
+  .hamburger-menu-btn[aria-expanded='true'] .hamburger-line-top-bottom {
+    stroke-dasharray: theme('hamburger.dashExpanded');
+    stroke-dashoffset: theme('hamburger.dashOffset');
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hamburger-icon-svg,
+    .hamburger-line {
+      transition: none !important;
+    }
+  }
+
+  /**
+   * Анимированный чекбокс заявки (`FormCheckbox`): круглый ripple, галочка и круг — stroke-dash.
+   * Цвет обводки — `currentColor` с `text-*` на label; числа dash — `theme('formCheckbox.*')`.
+   */
+  .form-checkbox-visual {
+    @apply relative flex h-4 w-4 cursor-pointer items-center justify-center;
+    -webkit-tap-highlight-color: transparent;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .form-checkbox-visual::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: theme('spacing.form-checkbox-ripple-inset');
+    left: theme('spacing.form-checkbox-ripple-inset');
+    width: theme('spacing.form-checkbox-ripple-size');
+    height: theme('spacing.form-checkbox-ripple-size');
+    border-radius: theme('borderRadius.full');
+    background: color-mix(in srgb, theme('colors.brand.primary') 10%, transparent);
+    opacity: 0;
+    transition: opacity theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+  }
+
+  .form-checkbox-visual:hover::before {
+    opacity: 1;
+  }
+
+  .form-checkbox-svg {
+    position: relative;
+    z-index: 1;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke: currentColor;
+    stroke-width: theme('formCheckbox.strokeWidth');
+    transform: translate3d(0, 0, 0);
+    transition: stroke theme('transitionDuration.hover') theme('transitionTimingFunction.standard');
+  }
+
+  .form-checkbox-svg path {
+    stroke-dasharray: theme('formCheckbox.pathDashArray');
+    stroke-dashoffset: 0;
+  }
+
+  .form-checkbox-svg polyline {
+    stroke-dasharray: theme('formCheckbox.polylineDashArray');
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetIdle');
+  }
+
+  .peer:checked + .form-checkbox-visual .form-checkbox-svg path {
+    stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+    transition: all 300ms linear;
+  }
+
+  .peer:checked + .form-checkbox-visual .form-checkbox-svg polyline {
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetChecked');
+    transition: all 200ms linear;
+    transition-delay: 150ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .form-checkbox-svg,
+    .form-checkbox-svg path,
+    .form-checkbox-svg polyline {
+      transition: none !important;
+    }
+
+    .peer:checked + .form-checkbox-visual .form-checkbox-svg path {
+      stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+    }
+
+    .peer:checked + .form-checkbox-visual .form-checkbox-svg polyline {
+      stroke-dashoffset: theme('formCheckbox.polylineDashOffsetChecked');
+      transition-delay: 0ms;
+    }
+  }
+
+  /**
+   * Декоративный чекбокс в плашке #safety (`SafetyStatusPlaqueCheckbox`): stroke-dash как у формы, пульс scale.
+   */
+  .safety-status-plaque-checkbox {
+    @apply relative inline-flex h-safety-status-checkbox w-safety-status-checkbox items-center justify-center;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .safety-status-plaque-checkbox-svg {
+    @apply pointer-events-none transition-[height,width] duration-safety-checkbox-grow ease-reveal-out motion-reduce:transition-none;
+    position: relative;
+    z-index: 1;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke: currentColor;
+    stroke-width: theme('formCheckbox.strokeWidth');
+    transform: translate3d(0, 0, 0);
+  }
+
+  .safety-status-plaque-checkbox-svg path {
+    stroke-dasharray: theme('formCheckbox.pathDashArray');
+    stroke-dashoffset: 0;
+    transition: all 300ms linear;
+  }
+
+  .safety-status-plaque-checkbox-svg polyline {
+    stroke-dasharray: theme('formCheckbox.polylineDashArray');
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetIdle');
+    transition: all 200ms linear;
+    transition-delay: 0ms;
+  }
+
+  .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg path {
+    stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+    transition-delay: 0ms;
+  }
+
+  .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg polyline {
+    stroke-dashoffset: theme('formCheckbox.polylineDashOffsetChecked');
+    transition-delay: 150ms;
+  }
+
+  .safety-status-plaque-checkbox--small .safety-status-plaque-checkbox-svg {
+    @apply h-safety-status-checkbox-sm w-safety-status-checkbox-sm;
+  }
+
+  .safety-status-plaque-checkbox--full .safety-status-plaque-checkbox-svg {
+    @apply h-safety-status-checkbox w-safety-status-checkbox;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .safety-status-plaque-checkbox--small .safety-status-plaque-checkbox-svg {
+      @apply h-safety-status-checkbox w-safety-status-checkbox;
+    }
+
+    .safety-status-plaque-checkbox-svg path,
+    .safety-status-plaque-checkbox-svg polyline {
+      transition: none !important;
+    }
+
+    .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg path,
+    .safety-status-plaque-checkbox--checked .safety-status-plaque-checkbox-svg polyline {
+      stroke-dashoffset: theme('formCheckbox.pathDashOffsetChecked');
+      transition-delay: 0ms;
+    }
+  }
+
+  /** Мобильное меню навбара: без анимации, но смена transform/opacity мгновенная (закрытие работает). */
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav-panel,
+    .mobile-nav-backdrop {
+      transition: none !important;
+    }
+  }
+}
+
+@layer components {
+  /** Сетка календарей туров: главный (#kalendar) и мини-календарь выездов. */
+  .tour-calendar {
+    --rdp-accent-color: theme('colors.season.spring');
+    --rdp-day-height: 2.75rem;
+    --rdp-day-width: 2.75rem;
+    --tour-calendar-day-tile-size: theme('spacing.8');
+    --tour-calendar-day-accent-size: theme('spacing.3');
+    --tour-calendar-day-accent-inset: theme('spacing.1');
+  }
+
+  .tour-calendar-mini {
+    --rdp-day-height: 2rem;
+    --rdp-day-width: 2rem;
+    --tour-calendar-day-tile-size: theme('spacing.6');
+    --tour-calendar-day-accent-size: theme('spacing.2');
+    --tour-calendar-day-accent-inset: theme('spacing[0.5]');
+  }
+
+  .tour-calendar.rdp-root:not(.tour-departure-calendar) {
+    overflow-x: clip;
+  }
+
+  [data-season='winter'] .tour-calendar,
+  .tour-calendar[data-season='winter'] {
+    --rdp-accent-color: theme('colors.season.winter');
+  }
+
+  [data-season='spring'] .tour-calendar,
+  .tour-calendar[data-season='spring'] {
+    --rdp-accent-color: theme('colors.season.spring');
+  }
+
+  [data-season='summer'] .tour-calendar,
+  .tour-calendar[data-season='summer'] {
+    --rdp-accent-color: theme('colors.season.summer');
+  }
+
+  [data-season='fall'] .tour-calendar,
+  .tour-calendar[data-season='fall'] {
+    --rdp-accent-color: theme('colors.season.fall');
+  }
+
+  .tour-calendar .rdp-day,
+  .tour-calendar .rdp-day.tour-calendar__day-cell--has-events,
+  .tour-calendar .rdp-day.tour-departure-calendar__day-cell,
+  .tour-calendar .rdp-selected {
+    background-color: transparent;
+  }
+
+  .tour-calendar__day-tile {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tour-calendar-day-tile-size);
+    height: var(--tour-calendar-day-tile-size);
+    border-radius: theme('borderRadius.lg');
+    color: inherit;
+    background-color: transparent;
+    box-shadow: none;
+    transition-property: background-color, color, box-shadow;
+    transition-duration: theme('transitionDuration.hover');
+    transition-timing-function: theme('transitionTimingFunction.standard');
+  }
+
+  .tour-calendar__day-num {
+    display: inline-block;
+    font-weight: inherit;
+  }
+
+  .tour-calendar .rdp-day.rdp-today:not(.tour-calendar__day--selected) .tour-calendar__day-tile {
+    box-shadow: 0 0 0 1px theme('colors.divider');
+  }
+
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .rdp-day:not(.tour-calendar__day--selected)
+    .tour-calendar__day-btn:hover:not(:disabled)
+    .tour-calendar__day-tile,
+  .tour-departure-calendar--select
+    .rdp-day:not(.tour-calendar__day--selected)
+    .tour-calendar__day-btn:hover:not(:disabled)
+    .tour-calendar__day-tile {
+    background-color: color-mix(in srgb, theme('colors.surface.dark') 5%, transparent);
+  }
+
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile,
+  .tour-departure-calendar--select
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile {
+    background-color: color-mix(
+      in srgb,
+      theme('colors.surface.dark') 88%,
+      theme('colors.surface.light') 12%
+    );
+    color: theme('colors.text.inverse');
+    font-weight: theme('fontWeight.semibold');
+    box-shadow: 0 1px 2px color-mix(in srgb, theme('colors.surface.dark') 16%, transparent);
+  }
+
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile::after,
+  .tour-departure-calendar--select
+    .tour-calendar__day-btn.tour-calendar__day--selected
+    .tour-calendar__day-tile::after {
+    content: '';
+    position: absolute;
+    right: var(--tour-calendar-day-accent-inset);
+    bottom: var(--tour-calendar-day-accent-inset);
+    width: var(--tour-calendar-day-accent-size);
+    height: var(--tour-calendar-day-accent-size);
+    pointer-events: none;
+    border-right: 2px solid theme('colors.cta.fill');
+    border-bottom: 2px solid theme('colors.cta.fill');
+    border-bottom-right-radius: theme('borderRadius.sm');
+  }
+
+  .tour-calendar.rdp-root:not(.tour-departure-calendar)
+    .tour-calendar__day-btn.tour-calendar__day--selected:hover
+    .tour-calendar__day-tile,
+  .tour-departure-calendar--select
+    .tour-calendar__day-btn.tour-calendar__day--selected:hover
+    .tour-calendar__day-tile {
+    background-color: color-mix(
+      in srgb,
+      theme('colors.surface.dark') 78%,
+      theme('colors.surface.light') 22%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-calendar__day-tile {
+      transition: none;
+    }
+  }
+
+  .tour-departure-calendar--display .tour-calendar__day-btn {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .tour-departure-calendar--display .tour-calendar__day-btn:active {
+    background-color: transparent;
+    color: inherit;
+    font-weight: inherit;
+  }
+
+  .tour-departure-calendar--display .rdp-day_button:not(.tour-departure-calendar__day--departure) {
+    cursor: default;
+  }
+
+  .tour-departure-calendar--display .rdp-day_button.tour-departure-calendar__day--departure {
+    cursor: default;
+  }
+
+  .tour-request-modal__steps {
+    @apply relative min-h-[13rem] overflow-hidden;
+  }
+
+  .tour-request-modal__step {
+    @apply transition-opacity duration-tour-request-step-crossfade ease-standard;
+  }
+
+  .tour-request-modal__step--active {
+    @apply relative z-10 opacity-100;
+  }
+
+  .tour-request-modal__step--inactive {
+    @apply pointer-events-none absolute inset-x-0 top-0 z-0 max-h-full overflow-hidden opacity-0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-request-modal__step {
+      transition: none;
+    }
+  }
+}
+
+@layer utilities {
+  /** Галерея тура (лайтбокс): горизонтальный скролл без видимой полосы — навигация точками и свайпом. */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Фраза тура в HeroCarousel: читаемость на светлых участках фона (цвет тени = surface.dark из темы). */
+  .hero-carousel-phrase-text-shadow {
+    text-shadow:
+      0 0.3125rem 1.5rem color-mix(in srgb, theme('colors.surface.dark') 84%, transparent),
+      0 0.125rem 0.5rem color-mix(in srgb, theme('colors.surface.dark') 96%, transparent),
+      0 0 2rem color-mix(in srgb, theme('colors.surface.dark') 52%, transparent);
+  }
+}

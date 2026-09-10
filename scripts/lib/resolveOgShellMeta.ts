@@ -33,6 +33,9 @@ const SEASON_BY_LIST_PATH: Record<string, Season> = {
 
 const TOUR_DETAIL_PATH_PATTERN = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)$/;
 
+const resolveOgJpegPath = (pathOrUrl: string): string =>
+  pathOrUrl.replace(/\.(?:webp|png|jpe?g)(?=$|[?#])/i, '.jpg');
+
 export const resolveOgShellMeta = (
   routePath: string,
   tourPublicationStatus?: TourPublicationStatus,
@@ -102,7 +105,9 @@ export const resolveOgShellMeta = (
       // Publication status drives index eligibility; keep the prerendered noindex for
       // in_development tours instead of overwriting it with the index,follow default.
       robots: seoEntry.robots ?? SEO_DEFAULTS.robots,
-      imagePathOrUrl: tour.imageUrl,
+      // Keep WebP for the UI, but use prebuilt JPEG OG assets so deployment
+      // does not need ffmpeg to convert images inside the build container.
+      imagePathOrUrl: resolveOgJpegPath(tour.imageUrl),
     };
   }
 

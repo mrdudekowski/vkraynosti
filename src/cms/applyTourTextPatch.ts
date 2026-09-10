@@ -22,7 +22,7 @@ export type CmsTourTextPatch = {
   descriptionAside?: string;
   prefaceAssetId: string | null;
   included: Array<{ text: string; iconKey: string }>;
-  program: Array<{ timeLabel: string; description: string }>;
+  program: Array<{ day?: number; timeLabel: string; description: string }>;
   programAdditionalNotes?: string[];
   assetAlts?: Record<string, string>;
 };
@@ -161,6 +161,7 @@ export function applyTourTextPatch(
       iconKey: item.iconKey,
     })),
     program: patch.program.map((step) => ({
+      day: step.day ?? 1,
       timeLabel: trimOrEmpty(step.timeLabel),
       description: trimOrEmpty(step.description),
     })),

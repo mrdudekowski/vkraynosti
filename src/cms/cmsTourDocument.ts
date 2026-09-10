@@ -45,6 +45,12 @@ export const cmsCoverCropSchema = z.object({
 
 export const CMS_TOUR_STATUSES = ['draft', 'in_development', 'active', 'hidden'] as const;
 
+export const cmsProgramStepSchema = z.object({
+  day: z.number().int().min(1).optional(),
+  timeLabel: z.string(),
+  description: z.string(),
+});
+
 export const cmsTourDocumentSchema = z.object({
   id: z.string().min(1),
   slug: z.string().min(1),
@@ -64,9 +70,7 @@ export const cmsTourDocumentSchema = z.object({
   price: z.string().default(''),
   pricePrevious: z.string().optional(),
   priceFootnote: z.string().optional(),
-  program: z
-    .array(z.object({ timeLabel: z.string(), description: z.string() }))
-    .default([]),
+  program: z.array(cmsProgramStepSchema).default([]),
   programAdditionalNotes: z.array(z.string()).optional(),
   included: z.array(z.object({ text: z.string(), iconKey: z.string().min(1) })).default([]),
   seoDescription: z.string().optional(),
@@ -94,6 +98,7 @@ export type CmsTourAsset = z.infer<typeof cmsTourAssetSchema>;
 export type CmsBentoSlot = z.infer<typeof cmsBentoSlotSchema>;
 export type CmsBentoBlock = z.infer<typeof cmsBentoBlockSchema>;
 export type CmsCoverCrop = z.infer<typeof cmsCoverCropSchema>;
+export type CmsProgramStep = z.infer<typeof cmsProgramStepSchema>;
 export type CmsTourDocument = z.infer<typeof cmsTourDocumentSchema>;
 export type CmsToursFile = z.infer<typeof cmsToursFileSchema>;
 

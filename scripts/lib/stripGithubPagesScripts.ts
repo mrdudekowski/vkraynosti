@@ -11,3 +11,12 @@ export const stripGithubPagesSpaRedirectScript = (html: string): string =>
 /** Remove GitHub Pages 404 redirect script from public/404.html template. */
 export const stripGithubPages404RedirectScript = (html: string): string =>
   html.replace(/<script>\s*\/\/ GitHub Pages SPA redirect:[\s\S]*?<\/script>\s*/gi, '');
+
+/** Keep the GitHub Pages redirect only in the GitHub Pages artifact. */
+export const sanitizeTimeweb404Html = (
+  html: string,
+  env: NodeJS.ProcessEnv = process.env,
+): string => {
+  if (!isTimewebAppBuild(env)) return html;
+  return stripGithubPagesSpaRedirectScript(stripGithubPages404RedirectScript(html));
+};

@@ -1,0 +1,34 @@
+# Example Caddy config for vkraynosti.ru (VPS / self-hosted Caddy + static dist/).
+# TimeWeb App Platform обычно не даёт править Caddy — для Mini App достаточно
+# статических dist/telegram/**/index.html из `npm run data:ssg` (см. runTelegramSpaShells.ts).
+# Copy to server (e.g. /etc/caddy/Caddyfile) and adjust `root` path.#
+# Goals:
+# - serve prebuilt OG shells from dist/**/index.html
+# - unknown paths → dist/404.html with HTTP 404 and noindex shell
+# - trailing slash canonicalization
+
+vkraynosti.ru {
+	encode gzip zstd
+
+	root * /var/www/vkraynosti/dist
+
+	@canonicalized path_regexp trailingSlash ^(.+[^/])$
+	redir @canonicalized {path}/ 308
+
+	@telegram path /telegram /telegram/*
+	handle @telegram {
+		try_files {path} {path}/ /telegram/index.html
+		file_server
+	}
+
+	@file file {path} {path}/index.html
+	handle @file {
+		file_server
+	}
+
+	handle {
+		rewrite * /404.html
+		file_server
+		header Status 404
+	}
+}

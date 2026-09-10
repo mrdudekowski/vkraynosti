@@ -1,23 +1,17 @@
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons/faEnvelope';
-import ContactMessengerLogo from '../icons/ContactMessengerLogo';
 import SeasonLinkLabel from '../shared/SeasonLinkLabel';
 import { UI } from '../../constants/ui';
-import { CONTACTS } from '../../constants/contacts';
 import {
   FOOTER_CONTACT_LINK_CLASS,
-  FOOTER_CONTACT_MESSENGER_ICON_CLASS,
-  FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS,
 } from '../../constants/footerContact';
 import { LEGAL_ENTITY } from '../../constants/legalEntity';
 import { LEGAL_DOCUMENTS_FOOTER } from '../../constants/legalDocuments';
 import { ROUTES } from '../../constants/routes';
 import LegalPdfLink from '../legal/LegalPdfLink';
 import { useCookieConsent } from '../../context/useCookieConsent';
-import { toSafeExternalHttpHref, toSafeMailtoHref, toSafePhoneHref } from '../../utils/safeHref';
 import type { Season } from '../../types';
 import FooterStudioCreditLink from './FooterStudioCreditLink';
+import { useSiteContent } from '../../context/SiteContentContext';
 
 const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] = [
   { season: 'winter', to: ROUTES.WINTER, hoverClass: 'hover:text-season-winter' },
@@ -28,6 +22,9 @@ const FOOTER_SEASON_LINKS: { season: Season; to: string; hoverClass: string }[] 
 
 const Footer = () => {
   const { openBanner } = useCookieConsent();
+  const { contacts, footer } = useSiteContent();
+  const footerRows = new Map(footer.blocks.flatMap((block) => block.visible ? block.rows.filter((row) => row.visible).map((row) => [row.id, row] as const) : []));
+  const contactChannels = contacts.channels.filter((channel) => channel.visible).sort((a, b) => a.order - b.order);
 
   return (
   <footer className="bg-home-season-banner-stage text-text-inverse">
@@ -42,9 +39,7 @@ const Footer = () => {
           >
             {UI.nav.brand}
           </Link>
-          <p className="mt-3 text-text-inverse/60 text-sm leading-relaxed">
-            {UI.footer.tagline}
-          </p>
+          <p className="mt-3 text-text-inverse/60 text-sm leading-relaxed">{footerRows.get('tagline')?.value ?? UI.footer.tagline}</p>
         </div>
 
         {/* Legal + documents */}
@@ -123,51 +118,7 @@ const Footer = () => {
         {/* Contacts */}
         <div>
           <h4 className="font-normal text-text-inverse mb-4">{UI.footer.contactHeading}</h4>
-          <div className="flex flex-col gap-3">
-            <a
-              href={toSafePhoneHref(CONTACTS.PHONE_HREF)}
-              className={FOOTER_CONTACT_LINK_CLASS}
-              aria-label={UI.contact.phone}
-            >
-              <span className={FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS}>
-                <ContactMessengerLogo variant="phone" className={FOOTER_CONTACT_MESSENGER_ICON_CLASS} />
-              </span>
-              {CONTACTS.PHONE_NUMBER}
-            </a>
-            <a
-              href={toSafeMailtoHref(`mailto:${CONTACTS.PERSONAL_DATA_EMAIL}`)}
-              className="flex items-center gap-3 text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover text-sm"
-            >
-              <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4 shrink-0" />
-              {CONTACTS.PERSONAL_DATA_EMAIL}
-            </a>
-            <a
-              href={toSafeExternalHttpHref(CONTACTS.TELEGRAM_HREF)}
-              target="_blank"
-              rel="noopener noreferrer external"
-              referrerPolicy="no-referrer"
-              className={FOOTER_CONTACT_LINK_CLASS}
-              aria-label={UI.contact.telegram}
-            >
-              <span className={FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS}>
-                <ContactMessengerLogo variant="telegram" className={FOOTER_CONTACT_MESSENGER_ICON_CLASS} />
-              </span>
-              {CONTACTS.TELEGRAM_HANDLE}
-            </a>
-            <a
-              href={toSafeExternalHttpHref(CONTACTS.MAX_HREF)}
-              target="_blank"
-              rel="noopener noreferrer external"
-              referrerPolicy="no-referrer"
-              className={FOOTER_CONTACT_LINK_CLASS}
-              aria-label={UI.contact.max}
-            >
-              <span className={FOOTER_CONTACT_MESSENGER_ICON_WELL_CLASS}>
-                <ContactMessengerLogo variant="max" className={FOOTER_CONTACT_MESSENGER_ICON_CLASS} />
-              </span>
-              {UI.contact.max}
-            </a>
-          </div>
+          <div className="flex flex-col gap-3">{contactChannels.map((channel) => <a key={channel.id} href={channel.href} target={channel.type === 'phone' ? undefined : '_blank'} rel={channel.type === 'phone' ? undefined : 'noopener noreferrer external'} className={FOOTER_CONTACT_LINK_CLASS}>{channel.label}</a>)}</div>
         </div>
       </div>
 

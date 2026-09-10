@@ -1,53 +1,79 @@
-# SEO-аудит и playbook VKRAYNOSTI.RU
+# VKRAYNOSTI SEO V2 — audit and playbook
 
-Дата аудита: 2026-09-03. Область изменений: ветка `codex/cms-crm-phase1`. Деплой не выполнялся.
+Дата аудита: 2026-09-09. Ветка: `cms-crm-phase1-staging`.
 
-## Резюме
+## Current SEO health
 
-Основная причина плохого сниппета — поисковик видел SPA-шаблон и/или ошибочный текст загрузки до того, как React успевал обновить `head` и тело страницы. Дополнительный риск давал OG-пайплайн: при отсутствии исполняемого `ffmpeg` он мог оставлять WebP и ссылаться на несуществующий JPEG.
+### Confirmed production baseline
 
-В ветке исправлены и проверяются:
+| Check | Result | Evidence |
+|---|---|---|
+| Sitemap | PASS | `https://vkraynosti.ru/sitemap.xml`, 47 URLs |
+| Public URL status | PASS | All 47 sitemap URLs returned HTTP 200 |
+| Canonical/robots | PASS | Every checked sitemap URL had self-path canonical and `index,follow` |
+| 404 | PASS | Probe returned HTTP 404 and noindex |
+| Metadata | PASS | One H1, title, description and canonical per crawled URL |
+| Loading layer | FIXED IN SOURCE | Static shell no longer contains loading copy/progress semantics; runtime inserts them for browsers |
+| GSC/Yandex data | GAP | Account access was not available in this workspace |
+| CWV/real bot logs | GAP | Requires Search Console, CrUX/RUM and server/CDN logs |
 
-- data-SSG HTML для главной, сезонных каталогов и опубликованных/готовящихся туров;
-- единый title, description, robots, canonical, Open Graph и Twitter metadata;
-- JSON-LD для Organization/WebSite, CollectionPage сезонных каталогов, TouristTrip и BreadcrumbList;
-- sitemap только для indexable URL; закрытые `/safety`, `/privacy`, Telegram-маршруты и hidden-туры исключены;
-- OG-shell с JPEG 1200×630 и безопасным локальным fallback `og-cover-prod.jpg`;
-- локальный gate `npm run verify:seo-dist`, проверяющий соответствие sitemap, HTML-файлов, canonical, robots, H1 и JSON-LD.
+### Important interpretation
 
-## Политика публикации
+The crawl proves technical availability and crawlable HTML, not guaranteed indexing, ranking, or AI citation. Google recommends crawlable links, useful content, valid metadata and structured data; Yandex separately exposes robot, sitemap and site-structure controls. See [Google Search Essentials](https://developers.google.com/search/docs/essentials) and [Yandex Webmaster help](https://yandex.com/support/webmaster/en/).
 
-`active` — `index,follow`, входит в sitemap и получает rendered HTML. `in_development` — `noindex,follow`, доступен пользователю, но не входит в sitemap. `hidden` — отсутствует в каталоге и не должен публиковаться. Удалённые/неизвестные маршруты — not-found и `noindex,nofollow`. Юридические страницы `/safety` и `/privacy` закрыты от индексации.
+## Fixed in this slice
 
-Изменение статуса должно проходить один путь: локальный каталог → генерация и проверка артефактов → staging → production. Нельзя считать смену статуса опубликованной без проверки HTTP и rendered HTML после деплоя.
+- Removed loading phrase and ARIA progress attributes from static `index.html`.
+- Preserved browser-only splash rendering in `public/boot-splash-runtime.js`.
+- Added regression checks so the loading UI cannot become semantic content of the initial HTML again.
+- Kept the existing noindex 404, generated sitemap/robots flow, canonical layer and post-deploy smoke check.
 
-## Чек-лист перед публикацией
+## P0 / P1 / P2 backlog
 
-1. Обновить каталог и проверить, что статус каждого URL соответствует политике.
-2. Выполнить `npm run build`.
-3. Выполнить `npm run data:ssg` и `npm run og:shells`.
-4. Выполнить `npm run verify:seo-dist` и `npm run verify:og-shells`.
-5. Проверить несколько initial HTML: `/`, сезон, активный тур, `in_development`, not-found.
-6. Проверить через HTTP staging: status, `Content-Type`, canonical, robots, H1 и отсутствие текста ошибки в indexable body.
-7. После production-деплоя проверить Google URL Inspection и Yandex Webmaster; запросить переобход только после подтверждения корректного HTML.
+### P0 — protect indexability
 
-## Мониторинг
+- Keep every sitemap URL HTTP 200, self-canonical and indexable.
+- Keep unknown routes real HTTP 404 with noindex; do not serve a soft-404 page with HTTP 200.
+- Preserve the CMS publication contract: only `active` tours enter sitemap; `in_development` is rendered but noindex; hidden tours stay out of public discovery.
+- Never let a loading screen replace the server/SSG content shell.
 
-Еженедельно сверять sitemap с каталогом, число indexable URL, страницы с `noindex`, HTTP 4xx/5xx, Core Web Vitals и Search Console/Yandex отчёты. Отдельно отслеживать, не возвращается ли в title/body текст `Что-то пошло не так` или `Произошла ошибка`.
+### P1 — improve qualified search coverage
 
-## Roadmap на 90 дней
+- Connect GSC and Yandex Webmaster; export queries/pages, excluded reasons, crawl stats and CWV monthly.
+- Resolve CMS/static catalogue source-of-truth drift in SSG, OG shell, sitemap and runtime paths before scaling route creation.
+- Maintain distinct season landing pages and tour detail pages; add internal links from season pages to active tours and back via breadcrumbs.
+- Improve descriptions from real route facts and intent, not length-padding. Avoid unsupported prices, dates, availability and markup.
+- Add a truthful archive policy for past tours: retain evergreen route content, remove stale availability, and use noindex/redirect only when the business decision requires it.
 
-- Дни 1–7: выкатить сборочные гейты на staging, проверить HTTP для Googlebot/Yandexbot и отправить sitemap в панели вебмастеров.
-- Дни 8–30: собрать baseline CTR/покрытия/ошибок, вручную улучшить описания приоритетных active-туров, проверить изображения и Core Web Vitals.
-- Дни 31–60: закрыть контентные пробелы по четырём сезонным кластерам, добавить только подтверждённые FAQ/сущности, повторить crawl-проверку.
-- Дни 61–90: сравнить запросы и конверсии до/после, удалить неэффективные дубли, формализовать еженедельный SEO-release gate.
+### P2 — growth and conversion
 
-## Источники требований
+- Build intent-led pages only after GSC/Wordstat/Keyword Planner demand validation.
+- Improve image filenames, descriptive alt text, compression and LCP after field measurement.
+- Test title/description variants by CTR, not by arbitrary character count.
+- Expand local entity signals: consistent NAP, legal contact page, map/profile links, reviews and route-specific trust content.
 
-- [Google: title links](https://developers.google.com/search/docs/appearance/title-link)
-- [Google: site names](https://developers.google.com/search/docs/appearance/site-names)
-- [Google: JavaScript SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/dynamic-rendering)
-- [Google: structured data policies](https://developers.google.com/search/docs/appearance/structured-data/sd-policies)
-- [Yandex: how robots see JavaScript](https://yandex.com/support/webmaster/en/robot-workings/vision)
-- [Yandex: robots.txt](https://yandex.com/support/webmaster/en/controlling-robot/robots-txt)
-- [Yandex: sitemap](https://yandex.com/support/webmaster/en/controlling-robot/sitemap)
+## Search architecture
+
+- `/` — brand/entity and broad Primorye travel intent.
+- `/tours/{season}/` — seasonal discovery and category intent.
+- `/tours/{season}/{slug}/` — one route, one canonical URL, commercial/informational route intent.
+- `/safety`, `/privacy` — useful support pages, excluded from sitemap by current policy.
+- `/telegram/*` — application surfaces, not SEO landing pages.
+
+Do not create near-duplicate pages for every phrase. Each indexable URL must answer a distinct search intent and link to a real published experience.
+
+## Owner access needed for the next audit
+
+1. Verify `vkraynosti.ru` in Google Search Console and Yandex Webmaster.
+2. Export the last 3 months for clicks, impressions, CTR, average position, indexed/not-indexed reasons, page experience and top queries.
+3. Share exports or screenshots without passwords/tokens. Re-run this playbook and map each issue to a URL and owner.
+
+## Verification commands
+
+```powershell
+npm run seo:check
+node scripts/check-seo-indexing.mjs --base https://vkraynosti.ru
+node --check public/boot-splash-runtime.js
+```
+
+The full test/build suite must be reported separately if dependencies are unavailable; a passing SEO smoke check is not a substitute for a production build.

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  auditSeoRouteIntegrity,
   getRenderableRoutePaths,
   getSitemapRoutePaths,
   getStaticIndexableRoutePaths,
@@ -67,5 +68,76 @@ describe('catalog-aware SEO route sets', () => {
     for (const path of [...sitemap, ...renderable]) {
       expect(path.startsWith('/telegram'), `non-SEO route leaked: ${path}`).toBe(false);
     }
+  });
+});
+
+describe('SEO route integrity audit', () => {
+  const baseInput = {
+    activePaths: ['/tours/summer/active-tour/'],
+    hiddenPaths: ['/tours/summer/hidden-tour/'],
+    inDevelopmentPaths: ['/tours/summer/dev-tour/'],
+    sitemapPaths: ['/tours/summer/active-tour/'],
+    renderablePaths: [
+      '/tours/summer/active-tour/',
+      '/tours/summer/dev-tour/',
+    ],
+    legacyRedirectPaths: ['/tours/summer/summer-1/'],
+    internalLinks: [
+      { from: '/', to: '/tours/summer/active-tour/' },
+    ],
+  };
+
+  it('accepts a consistent active, hidden, in-development and renderable route set', () => {
+    expect(auditSeoRouteIntegrity(baseInput).violations).toEqual([]);
+  });
+
+  it('reports an active tour missing from the Sitemap', () => {
+    const result = auditSeoRouteIntegrity({
+      ...baseInput,
+      sitemapPaths: [],
+    });
+
+    expect(result.violations).toContainEqual(
+      expect.objectContaining({ code: 'active_not_in_sitemap', path: '/tours/summer/active-tour/' }),
+    );
+  });
+
+  it('reports hidden and in-development tours leaked into the Sitemap', () => {
+    const result = auditSeoRouteIntegrity({
+      ...baseInput,
+      sitemapPaths: [
+        '/tours/summer/active-tour/',
+        '/tours/summer/hidden-tour/',
+        '/tours/summer/dev-tour/',
+      ],
+    });
+
+    expect(result.violations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'hidden_in_sitemap', path: '/tours/summer/hidden-tour/' }),
+        expect.objectContaining({ code: 'in_development_in_sitemap', path: '/tours/summer/dev-tour/' }),
+      ]),
+    );
+  });
+
+  it('reports renderable routes missing from generated output and legacy links', () => {
+    const result = auditSeoRouteIntegrity({
+      ...baseInput,
+      renderablePaths: ['/tours/summer/active-tour/'],
+      internalLinks: [
+        { from: '/', to: '/tours/summer/summer-1/' },
+        { from: '/', to: '/tours/summer/hidden-tour/' },
+        { from: '/', to: '/tours/summer/unknown-tour/' },
+      ],
+    });
+
+    expect(result.violations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'in_development_not_renderable', path: '/tours/summer/dev-tour/' }),
+        expect.objectContaining({ code: 'legacy_internal_link', path: '/tours/summer/summer-1/' }),
+        expect.objectContaining({ code: 'hidden_internal_link', path: '/tours/summer/hidden-tour/' }),
+        expect.objectContaining({ code: 'unknown_internal_link', path: '/tours/summer/unknown-tour/' }),
+      ]),
+    );
   });
 });

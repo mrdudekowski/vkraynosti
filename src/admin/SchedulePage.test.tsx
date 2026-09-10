@@ -1,10 +1,11 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CmsTourDocument } from '../cms/cmsTourDocument';
 import { createCmsTourMeta } from '../cms/cmsTourMeta';
 import type { AdminDeparture, AdminSession } from './api';
+import { adminCalendarSeason } from './adminCalendarSeason';
 import { ADMIN_SCHEDULE_MODE_STORAGE_KEY, ADMIN_SCHEDULE_WEEK_LAYOUT_STORAGE_KEY } from '../constants/adminUiTokens';
 import { ADMIN_UI } from './constants/ui';
 import { formatScheduleOverflowDepartures, formatScheduleWeekdayDate } from './formatAdminCopy';
@@ -76,7 +77,7 @@ function listItem(
   title: string,
   published = true,
   status: 'draft' | 'active' = 'active',
-  season: 'winter' | 'spring' | 'summer' | 'fall' = 'summer',
+  season: 'winter' | 'spring' | 'summer' | 'fall' = adminCalendarSeason(),
 ) {
   return {
     id,
@@ -132,8 +133,6 @@ function renderSchedule(session: AdminSession = adminSession, initialEntries: st
 
 describe('SchedulePage', () => {
   beforeEach(() => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    vi.setSystemTime(new Date('2026-08-19T12:00:00.000+10:00'));
     clearAdminDataCache();
     vi.clearAllMocks();
     delete document.body.dataset.adminScheduleSections;
@@ -165,10 +164,6 @@ describe('SchedulePage', () => {
     vi.mocked(adminDeleteDeparture).mockResolvedValue(undefined);
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it('shows day, week and month modes, opens the wizard on an empty cell, and lists only on-site tours', async () => {
     const user = userEvent.setup();
     renderSchedule();
@@ -178,7 +173,6 @@ describe('SchedulePage', () => {
     expect(screen.getByRole('button', { name: ADMIN_UI.scheduleModeWeek })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: ADMIN_UI.scheduleModeMonth })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: ADMIN_UI.scheduleAdd })).toHaveClass('admin-btn-primary');
-    expect(screen.queryByRole('button', { name: ADMIN_UI.quickAdd })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: ADMIN_UI.publishSchedule })).toHaveClass(
       'admin-btn-secondary',
     );

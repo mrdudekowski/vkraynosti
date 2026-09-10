@@ -1,24 +1,32 @@
-# Семантическая карта
+# SEO semantic map
 
-## Кластеры и посадочные
+Запросы и объёмы здесь не считаются подтверждёнными до получения GSC/Wordstat/Keyword Planner. Карта задаёт intent и требования к контенту.
 
-| Кластер | Посадочная | Состояние |
-| --- | --- | --- |
-| Поездки по Приморью из Владивостока | `/` | indexable, Organization/WebSite |
-| Зимние поездки, сопки, море | `/tours/winter/` | indexable, CollectionPage |
-| Весенние поездки, Пидан, Аскольд | `/tours/spring/` | indexable, CollectionPage |
-| Летние поездки, побережье, острова | `/tours/summer/` | indexable, CollectionPage |
-| Осенние маршруты | `/tours/fall/` | indexable, CollectionPage |
-| Конкретный маршрут | `/tours/{season}/{slug}/` | indexable только при `active` |
-| Программа готовится | тот же URL тура | `noindex,follow` |
-| Безопасность и условия участия | `/safety/` | `noindex,nofollow` |
-| Конфиденциальность | `/privacy/` | `noindex,nofollow` |
+| Cluster | Intent | Canonical page | Required proof/content |
+|---|---|---|---|
+| Поездки по Приморью из Владивостока | broad discovery | `/` | сезоны, формат поездок, география, доверие |
+| Походы/сопки Приморья | category discovery | season landing | подборка маршрутов, сложность, сезонность |
+| Зимние поездки Приморья | seasonal | `/tours/winter/` | реальные зимние маршруты и условия |
+| Весенние поездки Приморья | seasonal | `/tours/spring/` | Пидан/Сестра/острова только если опубликованы |
+| Летние поездки Приморья | seasonal | `/tours/summer/` | море, бухты, заповедные маршруты |
+| Осенние поездки Приморья | seasonal | `/tours/fall/` | актуальная сезонная программа |
+| Название конкретного маршрута | route-specific | tour detail | программа, цена из CMS, даты из CMS, что включено |
+| Безопасность поездок | trust/support | `/safety` | правила, ограничения и контакты |
 
-## Правила контента
+## Internal linking rules
 
-У каждого indexable маршрута должен быть один H1, уникальный title и description, короткое описание с географией и намерением пользователя, видимый маршрут/программа и внутренние ссылки на сезон и главную. Slug стабилен и не меняется из-за редакторского переименования. Синонимы («поездки», «туры», «маршруты», «Приморье», «из Владивостока») распределяются естественно; keyword stuffing не используется.
+- Home links to all season hubs and high-priority active routes.
+- Season hub links only to routes in that season and explains the selection.
+- Tour links back to its season hub and to one or two genuinely related routes.
+- Breadcrumbs reflect the same hierarchy as the canonical URL.
+- Anchor text describes the destination; do not repeat an exact commercial phrase mechanically.
 
-## Приоритеты
+## Content gap method
 
-Сначала — главная, четыре сезонных кластера и реально продаваемые active-туры. Затем — расширение уникальных описаний и FAQ только там, где ответы есть в продукте. Не создавать отдельные страницы под каждую комбинацию слов без самостоятельной полезности.
+For each query from GSC/Yandex:
 
+1. classify intent;
+2. map to an existing canonical URL;
+3. check whether the page answers the query with first-party facts;
+4. improve the existing page before creating a new URL;
+5. only create a new landing page when the intent, content and business offer are distinct.

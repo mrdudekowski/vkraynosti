@@ -4,6 +4,8 @@ import {
   CMS_PUBLISHED_SCHEDULE_KEY,
   CMS_PUBLISHED_TOURS_LIST_KEY,
 } from './cmsPackageKeys';
+import { siteContentPublishedKey } from './siteContentPackageKeys';
+import type { SiteContentDocumentKind } from './siteContentDocument';
 
 export const CMS_PUBLISHED_TOURS_PATH = CMS_PUBLISHED_CATALOG_KEY;
 
@@ -34,6 +36,13 @@ export function buildCmsPublishedToursListUrl(baseUrl: string): string {
 
 export function buildCmsPublishedScheduleUrl(baseUrl: string): string {
   return `${stripTrailingSlash(baseUrl)}/${CMS_PUBLISHED_SCHEDULE_KEY}`;
+}
+
+export function buildCmsPublishedSiteContentUrl(
+  baseUrl: string,
+  kind: SiteContentDocumentKind,
+): string {
+  return `${stripTrailingSlash(baseUrl)}/${siteContentPublishedKey(kind)}`;
 }
 
 export function resolveCmsLocalFallbackUrl(): string {

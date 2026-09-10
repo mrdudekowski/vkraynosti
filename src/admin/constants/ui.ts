@@ -10,6 +10,7 @@ export const ADMIN_UI = {
   overflowNavClose: 'Закрыть список разделов',
   overflowNavReset: 'Сбросить порядок',
   overflowNavDragHint: 'Перетащите раздел на пункт сайдбара, чтобы поменять их местами.',
+  overflowNavTargetLabel: (item: string) => `Переместить ${item} в сайдбар`,
   overflowNavMoved: 'Раздел перемещён в сайдбар',
   closeOverlay: 'Закрыть',
   quickAdd: 'Создать',

@@ -1,4 +1,4 @@
-import type { RefObject } from 'react';
+import { useState, type RefObject } from 'react';
 import { NavLink } from 'react-router-dom';
 import type { AdminNavId, AdminNavItem } from '../constants/nav';
 import { ADMIN_UI } from '../constants/ui';
@@ -9,6 +9,7 @@ export const ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE = 'application/x-admin-sidebar-ove
 
 type AdminSidebarOverflowDialogProps = {
   items: readonly AdminNavItem[];
+  visibleItems?: readonly Pick<AdminNavItem, 'id' | 'label'>[];
   onClose: () => void;
   onNavigate: (item: AdminNavItem) => void;
   onDragStart?: (itemId: AdminNavId) => void;
@@ -16,12 +17,13 @@ type AdminSidebarOverflowDialogProps = {
   allowUnderlyingPointerEvents?: boolean;
   restoreFocusRef?: RefObject<HTMLElement | null>;
   onDropOnVisible: (itemId: AdminNavId) => void;
+  onKeyboardExchange?: (itemId: AdminNavId, visibleIndex: number) => void;
   onReset: () => void;
-  visibleItemCount: number;
 };
 
 const AdminSidebarOverflowDialog = ({
   items,
+  visibleItems = [],
   onClose,
   onNavigate,
   onDragStart,
@@ -29,8 +31,11 @@ const AdminSidebarOverflowDialog = ({
   allowUnderlyingPointerEvents = false,
   restoreFocusRef,
   onDropOnVisible,
+  onKeyboardExchange,
   onReset,
 }: AdminSidebarOverflowDialogProps) => {
+  const [keyboardTargets, setKeyboardTargets] = useState<Record<string, AdminNavId>>({});
+
   if (items.length === 0) return null;
 
   const overflowItemIds = new Set(items.map((item) => item.id));
@@ -51,8 +56,8 @@ const AdminSidebarOverflowDialog = ({
         aria-label={`${ADMIN_UI.moreNav} (${items.length})`}
       >
         {items.map((item) => (
-          <NavLink
-            key={item.id}
+          <div key={item.id} className="min-w-0">
+            <NavLink
             to={item.to}
             end={item.id === 'dashboard'}
             draggable
@@ -85,7 +90,47 @@ const AdminSidebarOverflowDialog = ({
             <span className="ml-auto text-text-secondary" aria-hidden>
               ⋮⋮
             </span>
-          </NavLink>
+            </NavLink>
+            {visibleItems.length > 0 ? (
+            <div className="col-span-full flex min-w-0 items-end gap-2 rounded-admin-control border border-divider/70 bg-surface-light/40 p-2">
+              <label className="sr-only" htmlFor={`admin-sidebar-target-${item.id}`}>
+                {ADMIN_UI.overflowNavTargetLabel(item.label)}
+              </label>
+              <select
+                id={`admin-sidebar-target-${item.id}`}
+                className="admin-input min-w-0 flex-1"
+                aria-label={ADMIN_UI.overflowNavTargetLabel(item.label)}
+                value={keyboardTargets[item.id] ?? visibleItems[0]?.id ?? ''}
+                onChange={(event) => {
+                  setKeyboardTargets((current) => ({
+                    ...current,
+                    [item.id]: event.target.value as AdminNavId,
+                  }));
+                }}
+              >
+                {visibleItems.map((visibleItem) => (
+                  <option key={visibleItem.id} value={visibleItem.id}>
+                    {visibleItem.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="admin-button-secondary shrink-0"
+                aria-label={ADMIN_UI.overflowNavTargetLabel(item.label)}
+                onClick={() => {
+                  const targetId = keyboardTargets[item.id] ?? visibleItems[0]?.id;
+                  const targetIndex = visibleItems.findIndex(({ id }) => id === targetId);
+                  if (targetId == null || targetIndex < 0) return;
+                  onKeyboardExchange?.(item.id, targetIndex);
+                }}
+                disabled={onKeyboardExchange == null}
+              >
+                {ADMIN_UI.overflowNavTargetLabel(item.label)}
+              </button>
+            </div>
+            ) : null}
+          </div>
         ))}
       </div>
       <div className="mt-4 flex justify-end border-t border-divider pt-3">

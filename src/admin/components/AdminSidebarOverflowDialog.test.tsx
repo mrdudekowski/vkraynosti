@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { LayoutDashboard, Map as MapIcon } from 'lucide-react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
@@ -35,7 +36,6 @@ function renderDialog(overrides: Partial<React.ComponentProps<typeof AdminSideba
         onNavigate={vi.fn()}
         onDropOnVisible={vi.fn()}
         onReset={vi.fn()}
-        visibleItemCount={8}
         {...overrides}
         />
       </MemoryRouter>,
@@ -124,6 +124,26 @@ describe('AdminSidebarOverflowDialog', () => {
     fireEvent.click(screen.getByRole('button', { name: ADMIN_UI.overflowNavReset }));
 
     expect(onReset).toHaveBeenCalledTimes(1);
+  });
+
+  it('moves an overflow item to the selected visible target by keyboard', async () => {
+    const user = userEvent.setup();
+    const onKeyboardExchange = vi.fn();
+    renderDialog({
+      visibleItems: [
+        { id: 'dashboard', label: 'Обзор' },
+        { id: 'tours', label: 'Туры' },
+      ],
+      onKeyboardExchange,
+    });
+
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: ADMIN_UI.overflowNavTargetLabel('Лиды') }),
+      'tours',
+    );
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.overflowNavTargetLabel('Лиды') }));
+
+    expect(onKeyboardExchange).toHaveBeenCalledWith('leads', 1);
   });
 
   it('renders nothing when there are no overflow items', () => {

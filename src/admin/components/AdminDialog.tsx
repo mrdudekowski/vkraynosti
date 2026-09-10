@@ -40,13 +40,14 @@ const AdminDialog = ({
 
   useEffect(() => {
     const previous = window.document.activeElement;
+    const restoreTarget = restoreFocusRef?.current;
     const requested =
       initialFocusId != null ? window.document.getElementById(initialFocusId) : null;
     const first =
       requested ?? panelRef.current?.querySelector<HTMLElement>('input, button, select, textarea');
     first?.focus();
     return () => {
-      const target = restoreFocusRef?.current ?? previous;
+      const target = restoreTarget ?? previous;
       if (target instanceof HTMLElement) target.focus();
     };
   }, [initialFocusId, restoreFocusRef]);

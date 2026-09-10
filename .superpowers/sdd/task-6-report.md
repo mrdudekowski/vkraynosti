@@ -80,3 +80,20 @@ Verification:
 - `npm run typecheck`: passed.
 - Exact-file ESLint: passed with one existing hook warning at `AdminDialog.tsx:49` about reading `restoreFocusRef.current` during effect cleanup; no errors.
 - `git diff --check`: passed; only existing LF/CRLF working-copy warnings were emitted.
+
+## Final keyboard fallback pass
+
+Implemented the remaining accessibility review item within the sidebar feature scope:
+
+- Each overflow item now exposes a labeled native select containing the current visible sidebar labels and IDs.
+- Its labeled `Переместить ... в сайдбар` button calls the same visible/overflow exchange path used by drag-and-drop.
+- `AdminChrome` passes visible target IDs/labels and closes the dialog with focus restored to `Ещё` after keyboard exchange.
+- `AdminDialog` captures the restore target before registering cleanup, removing the exhaustive-deps warning without changing focus behavior.
+- Existing click navigation, drag exchange, reset, glassmorphism dialog, desktop-only layout, and mobile/tablet boundaries remain unchanged.
+
+Fresh verification:
+
+- Targeted sidebar suite: 5 files, 54 tests passed.
+- Typecheck: passed, `npm run typecheck`, exit code 0.
+- Exact-file ESLint: passed, exit code 0, no warnings.
+- `git diff --check`: pending immediately before commit.

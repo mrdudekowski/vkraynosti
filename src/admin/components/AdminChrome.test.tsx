@@ -330,4 +330,26 @@ describe('AdminChrome', () => {
     expect(trigger).toHaveFocus();
   });
 
+  it('обменивает overflow-раздел через keyboard target и возвращает фокус на триггер', async () => {
+    const user = userEvent.setup();
+    setPermittedItemCount(9);
+    renderChrome(adminSession);
+    const trigger = screen.getByRole('button', { name: ADMIN_UI.moreNav });
+
+    await user.click(trigger);
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: ADMIN_UI.overflowNavTargetLabel('Дополнительный раздел 2') }),
+      'dashboard',
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: ADMIN_UI.overflowNavTargetLabel('Дополнительный раздел 2'),
+      }),
+    );
+
+    expect(screen.getByRole('link', { name: 'Дополнительный раздел 2' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: ADMIN_UI.dashboardNav })).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
 });

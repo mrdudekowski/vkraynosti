@@ -612,6 +612,13 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             setOverflowDragging(false);
             setSidebarOverflowOpen(false);
           }}
+          onKeyboardExchange={(itemId, visibleIndex) => {
+            exchangeOverflowItem(itemId, visibleIndex);
+            push({ message: ADMIN_UI.overflowNavMoved });
+            overflowDragRef.current = null;
+            setOverflowDragging(false);
+            setSidebarOverflowOpen(false);
+          }}
           onReset={() => {
             resetSidebarLayout();
             push({ message: ADMIN_UI.listReordered });
@@ -620,7 +627,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
           }}
           restoreFocusRef={overflowTriggerRef}
           allowUnderlyingPointerEvents={overflowDragging}
-          visibleItemCount={visibleSidebarItems.length}
+          visibleItems={visibleSidebarItems.map(({ id, label }) => ({ id, label }))}
         />
       ) : null}
       {commandOpen ? <AdminCommandMenu items={items} onClose={() => setCommandOpen(false)} /> : null}

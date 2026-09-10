@@ -18,3 +18,17 @@
 ## Scope
 
 Only the Task 3 component, its focused test, and this report were added. Existing unrelated dirty files were not modified.
+
+## Review follow-up
+
+- Rejected empty and non-canonical visible-item drag payloads before numeric conversion.
+- Runtime-validated overflow drag IDs against `ADMIN_NAV_ITEMS` before invoking `onDropOverflow`.
+- Added item-specific keyboard control names such as `Выше: Туры` and `Ниже: Туры`.
+- Added regression coverage for drag data/effects, unsupported payloads, drag-click navigation suppression, keyboard boundaries, non-first upward movement, and accessible names.
+
+## Review follow-up verification
+
+- Focused Vitest: `7 passed` in `src/admin/components/AdminSidebarNav.test.tsx`.
+- ESLint: passed for both Task 3 source files.
+- `npm run typecheck`: not rerun in the final bounded pass; the interrupted follow-up produced no new evidence. An earlier invocation before this bounded pass completed successfully.
+- `git diff --check`: passed.

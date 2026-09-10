@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import type { AdminNavId, AdminNavItem } from '../constants/nav';
+import { ADMIN_NAV_ITEMS, type AdminNavId, type AdminNavItem } from '../constants/nav';
 import { ADMIN_UI } from '../constants/ui';
 import AdminIcon from './AdminIcon';
 
@@ -21,13 +21,21 @@ type DragPayload =
   | { type: typeof ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE; value: AdminNavId }
   | null;
 
+function isAdminNavId(value: string): value is AdminNavId {
+  return ADMIN_NAV_ITEMS.some((item) => item.id === value);
+}
+
 function readDragPayload(dataTransfer: DataTransfer): DragPayload {
   const overflowId = dataTransfer.getData(ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE);
-  if (overflowId) {
+  if (isAdminNavId(overflowId)) {
     return { type: ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE, value: overflowId as AdminNavId };
   }
 
   const indexValue = dataTransfer.getData(ADMIN_SIDEBAR_ITEM_DRAG_TYPE);
+  if (!/^(0|[1-9]\d*)$/.test(indexValue)) {
+    return null;
+  }
+
   const index = Number(indexValue);
   return Number.isInteger(index) ? { type: ADMIN_SIDEBAR_ITEM_DRAG_TYPE, value: index } : null;
 }
@@ -117,7 +125,7 @@ const AdminSidebarNav = ({
               <button
                 type="button"
                 className="rounded-admin-control p-1 text-text-inverse/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary disabled:opacity-40"
-                aria-label={ADMIN_UI.moveUp}
+                aria-label={`${ADMIN_UI.moveUp}: ${item.label}`}
                 title={`${ADMIN_UI.moveUp}: ${item.label}`}
                 disabled={moveUpDisabled}
                 onClick={() => onReorder?.(index, index - 1)}
@@ -127,7 +135,7 @@ const AdminSidebarNav = ({
               <button
                 type="button"
                 className="rounded-admin-control p-1 text-text-inverse/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary disabled:opacity-40"
-                aria-label={ADMIN_UI.moveDown}
+                aria-label={`${ADMIN_UI.moveDown}: ${item.label}`}
                 title={`${ADMIN_UI.moveDown}: ${item.label}`}
                 disabled={moveDownDisabled}
                 onClick={() => onReorder?.(index, index + 1)}

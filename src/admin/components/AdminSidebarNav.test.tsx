@@ -74,7 +74,45 @@ describe('AdminSidebarNav', () => {
     fireEvent.dragOver(target, { dataTransfer });
     fireEvent.drop(target, { dataTransfer });
 
+    expect(dataTransfer.effectAllowed).toBe('move');
+    expect(dataTransfer.dropEffect).toBe('move');
+    expect(dataTransfer.setData).toHaveBeenCalledWith(
+      'application/x-admin-sidebar-item',
+      '0',
+    );
+    expect(dataTransfer.setData).toHaveBeenCalledWith('text/plain', '0');
     expect(onReorder).toHaveBeenCalledWith(0, 1);
+  });
+
+  it('ignores empty and unsupported drag payloads', () => {
+    const onReorder = vi.fn();
+    const onDropOverflow = vi.fn();
+    renderNav({ onReorder, onDropOverflow });
+    const target = screen.getByRole('link', { name: 'Туры' });
+
+    const emptyPayload = createDataTransfer('text/plain', '');
+    fireEvent.drop(target, { dataTransfer: emptyPayload });
+
+    const unsupportedPayload = createDataTransfer(
+      'application/x-admin-sidebar-overflow',
+      'not-a-nav-id',
+    );
+    fireEvent.drop(target, { dataTransfer: unsupportedPayload });
+
+    expect(onReorder).not.toHaveBeenCalled();
+    expect(onDropOverflow).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate after a drag gesture', () => {
+    const onNavigate = vi.fn();
+    renderNav({ onNavigate });
+    const source = screen.getByRole('link', { name: 'Обзор' });
+    const dataTransfer = createDataTransfer('application/x-admin-sidebar-item', '0');
+
+    fireEvent.dragStart(source, { dataTransfer });
+    fireEvent.click(source);
+
+    expect(onNavigate).not.toHaveBeenCalled();
   });
 
   it('exchanges an overflow item when it is dropped on a visible row', () => {
@@ -93,11 +131,18 @@ describe('AdminSidebarNav', () => {
     const onReorder = vi.fn();
     renderNav({ onReorder });
 
-    const firstMoveUp = screen.getAllByRole('button', { name: ADMIN_UI.moveUp })[0]!;
-    const firstMoveDown = screen.getAllByRole('button', { name: ADMIN_UI.moveDown })[0]!;
+    const firstMoveUp = screen.getByRole('button', { name: `${ADMIN_UI.moveUp}: Обзор` });
+    const firstMoveDown = screen.getByRole('button', { name: `${ADMIN_UI.moveDown}: Обзор` });
+    const secondMoveUp = screen.getByRole('button', { name: `${ADMIN_UI.moveUp}: Туры` });
+    const secondMoveDown = screen.getByRole('button', { name: `${ADMIN_UI.moveDown}: Туры` });
     expect(firstMoveUp).toBeDisabled();
+    expect(secondMoveDown).toBeDisabled();
     await user.click(firstMoveDown);
+    await user.click(secondMoveUp);
 
-    expect(onReorder).toHaveBeenCalledWith(0, 1);
+    expect(onReorder).toHaveBeenNthCalledWith(1, 0, 1);
+    expect(onReorder).toHaveBeenNthCalledWith(2, 1, 0);
+    expect(firstMoveUp).toHaveAttribute('aria-label', 'Выше: Обзор');
+    expect(secondMoveDown).toHaveAttribute('aria-label', 'Ниже: Туры');
   });
 });

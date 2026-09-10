@@ -16,7 +16,8 @@ export interface TourScheduleEvent {
   date: string;
   tourId: string;
   durationType: TourScheduleDurationType;
-  priceRub: number | null;
+  /** @deprecated Legacy in-memory field; never accepted from or emitted to public schedule data. */
+  priceRub?: number | null;
   seats: number | null;
   status: TourScheduleStatus;
   comment: string | null;

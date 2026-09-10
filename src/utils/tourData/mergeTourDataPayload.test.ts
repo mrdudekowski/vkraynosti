@@ -50,7 +50,6 @@ describe('mergeTourDataToSchedulePayload', () => {
     expect(payload.events[0]).toMatchObject({
       tourId: 'summer-3',
       durationType: 'однодневный',
-      priceRub: 8500,
     });
     expect(payload.catalogPublicationStatuses).toEqual({
       'summer-3': 'active',
@@ -76,7 +75,6 @@ describe('mergeTourDataToSchedulePayload', () => {
             status: 'completed',
             comment: null,
             durationType: 'однодневный',
-            overridePriceRub: 6000,
           },
         ],
       },
@@ -88,7 +86,6 @@ describe('mergeTourDataToSchedulePayload', () => {
           date: '2026-07-12',
           tourId: 'summer-9',
           durationType: 'однодневный',
-          priceRub: 6000,
           status: 'completed',
         }),
       ]),
@@ -96,7 +93,7 @@ describe('mergeTourDataToSchedulePayload', () => {
     expect(payload.catalogPublicationStatuses['summer-9']).toBe('hidden');
   });
 
-  it('uses overridePriceRub when provided', () => {
+  it('does not add a price to a schedule event', () => {
     const payload = mergeTourDataToSchedulePayload(toursList, {
       ...schedule,
       events: [
@@ -106,10 +103,10 @@ describe('mergeTourDataToSchedulePayload', () => {
           seats: 12,
           status: 'open',
           comment: null,
-          overridePriceRub: 7900,
         },
       ],
     });
-    expect(payload.events[0]?.priceRub).toBe(7900);
+    expect(payload.events[0]).not.toHaveProperty('priceRub');
+    expect(payload.events[0]).not.toHaveProperty('overridePriceRub');
   });
 });

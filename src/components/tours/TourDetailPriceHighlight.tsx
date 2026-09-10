@@ -25,8 +25,6 @@ export interface TourDetailPriceHighlightProps {
   ariaHidden?: boolean;
   /** Принудительно показать empty state дат (режим «в разработке»). */
   forceDeparturesEmpty?: boolean;
-  /** Не подставлять цену из расписания (всегда `tour.price`). По умолчанию true. */
-  preferCatalogPrice?: boolean;
 }
 
 const formatDepartureDate = (isoDate: string): string =>
@@ -40,12 +38,9 @@ const TourDetailPriceHighlight = ({
   className = "",
   ariaHidden,
   forceDeparturesEmpty = false,
-  preferCatalogPrice = true,
 }: TourDetailPriceHighlightProps) => {
   const { status, events } = useTourSchedule();
-  const { displayPrice, displayPricePrevious } = useTourDisplayPrice(tour, {
-    preferCatalogPrice,
-  });
+  const { displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
 
   const tourEvents = useMemo(
     () => events.filter(event => event.tourId === tour.id),

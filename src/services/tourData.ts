@@ -28,7 +28,6 @@ const scheduleEventSchema = z.object({
   seats: z.number().int().nonnegative().nullable(),
   status: z.enum(['planned', 'open', 'full', 'cancelled', 'completed']),
   comment: z.string().nullable(),
-  overridePriceRub: z.number().nonnegative().optional(),
   durationType: z.enum(['однодневный', 'многодневный']).optional(),
 });
 

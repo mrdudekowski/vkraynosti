@@ -268,7 +268,6 @@ export function toGuestSchedulePayload(
       date: departure.startsOn,
       tourId: departure.tourId,
       durationType: guestDurationType(tour.durationDays),
-      priceRub: guestPriceRub(tour.price),
       seats: departure.seats,
       status: departure.status,
       comment: null,
@@ -352,7 +351,6 @@ export function toGuestTourDataFiles(
         status: event.status,
         comment: event.comment,
         durationType: event.durationType,
-        ...(event.priceRub == null ? {} : { overridePriceRub: event.priceRub }),
       })),
     },
   };

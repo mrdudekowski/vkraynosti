@@ -34,9 +34,6 @@ export const mergeTourDataToSchedulePayload = (
     }
     catalogPublicationStatuses[event.tourId] = 'hidden';
     catalogDurationTypes[event.tourId] = offSite.durationType;
-    if (offSite.priceRub != null) {
-      catalogPrices[event.tourId] = offSite.priceRub;
-    }
     events.push(offSite);
   }
 
@@ -55,7 +52,6 @@ export const hydrateScheduleEvent = (
   date: event.date,
   tourId: event.tourId,
   durationType: tour.durationType,
-  priceRub: event.overridePriceRub ?? tour.priceRub,
   seats: event.seats,
   status: event.status,
   comment: event.comment,
@@ -69,7 +65,6 @@ const hydrateOffSiteScheduleEvent = (event: ScheduleEvent): TourScheduleEvent | 
     date: event.date,
     tourId: event.tourId,
     durationType: event.durationType,
-    priceRub: event.overridePriceRub ?? null,
     seats: event.seats,
     status: event.status,
     comment: event.comment,

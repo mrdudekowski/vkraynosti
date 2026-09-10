@@ -41,9 +41,12 @@ const TourCardDuration = ({ tour }: TourCardPriceProps) => {
 };
 
 const TourCardPrice = ({ tour }: TourCardPriceProps) => {
-  const { priceRub, displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
+  const { displayPrice, displayPricePrevious } = useTourDisplayPrice(tour);
   const winterStruck = winterCardStruckPrice(tour);
-  const showWinterInquiry = tour.season === 'winter' && priceRub == null;
+  const showWinterInquiry =
+    tour.season === 'winter' &&
+    (displayPrice === UI.tourCard.winterPriceLead ||
+      displayPrice === UI.tourCard.winterPricePlaceholderNoListing);
 
   if (showWinterInquiry) {
     return (

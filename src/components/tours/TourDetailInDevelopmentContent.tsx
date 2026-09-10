@@ -15,7 +15,6 @@ const TourDetailInDevelopmentContent = ({
   const priceHighlightProps = {
     tour,
     forceDeparturesEmpty: true,
-    preferCatalogPrice: false,
   } as const;
 
   return (

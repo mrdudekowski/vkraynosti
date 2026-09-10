@@ -24,6 +24,7 @@ import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
 import TourDetailPriceHighlight from "../components/tours/TourDetailPriceHighlight";
 import TourIncludedIconList from "../components/tours/TourIncludedIconList";
 import TourProgramDaySeparator from "../components/tours/TourProgramDaySeparator";
+import { hasMultipleTourProgramDays } from "../utils/tourProgram/hasMultipleTourProgramDays";
 import RevealBox from "../components/shared/RevealBox";
 import SeasonPageBackdrop from "../components/seasons/SeasonPageBackdrop";
 import { BREAKPOINT_LG_PX } from "../constants/reveal";
@@ -85,6 +86,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     updateKey: `${mountedStepCount}-${mountedFooter ? 'footer' : 'steps'}-${revealedCount}-${showProgramFooter ? 'footer-on' : 'footer-off'}`,
   });
   const mountedProgramSteps = tour.program.slice(0, mountedStepCount);
+  const hasMultipleProgramDays = hasMultipleTourProgramDays(tour.program);
   const activeProgramStepRefIndex = getTourProgramActiveStepRefIndex({
     revealedCount,
     mountedStepCount,
@@ -425,7 +427,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
 
                         return (
                           <Fragment key={`${step.timeLabel}-${idx}`}>
-                            {isDayStart && (
+                            {hasMultipleProgramDays && isDayStart && (
                               <TourProgramDaySeparator
                                 step={step}
                                 season={tour.season}

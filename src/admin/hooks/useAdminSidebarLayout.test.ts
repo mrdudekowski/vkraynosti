@@ -63,6 +63,30 @@ describe('useAdminSidebarLayout', () => {
     expect(result.current.layout).toEqual(createDefaultAdminSidebarLayout(makeItems()));
   });
 
+  it('loads persisted layout when enabled changes after mount', () => {
+    window.localStorage.setItem(
+      ADMIN_SIDEBAR_LAYOUT_STORAGE_KEY,
+      JSON.stringify({
+        visibleOrder: ['analytics', 'dashboard'],
+        overflowOrder: ['tours'],
+      }),
+    );
+
+    const { result, rerender } = renderHook(
+      ({ enabled }) => useAdminSidebarLayout(makeItems(), enabled),
+      { initialProps: { enabled: false } },
+    );
+
+    expect(result.current.layout).toEqual(createDefaultAdminSidebarLayout(makeItems()));
+
+    rerender({ enabled: true });
+
+    expect(result.current.layout).toEqual({
+      visibleOrder: ['analytics', 'dashboard', ...fixtureIds.slice(1, 7)],
+      overflowOrder: ['reports'],
+    });
+  });
+
   it('removes forbidden IDs and appends newly permitted IDs canonically', () => {
     window.localStorage.setItem(
       ADMIN_SIDEBAR_LAYOUT_STORAGE_KEY,
@@ -137,5 +161,56 @@ describe('useAdminSidebarLayout', () => {
       visibleOrder: [...fixtureIds.slice(0, 8)],
       overflowOrder: ['analytics'],
     });
+  });
+
+  it('persists permission-removal normalization when permitted items change', () => {
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
+    const { rerender } = renderHook(
+      ({ items }) => useAdminSidebarLayout(items, true),
+      { initialProps: { items: makeItems() } },
+    );
+
+    expect(setItemSpy).not.toHaveBeenCalled();
+    rerender({ items: makeItems(fixtureIds.slice(0, 8)) });
+
+    expect(setItemSpy).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(setItemSpy.mock.calls[0][1])).toEqual({
+      visibleOrder: [...fixtureIds.slice(0, 8)],
+      overflowOrder: [],
+    });
+  });
+
+  it('does not write for no-op reorder, invalid exchange, or no-op reset', () => {
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
+    const { result } = renderHook(() => useAdminSidebarLayout(makeItems(), true));
+
+    act(() => result.current.setVisibleOrder(0, 0));
+    act(() => result.current.exchangeOverflowItem('analytics' as AdminNavId, -1));
+    act(() => result.current.reset());
+
+    expect(setItemSpy).not.toHaveBeenCalled();
+  });
+
+  it('survives localStorage read failures', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('read failed');
+    });
+
+    const { result } = renderHook(() => useAdminSidebarLayout(makeItems(), true));
+
+    expect(result.current.layout).toEqual(createDefaultAdminSidebarLayout(makeItems()));
+  });
+
+  it('survives localStorage write failures', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('write failed');
+    });
+
+    const { result } = renderHook(() => useAdminSidebarLayout(makeItems(), true));
+
+    expect(() => {
+      act(() => result.current.setVisibleOrder(0, 1));
+    }).not.toThrow();
+    expect(result.current.layout.visibleOrder.slice(0, 2)).toEqual(['tours', 'dashboard']);
   });
 });

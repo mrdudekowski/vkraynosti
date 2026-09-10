@@ -104,3 +104,58 @@ Git emitted existing LF-to-CRLF warnings for unrelated dirty files when status/d
 ## Commit
 
 Commit message: `feat(admin): persist sidebar layout`
+
+## Follow-up fix for review findings (2026-09-10)
+
+### Scope
+
+Only the Task 2 hook and its focused test were changed for the review fix. Task 1 helpers and unrelated dirty files were preserved.
+
+### Changes
+
+- Added an `enabled` transition guard with `useRef`.
+- When the hook changes from `enabled=false` to `enabled=true`, it reads `admin.sidebar.layout.v1`, normalizes it against the current permitted items, and replaces the default in-memory layout.
+- Added regression coverage for delayed enabling.
+- Added coverage for `localStorage.getItem` and `setItem` exceptions.
+- Added coverage proving no-op reorder, invalid exchange, and no-op reset do not write.
+- Added coverage proving permission-removal normalization is persisted when the permitted catalog changes.
+
+### TDD evidence
+
+Regression command before the production fix:
+
+```text
+npm run test -- src/admin/hooks/useAdminSidebarLayout.test.ts
+```
+
+Result: failed as expected, with the delayed-enable test retaining the canonical default instead of loading the persisted layout (`1 failed, 9 passed`).
+
+### Fresh verification
+
+Focused hook test:
+
+```text
+npm run test -- src/admin/hooks/useAdminSidebarLayout.test.ts
+```
+
+Result: `1` test file passed, `10` tests passed, exit code `0`.
+
+Typecheck:
+
+```text
+npm run typecheck
+```
+
+Result: `tsc -b` passed, exit code `0`.
+
+Diff check:
+
+```text
+git diff --check
+```
+
+Result: passed, exit code `0`; Git only reported existing LF-to-CRLF conversion warnings.
+
+### Review status
+
+The P2 enabled-transition finding and all P3 storage/no-op/persistence coverage findings are addressed. The follow-up remains limited to the hook, its tests, and this append-only evidence update; no unrelated files were modified.

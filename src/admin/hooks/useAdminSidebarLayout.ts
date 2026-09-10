@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import type { AdminNavId, AdminNavItem } from '../constants/nav';
 import {
   type AdminSidebarLayout,
@@ -57,11 +57,22 @@ export function useAdminSidebarLayout(
   reset: () => void;
 } {
   const [layout, setLayout] = useState<AdminSidebarLayout>(() => readLayout(items, enabled));
+  const previousEnabled = useRef(enabled);
 
   useEffect(() => {
+    const enabledAfterMount = enabled && !previousEnabled.current;
+    previousEnabled.current = enabled;
+
+    if (enabledAfterMount) {
+      startTransition(() => setLayout(readLayout(items, true)));
+      return;
+    }
+
     const normalized = normalizeAdminSidebarLayout(layout, items);
     if (layoutsEqual(layout, normalized)) return;
 
+    // The catalog changed externally; synchronize the normalized layout once.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLayout(normalized);
     if (enabled) writeLayout(normalized);
   }, [items, enabled, layout]);

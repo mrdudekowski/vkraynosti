@@ -131,6 +131,10 @@ export function parseSiteContentDocument(
 export function parseSiteContentDocument(
   kind: SiteContentDocumentKind,
   input: unknown,
+): SiteContentDocument;
+export function parseSiteContentDocument(
+  kind: SiteContentDocumentKind,
+  input: unknown,
 ): SiteContentDocument {
   if (kind === 'team') return teamContentDocumentSchema.parse(input);
   if (kind === 'contacts') return contactsContentDocumentSchema.parse(input);

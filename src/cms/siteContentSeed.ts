@@ -7,7 +7,6 @@ import type {
   ContactsContentDocument,
   FooterContentDocument,
   SiteContentAsset,
-  SiteContentDocument,
   TeamContentDocument,
 } from './siteContentDocument';
 
@@ -130,6 +129,6 @@ function locationOrigin(): string {
   return typeof window === 'undefined' ? 'http://localhost' : window.location.origin;
 }
 
-export function seedSiteContentDocuments(): Record<'team' | 'contacts' | 'footer', SiteContentDocument> {
+export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument } {
   return { team, contacts, footer };
 }

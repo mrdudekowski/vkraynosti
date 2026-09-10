@@ -9,6 +9,7 @@ import { RouterProvider } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ModalProvider } from './context/ModalContext';
 import { SeasonProvider } from './context/SeasonContext';
+import { SiteContentProvider } from './context/SiteContentContext';
 import { CmsToursProvider } from './cms/CmsToursProvider';
 import { TourScheduleProvider } from './context/TourScheduleContext';
 import ErrorBoundary from './components/errors/ErrorBoundary';
@@ -30,6 +31,7 @@ createRoot(document.getElementById('root')!).render(
       <ErrorBoundary>
         <HelmetProvider>
           <SeasonProvider>
+            <SiteContentProvider>
             <CmsToursProvider>
               <TourScheduleProvider>
                 <ModalProvider>
@@ -37,6 +39,7 @@ createRoot(document.getElementById('root')!).render(
                 </ModalProvider>
               </TourScheduleProvider>
             </CmsToursProvider>
+            </SiteContentProvider>
           </SeasonProvider>
         </HelmetProvider>
       </ErrorBoundary>

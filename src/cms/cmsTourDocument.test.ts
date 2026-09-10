@@ -62,6 +62,18 @@ describe('cmsToursFileSchema', () => {
     expect(parsed.success).toBe(true);
   });
 
+  it('принимает SEO-поля тура и сохраняет legacy seoDescription', () => {
+    const parsed = cmsToursFileSchema.safeParse({
+      schemaVersion: 1,
+      tours: [{ ...validTour, seoDescription: 'Старое описание', seo: { title: 'SEO title', description: 'SEO description', h1: 'SEO H1' } }],
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.tours[0]?.seo).toEqual({ title: 'SEO title', description: 'SEO description', h1: 'SEO H1' });
+      expect(parsed.data.tours[0]?.seoDescription).toBe('Старое описание');
+    }
+  });
+
   it('отклоняет блок с неверным числом слотов', () => {
     const parsed = cmsToursFileSchema.safeParse({
       schemaVersion: 1,

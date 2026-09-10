@@ -69,6 +69,39 @@ describe('adminSidebarLayout', () => {
     expect(result.overflowOrder).toEqual(['site', 'reports']);
   });
 
+  it('appends newly permitted IDs canonically and keeps the exact-once union', () => {
+    const previouslyPermitted = fixtureItems.slice(0, 9);
+    const saved = {
+      visibleOrder: ids.slice(0, 8),
+      overflowOrder: [ids[8]],
+    };
+
+    const result = normalizeAdminSidebarLayout(saved, fixtureItems);
+
+    expect(result).toEqual({
+      visibleOrder: ids.slice(0, 8),
+      overflowOrder: [ids[8], ids[9]],
+    });
+    expect([...result.visibleOrder, ...result.overflowOrder]).toEqual([...ids]);
+    expect(
+      normalizeAdminSidebarLayout(
+        { visibleOrder: ids.slice(0, 8), overflowOrder: [ids[8]] },
+        [...previouslyPermitted, fixtureItems[9]],
+      ),
+    ).toEqual(result);
+  });
+
+  it('deduplicates permitted IDs, including malformed-save fallback', () => {
+    const duplicatedItems = [...fixtureItems, fixtureItems[0], fixtureItems[8]];
+
+    expect(createDefaultAdminSidebarLayout(duplicatedItems)).toEqual(
+      createDefaultAdminSidebarLayout(fixtureItems),
+    );
+    expect(normalizeAdminSidebarLayout(null, duplicatedItems)).toEqual(
+      createDefaultAdminSidebarLayout(fixtureItems),
+    );
+  });
+
   it('treats malformed saved values as an empty layout', () => {
     expect(normalizeAdminSidebarLayout(null, fixtureItems)).toEqual(
       createDefaultAdminSidebarLayout(fixtureItems),
@@ -87,6 +120,10 @@ describe('adminSidebarLayout', () => {
     });
     expect(reorderVisibleAdminSidebarItem(layout, -1, 2)).toEqual(layout);
     expect(reorderVisibleAdminSidebarItem(layout, 0, 8)).toEqual(layout);
+    expect(reorderVisibleAdminSidebarItem(layout, Number.NaN, 2)).toEqual(layout);
+    expect(reorderVisibleAdminSidebarItem(layout, 0, Number.POSITIVE_INFINITY)).toEqual(layout);
+    expect(reorderVisibleAdminSidebarItem(layout, 0, 1.5)).toEqual(layout);
+    expect(reorderVisibleAdminSidebarItem(layout, 1.5, 2)).toEqual(layout);
   });
 
   it('exchanges an overflow item with the visible target and preserves overflow order', () => {
@@ -99,6 +136,9 @@ describe('adminSidebarLayout', () => {
     expect(exchangeAdminSidebarItem(layout, 'missing' as AdminNavId, 2)).toEqual(layout);
     expect(exchangeAdminSidebarItem(layout, ids[8], -1)).toEqual(layout);
     expect(exchangeAdminSidebarItem(layout, ids[8], 8)).toEqual(layout);
+    expect(exchangeAdminSidebarItem(layout, ids[8], Number.NaN)).toEqual(layout);
+    expect(exchangeAdminSidebarItem(layout, ids[8], Number.POSITIVE_INFINITY)).toEqual(layout);
+    expect(exchangeAdminSidebarItem(layout, ids[8], 1.5)).toEqual(layout);
   });
 
   it('returns a canonical reset layout', () => {

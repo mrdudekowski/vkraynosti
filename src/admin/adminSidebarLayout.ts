@@ -18,10 +18,23 @@ const copyLayout = (layout: AdminSidebarLayout): AdminSidebarLayout => ({
   overflowOrder: [...layout.overflowOrder],
 });
 
+const getCanonicalIds = (items: readonly AdminNavItem[]): AdminNavId[] => {
+  const seen = new Set<AdminNavId>();
+  const ids: AdminNavId[] = [];
+
+  for (const { id } of items) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+
+  return ids;
+};
+
 export function createDefaultAdminSidebarLayout(
   items: readonly AdminNavItem[],
 ): AdminSidebarLayout {
-  const ids = items.map(({ id }) => id);
+  const ids = getCanonicalIds(items);
   return {
     visibleOrder: ids.slice(0, ADMIN_SIDEBAR_VISIBLE_LIMIT),
     overflowOrder: ids.slice(ADMIN_SIDEBAR_VISIBLE_LIMIT),
@@ -37,7 +50,8 @@ export function normalizeAdminSidebarLayout(
     return fallback;
   }
 
-  const permittedIds = new Set(items.map(({ id }) => id));
+  const canonicalIds = getCanonicalIds(items);
+  const permittedIds = new Set(canonicalIds);
   const seen = new Set<AdminNavId>();
   const orderedIds: AdminNavId[] = [];
 
@@ -49,7 +63,7 @@ export function normalizeAdminSidebarLayout(
     orderedIds.push(id);
   }
 
-  for (const { id } of items) {
+  for (const id of canonicalIds) {
     if (seen.has(id)) continue;
     seen.add(id);
     orderedIds.push(id);
@@ -67,6 +81,8 @@ export function reorderVisibleAdminSidebarItem(
   toIndex: number,
 ): AdminSidebarLayout {
   if (
+    !Number.isInteger(fromIndex) ||
+    !Number.isInteger(toIndex) ||
     fromIndex < 0 ||
     fromIndex >= layout.visibleOrder.length ||
     toIndex < 0 ||
@@ -87,6 +103,7 @@ export function exchangeAdminSidebarItem(
   visibleIndex: number,
 ): AdminSidebarLayout {
   if (
+    !Number.isInteger(visibleIndex) ||
     visibleIndex < 0 ||
     visibleIndex >= layout.visibleOrder.length ||
     !layout.overflowOrder.includes(overflowId)

@@ -13,8 +13,19 @@ export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
   const [value, setValue] = useState<SiteContentValue>(fallback);
   useEffect(() => {
     let alive = true;
-    void Promise.all([loadPublishedSiteContent('team'), loadPublishedSiteContent('contacts'), loadPublishedSiteContent('footer'), loadPublishedSiteContent('modal')]).then(([team, contacts, footer, modal]) => {
-      if (alive && team?.kind === 'team' && contacts?.kind === 'contacts' && footer?.kind === 'footer' && modal?.kind === 'modal') setValue({ team, contacts, footer, modal });
+    void Promise.all([
+      loadPublishedSiteContent('team'),
+      loadPublishedSiteContent('contacts'),
+      loadPublishedSiteContent('footer'),
+      loadPublishedSiteContent('modal'),
+    ]).then(([team, contacts, footer, modal]) => {
+      if (!alive) return;
+      setValue({
+        team: team?.kind === 'team' ? team : fallback.team,
+        contacts: contacts?.kind === 'contacts' ? contacts : fallback.contacts,
+        footer: footer?.kind === 'footer' ? footer : fallback.footer,
+        modal: modal?.kind === 'modal' ? modal : fallback.modal,
+      });
     }).catch(() => undefined);
     return () => { alive = false; };
   }, []);

@@ -48,6 +48,7 @@ describe('AdminSidebarOverflowDialog', () => {
     renderDialog();
 
     expect(screen.getByRole('dialog', { name: ADMIN_UI.overflowNavTitle })).toBeInTheDocument();
+    expect(screen.getByLabelText(`${ADMIN_UI.moreNav} (2)`)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Сайт' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Лиды' })).toBeInTheDocument();
     expect(screen.getByText(ADMIN_UI.overflowNavDragHint)).toBeInTheDocument();
@@ -70,7 +71,7 @@ describe('AdminSidebarOverflowDialog', () => {
 
     unmount();
     const next = renderDialog();
-    fireEvent.click(screen.getAllByRole('button', { name: ADMIN_UI.overflowNavClose })[1]!);
+    fireEvent.click(screen.getAllByRole('button', { name: ADMIN_UI.overflowNavClose })[0]!);
     expect(next.onClose).toHaveBeenCalledTimes(1);
 
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -84,6 +85,8 @@ describe('AdminSidebarOverflowDialog', () => {
     const dataTransfer = {
       effectAllowed: '',
       setData: vi.fn(),
+      getData: vi.fn(() => 'leads'),
+      dropEffect: 'move',
     } as unknown as DataTransfer;
 
     fireEvent.dragStart(link, { dataTransfer });
@@ -94,6 +97,23 @@ describe('AdminSidebarOverflowDialog', () => {
       'leads',
     );
     expect(dataTransfer.setData).toHaveBeenCalledWith('text/plain', 'leads');
+
+    fireEvent.dragEnd(link, { dataTransfer });
+
+    expect(onDropOnVisible).toHaveBeenCalledWith('leads');
+  });
+
+  it('ignores a valid canonical ID that is not currently in overflow', () => {
+    const onDropOnVisible = vi.fn();
+    renderDialog({ onDropOnVisible });
+    const link = screen.getByRole('link', { name: 'Лиды' });
+    const dataTransfer = {
+      getData: vi.fn(() => 'dashboard'),
+      dropEffect: 'move',
+    } as unknown as DataTransfer;
+
+    fireEvent.dragEnd(link, { dataTransfer });
+
     expect(onDropOnVisible).not.toHaveBeenCalled();
   });
 

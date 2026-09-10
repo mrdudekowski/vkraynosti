@@ -25,9 +25,10 @@ const AdminSidebarOverflowDialog = ({
   onNavigate,
   onDropOnVisible,
   onReset,
-  visibleItemCount,
 }: AdminSidebarOverflowDialogProps) => {
   if (items.length === 0) return null;
+
+  const overflowItemIds = new Set(items.map((item) => item.id));
 
   return (
     <AdminDialog
@@ -40,7 +41,7 @@ const AdminSidebarOverflowDialog = ({
       <p className="mb-3 text-sm text-text-secondary">{ADMIN_UI.overflowNavDragHint}</p>
       <div
         className="grid gap-2 sm:grid-cols-2"
-        aria-label={`${ADMIN_UI.moreNav} (${visibleItemCount})`}
+        aria-label={`${ADMIN_UI.moreNav} (${items.length})`}
       >
         {items.map((item) => (
           <NavLink
@@ -61,7 +62,11 @@ const AdminSidebarOverflowDialog = ({
             }}
             onDragEnd={(event) => {
               const payload = event.dataTransfer.getData(ADMIN_SIDEBAR_OVERFLOW_DRAG_TYPE);
-              if (event.dataTransfer.dropEffect === 'move' && isAdminNavId(payload)) {
+              if (
+                event.dataTransfer.dropEffect === 'move' &&
+                isAdminNavId(payload) &&
+                overflowItemIds.has(payload)
+              ) {
                 onDropOnVisible(payload);
               }
             }}

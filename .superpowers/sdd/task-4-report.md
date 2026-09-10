@@ -28,3 +28,12 @@ Implemented and committed as `feat(admin): add sidebar overflow dialog`.
 
 - Full typecheck and diff-check remain to be run by the parent integration task.
 - `onDropOnVisible` is emitted after a successful native drag operation via `dropEffect === 'move'`; the parent integration task supplies the visible-slot exchange handling.
+
+## Review follow-up evidence
+
+- Restricted drag-end acceptance to IDs present in the current `items` overflow collection; canonical IDs outside that collection are ignored.
+- Corrected the backdrop test to click the backdrop control and added coverage for a successful exchange callback and an invalid/stale payload.
+- Corrected the overflow container label to report `items.length` rather than `visibleItemCount`.
+- Focused test: `npm run test -- src/admin/components/AdminSidebarOverflowDialog.test.tsx` — passed, 7/7.
+- Targeted ESLint: `npx eslint src/admin/components/AdminSidebarOverflowDialog.tsx src/admin/components/AdminSidebarOverflowDialog.test.tsx src/admin/constants/ui.ts` — passed.
+- Skipped by request: full typecheck and diff-check.

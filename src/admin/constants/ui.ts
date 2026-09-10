@@ -312,7 +312,7 @@ export const ADMIN_UI = {
   usersNav: 'Люди',
   siteNav: 'Сайт',
   siteContentPermission: 'Изменение сайта',
-  siteDescription: 'Команда, контакты и подвал сайта.',
+  siteDescription: 'Команда, контакты, подвал и модалки сайта.',
   usersTitle: 'Пользователи админки',
   usersDescription: 'Кто может править черновики и публиковать.',
   usersEmpty: 'Пока никого нет',

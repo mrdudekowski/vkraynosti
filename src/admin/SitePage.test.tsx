@@ -31,7 +31,7 @@ describe('SitePage', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Контакты' }));
 
     expect(await screen.findByRole('tabpanel')).toHaveAttribute('id', 'admin-panel-contacts');
-    expect(window.location.hash).toBe('#/site');
+    expect(window.location.hash).toBe('#/site?tab=contacts');
   });
 
   it('supports roving keyboard navigation for tabs', async () => {
@@ -50,20 +50,88 @@ describe('SitePage', () => {
       meta: { rev: 2 },
     } as never));
     render(<SitePage />);
-    fireEvent.click(await screen.findByRole('tab', { name: 'Модальная заявка' }));
-    await screen.findByRole('tabpanel', { name: 'Модальная заявка' });
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Активный режим модалки' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+    fireEvent.click(await screen.findByRole('tab', { name: 'Модалки' }));
+    await screen.findByRole('tabpanel', { name: 'Модалки' });
+    fireEvent.click(screen.getByRole('radio', { name: 'Контакты' }));
+    fireEvent.click(screen.getByRole('button', { name: /Сохранить черновик/ }));
     await waitFor(() => expect(adminSaveSiteContent).toHaveBeenCalledWith('modal', 1, expect.objectContaining({ requestFormEnabled: false })));
   });
 
-  it('switches the editable modal content with the cards and toggle', async () => {
+  it('switches the editable modal content with the mode selector', async () => {
     render(<SitePage />);
-    fireEvent.click(await screen.findByRole('tab', { name: 'Модальная заявка' }));
-    await screen.findByText('Содержимое модалки «Заявка»');
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Активный режим модалки' }));
+    fireEvent.click(await screen.findByRole('tab', { name: 'Модалки' }));
+    await screen.findByText('Форма заявки');
+    fireEvent.click(screen.getByRole('radio', { name: 'Контакты' }));
     expect(await screen.findByText('Содержимое модалки «Контакты»')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Активный режим модалки' }));
-    expect(await screen.findByText('Содержимое модалки «Заявка»')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: 'Заявка' }));
+    expect(await screen.findByText('Форма заявки')).toBeInTheDocument();
+  });
+
+  it('exposes the active mode, complete page copy, and a truthful request preview', async () => {
+    render(<SitePage />);
+    expect(screen.getByText(/Команда, контакты, подвал и модалки/)).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole('tab', { name: 'Модалки' }));
+
+    expect(await screen.findByRole('radiogroup', { name: 'Режим CTA' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Заявка' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByText('Активный режим: Заявка')).toBeInTheDocument();
+    expect(screen.getByText('Форма заявки')).toBeInTheDocument();
+    expect(screen.getByText('Имя')).toBeInTheDocument();
+    expect(screen.getByText('Телефон')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Отправить заявку' })).toBeDisabled();
+    expect(screen.queryByText(/Карточки ниже/)).not.toBeInTheDocument();
+  });
+
+  it('moves keyboard focus when roving through site tabs', async () => {
+    render(<SitePage />);
+    const teamTab = await screen.findByRole('tab', { name: 'Команда' });
+    teamTab.focus();
+    fireEvent.keyDown(teamTab, { key: 'ArrowRight' });
+
+    await waitFor(() => expect(screen.getByRole('tab', { name: 'Контакты' })).toHaveFocus());
+  });
+
+  it('makes the publication scope and actions explicit for modal CTA changes', async () => {
+    render(<SitePage />);
+    fireEvent.click(await screen.findByRole('tab', { name: 'Модалки' }));
+
+    expect(screen.getByRole('button', { name: /Сохранить черновик/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Опубликовать на сайте/ })).toBeInTheDocument();
+    expect(await screen.findByText(/Изменение применяется ко всем CTA/)).toBeInTheDocument();
+  });
+
+  it('keeps the modal editor when contact preview loading fails', async () => {
+    vi.mocked(adminGetSiteContent).mockImplementation(async (kind) => {
+      if (kind === 'contacts') throw new Error('site_content_load_failed');
+      return { document: kind === 'modal' ? modal : kind === 'team' ? team : footer, meta: { rev: 1 } } as never;
+    });
+
+    render(<SitePage />);
+    fireEvent.click(await screen.findByRole('tab', { name: 'Модалки' }));
+
+    expect(await screen.findByText('Форма заявки')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: 'Контакты' }));
+    expect(await screen.findByText(/Каналы контактов недоступны/)).toBeInTheDocument();
+  });
+
+  it('opens the modal tab from the site route query without replacing the route', async () => {
+    window.location.hash = '#/site?tab=modal';
+    render(<SitePage />);
+
+    expect(await screen.findByRole('tabpanel', { name: 'Модалки' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/site?tab=modal');
+  });
+
+  it('gives contact visibility controls a contextual accessible name', async () => {
+    const channelContacts = { ...contacts, channels: [{ id: 'telegram', label: 'Telegram', href: 'https://t.me/example', type: 'telegram', visible: true, order: 0 }] };
+    vi.mocked(adminGetSiteContent).mockImplementation(async (kind) => ({
+      document: kind === 'contacts' ? channelContacts : kind === 'team' ? team : kind === 'modal' ? modal : footer,
+      meta: { rev: 1 },
+    } as never));
+    render(<SitePage />);
+    fireEvent.click(await screen.findByRole('tab', { name: 'Контакты' }));
+
+    expect(await screen.findByRole('checkbox', { name: 'Показывать Telegram' })).toBeInTheDocument();
+    expect(screen.getByDisplayValue('https://t.me/example')).toBeVisible();
   });
 });

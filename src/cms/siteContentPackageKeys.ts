@@ -17,4 +17,3 @@ export function siteContentPublishedKey(kind: SiteContentDocumentKind): string {
 export function siteContentMediaPrefix(kind: SiteContentDocumentKind): string {
   return `media/site-content/${kind}`;
 }
-

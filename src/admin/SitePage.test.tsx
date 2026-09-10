@@ -56,4 +56,14 @@ describe('SitePage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
     await waitFor(() => expect(adminSaveSiteContent).toHaveBeenCalledWith('modal', 1, expect.objectContaining({ requestFormEnabled: false })));
   });
+
+  it('switches the editable modal content with the cards and toggle', async () => {
+    render(<SitePage />);
+    fireEvent.click(await screen.findByRole('tab', { name: 'Модальная заявка' }));
+    await screen.findByText('Содержимое модалки «Заявка»');
+    fireEvent.click(screen.getByText('Контакты', { selector: 'strong' }).closest('button')!);
+    expect(await screen.findByText('Содержимое модалки «Контакты»')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Активный режим модалки' }));
+    expect(await screen.findByText('Содержимое модалки «Заявка»')).toBeInTheDocument();
+  });
 });

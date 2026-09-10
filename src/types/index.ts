@@ -4,6 +4,7 @@ import type { TourScheduleDurationType } from './tourSchedule';
 import type { TourCoverCrop } from '../utils/mediaObjectPosition';
 
 export interface TourProgramStep {
+  day?: number;
   timeLabel: string;
   description: string;
 }

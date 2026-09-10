@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties } from "react";
+import { Fragment, useRef, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons/faCircleQuestion';
@@ -23,6 +23,7 @@ import TourDetailSectionHeading from "../components/tours/TourDetailSectionHeadi
 import TourDetailMetaFacts from "../components/tours/TourDetailMetaFacts";
 import TourDetailPriceHighlight from "../components/tours/TourDetailPriceHighlight";
 import TourIncludedIconList from "../components/tours/TourIncludedIconList";
+import TourProgramDaySeparator from "../components/tours/TourProgramDaySeparator";
 import RevealBox from "../components/shared/RevealBox";
 import SeasonPageBackdrop from "../components/seasons/SeasonPageBackdrop";
 import { BREAKPOINT_LG_PX } from "../constants/reveal";
@@ -417,36 +418,49 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                     style={programTrackStyle}
                   >
                     <ol className="border-l border-divider pl-4 ml-2 space-y-6">
-                      {mountedProgramSteps.map((step, idx) => (
-                        <li
-                          key={`${step.timeLabel}-${idx}`}
-                          ref={
-                            activeProgramStepRefIndex === idx
-                              ? (node) => {
-                                  activeProgramItemRef.current = node;
-                                }
-                              : undefined
-                          }
-                          className={[
-                            'flex gap-3',
-                            getTourProgramStepRevealClassName(idx < revealedCount),
-                          ].join(' ')}
-                        >
-                          <FontAwesomeIcon
-                            icon={faClock}
-                            className="text-brand-primary mt-1 shrink-0"
-                            aria-hidden
-                          />
-                          <div>
-                            <p className="text-tooltip text-text-muted">
-                              {step.timeLabel}
-                            </p>
-                            <p className="text-tour-detail-program-body text-text-muted">
-                              {step.description}
-                            </p>
-                          </div>
-                        </li>
-                      ))}
+                      {mountedProgramSteps.map((step, idx) => {
+                        const currentDay = step.day ?? 1;
+                        const previousDay = mountedProgramSteps[idx - 1]?.day ?? 1;
+                        const isDayStart = idx === 0 || currentDay !== previousDay;
+
+                        return (
+                          <Fragment key={`${step.timeLabel}-${idx}`}>
+                            {isDayStart && (
+                              <TourProgramDaySeparator
+                                step={step}
+                                season={tour.season}
+                              />
+                            )}
+                            <li
+                              ref={
+                                activeProgramStepRefIndex === idx
+                                  ? (node) => {
+                                      activeProgramItemRef.current = node;
+                                    }
+                                  : undefined
+                              }
+                              className={[
+                                'flex gap-3',
+                                getTourProgramStepRevealClassName(idx < revealedCount),
+                              ].join(' ')}
+                            >
+                              <FontAwesomeIcon
+                                icon={faClock}
+                                className="text-brand-primary mt-1 shrink-0"
+                                aria-hidden
+                              />
+                              <div>
+                                <p className="text-tooltip text-text-muted">
+                                  {step.timeLabel}
+                                </p>
+                                <p className="text-tour-detail-program-body text-text-muted">
+                                  {step.description}
+                                </p>
+                              </div>
+                            </li>
+                          </Fragment>
+                        );
+                      })}
                     </ol>
                     {mountedFooter && (
                       <div

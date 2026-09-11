@@ -596,12 +596,13 @@
       motion-reduce:transition-none;
   }
 
-  .admin-btn-primary {
+  .admin-btn-primary,
+  .admin-btn-publish {
     @apply admin-btn bg-brand-primary text-text-inverse hover:bg-brand-primary/90 active:bg-brand-primary/80;
   }
 
   .admin-btn-publish {
-    @apply admin-btn bg-brand-primary px-4 font-semibold text-text-inverse hover:bg-brand-primary/90 active:bg-brand-primary/80;
+    @apply px-4 font-semibold;
   }
 
   .admin-btn-secondary {

@@ -33,6 +33,7 @@ function textPatchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
     difficultyDisplayLabel: document.difficultyDisplayLabel ?? '',
     metaAudienceLabel: document.metaAudienceLabel ?? '',
     price: document.price,
+    priceFrom: document.priceFrom ?? false,
     pricePrevious: document.pricePrevious ?? '',
     priceFootnote: document.priceFootnote ?? '',
     seoDescription: document.seoDescription ?? '',

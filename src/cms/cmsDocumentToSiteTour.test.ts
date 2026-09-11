@@ -75,6 +75,12 @@ describe('cmsDocumentToSiteTour', () => {
     expect(tour.includedInPrice[0]?.text).toBe('Трансфер');
   });
 
+  it('прокидывает признак минимальной цены в публичный тур', () => {
+    const tour = cmsDocumentToSiteTour({ ...document, price: '5000 ₽', priceFrom: true });
+
+    expect(tour.priceFrom).toBe(true);
+  });
+
   it('прокидывает кадрирование обложки', () => {
     const tour = cmsDocumentToSiteTour({
       ...document,

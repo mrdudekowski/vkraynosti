@@ -45,6 +45,7 @@ export interface Tour {
    */
   difficultyDisplayLabel?: string;
   price: string;
+  priceFrom?: boolean;
   /** Зачёркнутая «старая» цена под основной (например, до обновления прайса). */
   pricePrevious?: string;
   /** Подпись под блоком стоимости вместо стандартной из `UI.tourDetail.priceHighlightNote`. */

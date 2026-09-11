@@ -2,6 +2,7 @@ import { isValidTourSlug } from '../constants/tourUrls';
 import { cmsTourDocumentSchema, type CmsTourDocument } from './cmsTourDocument';
 import { isTourDurationDays, publicDurationFromDays } from './durationDays';
 import { isIncludedIconKey, isUnsetIncludedIconKey } from './includedIconCatalog';
+import { isNumericTourPrice, normalizeTourPrice } from './tourPrice';
 
 export type CmsTourTextPatch = {
   title?: string;
@@ -14,6 +15,7 @@ export type CmsTourTextPatch = {
   difficultyDisplayLabel?: string;
   metaAudienceLabel?: string;
   price?: string;
+  priceFrom?: boolean;
   pricePrevious?: string;
   priceFootnote?: string;
   seoDescription?: string;
@@ -124,6 +126,10 @@ export function applyTourTextPatch(
   const pricePrevious = optionalOrCurrent(patch.pricePrevious, document.pricePrevious);
   const priceFootnote = optionalOrCurrent(patch.priceFootnote, document.priceFootnote);
   const seoDescription = optionalOrCurrent(patch.seoDescription, document.seoDescription);
+  const normalizedPrice = normalizeTourPrice(textOrCurrent(patch.price, document.price));
+  const priceFrom = isNumericTourPrice(normalizedPrice.price)
+    ? normalizedPrice.priceFrom || patch.priceFrom || document.priceFrom === true
+    : false;
 
   const rest: CmsTourDocument = { ...document };
   delete rest.descriptionLeadBold;
@@ -131,6 +137,7 @@ export function applyTourTextPatch(
   delete rest.programAdditionalNotes;
   delete rest.difficultyDisplayLabel;
   delete rest.metaAudienceLabel;
+  delete rest.priceFrom;
   delete rest.pricePrevious;
   delete rest.priceFootnote;
   delete rest.seoDescription;
@@ -145,7 +152,8 @@ export function applyTourTextPatch(
     duration,
     ...(durationDays != null ? { durationDays } : {}),
     difficulty: patch.difficulty ?? document.difficulty,
-    price: textOrCurrent(patch.price, document.price),
+    price: normalizedPrice.price,
+    priceFrom,
     ...(difficultyDisplayLabel != null ? { difficultyDisplayLabel } : {}),
     ...(metaAudienceLabel != null ? { metaAudienceLabel } : {}),
     ...(pricePrevious != null ? { pricePrevious } : {}),

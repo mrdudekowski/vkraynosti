@@ -110,6 +110,7 @@ export function cmsDocumentToSiteTour(document: CmsTourDocument): Tour {
       ? { metaAudienceLabel: document.metaAudienceLabel }
       : {}),
     price: document.price,
+    ...(document.priceFrom === true ? { priceFrom: true } : {}),
     ...(document.pricePrevious != null ? { pricePrevious: document.pricePrevious } : {}),
     ...(document.priceFootnote != null ? { priceFootnote: document.priceFootnote } : {}),
     description: document.description,

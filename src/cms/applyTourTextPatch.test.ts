@@ -41,6 +41,34 @@ const document: CmsTourDocument = {
 };
 
 describe('applyTourTextPatch', () => {
+  it('normalizes numeric price and persists the from flag', () => {
+    const next = applyTourTextPatch(document, {
+      description: 'x',
+      prefaceAssetId: 'preface',
+      included: [],
+      program: [],
+      price: '5000',
+      priceFrom: true,
+    });
+
+    expect(next.price).toBe('5000 ₽');
+    expect(next.priceFrom).toBe(true);
+  });
+
+  it('clears the from flag for request prices', () => {
+    const next = applyTourTextPatch(document, {
+      description: 'x',
+      prefaceAssetId: 'preface',
+      included: [],
+      program: [],
+      price: 'по запросу',
+      priceFrom: true,
+    });
+
+    expect(next.price).toBe('по запросу');
+    expect(next.priceFrom).toBe(false);
+  });
+
   it('меняет тексты и не трогает bento', () => {
     const next = applyTourTextPatch(document, {
       description: '  Новый текст  ',

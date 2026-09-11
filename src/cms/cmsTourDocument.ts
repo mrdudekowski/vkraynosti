@@ -74,6 +74,7 @@ export const cmsTourDocumentSchema = z.object({
   difficultyDisplayLabel: z.string().optional(),
   metaAudienceLabel: z.string().optional(),
   price: z.string().default(''),
+  priceFrom: z.boolean().optional(),
   pricePrevious: z.string().optional(),
   priceFootnote: z.string().optional(),
   program: z.array(cmsProgramStepSchema).default([]),

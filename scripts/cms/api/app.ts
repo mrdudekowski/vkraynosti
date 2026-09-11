@@ -752,7 +752,17 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       maxAge: 600,
     })
   );
-  const seedPromise = seedLocalCmsUsersIfEmpty(authRepository, env);
+  let seedPromise: Promise<void> | null = null;
+
+  function ensureLocalCmsUsersSeeded(): Promise<void> {
+    if (seedPromise == null) {
+      seedPromise = seedLocalCmsUsersIfEmpty(authRepository, env).catch((error) => {
+        seedPromise = null;
+        throw error;
+      });
+    }
+    return seedPromise;
+  }
 
   async function loadQueueTours(): Promise<QueueTourInput[]> {
     const { documents, publishedById } = await listCmsTourDocumentsWithPublication(store);
@@ -849,7 +859,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
   app.get('/api/cms/health', (c) => c.json({ ok: true }));
 
   app.post('/api/cms/login', async (c) => {
-    await seedPromise;
+    await ensureLocalCmsUsersSeeded();
     const parsed = loginBodySchema.safeParse(await readJsonBody(c));
     if (!parsed.success) {
       return c.json({ error: 'invalid_body' }, 400);

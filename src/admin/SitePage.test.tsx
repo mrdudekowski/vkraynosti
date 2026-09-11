@@ -107,7 +107,7 @@ describe('SitePage', () => {
     fireEvent.click(await screen.findByRole('tab', { name: 'Модалки' }));
 
     expect(screen.getByRole('button', { name: /Сохранить черновик/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Опубликовать на сайте/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Опубликовать на сайте/ })).toHaveClass('admin-btn-publish');
     expect(await screen.findByText(/Изменение применяется ко всем CTA/)).toBeInTheDocument();
   });
 

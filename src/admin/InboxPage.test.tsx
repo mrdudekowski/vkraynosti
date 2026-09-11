@@ -116,7 +116,9 @@ describe('InboxPage', () => {
     renderInbox(adminSession);
     expect(await screen.findAllByText('Изюбриная')).not.toHaveLength(0);
     await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxTabTours }));
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxPublishOne }));
+    const publish = screen.getByRole('button', { name: ADMIN_UI.inboxPublishOne });
+    expect(publish).toHaveClass('admin-btn-publish');
+    await user.click(publish);
     expect(adminPublishQueue).toHaveBeenCalledWith({
       tourIds: ['winter-2'],
       departureIds: [],
@@ -129,7 +131,9 @@ describe('InboxPage', () => {
     renderInbox(adminSession);
     expect(await screen.findAllByText('Изюбриная')).not.toHaveLength(0);
     await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxTabTours }));
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxPublishAll }));
+    const publish = screen.getByRole('button', { name: ADMIN_UI.inboxPublishAll });
+    expect(publish).toHaveClass('admin-btn-publish');
+    await user.click(publish);
     expect(adminPublishQueue).toHaveBeenCalledWith({
       tourIds: ['winter-2'],
       departureIds: [],
@@ -142,8 +146,9 @@ describe('InboxPage', () => {
     renderInbox(adminSession);
     expect(await screen.findAllByText('Изюбриная')).not.toHaveLength(0);
     await user.click(screen.getByRole('checkbox', { name: 'Выбрать Тур: Изюбриная' }));
-    expect(screen.getByRole('button', { name: ADMIN_UI.inboxPublishSelected })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxPublishSelected }));
+    const publish = screen.getByRole('button', { name: ADMIN_UI.inboxPublishSelected });
+    expect(publish).toHaveClass('admin-btn-publish');
+    await user.click(publish);
     expect(adminPublishQueue).toHaveBeenCalledWith({
       tourIds: ['winter-2'],
       departureIds: [],

@@ -82,7 +82,7 @@ const InboxQueueTable = ({
         const ready = isInboxQueueItemReady(item);
         const canPublish = canPublishItem(item);
         return (
-          <li key={`${item.kind}:${item.id}`} className="admin-inbox-row">
+          <li key={`${item.kind}:${item.id}`} className="admin-inbox-row admin-inbox-grid">
             <label className="flex min-h-11 items-center gap-2">
               <input
                 type="checkbox"

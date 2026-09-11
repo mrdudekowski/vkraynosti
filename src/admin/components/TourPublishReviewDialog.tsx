@@ -68,7 +68,7 @@ const TourPublishReviewDialog = ({
       <AdminButton type="button" variant="secondary" onClick={onClose}>
         {ADMIN_UI.cancel}
       </AdminButton>
-      <AdminButton type="button" onClick={onConfirm}>
+      <AdminButton type="button" variant="publish" onClick={onConfirm}>
         {ADMIN_UI.publishReviewConfirm}
       </AdminButton>
     </div>

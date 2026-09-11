@@ -563,7 +563,7 @@ const SchedulePage = () => {
         secondary={
           session.canPublishSchedule ? (
             <AdminButton
-              variant="secondary"
+              variant="publish"
               disabled={busy || publishDisabledReason != null}
               aria-describedby={publishDisabledReason != null ? 'schedule-publish-hint' : undefined}
               onClick={() => void onPublishSchedule()}

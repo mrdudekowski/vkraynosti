@@ -917,6 +917,7 @@ const TourEditorPage = () => {
         primary={
           session.canPublishTours ? (
             <AdminButton
+              variant="publish"
               disabled={saving || uploading || publishing || publishBlockers.length > 0}
               aria-describedby={publishDisabledHint != null ? 'admin-sticky-disabled-hint' : undefined}
               onClick={() => setPublishReviewOpen(true)}

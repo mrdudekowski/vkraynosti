@@ -220,6 +220,7 @@ const InboxPage = () => {
           canBulkPublish ? (
             <AdminButton
               type="button"
+              variant="publish"
               disabled={busy || items == null}
               onClick={() => {
                 runPayload(queuePayload(publishable));
@@ -383,6 +384,7 @@ const InboxPage = () => {
                     <div className="flex flex-col gap-2 sm:flex-row">
                       <AdminButton
                         type="button"
+                        variant="publish"
                         disabled={busy || selectedPublishable.length !== selectedItems.length}
                         onClick={() => runPayload(queuePayload(selectedPublishable))}
                       >

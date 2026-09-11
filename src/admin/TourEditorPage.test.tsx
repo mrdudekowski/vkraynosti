@@ -115,7 +115,7 @@ describe('TourEditorPage publish actions', () => {
     });
     await waitFor(() => expect(adminGetTour).toHaveBeenCalled());
     const publish = await screen.findByRole('button', { name: ADMIN_UI.publish });
-    expect(publish).toHaveClass('admin-btn-primary');
+    expect(publish).toHaveClass('admin-btn-publish');
     expect(screen.queryByRole('button', { name: ADMIN_UI.save })).not.toBeInTheDocument();
     expect(screen.getByRole('tablist', { name: ADMIN_UI.editorSections })).toBeInTheDocument();
     expect(document.querySelector('.admin-tour-editor')).toBeInTheDocument();

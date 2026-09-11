@@ -177,7 +177,7 @@ describe('SchedulePage', () => {
     expect(screen.getByRole('button', { name: ADMIN_UI.scheduleModeMonth })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: ADMIN_UI.scheduleAdd })).toHaveClass('admin-btn-primary');
     expect(screen.getByRole('button', { name: ADMIN_UI.publishSchedule })).toHaveClass(
-      'admin-btn-secondary',
+      'admin-btn-publish',
     );
     expect(screen.getByRole('button', { name: ADMIN_UI.scheduleModeMonth })).not.toHaveClass(
       'admin-btn-primary',

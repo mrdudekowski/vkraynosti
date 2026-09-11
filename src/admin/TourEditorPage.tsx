@@ -137,6 +137,7 @@ function editorTourDocument(
     durationDays: patch.durationDays ?? document.durationDays,
     difficulty: patch.difficulty ?? document.difficulty,
     price: patch.price ?? document.price,
+    priceFrom: patch.priceFrom ?? document.priceFrom,
     description: patch.description,
     descriptionAside: patch.descriptionAside,
     included: patch.included,
@@ -808,6 +809,7 @@ const TourEditorPage = () => {
               difficultyDisplayLabel={patch.difficultyDisplayLabel ?? ''}
               metaAudienceLabel={patch.metaAudienceLabel ?? ''}
               price={patch.price ?? ''}
+              priceFrom={patch.priceFrom ?? document.priceFrom ?? false}
               pricePrevious={patch.pricePrevious ?? ''}
               priceFootnote={patch.priceFootnote ?? ''}
               seoDescription={patch.seoDescription ?? ''}

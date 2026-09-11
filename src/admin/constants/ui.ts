@@ -520,6 +520,7 @@ export const ADMIN_UI = {
   difficultyDisplayLabel: 'Подпись сложности (необязательно)',
   audienceLabel: 'Аудитория на карточке (необязательно)',
   priceLabel: 'Цена',
+  priceFromLabel: 'от',
   pricePreviousLabel: 'Старая цена (необязательно)',
   priceFootnoteLabel: 'Сноска к цене (необязательно)',
   seoDescriptionLabel: 'SEO-описание (необязательно)',

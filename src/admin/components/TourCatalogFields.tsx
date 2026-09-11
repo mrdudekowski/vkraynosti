@@ -8,6 +8,7 @@ import {
   TOUR_DURATION_DAY_OPTIONS,
 } from '../../cms/durationDays';
 import { CATALOG_PRICE_ON_REQUEST } from '../../cms/tourCompleteness';
+import { isNumericTourPrice, normalizeTourPrice } from '../../cms/tourPrice';
 import { ADMIN_EDITOR_SHORT_TEXT_MAX } from '../../constants/adminUiTokens';
 import { ADMIN_UI } from '../constants/ui';
 import { EDITOR_FOCUS_IDS } from '../tourEditorTabs';
@@ -41,6 +42,7 @@ type TourCatalogFieldsProps = {
   difficultyDisplayLabel: string;
   metaAudienceLabel: string;
   price: string;
+  priceFrom: boolean;
   pricePrevious: string;
   priceFootnote: string;
   seoDescription: string;
@@ -54,11 +56,14 @@ const TourCatalogFields = ({
   difficultyDisplayLabel,
   metaAudienceLabel,
   price,
+  priceFrom,
   pricePrevious,
   priceFootnote,
   seoDescription,
   onChange,
 }: TourCatalogFieldsProps) => {
+  const normalizedPrice = normalizeTourPrice(price);
+  const canUsePriceFrom = isNumericTourPrice(normalizedPrice.price);
   const extrasDeepOpen =
     priceFootnote.trim().length > 0 || seoDescription.trim().length > 0;
 
@@ -149,9 +154,35 @@ const TourCatalogFields = ({
                   className="pl-8"
                   value={price}
                   hasError={!isCatalogPrice(price)}
-                  onChange={(event) => onChange({ price: event.target.value })}
+                  onChange={(event) => {
+                    const nextPrice = event.target.value;
+                    onChange({
+                      price: nextPrice,
+                      ...(isNumericTourPrice(normalizeTourPrice(nextPrice).price)
+                        ? {}
+                        : { priceFrom: false }),
+                    });
+                  }}
+                  onBlur={() => {
+                    const next = normalizeTourPrice(price);
+                    onChange({
+                      price: next.price,
+                      priceFrom: canUsePriceFrom ? priceFrom || next.priceFrom : false,
+                    });
+                  }}
                 />
               </div>
+              {canUsePriceFrom && (
+                <label className="mt-1 inline-flex min-h-8 items-center gap-2 text-sm text-text-primary">
+                  <input
+                    id="admin-price-from"
+                    type="checkbox"
+                    checked={priceFrom || normalizedPrice.priceFrom}
+                    onChange={(event) => onChange({ priceFrom: event.target.checked })}
+                  />
+                  <span>{ADMIN_UI.priceFromLabel}</span>
+                </label>
+              )}
             </div>
           </div>
         </div>

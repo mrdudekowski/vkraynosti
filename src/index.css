@@ -600,6 +600,10 @@
     @apply admin-btn bg-brand-primary text-text-inverse hover:bg-brand-primary/90 active:bg-brand-primary/80;
   }
 
+  .admin-btn-publish {
+    @apply admin-btn bg-brand-primary px-4 font-semibold text-text-inverse hover:bg-brand-primary/90 active:bg-brand-primary/80;
+  }
+
   .admin-btn-secondary {
     @apply admin-btn border border-divider bg-surface-light text-text-primary hover:bg-surface-dark/5 active:bg-surface-dark/10;
   }

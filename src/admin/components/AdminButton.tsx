@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-export type AdminButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
+export type AdminButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'publish';
 
 type AdminButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: AdminButtonVariant;
@@ -12,6 +12,7 @@ const VARIANT_CLASS: Record<AdminButtonVariant, string> = {
   secondary: 'admin-btn-secondary',
   ghost: 'admin-btn-ghost',
   destructive: 'admin-btn-destructive',
+  publish: 'admin-btn-publish',
 };
 
 const AdminButton = ({

@@ -62,6 +62,21 @@ const scheduleContextValue = (
 });
 
 describe('TourDetailPriceHighlight', () => {
+  it('shows the from label for a numeric CMS price', () => {
+    const tour = { ...spring3, price: '5000', priceFrom: true };
+
+    render(
+      <TourScheduleContext.Provider value={scheduleContextValue()}>
+        <TourDetailPriceHighlight tour={tour} />
+      </TourScheduleContext.Provider>
+    );
+
+    expect(screen.getByText('от 5000 ₽')).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: /от 5000 ₽/i })
+    ).toBeInTheDocument();
+  });
+
   it('shows the CMS tour price and future departure dates in one card', () => {
     render(
       <TourScheduleContext.Provider value={scheduleContextValue()}>

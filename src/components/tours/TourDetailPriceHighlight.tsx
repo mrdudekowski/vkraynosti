@@ -19,7 +19,7 @@ const ACCENT_BG: Record<Tour['season'], string> = {
 };
 
 export interface TourDetailPriceHighlightProps {
-  tour: Pick<Tour, "id" | "price" | "pricePrevious" | "priceFootnote" | "season">;
+  tour: Pick<Tour, "id" | "price" | "priceFrom" | "pricePrevious" | "priceFootnote" | "season">;
   className?: string;
   /** Дублирующий экземпляр: скрыть от вспомогательных технологий, если блок показан в другом месте. */
   ariaHidden?: boolean;

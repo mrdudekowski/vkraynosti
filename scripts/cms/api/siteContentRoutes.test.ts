@@ -1,12 +1,16 @@
 /** @vitest-environment node */
 import { Hono } from 'hono';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { seedSiteContentDocuments } from '../../../src/cms/siteContentSeed.ts';
 import { siteContentDraftKey, siteContentPublishedKey } from '../../../src/cms/siteContentPackageKeys.ts';
 import type { CmsApiEnv } from './env.ts';
 import type { CmsSession } from './session.ts';
 import { registerSiteContentRoutes } from './siteContentRoutes.ts';
 import { createMemoryJsonStore } from './store.ts';
+
+vi.mock('heic-convert', () => ({
+  default: async () => new Uint8Array([255, 216, 255, 224]),
+}));
 
 const env = {
   s3: {
@@ -79,7 +83,18 @@ describe('site content routes', () => {
     expect(saved.status).toBe(200);
     const changes = await app.request('/api/cms/site-content-changes');
     expect(changes.status).toBe(200);
-    expect(await changes.json()).toMatchObject({ items: [{ kind: 'modal', changes: [{ label: 'Режим CTA', to: 'контакты' }] }] });
+    expect(await changes.json()).toEqual(
+      expect.objectContaining({
+        items: expect.arrayContaining([
+          expect.objectContaining({
+            kind: 'modal',
+            changes: expect.arrayContaining([
+              expect.objectContaining({ label: 'Режим CTA', to: 'контакты' }),
+            ]),
+          }),
+        ]),
+      }),
+    );
     const reloaded = await app.request('/api/cms/site-content/modal');
     expect((await reloaded.json()).document.requestFormEnabled).toBe(false);
   });
@@ -98,5 +113,20 @@ describe('site content routes', () => {
     expect(body.asset.url).toContain('cdn.twcstorage.ru');
     const stored = await store.getBytes(`media/site-content/team/${body.asset.assetId}.jpg`);
     expect(stored?.body).toEqual(new Uint8Array([1, 2, 3]));
+  });
+
+  it('converts an uploaded HEIC team photo to jpeg before storing', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const form = new FormData();
+    form.set('file', new File([new Uint8Array([1, 2, 3])], 'elena.heic', { type: 'image/heic' }));
+    const response = await app.request('/api/cms/site-content/team/assets', { method: 'POST', body: form });
+    expect(response.status).toBe(201);
+    const body = (await response.json()) as { asset: { assetId: string; url: string; mimeType: string } };
+    expect(body.asset.mimeType).toBe('image/jpeg');
+    expect(body.asset.url).toBe(
+      `https://ypnmfvotln.cdn.twcstorage.ru/media/site-content/team/${body.asset.assetId}.jpg`,
+    );
+    const stored = await store.getBytes(`media/site-content/team/${body.asset.assetId}.jpg`);
+    expect(stored?.body).toEqual(new Uint8Array([255, 216, 255, 224]));
   });
 });

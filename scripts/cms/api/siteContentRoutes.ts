@@ -19,6 +19,7 @@ import {
 import { seedSiteContentDocuments } from '../../../src/cms/siteContentSeed.ts';
 import { SITE_CONTENT_KIND_LABELS, siteContentChanges, type SiteContentChangesItem } from '../../../src/cms/siteContentChanges.ts';
 import type { CmsApiEnv } from './env.ts';
+import { prepareCmsImageUpload } from './heic.ts';
 import type { CmsSession } from './session.ts';
 import type { CmsJsonStore } from './store.ts';
 
@@ -152,12 +153,18 @@ export function registerSiteContentRoutes(
     const form = await c.req.parseBody();
     const file = form.file;
     if (!(file instanceof File)) return c.json({ error: 'file_required' }, 400);
-    const extension = siteContentMediaExtensionForMime(file.type);
-    if (extension == null || file.size > 10 * 1024 * 1024) return c.json({ error: 'invalid_file' }, 400);
+    if (file.size > 10 * 1024 * 1024) return c.json({ error: 'invalid_file' }, 400);
+    const prepared = await prepareCmsImageUpload(file, siteContentMediaExtensionForMime);
+    if (!prepared.ok) {
+      return c.json(
+        { error: prepared.error === 'heic_conversion_failed' ? 'heic_conversion_failed' : 'invalid_file' },
+        400,
+      );
+    }
     const assetId = randomUUID();
-    const key = siteContentMediaObjectKey(kind, assetId, extension);
-    await deps.store.putBytes(key, new Uint8Array(await file.arrayBuffer()), file.type);
-    const asset = { assetId, url: `${siteContentMediaPublicBaseUrl(deps.env)}/${key}`, mimeType: file.type, alt: typeof form.alt === 'string' ? form.alt.trim() : '' };
+    const key = siteContentMediaObjectKey(kind, assetId, prepared.extension);
+    await deps.store.putBytes(key, prepared.bytes, prepared.mimeType);
+    const asset = { assetId, url: `${siteContentMediaPublicBaseUrl(deps.env)}/${key}`, mimeType: prepared.mimeType, alt: typeof form.alt === 'string' ? form.alt.trim() : '' };
     return c.json({ asset }, 201);
   });
 

@@ -3,6 +3,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['scripts/cms/api/app.test.ts', 'scripts/cms/api/**/*.integration.test.ts'],
+    include: [
+      'scripts/cms/api/app.test.ts',
+      'scripts/cms/api/heic.test.ts',
+      'scripts/cms/api/siteContentRoutes.test.ts',
+      'scripts/cms/api/**/*.integration.test.ts',
+    ],
   },
 });

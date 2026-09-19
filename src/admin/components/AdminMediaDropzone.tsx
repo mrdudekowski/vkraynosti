@@ -7,6 +7,7 @@ type AdminMediaDropzoneProps = {
   accept?: string;
   multiple?: boolean;
   disabled?: boolean;
+  className?: string;
   onFiles: (files: File[]) => void;
   children?: ReactNode;
 };
@@ -19,6 +20,7 @@ const AdminMediaDropzone = ({
   accept = CMS_MEDIA_ACCEPT,
   multiple = true,
   disabled = false,
+  className = '',
   onFiles,
   children,
 }: AdminMediaDropzoneProps) => {
@@ -46,7 +48,7 @@ const AdminMediaDropzone = ({
   return (
     <label
       htmlFor={id}
-      className={`admin-dropzone ${disabled ? 'pointer-events-none opacity-50' : ''}`.trim()}
+      className={`admin-dropzone ${disabled ? 'pointer-events-none opacity-50' : ''} ${className}`.trim()}
       onDragOver={(event) => event.preventDefault()}
       onDrop={onDrop}
     >
@@ -58,6 +60,7 @@ const AdminMediaDropzone = ({
         accept={accept}
         multiple={multiple}
         disabled={disabled}
+        aria-label={label}
         onChange={onChange}
       />
       {children ?? <span>{label}</span>}

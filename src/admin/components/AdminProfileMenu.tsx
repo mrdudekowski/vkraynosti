@@ -21,7 +21,7 @@ export default function AdminProfileMenu({ session, onLogout }: { session: Admin
       <span className="min-w-0 flex-1 text-tooltip"><span className="block truncate font-medium text-text-inverse">{session.login}</span><span className="block truncate text-text-inverse/60">{role}</span></span>
       <AdminIcon icon={ChevronDown} size={16} className="shrink-0 text-text-inverse/60" />
     </button>
-    {open ? <div role="menu" className="absolute bottom-full left-0 z-tooltip mb-2 w-full min-w-60 rounded-admin-control border border-divider bg-surface-light p-2 shadow-admin-overlay">
+    {open ? <div role="menu" className="absolute bottom-full left-0 z-tooltip mb-2 w-full min-w-0 max-w-full rounded-admin-control border border-divider bg-surface-light p-2 shadow-admin-overlay">
       <p className="px-2 py-1 text-xs text-text-muted">{role}</p>
       <p className="px-2 py-1 text-sm text-text-primary">{session.canPublishTours ? 'Публикация туров разрешена' : 'Только черновики туров'}</p>
       <p className="px-2 py-1 text-sm text-text-primary">{session.canPublishSchedule ? 'Публикация выездов разрешена' : 'Только черновики выездов'}</p>

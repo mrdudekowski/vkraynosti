@@ -58,7 +58,7 @@ const InboxQueueTable = ({
 
   return (
   <div>
-        <div className="admin-inbox-head flex">
+        <div className="admin-inbox-head admin-inbox-grid">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -145,7 +145,7 @@ const InboxQueueTable = ({
                 {ADMIN_UI.inboxView}
               </AdminButton>
               {canPublish && ready ? (
-                <AdminButton type="button" className="gap-2" disabled={busy} onClick={() => onPublish(item)}>
+                <AdminButton type="button" variant="publish" className="gap-2" disabled={busy} onClick={() => onPublish(item)}>
                   <AdminIcon icon={Send} size={16} />
                   {ADMIN_UI.inboxPublishOne}
                 </AdminButton>

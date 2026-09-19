@@ -320,7 +320,14 @@ const SitePage = () => {
     ) : document == null ? (
       <AdminSkeleton variant="page" />
     ) : tab === 'team' ? (
-      <SiteTeamTab value={document as TeamContentDocument} onChange={setDocument} onUpload={uploadTeamPhoto} />
+      <SiteTeamTab
+        value={document as TeamContentDocument}
+        onChange={setDocument}
+        onUpload={uploadTeamPhoto}
+        onSave={() => void persist('team')}
+        onCancel={() => loadKinds(['team'], true)}
+        isSaving={isSaving}
+      />
     ) : tab === 'contacts' ? (
       <SiteContactsTab value={document as ContactsContentDocument} onChange={setDocument} />
     ) : tab === 'footer' ? (
@@ -374,15 +381,17 @@ const SitePage = () => {
         saveHint={saveHint}
         disabledHint={publishHint}
         secondary={
-          <AdminButton
-            variant="secondary"
-            aria-busy={isSaving}
-            disabled={document == null || isSaving}
-            onClick={() => void persist(tab)}
-          >
-            <Save size={16} aria-hidden="true" />
-            {isSaving ? ADMIN_UI.saving : ADMIN_UI.siteSaveDraft}
-          </AdminButton>
+          tab === 'team' ? undefined : (
+            <AdminButton
+              variant="secondary"
+              aria-busy={isSaving}
+              disabled={document == null || isSaving}
+              onClick={() => void persist(tab)}
+            >
+              <Save size={16} aria-hidden="true" />
+              {isSaving ? ADMIN_UI.saving : ADMIN_UI.siteSaveDraft}
+            </AdminButton>
+          )
         }
         primary={
           <AdminButton

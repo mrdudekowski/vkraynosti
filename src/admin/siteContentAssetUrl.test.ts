@@ -19,11 +19,10 @@ describe('resolveSiteContentAssetUrl', () => {
     );
   });
 
-  it('uses the CMS origin from env when site-content URLs are relative', () => {
+  it('keeps seed portraits on the public CMS CDN even when catalog S3 is set', () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://s3.twcstorage.ru/vkraynosti-cms-dev/');
     expect(resolveSiteContentAssetUrl('team/team-4.webp')).toBe(
-      'https://s3.twcstorage.ru/vkraynosti-cms-dev/team/team-4.webp',
+      'https://ypnmfvotln.cdn.twcstorage.ru/team/team-4.webp',
     );
-    vi.unstubAllEnvs();
   });
 });

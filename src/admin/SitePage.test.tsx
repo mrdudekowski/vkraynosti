@@ -269,7 +269,7 @@ describe('SitePage', () => {
     renderSite();
     fireEvent.click(await screen.findByRole('tab', { name: ADMIN_UI.siteTabContacts }));
 
-    expect(await screen.findByRole('checkbox', { name: 'Показывать Telegram' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Показывать Telegram' })).toBeInTheDocument();
     expect(screen.getByDisplayValue('https://t.me/example')).toBeVisible();
     expect(screen.getByLabelText(ADMIN_UI.siteChannelType)).toHaveValue('telegram');
   });
@@ -309,6 +309,7 @@ describe('SitePage', () => {
       meta: { rev: 1 },
     } as never));
     renderSite();
+    fireEvent.click(await screen.findByRole('button', { name: /Анна/ }));
     expect(await screen.findByLabelText(ADMIN_UI.siteMemberName)).toHaveValue('Анна');
 
     fireEvent.click(screen.getByRole('button', { name: ADMIN_UI.removeItem }));
@@ -316,7 +317,7 @@ describe('SitePage', () => {
 
     expect(screen.queryByLabelText(ADMIN_UI.siteMemberName)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: ADMIN_UI.undo }));
-    expect(screen.getByLabelText(ADMIN_UI.siteMemberName)).toHaveValue('Анна');
+    expect(await screen.findByRole('button', { name: /Анна/ })).toBeInTheDocument();
   });
 
   it('adds footer rows of each type', async () => {
@@ -359,7 +360,7 @@ describe('SitePage', () => {
     renderSite();
     await screen.findByRole('tabpanel', { name: ADMIN_UI.siteTabTeam });
     fireEvent.click(screen.getByRole('button', { name: ADMIN_UI.siteAddMember }));
-    fireEvent.click(screen.getByRole('button', { name: ADMIN_UI.siteSaveDraft }));
+    fireEvent.click(screen.getByRole('button', { name: ADMIN_UI.siteSaveChanges }));
 
     expect(adminSaveSiteContent).not.toHaveBeenCalled();
     expect(screen.getByText(ADMIN_UI.sitePhotoRequired)).toBeInTheDocument();
@@ -392,6 +393,7 @@ describe('SitePage', () => {
       asset: { assetId: 'photo-2', url: 'https://cdn.example/anna.jpg', mimeType: 'image/jpeg', alt: 'Анна' },
     });
     renderSite();
+    fireEvent.click(await screen.findByRole('button', { name: /Анна/ }));
     const input = await screen.findByLabelText(ADMIN_UI.sitePhotoHint);
 
     fireEvent.change(input, {

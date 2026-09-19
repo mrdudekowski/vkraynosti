@@ -888,21 +888,36 @@
   }
 
   .admin-inbox-head {
-    @apply mb-2 hidden items-center gap-3 px-3 text-xs font-medium leading-tight text-text-muted
-      whitespace-nowrap;
+    @apply mb-2 hidden items-center gap-2 px-3 text-xs font-medium leading-tight text-text-muted
+      admin-desktop:grid;
   }
 
   .admin-inbox-row {
     @apply flex flex-col gap-2 rounded-admin-surface border border-divider bg-surface-light p-3
       transition-shadow duration-admin hover:shadow-admin-overlay
-      admin-desktop:items-center admin-desktop:gap-3 admin-desktop:rounded-none
+      admin-desktop:items-center admin-desktop:gap-2 admin-desktop:rounded-none
       admin-desktop:border-x-0 admin-desktop:border-t-0 admin-desktop:bg-transparent admin-desktop:px-3 admin-desktop:py-3
       admin-desktop:shadow-none admin-desktop:hover:bg-surface-dark/5 admin-desktop:hover:shadow-none
       motion-reduce:transition-none;
   }
 
   .admin-inbox-grid {
-    @apply admin-desktop:grid admin-desktop:grid-cols-[8rem_minmax(14rem,1fr)_11rem_7rem_10rem_10rem_13rem_minmax(13rem,1.4fr)];
+    @apply min-w-0 admin-desktop:grid
+      admin-desktop:grid-cols-[2.75rem_5rem_minmax(0,1fr)_8.5rem_8.75rem];
+  }
+
+  .admin-inbox-grid > * {
+    @apply min-w-0;
+  }
+
+  .admin-inbox-row .admin-badge {
+    @apply max-w-full shrink whitespace-normal text-left leading-tight;
+  }
+
+  @screen admin-wide {
+    .admin-inbox-grid {
+      @apply grid-cols-[5.5rem_5rem_minmax(0,1fr)_8.5rem_5.75rem_6.5rem_6.25rem_8.75rem];
+    }
   }
 
   .admin-schedule-toolbar {

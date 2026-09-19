@@ -141,6 +141,17 @@ export function formatAdminAbsoluteTime(iso: string): string {
   }).format(new Date(iso));
 }
 
+export function formatAdminCompactDateTime(iso: string): string {
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: VLADIVOSTOK_TIME_ZONE,
+  }).format(new Date(iso));
+}
+
 export function formatAdminRelativeTime(iso: string, now: Date = new Date()): string {
   const then = Date.parse(iso);
   if (Number.isNaN(then)) {

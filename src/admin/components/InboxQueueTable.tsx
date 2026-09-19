@@ -1,8 +1,12 @@
-import { CalendarDays, Check, CircleAlert, Eye, Mountain, Send, Undo2 } from 'lucide-react';
+import { Check, CircleAlert, Eye, Send, Undo2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { AdminPublishQueueItem } from '../api';
 import { ADMIN_UI } from '../constants/ui';
-import { formatAdminAbsoluteTime, formatAdminRelativeTime } from '../formatAdminCopy';
+import {
+  formatAdminAbsoluteTime,
+  formatAdminCompactDateTime,
+  formatAdminRelativeTime,
+} from '../formatAdminCopy';
 import {
   inboxQueueItemSubtitle,
   inboxQueueItemTitle,
@@ -12,6 +16,7 @@ import {
 import AdminBadge from './AdminBadge';
 import AdminButton from './AdminButton';
 import AdminIcon from './AdminIcon';
+import AdminIconButton from './AdminIconButton';
 import AdminStatus from './AdminStatus';
 import TourCoverImage from './TourCoverImage';
 
@@ -57,117 +62,134 @@ const InboxQueueTable = ({
   }, [allItemsSelected, someItemsSelected]);
 
   return (
-  <div>
-        <div className="admin-inbox-head admin-inbox-grid">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allItemsSelected}
-              ref={selectAllRef}
-              aria-label={ADMIN_UI.inboxSelectAllVisible}
-              onChange={onToggleAll}
-            />
-            <span>{ADMIN_UI.inboxSelect}</span>
-          </label>
-      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnType}</span>
-      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnName}</span>
-      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnStatus}</span>
-      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnAuthor}</span>
-      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnSent}</span>
-      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnReady}</span>
-      <span className="hidden admin-desktop:block">{ADMIN_UI.inboxColumnActions}</span>
-    </div>
-    <ul className="flex flex-col gap-2 admin-desktop:gap-0">
-      {items.map((item) => {
-        const ready = isInboxQueueItemReady(item);
-        const canPublish = canPublishItem(item);
-        return (
-          <li key={`${item.kind}:${item.id}`} className="admin-inbox-row admin-inbox-grid">
-            <label className="flex min-h-11 items-center gap-2">
-              <input
-                type="checkbox"
-                checked={selectedKeys.has(`${item.kind}:${item.id}`)}
-                aria-label={`${ADMIN_UI.inboxSelectItem} ${item.kind === 'tour' ? ADMIN_UI.inboxTourItem : ADMIN_UI.inboxDepartureItem}: ${inboxQueueItemTitle(item)}`}
-                onChange={() => onToggleSelected(item)}
-              />
-            </label>
-            <div className="flex items-center gap-2">
-              <span className="admin-editor-icon-well">
-                <AdminIcon icon={item.kind === 'tour' ? Mountain : CalendarDays} size={16} />
-              </span>
-              <AdminBadge tone={item.kind === 'tour' ? 'success' : 'warning'}>
-                {item.kind === 'tour' ? ADMIN_UI.inboxTourItem : ADMIN_UI.inboxDepartureItem}
-              </AdminBadge>
-            </div>
-            <div className="flex min-w-0 items-center gap-3">
-              <TourCoverImage
-                src={tourImageUrls[item.tourId]}
-                alt={inboxQueueItemTitle(item)}
-                className="h-10 w-14 shrink-0 rounded-admin-control"
-              />
+    <div className="min-w-0">
+      <div className="admin-inbox-head admin-inbox-grid">
+        <label className="flex min-w-0 items-center gap-2">
+          <input
+            type="checkbox"
+            checked={allItemsSelected}
+            ref={selectAllRef}
+            aria-label={ADMIN_UI.inboxSelectAllVisible}
+            onChange={onToggleAll}
+          />
+          <span className="hidden truncate admin-wide:inline">{ADMIN_UI.inboxSelect}</span>
+        </label>
+        <span className="hidden min-w-0 admin-desktop:block">{ADMIN_UI.inboxColumnType}</span>
+        <span className="hidden min-w-0 admin-desktop:block">{ADMIN_UI.inboxColumnName}</span>
+        <span className="hidden min-w-0 admin-desktop:block">{ADMIN_UI.inboxColumnStatus}</span>
+        <span className="hidden min-w-0 admin-wide:block">{ADMIN_UI.inboxColumnAuthor}</span>
+        <span className="hidden min-w-0 admin-wide:block">{ADMIN_UI.inboxColumnSent}</span>
+        <span className="hidden min-w-0 admin-wide:block">{ADMIN_UI.inboxColumnReady}</span>
+        <span className="hidden min-w-0 text-right admin-desktop:block">{ADMIN_UI.inboxColumnActions}</span>
+      </div>
+      <ul className="flex flex-col gap-2 admin-desktop:gap-0">
+        {items.map((item) => {
+          const ready = isInboxQueueItemReady(item);
+          const canPublish = canPublishItem(item);
+          const sentAbsolute = item.timestamp == null ? null : formatAdminAbsoluteTime(item.timestamp);
+          const sentRelative = item.timestamp == null ? null : formatAdminRelativeTime(item.timestamp);
+          const sentLabel =
+            sentRelative == null || sentAbsolute == null
+              ? null
+              : sentRelative === sentAbsolute
+                ? formatAdminCompactDateTime(item.timestamp)
+                : sentRelative;
+          return (
+            <li key={`${item.kind}:${item.id}`} className="admin-inbox-row admin-inbox-grid">
+              <label className="flex min-h-11 items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedKeys.has(`${item.kind}:${item.id}`)}
+                  aria-label={`${ADMIN_UI.inboxSelectItem} ${item.kind === 'tour' ? ADMIN_UI.inboxTourItem : ADMIN_UI.inboxDepartureItem}: ${inboxQueueItemTitle(item)}`}
+                  onChange={() => onToggleSelected(item)}
+                />
+              </label>
               <div className="min-w-0">
-                <button type="button" className="text-left font-medium text-text-primary hover:underline" onClick={() => onNavigate?.(item)}>
-                  {inboxQueueItemTitle(item)}
-                </button>
-                <p className="text-sm text-text-muted">{inboxQueueItemSubtitle(item)}</p>
+                <AdminBadge tone={item.kind === 'tour' ? 'success' : 'warning'}>
+                  {item.kind === 'tour' ? ADMIN_UI.inboxTourItem : ADMIN_UI.inboxDepartureItem}
+                </AdminBadge>
               </div>
-            </div>
-            <AdminStatus level="primary" tone={ready ? (item.kind === 'tour' ? 'info' : 'warning') : 'danger'}>
-              {inboxQueueStatusLabel(item)}
-            </AdminStatus>
-            <div className="min-w-0">
-              <p className="text-sm text-text-primary">{item.author ?? ADMIN_UI.inboxAuthorUnknown}</p>
-            </div>
-            <div className="min-w-0">
-              {item.timestamp != null ? (
-                <>
-                  <p className="text-sm text-text-primary">{formatAdminRelativeTime(item.timestamp)}</p>
-                  <p className="text-tooltip text-text-muted">{formatAdminAbsoluteTime(item.timestamp)}</p>
-                </>
-              ) : (
-                <p className="text-sm text-text-muted">{ADMIN_UI.inboxAuthorUnknown}</p>
-              )}
-            </div>
-            <button type="button" className="text-left" onClick={() => !ready && onView(item)}>
-              <AdminStatus level={ready ? 'secondary' : 'attention'} tone={ready ? 'success' : 'danger'} icon={ready ? Check : CircleAlert}>
-                {ready ? ADMIN_UI.inboxReadyYes : ADMIN_UI.inboxHasBlockers}
-              </AdminStatus>
-            </button>
-            <div className="flex flex-wrap items-center gap-1">
-              <AdminButton
+              <div className="flex min-w-0 items-center gap-3">
+                <TourCoverImage
+                  src={tourImageUrls[item.tourId]}
+                  alt=""
+                  className="h-10 w-14 shrink-0 rounded-admin-control"
+                />
+                <div className="min-w-0">
+                  <button
+                    type="button"
+                    className="line-clamp-2 text-left font-medium text-text-primary hover:underline"
+                    onClick={() => onNavigate?.(item)}
+                  >
+                    {inboxQueueItemTitle(item)}
+                  </button>
+                  <p className="truncate text-sm text-text-muted">{inboxQueueItemSubtitle(item)}</p>
+                </div>
+              </div>
+              <div className="min-w-0 overflow-hidden" title={inboxQueueStatusLabel(item)}>
+                <AdminStatus level="primary" tone={ready ? (item.kind === 'tour' ? 'info' : 'warning') : 'danger'}>
+                  {inboxQueueStatusLabel(item)}
+                </AdminStatus>
+              </div>
+              <p className="min-w-0 truncate text-sm text-text-primary admin-desktop:hidden admin-wide:block">
+                {item.author ?? ADMIN_UI.inboxAuthorUnknown}
+              </p>
+              <div className="min-w-0 admin-desktop:hidden admin-wide:block">
+                {sentLabel != null ? (
+                  <p className="truncate text-sm text-text-primary" title={sentAbsolute ?? undefined}>
+                    {sentLabel}
+                  </p>
+                ) : (
+                  <p className="text-sm text-text-muted">{ADMIN_UI.inboxAuthorUnknown}</p>
+                )}
+              </div>
+              <button
                 type="button"
-                variant="ghost"
-                className="gap-2"
-                disabled={busy}
-                onClick={() => onView(item)}
+                className="min-w-0 text-left admin-desktop:hidden admin-wide:block"
+                onClick={() => !ready && onView(item)}
               >
-                <AdminIcon icon={Eye} size={16} />
-                {ADMIN_UI.inboxView}
-              </AdminButton>
-              {canPublish && ready ? (
-                <AdminButton type="button" variant="publish" className="gap-2" disabled={busy} onClick={() => onPublish(item)}>
-                  <AdminIcon icon={Send} size={16} />
-                  {ADMIN_UI.inboxPublishOne}
-                </AdminButton>
-              ) : null}
-              {canReturnItems ? (
-                <AdminButton
-                  type="button"
-                  variant="ghost"
-                  className="gap-2"
-                  disabled={busy}
-                  onClick={() => onReturn(item)}
+                <AdminStatus
+                  level={ready ? 'secondary' : 'attention'}
+                  tone={ready ? 'success' : 'danger'}
+                  icon={ready ? Check : CircleAlert}
                 >
-                  <AdminIcon icon={Undo2} size={16} />
-                  {ADMIN_UI.inboxReturnShort}
-                </AdminButton>
-              ) : null}
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  </div>
+                  {ready ? ADMIN_UI.inboxReadyYes : ADMIN_UI.inboxHasBlockers}
+                </AdminStatus>
+              </button>
+              <div className="flex flex-nowrap items-center justify-end gap-1">
+                <AdminIconButton
+                  icon={Eye}
+                  label={ADMIN_UI.inboxView}
+                  disabled={busy}
+                  onClick={() => onView(item)}
+                />
+                {canPublish && ready ? (
+                  <AdminButton
+                    type="button"
+                    variant="publish"
+                    className="px-2.5"
+                    disabled={busy}
+                    aria-label={ADMIN_UI.inboxPublishOne}
+                    title={ADMIN_UI.inboxPublishOne}
+                    onClick={() => onPublish(item)}
+                  >
+                    <AdminIcon icon={Send} size={16} />
+                  </AdminButton>
+                ) : null}
+                {canReturnItems ? (
+                  <AdminIconButton
+                    icon={Undo2}
+                    label={ADMIN_UI.inboxReturnShort}
+                    disabled={busy}
+                    onClick={() => onReturn(item)}
+                  />
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 };
 

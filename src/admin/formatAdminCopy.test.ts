@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatAdminAbsoluteTime,
+  formatAdminCompactDateTime,
   formatAdminBlockerCount,
   formatAdminCancelledThisWeek,
   formatAdminOnSiteCount,
@@ -36,6 +37,7 @@ describe('formatAdminCopy', () => {
       `12 ${ADMIN_UI.relativeMinutesAgo}`,
     );
     expect(formatAdminAbsoluteTime('2026-08-19T05:42:00.000Z')).toMatch(/2026/);
+    expect(formatAdminCompactDateTime('2026-08-19T05:42:00.000Z')).toMatch(/^\d{2}\.\d{2}\.2026/);
     expect(formatScheduleOverflowDepartures(2)).toBe('+2 выезда');
     expect(formatScheduleOverflowDepartures(9)).toBe('+9 выездов');
     expect(formatScheduleDepartureCount(3)).toBe('3 выезда');

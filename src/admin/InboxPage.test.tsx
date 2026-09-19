@@ -90,7 +90,7 @@ describe('InboxPage', () => {
     expect(screen.queryByRole('button', { name: ADMIN_UI.inboxSubmitAll })).not.toBeInTheDocument();
   });
 
-  it('uses the same eight-column desktop grid for headers and queue rows', async () => {
+  it('uses the same desktop grid for headers and queue rows', async () => {
     renderInbox(adminSession);
 
     expect(await screen.findByText(ADMIN_UI.inboxColumnType)).toBeInTheDocument();

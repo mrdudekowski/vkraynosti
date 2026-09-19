@@ -338,7 +338,7 @@ export const ADMIN_UI = {
   sitePhotoHint: 'Перетащите снимок или выберите файл',
   sitePhotoAlt: 'Подпись к фото',
   sitePhotoRequired: 'У каждого участника должно быть фото.',
-  sitePhotoFormatError: 'Для сайта нужен JPG, PNG, WebP или SVG. HEIC API не принимает.',
+  sitePhotoFormatError: 'Для сайта нужен JPG, PNG, WebP, SVG или HEIC.',
   siteDraftInvalid: 'Черновик нельзя сохранить, пока не заполнены обязательные поля.',
   sitePdfRequired: 'Для строки PDF загрузите файл.',
   siteDeleteMemberTitle: 'Удалить участника?',

@@ -14,6 +14,7 @@ import AdminPageHeader from './components/AdminPageHeader';
 import AdminSkeleton from './components/AdminSkeleton';
 import AdminStatus from './components/AdminStatus';
 import AdminStickyContextBar from './components/AdminStickyContextBar';
+import MediaConversionModal from './components/MediaConversionModal';
 import SiteContactsTab from './components/SiteContactsTab';
 import SiteFooterTab from './components/SiteFooterTab';
 import SiteModalTab from './components/SiteModalTab';
@@ -22,6 +23,7 @@ import SiteTeamTab from './components/SiteTeamTab';
 import { ADMIN_UI } from './constants/ui';
 import { useAdminAutosave } from './hooks/useAdminAutosave';
 import { isSiteContentImageFile, isSiteContentPdfFile } from './siteContentMediaAccept';
+import { isHeicCmsFile } from './prepareCmsUploads';
 import { siteContentBlocker } from './siteContentReady';
 import type {
   ContactsContentDocument,
@@ -69,6 +71,12 @@ const SitePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [loadErrors, setLoadErrors] = useState<LoadErrors>({});
   const [reloadToken, setReloadToken] = useState(0);
+  const [mediaConversion, setMediaConversion] = useState<{
+    file: File;
+    memberId: string;
+    progress: number;
+    error: 'conversion' | 'upload' | null;
+  } | null>(null);
   const documentsRef = useRef(documents);
   const revisionsRef = useRef(revisions);
   const statusRef = useRef(status);
@@ -196,12 +204,16 @@ const SitePage = () => {
       setError(ADMIN_UI.sitePhotoFormatError);
       return;
     }
+    const heic = isHeicCmsFile(file);
     const currentTeam = documentsRef.current.team;
     const member = currentTeam?.kind === 'team'
       ? currentTeam.members.find((item) => item.id === memberId)
       : undefined;
     const alt = member?.photo.alt.trim() || member?.name || '';
     try {
+      if (heic) {
+        setMediaConversion({ file, memberId, progress: 15, error: null });
+      }
       const result = await adminUploadSiteAsset('team', file, alt);
       const team = documentsRef.current.team;
       if (team?.kind === 'team') {
@@ -217,7 +229,20 @@ const SitePage = () => {
         setStatus((current) => ({ ...current, team: 'dirty' }));
         setError(null);
       }
+      if (heic) {
+        setMediaConversion({ file, memberId, progress: 100, error: null });
+        window.setTimeout(() => setMediaConversion(null), 250);
+      }
     } catch (reason: unknown) {
+      if (heic) {
+        setMediaConversion({
+          file,
+          memberId,
+          progress: 40,
+          error: reason instanceof Error && reason.message === 'heic_conversion_failed' ? 'conversion' : 'upload',
+        });
+        return;
+      }
       setError(siteErrorMessage(reason));
     }
   };
@@ -371,6 +396,17 @@ const SitePage = () => {
             {isSaving ? ADMIN_UI.publishing : ADMIN_UI.sitePublish}
           </AdminButton>
         }
+      />
+      <MediaConversionModal
+        open={mediaConversion != null}
+        progress={mediaConversion?.progress ?? 0}
+        error={mediaConversion?.error}
+        onRetry={
+          mediaConversion != null
+            ? () => void uploadTeamPhoto(mediaConversion.memberId, mediaConversion.file)
+            : undefined
+        }
+        onClose={() => setMediaConversion(null)}
       />
     </div>
   );

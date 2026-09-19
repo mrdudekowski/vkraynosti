@@ -307,7 +307,7 @@ describe('SitePage', () => {
     expect(screen.getByText(ADMIN_UI.sitePhotoRequired)).toBeInTheDocument();
   });
 
-  it('uploads a team photo and rejects HEIC', async () => {
+  it('uploads a team photo including HEIC and rejects GIF', async () => {
     const teamWithMember = {
       ...team,
       members: [
@@ -337,10 +337,21 @@ describe('SitePage', () => {
     const input = await screen.findByLabelText(ADMIN_UI.sitePhotoHint);
 
     fireEvent.change(input, {
-      target: { files: [new File(['heic'], 'anna.heic', { type: 'image/heic' })] },
+      target: { files: [new File(['gif'], 'anna.gif', { type: 'image/gif' })] },
     });
     expect(adminUploadSiteAsset).not.toHaveBeenCalled();
     expect(screen.getByText(ADMIN_UI.sitePhotoFormatError)).toBeInTheDocument();
+
+    fireEvent.change(input, {
+      target: { files: [new File(['heic'], 'anna.heic', { type: 'image/heic' })] },
+    });
+    await waitFor(() =>
+      expect(adminUploadSiteAsset).toHaveBeenCalledWith(
+        'team',
+        expect.any(File),
+        'Анна',
+      ),
+    );
 
     fireEvent.change(input, {
       target: { files: [new File(['jpg'], 'anna.jpg', { type: 'image/jpeg' })] },

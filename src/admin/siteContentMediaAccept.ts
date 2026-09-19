@@ -1,13 +1,18 @@
+import { isHeicCmsFile } from './prepareCmsUploads';
+
 const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']);
 const PDF_MIME = 'application/pdf';
 
 export const SITE_CONTENT_IMAGE_ACCEPT =
-  'image/jpeg,image/png,image/webp,image/svg+xml,.jpg,.jpeg,.png,.webp,.svg';
+  'image/jpeg,image/png,image/webp,image/svg+xml,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.svg,.heic,.heif';
 export const SITE_CONTENT_PDF_ACCEPT = 'application/pdf,.pdf';
 
 const fileName = (file: File) => file.name.toLowerCase();
 
 export function isSiteContentImageFile(file: File): boolean {
+  if (isHeicCmsFile(file)) {
+    return true;
+  }
   const mime = file.type.toLowerCase();
   if (IMAGE_MIMES.has(mime)) {
     return true;

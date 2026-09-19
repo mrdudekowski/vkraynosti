@@ -667,15 +667,18 @@
     @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary;
   }
 
+  .admin-sticky-editor,
   .admin-tour-editor {
     min-width: 0;
   }
 
+  .admin-sticky-editor > *,
   .admin-tour-editor > * {
     min-width: 0;
   }
 
   @media (max-width: 1023px) {
+    .admin-sticky-editor,
     .admin-tour-editor {
       padding-bottom: calc(7rem + env(safe-area-inset-bottom));
     }

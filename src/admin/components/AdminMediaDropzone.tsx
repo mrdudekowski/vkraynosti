@@ -4,6 +4,7 @@ import { CMS_MEDIA_ACCEPT } from '../../cms/cmsMediaAccept';
 type AdminMediaDropzoneProps = {
   id: string;
   label: string;
+  accept?: string;
   multiple?: boolean;
   disabled?: boolean;
   onFiles: (files: File[]) => void;
@@ -15,6 +16,7 @@ const filesFromList = (list: FileList | null): File[] => (list == null ? [] : [.
 const AdminMediaDropzone = ({
   id,
   label,
+  accept = CMS_MEDIA_ACCEPT,
   multiple = true,
   disabled = false,
   onFiles,
@@ -53,7 +55,7 @@ const AdminMediaDropzone = ({
         id={id}
         type="file"
         className="sr-only"
-        accept={CMS_MEDIA_ACCEPT}
+        accept={accept}
         multiple={multiple}
         disabled={disabled}
         onChange={onChange}

@@ -6,6 +6,7 @@ import type {
 } from '../../cms/siteContentDocument';
 import { ADMIN_UI } from '../constants/ui';
 import { SITE_CONTENT_PDF_ACCEPT } from '../siteContentMediaAccept';
+import { resolveSiteContentAssetUrl } from '../siteContentAssetUrl';
 import { moveOrdered, withOrder } from '../siteContentOrder';
 import { useAdminToast } from '../toast/adminToastContext';
 import { pushAdminUndo } from '../toast/pushAdminUndo';
@@ -265,7 +266,9 @@ const SiteFooterTab = ({ value, onChange, onUploadPdf }: SiteFooterTabProps) => 
                           {ADMIN_UI.siteFooterPdf}
                         </span>
                         {row.asset?.url != null && row.asset.url.length > 0 ? (
-                          <p className="truncate text-sm text-text-muted">{row.asset.url}</p>
+                          <p className="truncate text-sm text-text-muted">
+                            {resolveSiteContentAssetUrl(row.asset.url)}
+                          </p>
                         ) : (
                           <p className="text-tooltip text-text-muted">{ADMIN_UI.siteFooterPdfHint}</p>
                         )}

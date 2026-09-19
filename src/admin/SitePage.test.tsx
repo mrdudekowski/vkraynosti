@@ -75,6 +75,64 @@ describe('SitePage', () => {
     expect(screen.getByRole('tablist', { name: ADMIN_UI.siteTabs })).not.toHaveClass('overflow-x-auto');
   });
 
+  it('previews seed team portraits from the CMS CDN', async () => {
+    const member = (
+      id: string,
+      name: string,
+      photo: { assetId: string; url: string; mimeType: string; alt: string },
+      order: number,
+    ) => ({
+      id,
+      name,
+      photo,
+      role: 'Гид',
+      roleVisible: true,
+      experience: '',
+      experienceVisible: false,
+      bio: '',
+      bioVisible: true,
+      visible: true,
+      order,
+    });
+    vi.mocked(adminGetSiteContent).mockImplementation(async (kind) => ({
+      document:
+        kind === 'team'
+          ? {
+              ...team,
+              members: [
+                member('team-1', 'Ярослав', {
+                  assetId: 'team-1',
+                  url: '/team/team-1.webp',
+                  mimeType: 'image/webp',
+                  alt: 'Ярослав',
+                }, 0),
+                member('team-3', 'Елена', {
+                  assetId: 'elena',
+                  url: 'https://ypnmfvotln.cdn.twcstorage.ru/media/site-content/team/elena.jpg',
+                  mimeType: 'image/jpeg',
+                  alt: 'Елена',
+                }, 1),
+              ],
+            }
+          : kind === 'contacts'
+            ? contacts
+            : kind === 'modal'
+              ? modal
+              : footer,
+      meta: { rev: 1 },
+    } as never));
+    renderSite();
+
+    expect(await screen.findByRole('img', { name: 'Ярослав' })).toHaveAttribute(
+      'src',
+      'https://ypnmfvotln.cdn.twcstorage.ru/team/team-1.webp',
+    );
+    expect(screen.getByRole('img', { name: 'Елена' })).toHaveAttribute(
+      'src',
+      'https://ypnmfvotln.cdn.twcstorage.ru/media/site-content/team/elena.jpg',
+    );
+  });
+
   it('saves the selected modal mode and keeps it after a reload', async () => {
     vi.mocked(adminSaveSiteContent).mockImplementation(async (_kind, _rev, document) => ({
       document,

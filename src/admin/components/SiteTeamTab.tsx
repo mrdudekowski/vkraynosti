@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Plus, Trash2, UsersRound } from 'lucide-react';
 import type { TeamContentDocument, TeamContentMember } from '../../cms/siteContentDocument';
 import { ADMIN_UI } from '../constants/ui';
 import { SITE_CONTENT_IMAGE_ACCEPT } from '../siteContentMediaAccept';
+import { resolveSiteContentAssetUrl } from '../siteContentAssetUrl';
 import { moveOrdered, withOrder } from '../siteContentOrder';
 import { useAdminToast } from '../toast/adminToastContext';
 import { pushAdminUndo } from '../toast/pushAdminUndo';
@@ -147,7 +148,7 @@ const SiteTeamTab = ({ value, onChange, onUpload }: SiteTeamTabProps) => {
                     <div className="aspect-square overflow-hidden rounded-admin-control bg-surface-dark/5">
                       {member.photo.url.length > 0 ? (
                         <img
-                          src={member.photo.url}
+                          src={resolveSiteContentAssetUrl(member.photo.url)}
                           alt={member.photo.alt || member.name}
                           width={128}
                           height={128}

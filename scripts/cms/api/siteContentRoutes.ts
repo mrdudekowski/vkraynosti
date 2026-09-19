@@ -12,7 +12,9 @@ import {
   siteContentDraftKey,
   siteContentDraftMetaKey,
   siteContentPublishedKey,
-  siteContentMediaPrefix,
+  siteContentMediaDeleteKeys,
+  siteContentMediaExtensionForMime,
+  siteContentMediaObjectKey,
 } from '../../../src/cms/siteContentPackageKeys.ts';
 import { seedSiteContentDocuments } from '../../../src/cms/siteContentSeed.ts';
 import { SITE_CONTENT_KIND_LABELS, siteContentChanges, type SiteContentChangesItem } from '../../../src/cms/siteContentChanges.ts';
@@ -69,6 +71,10 @@ async function loadDraft(
 
 function invalidKind(context: SiteContentContext): Response {
   return context.json({ error: 'invalid_kind' }, 400);
+}
+
+function siteContentMediaPublicBaseUrl(env: CmsApiEnv): string {
+  return env.s3.publicBaseUrl.replace(/\/+$/, '');
 }
 
 export function registerSiteContentRoutes(
@@ -146,12 +152,12 @@ export function registerSiteContentRoutes(
     const form = await c.req.parseBody();
     const file = form.file;
     if (!(file instanceof File)) return c.json({ error: 'file_required' }, 400);
-    const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'application/pdf']);
-    if (!allowed.has(file.type) || file.size > 10 * 1024 * 1024) return c.json({ error: 'invalid_file' }, 400);
+    const extension = siteContentMediaExtensionForMime(file.type);
+    if (extension == null || file.size > 10 * 1024 * 1024) return c.json({ error: 'invalid_file' }, 400);
     const assetId = randomUUID();
-    const key = `${siteContentMediaPrefix(kind)}${assetId}`;
+    const key = siteContentMediaObjectKey(kind, assetId, extension);
     await deps.store.putBytes(key, new Uint8Array(await file.arrayBuffer()), file.type);
-    const asset = { assetId, url: `${deps.env.s3.publicBaseUrl.replace(/\/+$/, '')}/${key}`, mimeType: file.type, alt: typeof form.alt === 'string' ? form.alt.trim() : '' };
+    const asset = { assetId, url: `${siteContentMediaPublicBaseUrl(deps.env)}/${key}`, mimeType: file.type, alt: typeof form.alt === 'string' ? form.alt.trim() : '' };
     return c.json({ asset }, 201);
   });
 
@@ -162,7 +168,7 @@ export function registerSiteContentRoutes(
     if (!siteContentSessionCanEdit(session)) return c.json({ error: 'forbidden' }, 403);
     const assetId = c.req.param('assetId');
     if (!assetId || assetId.includes('/')) return c.json({ error: 'invalid_asset' }, 400);
-    await deps.store.deleteBytes(`${siteContentMediaPrefix(kind)}${assetId}`);
+    await Promise.all(siteContentMediaDeleteKeys(kind, assetId).map((key) => deps.store.deleteBytes(key)));
     return c.body(null, 204);
   });
 }

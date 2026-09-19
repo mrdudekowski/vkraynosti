@@ -1,0 +1,15 @@
+---
+description: Local workspaces and GitHub branches for Vkraynosti CMS/CRM
+alwaysApply: true
+---
+
+# Vkraynosti workspaces
+
+One GitHub repo: `https://github.com/mrdudekowski/vkraynosti`
+
+- Frontend + CMS backend: `E:\Cursor Projects\Vkrainosti-cms-crm-phase1` → branch `cms-crm-phase1-staging`
+- Admin app: `E:\Cursor Projects\Vkrainosti-cms-crm-phase1-admin-app` → branch `codex/admin-app`
+
+Do not mix the two trees. Site-content upload routes live in the frontend/backend branch; the admin frontend only calls `/api/cms/site-content/*`.
+
+CMS media on the live site must be served from `https://ypnmfvotln.cdn.twcstorage.ru/` because production CSP `img-src` allows only that CDN. Keys must be `media/site-content/{kind}/{id}.{ext}`. Extensionless keys like `media/site-content/team{uuid}` return CDN 403 even though the same object is 200 on S3.

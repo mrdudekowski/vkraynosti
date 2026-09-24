@@ -10,8 +10,11 @@ describe('legalDocuments', () => {
     expect(LEGAL_DOCUMENTS_FOOTER).toHaveLength(4);
   });
 
-  it('builds public URLs under /legal/', () => {
-    expect(getLegalDocumentUrl('personal-data-policy')).toMatch(/\/legal\/personal-data-policy\.pdf$/);
+  it('builds public URLs on the live site origin', () => {
+    expect(getLegalDocumentUrl('personal-data-policy')).toBe(
+      'https://vkraynosti.ru/legal/personal-data-policy.pdf',
+    );
+    expect(getLegalDocumentUrl('offer-and-safety')).not.toContain('localhost');
   });
 
   it('marks policy and consent for tour request modal', () => {

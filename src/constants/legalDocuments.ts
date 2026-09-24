@@ -1,4 +1,4 @@
-import { APP_ASSET_BASE } from './publicAssetBase';
+import { SITE_URL } from './siteUrl';
 
 export type LegalDocumentId =
   | 'offer-and-safety'
@@ -51,6 +51,6 @@ export const LEGAL_DOCUMENTS_FOOTER = (
   Object.values(LEGAL_DOCUMENTS) as LegalDocument[]
 ).filter((doc) => doc.showInFooter);
 
-/** Public URL for download / open in new tab. */
+/** Canonical public URL on vkraynosti.ru — not the current origin or localhost. */
 export const getLegalDocumentUrl = (id: LegalDocumentId): string =>
-  `${APP_ASSET_BASE}legal/${LEGAL_DOCUMENTS[id].filename}`;
+  `${SITE_URL.replace(/\/+$/, '')}/legal/${LEGAL_DOCUMENTS[id].filename}`;

@@ -25,4 +25,10 @@ describe('resolveSiteContentAssetUrl', () => {
       'https://ypnmfvotln.cdn.twcstorage.ru/team/team-4.webp',
     );
   });
+
+  it('rewrites localhost legal PDFs to the public site', () => {
+    expect(resolveSiteContentAssetUrl('http://localhost/legal/offer-and-safety.pdf')).toBe(
+      'https://vkraynosti.ru/legal/offer-and-safety.pdf',
+    );
+  });
 });

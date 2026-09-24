@@ -1,4 +1,4 @@
-import { APP_ASSET_BASE } from './publicAssetBase';
+import { SITE_URL } from './siteUrl';
 
 export type LegalDocumentId =
   | 'offer-and-safety'
@@ -51,6 +51,40 @@ export const LEGAL_DOCUMENTS_FOOTER = (
   Object.values(LEGAL_DOCUMENTS) as LegalDocument[]
 ).filter((doc) => doc.showInFooter);
 
-/** Public URL for download / open in new tab. */
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1']);
+
+export function isLegalDocumentId(id: string): id is LegalDocumentId {
+  return Object.prototype.hasOwnProperty.call(LEGAL_DOCUMENTS, id);
+}
+
+/** Canonical public URL on vkraynosti.ru — not the current origin or localhost. */
 export const getLegalDocumentUrl = (id: LegalDocumentId): string =>
-  `${APP_ASSET_BASE}legal/${LEGAL_DOCUMENTS[id].filename}`;
+  `${SITE_URL.replace(/\/+$/, '')}/legal/${LEGAL_DOCUMENTS[id].filename}`;
+
+function isLocalHostname(hostname: string): boolean {
+  return LOCAL_HOSTS.has(hostname);
+}
+
+/** Turn a stored CMS PDF URL into a downloadable public href. */
+export function resolveFooterPdfHref(row: {
+  documentId: string;
+  asset?: { url?: string };
+}): string | null {
+  const raw = row.asset?.url?.trim() ?? '';
+  if (raw.length > 0) {
+    try {
+      const parsed = new URL(raw, `${SITE_URL.replace(/\/+$/, '')}/`);
+      if (!isLocalHostname(parsed.hostname)) {
+        return parsed.toString();
+      }
+    } catch {
+      if (raw.startsWith('/legal/') && isLegalDocumentId(row.documentId)) {
+        return getLegalDocumentUrl(row.documentId);
+      }
+    }
+  }
+  if (isLegalDocumentId(row.documentId)) {
+    return getLegalDocumentUrl(row.documentId);
+  }
+  return raw.length > 0 ? raw : null;
+}

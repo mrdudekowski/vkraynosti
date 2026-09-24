@@ -5,6 +5,7 @@ import {
   FOOTER_CONTACT_LINK_CLASS,
 } from '../../constants/footerContact';
 import { ROUTES } from '../../constants/routes';
+import { resolveFooterPdfHref } from '../../constants/legalDocuments';
 import { useCookieConsent } from '../../context/useCookieConsent';
 import type { Season } from '../../types';
 import type { FooterContentBlock, FooterContentRow } from '../../cms/siteContentDocument';
@@ -29,7 +30,7 @@ const isFooterLinkRow = (
 ): row is Extract<FooterContentRow, { type: 'link' | 'pdf' }> => row.type === 'link' || row.type === 'pdf';
 
 const FooterRowLink = ({ row, className }: { row: Extract<FooterContentRow, { type: 'link' | 'pdf' }>; className: string }) => {
-  const href = row.type === 'pdf' ? row.asset?.url : row.href;
+  const href = row.type === 'pdf' ? resolveFooterPdfHref(row) : row.href;
   if (!href) return null;
 
   if (row.type === 'link' && href.startsWith('/')) {

@@ -1,5 +1,5 @@
 import { CONTACTS } from '../constants/contacts';
-import { LEGAL_DOCUMENTS } from '../constants/legalDocuments';
+import { getLegalDocumentUrl, LEGAL_DOCUMENTS } from '../constants/legalDocuments';
 import { LEGAL_ENTITY } from '../constants/legalEntity';
 import { UI } from '../constants/ui';
 import { TEAM } from '../data/teamData';
@@ -76,7 +76,7 @@ const footer: FooterContentDocument = {
           documentId: document.id,
           visible: document.showInFooter,
           order: order + 3,
-          asset: seedAsset(document.id, `${locationOrigin()}/legal/${document.filename}`, 'application/pdf', document.title),
+          asset: seedAsset(document.id, getLegalDocumentUrl(document.id), 'application/pdf', document.title),
         })),
       ],
     },
@@ -134,10 +134,6 @@ const modal: ModalContentDocument = {
   contactDescription: 'Выберите удобный канал связи.',
   tourContactTitle: 'Свяжитесь с нами и забронируйте тур',
 };
-
-function locationOrigin(): string {
-  return typeof window === 'undefined' ? 'http://localhost' : window.location.origin;
-}
 
 export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument } {
   return { team, contacts, footer, modal };

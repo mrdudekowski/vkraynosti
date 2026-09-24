@@ -31,6 +31,21 @@ vi.mock('../../context/SiteContentContext', () => ({
             { id: 'inn', type: 'text', label: 'ИНН', value: '250809067912', visible: true, order: 1 },
             { id: 'legal-address', type: 'text', label: 'Адрес', value: 'Владивосток', visible: true, order: 2 },
             { id: 'missing-pdf', type: 'pdf', label: 'Пустой PDF', value: 'Пустой PDF', documentId: 'missing-pdf', visible: true, order: 3 },
+            {
+              id: 'offer-and-safety',
+              type: 'pdf',
+              label: 'Оферта и правила безопасности',
+              value: 'Оферта и правила безопасности',
+              documentId: 'offer-and-safety',
+              visible: true,
+              order: 4,
+              asset: {
+                assetId: 'offer-and-safety',
+                url: 'http://localhost/legal/offer-and-safety.pdf',
+                mimeType: 'application/pdf',
+                alt: 'Оферта и правила безопасности',
+              },
+            },
           ],
         },
         {
@@ -106,5 +121,14 @@ describe('Footer', () => {
     expect(screen.queryByRole('link', { name: 'Пустой PDF' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Настройки cookies' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'SILA' })).not.toBeInTheDocument();
+  });
+
+  it('rewrites stored localhost legal PDFs to public site URLs', () => {
+    render(<Footer />, { wrapper: MemoryRouter });
+
+    expect(screen.getByRole('link', { name: 'Оферта и правила безопасности' })).toHaveAttribute(
+      'href',
+      'https://vkraynosti.ru/legal/offer-and-safety.pdf',
+    );
   });
 });

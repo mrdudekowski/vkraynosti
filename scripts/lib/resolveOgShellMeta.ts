@@ -95,7 +95,11 @@ export const resolveOgShellMeta = (
   const tourMatch = TOUR_DETAIL_PATH_PATTERN.exec(routePath);
   if (tourMatch != null) {
     const [, season, segment] = tourMatch;
-    const baseTour = findTourBySeasonAndSegment(season as Season, segment);
+    const cmsTour = [...(overrides.toursById?.values() ?? [])].find(
+      (tour) =>
+        tour.season === season && (tour.slug === segment || tour.id === segment),
+    );
+    const baseTour = cmsTour ?? findTourBySeasonAndSegment(season as Season, segment);
     if (baseTour == null) {
       throw new Error(`Unknown tour segment for OG shell: ${segment} (${routePath})`);
     }

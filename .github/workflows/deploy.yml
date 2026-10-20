@@ -102,6 +102,7 @@ jobs:
 
         env:
 
+          VITE_CMS_S3_BASE_URL: ${{ vars.VITE_CMS_S3_BASE_URL }}
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
 
         run: npm run sync:catalog
@@ -128,6 +129,7 @@ jobs:
 
         env:
 
+          VITE_CMS_S3_BASE_URL: ${{ vars.VITE_CMS_S3_BASE_URL }}
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
 
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
@@ -142,6 +144,7 @@ jobs:
 
         env:
 
+          VITE_CMS_S3_BASE_URL: ${{ vars.VITE_CMS_S3_BASE_URL }}
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
 
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}
@@ -156,6 +159,7 @@ jobs:
 
         env:
 
+          VITE_CMS_S3_BASE_URL: ${{ vars.VITE_CMS_S3_BASE_URL }}
           VITE_PUBLIC_S3_BASE_URL: ${{ vars.VITE_PUBLIC_S3_BASE_URL || vars.VITE_PUBLIC_ASSET_BASE_URL }}
 
           VITE_TOUR_REQUEST_ENDPOINT_URL: ${{ vars.VITE_TOUR_REQUEST_ENDPOINT_URL }}

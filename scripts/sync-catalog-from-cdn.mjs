@@ -4,37 +4,28 @@
  * bodies and OG shells reflect the currently published catalog (status flips made via
  * the GAS "Опубликовать" menu) instead of the committed snapshot.
  *
- * Source = same base the app fetches at runtime: VITE_PUBLIC_S3_BASE_URL or
- * VITE_PUBLIC_ASSET_BASE_URL. With no base set, seeds committed fixtures into public/.
+ * Prefer the published CMS package when configured so the SEO build sees the same
+ * tour IDs, slugs, statuses and schedule as the public runtime. Fall back to the
+ * legacy public CDN catalog when CMS is not configured.
  *
- * ponytail: best-effort CDN fetch — on failure per file, keep existing public/ copy or fixture.
+ * Legacy CDN fetches retain their fixture fallback. A configured CMS package is treated
+ * as authoritative and must be complete before any snapshots are replaced.
  */
 import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { loadDotEnvLocal } from './lib/loadDotEnvLocal.mjs';
+import { resolveCatalogSource } from './lib/catalogSource.mjs';
 import {
   TOUR_CATALOG_FIXTURE_DIR,
   seedTourCatalogFromFixtures,
 } from './lib/readTourCatalogFile.mjs';
 
-const rootDir = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
-loadDotEnvLocal(rootDir);
+const rootDir = process.cwd();
 
-const outDir = resolve(rootDir, 'public/data/tour-schedule');
 const CATALOG_FILES = ['tours_list.json', 'schedule.json'];
 
-const resolveCatalogBaseUrl = () => {
-  const base = (
-    process.env.VITE_PUBLIC_S3_BASE_URL ||
-    process.env.VITE_PUBLIC_ASSET_BASE_URL ||
-    ''
-  ).trim();
-  return base.replace(/\/+$/, '');
-};
-
-const fetchCatalogJson = async (url) => {
-  const response = await fetch(url, { cache: 'no-store' });
+const fetchCatalogJson = async (url, fetchImpl = fetch) => {
+  const response = await fetchImpl(url, { cache: 'no-store' });
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
@@ -43,36 +34,87 @@ const fetchCatalogJson = async (url) => {
   return text.endsWith('\n') ? text : `${text}\n`;
 };
 
-const run = async () => {
-  const base = resolveCatalogBaseUrl();
-  if (!base) {
+const parsePackage = (text, label, arrayKey) => {
+  const value = JSON.parse(text);
+  if (value?.schemaVersion !== 1 || !Array.isArray(value[arrayKey])) {
+    throw new Error(`${label} has an invalid published CMS package shape`);
+  }
+  if (label.endsWith('/published/tours.json') && value.tours.some((tour) =>
+    !tour || typeof tour.id !== 'string' || typeof tour.slug !== 'string' ||
+    typeof tour.season !== 'string' || typeof tour.status !== 'string')) {
+    throw new Error(`${label} contains an invalid tour document`);
+  }
+  if (arrayKey === 'tours' && value.tours.some((tour) => !tour || typeof tour.id !== 'string' || !tour.id)) {
+    throw new Error(`${label} contains a tour without an id`);
+  }
+  return text;
+};
+
+export async function syncCatalog({
+  root = rootDir,
+  env = process.env,
+  fetchImpl = fetch,
+} = {}) {
+  const source = resolveCatalogSource(env);
+  const scheduleDir = resolve(root, 'public/data/tour-schedule');
+  const cmsDir = resolve(root, 'public/data/cms');
+
+  if (source == null) {
     process.stdout.write('[sync:catalog] no CDN base URL set — seeding from fixtures\n');
-    await seedTourCatalogFromFixtures(rootDir);
+    await seedTourCatalogFromFixtures(root);
+    await mkdir(cmsDir, { recursive: true });
+    await writeFile(resolve(cmsDir, 'build-source.json'), '{"kind":"legacy"}\n', 'utf8');
     return;
   }
 
-  await mkdir(outDir, { recursive: true });
+  await mkdir(scheduleDir, { recursive: true });
+
+  if (source.kind === 'cms') {
+    const [toursText, toursListText, scheduleText] = await Promise.all([
+      fetchCatalogJson(source.toursUrl, fetchImpl),
+      fetchCatalogJson(source.toursListUrl, fetchImpl),
+      fetchCatalogJson(source.scheduleUrl, fetchImpl),
+    ]);
+    parsePackage(toursText, source.toursUrl, 'tours');
+    parsePackage(toursListText, source.toursListUrl, 'tours');
+    parsePackage(scheduleText, source.scheduleUrl, 'events');
+    await mkdir(cmsDir, { recursive: true });
+    await Promise.all([
+      writeFile(resolve(cmsDir, 'tours.json'), toursText, 'utf8'),
+      writeFile(resolve(scheduleDir, 'tours_list.json'), toursListText, 'utf8'),
+      writeFile(resolve(scheduleDir, 'schedule.json'), scheduleText, 'utf8'),
+      writeFile(resolve(cmsDir, 'build-source.json'), '{"kind":"cms"}\n', 'utf8'),
+    ]);
+    process.stdout.write(`[sync:catalog] updated published CMS tours and schedule (${JSON.parse(toursText).tours.length} tours)\n`);
+    return;
+  }
+
   for (const fileName of CATALOG_FILES) {
-    const url = `${base}/tour-schedule/${fileName}`;
+    const url = fileName === 'tours_list.json' ? source.toursListUrl : source.scheduleUrl;
     try {
-      const body = await fetchCatalogJson(url);
-      await writeFile(resolve(outDir, fileName), body, 'utf8');
+      const body = await fetchCatalogJson(url, fetchImpl);
+      await writeFile(resolve(scheduleDir, fileName), body, 'utf8');
       process.stdout.write(`[sync:catalog] updated ${fileName} from ${url}\n`);
     } catch (error) {
       process.stdout.write(
         `[sync:catalog] WARN ${fileName} from CDN (${error instanceof Error ? error.message : String(error)}) — using fixture\n`,
       );
       await copyFile(
-        resolve(rootDir, TOUR_CATALOG_FIXTURE_DIR, fileName),
-        resolve(outDir, fileName),
+        resolve(root, TOUR_CATALOG_FIXTURE_DIR, fileName),
+        resolve(scheduleDir, fileName),
       );
     }
   }
-};
+  await mkdir(cmsDir, { recursive: true });
+  await writeFile(resolve(cmsDir, 'build-source.json'), '{"kind":"legacy"}\n', 'utf8');
+}
 
-run().catch((error) => {
-  process.stderr.write(
-    `sync-catalog-from-cdn failed: ${error instanceof Error ? error.message : String(error)}\n`,
-  );
-  process.exitCode = 1;
-});
+if (process.argv[1] && resolve(process.argv[1]) === resolve(rootDir, 'scripts/sync-catalog-from-cdn.mjs')) {
+  loadDotEnvLocal(rootDir);
+  syncCatalog().catch((error) => {
+    process.stderr.write(
+      `sync-catalog-from-cdn failed: ${error instanceof Error ? error.message : String(error)}\n`,
+    );
+    process.exitCode = 1;
+  });
+}

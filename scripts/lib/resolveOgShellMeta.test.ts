@@ -106,6 +106,38 @@ describe('resolveOgShellMeta', () => {
       imagePathOrUrl: expect.stringContaining('summer-8'),
     });
   });
+
+  it('resolves OG metadata for an active CMS tour outside the legacy slug map', async () => {
+    const [{ resolveOgShellMeta }, { findTourBySeasonAndSegment }] = await Promise.all([
+      import('./resolveOgShellMeta.ts'),
+      import('../../src/data/tourLookup.ts'),
+    ]);
+    const base = findTourBySeasonAndSegment('summer', 'poluostrov-krabbe');
+    expect(base).toBeDefined();
+    const tour = {
+      ...base!,
+      id: 'fall-17',
+      slug: 'odin-den-v-ta-chingouze-2',
+      season: 'fall' as const,
+      title: 'Один день в Та-Чингоузе',
+      seo: {
+        title: 'Один день в Та-Чингоузе — осенний тур | Вкрайности',
+        description: 'CMS описание маршрута из Владивостока.',
+        h1: 'Осенний день в Та-Чингоузе',
+        keywords: ['Та-Чингоуза осенью'],
+      },
+    };
+    const meta = resolveOgShellMeta('/tours/fall/odin-den-v-ta-chingouze-2', 'active', {
+      toursById: new Map([[tour.id, tour]]),
+    });
+
+    expect(meta).toMatchObject({
+      title: tour.seo.title,
+      description: tour.seo.description,
+      path: '/tours/fall/odin-den-v-ta-chingouze-2/',
+      imagePathOrUrl: expect.stringContaining('summer-8'),
+    });
+  });
 });
 
 describe('collectOgShellImageLogicalPaths', () => {

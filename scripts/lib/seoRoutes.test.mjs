@@ -11,6 +11,28 @@ import {
 const rootDir = process.cwd();
 
 describe('catalog-aware SEO route sets', () => {
+  it('uses published CMS ids and slugs for active routes, while excluding hidden and draft tours', async () => {
+    const cmsTours = [
+      { id: 'summer-13', season: 'summer', slug: 'odin-den-v-ta-chingouze', status: 'active' },
+      { id: 'fall-17', season: 'fall', slug: 'odin-den-v-ta-chingouze-2', status: 'active' },
+      { id: 'fall-20', season: 'fall', slug: 'voskhozhdenie-na-goru-sestra-2', status: 'hidden' },
+      { id: 'fall-19', season: 'fall', slug: 'magia-bryusa', status: 'draft' },
+      { id: 'winter-6', season: 'winter', slug: 'new-winter-tour', status: 'in_development' },
+    ];
+
+    const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours);
+    const sitemap = await getSitemapRoutePaths(rootDir, cmsTours);
+    const renderable = await getRenderableRoutePaths(rootDir, cmsTours);
+
+    expect(statusByPath.get('/tours/summer/odin-den-v-ta-chingouze')).toBe('active');
+    expect(statusByPath.get('/tours/fall/odin-den-v-ta-chingouze-2')).toBe('active');
+    expect(sitemap).toContain('/tours/fall/odin-den-v-ta-chingouze-2');
+    expect(renderable).toContain('/tours/winter/new-winter-tour');
+    expect(sitemap).not.toContain('/tours/winter/new-winter-tour');
+    expect(renderable).not.toContain('/tours/fall/voskhozhdenie-na-goru-sestra-2');
+    expect(renderable).not.toContain('/tours/fall/magia-bryusa');
+  });
+
   it('sitemap contains active tours, excludes in_development; renderable contains both', async () => {
     const statusByPath = await getTourStatusByPublicPath(rootDir);
     const activePaths = [...statusByPath.entries()]

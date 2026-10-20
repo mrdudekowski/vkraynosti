@@ -6,6 +6,7 @@ import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { normalizeCanonicalPath } from '../src/constants/canonicalUrl.ts';
 import { getSitemapRoutePaths, resolveSiteRoot } from './lib/seoRoutes.mjs';
+import { loadBuildCmsToursFile } from './lib/loadBuildCmsTours.ts';
 
 const rootDir = process.cwd();
 const siteRoot = resolveSiteRoot();
@@ -20,7 +21,8 @@ const createUrlNode = (routePath: string): string => {
 };
 
 const run = async (): Promise<void> => {
-  const allRoutes = await getSitemapRoutePaths(rootDir);
+  const cmsTours = await loadBuildCmsToursFile(rootDir);
+  const allRoutes = await getSitemapRoutePaths(rootDir, cmsTours?.tours);
   const xmlLines = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

@@ -78,4 +78,33 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.bodyHtml).toContain('Тестовое описание маршрута Краббе.');
     expect(page.structuredData[0]).toMatchObject({ name: 'Поездка на полуостров Краббе' });
   });
+
+  it('renders an active CMS tour route that has no legacy static lookup entry', () => {
+    const base = findTourBySeasonAndSegment('summer', 'poluostrov-krabbe');
+    expect(base).toBeDefined();
+    const tour = {
+      ...base!,
+      id: 'fall-17',
+      slug: 'odin-den-v-ta-chingouze-2',
+      season: 'fall' as const,
+      title: 'Один день в Та-Чингоузе',
+      seo: {
+        title: 'Один день в Та-Чингоузе — осенний тур | Вкрайности',
+        description: 'CMS описание маршрута из Владивостока.',
+        h1: 'Осенний день в Та-Чингоузе',
+        keywords: ['Та-Чингоуза осенью'],
+      },
+    };
+
+    const page = resolveDataSsgForRoute(
+      '/tours/fall/odin-den-v-ta-chingouze-2',
+      emptySnapshot(),
+      'active',
+      { toursById: new Map([[tour.id, tour]]) },
+    );
+
+    expect(page.bodyHtml).toContain('<h1>Осенний день в Та-Чингоузе</h1>');
+    expect(page.bodyHtml).toContain('CMS описание маршрута из Владивостока.');
+    expect(page.structuredData[0]).toMatchObject({ name: 'Осенний день в Та-Чингоузе' });
+  });
 });

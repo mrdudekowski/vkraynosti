@@ -49,6 +49,48 @@ export function extractTourPublicUrlsFromSlugMap(tourSlugsSource) {
   );
 }
 
+/** Read the catalog snapshot produced by `sync:catalog`; null means legacy mode. */
+export async function loadBuildCmsTourDocuments(rootDir = process.cwd()) {
+  const markerPath = resolve(rootDir, 'public/data/cms/build-source.json');
+  let marker;
+  try {
+    marker = JSON.parse(await readFile(markerPath, 'utf8'));
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null;
+    throw new Error(`Invalid catalog build-source marker: ${markerPath}`, { cause: error });
+  }
+  if (typeof marker !== 'object' || marker == null || !('kind' in marker)) {
+    throw new Error(`Invalid catalog build-source marker: ${markerPath}`);
+  }
+  if (marker.kind === 'legacy') return null;
+  if (marker.kind !== 'cms') {
+    throw new Error(`Unknown catalog build-source kind: ${String(marker.kind)}`);
+  }
+
+  const filePath = resolve(rootDir, 'public/data/cms/tours.json');
+  const parsed = JSON.parse(await readFile(filePath, 'utf8'));
+  if (parsed?.schemaVersion !== 1 || !Array.isArray(parsed.tours)) {
+    throw new Error(`Published CMS tour snapshot has an invalid shape: ${filePath}`);
+  }
+  return parsed.tours;
+}
+
+function publicPathForCmsTour(tour) {
+  const season = ['winter', 'spring', 'summer', 'fall'].includes(tour?.season)
+    ? tour.season
+    : null;
+  const slug = typeof tour?.slug === 'string' ? tour.slug.trim() : '';
+  if (
+    !season ||
+    typeof tour?.id !== 'string' ||
+    !tour.id.startsWith(`${season}-`) ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
+  ) {
+    throw new Error(`Invalid published CMS tour route data for id "${tour?.id ?? ''}"`);
+  }
+  return `/tours/${season}/${slug}`;
+}
+
 /** Legacy id paths for tours with slug (redirect shells only). */
 export function extractLegacyTourRedirectUrls(tourSlugsSource) {
   const slugMap = parseTourSlugMap(tourSlugsSource);
@@ -116,10 +158,42 @@ async function loadPublishedTourStatusById(rootDir) {
  * public slug AND appear in the catalog. Hidden tours (absent from catalog) are omitted,
  * so they never reach sitemap, prerender or OG shells.
  */
-export async function getTourStatusByPublicPath(rootDir = process.cwd()) {
+export async function getTourStatusByPublicPath(rootDir = process.cwd(), publishedCmsTours) {
   const { tourSlugsSource } = await loadSeoRouteSources(rootDir);
   const slugMap = parseTourSlugMap(tourSlugsSource);
   const statusById = await loadPublishedTourStatusById(rootDir);
+
+  const cmsTours = publishedCmsTours ?? await loadBuildCmsTourDocuments(rootDir);
+  if (cmsTours != null) {
+    const statusByPath = new Map();
+    const ownerByPath = new Map();
+    const cmsTourIds = new Set(cmsTours.map((tour) => tour?.id).filter(Boolean));
+
+    // Keep legacy routes for tours not yet represented by a CMS document.
+    // CMS status and slug are authoritative for IDs that do have a document.
+    for (const [tourId, status] of statusById) {
+      if (cmsTourIds.has(tourId) || !['active', 'in_development'].includes(status)) continue;
+      const slug = slugMap.get(tourId);
+      if (slug) {
+        const path = `/tours/${seasonFromTourId(tourId)}/${slug}`;
+        statusByPath.set(path, status);
+        ownerByPath.set(path, tourId);
+      }
+    }
+
+    for (const tour of cmsTours) {
+      if (!['active', 'in_development'].includes(tour?.status)) continue;
+      const path = publicPathForCmsTour(tour);
+      const owner = ownerByPath.get(path);
+      if (owner != null && owner !== tour.id) {
+        throw new Error(`Duplicate published CMS tour route ${path}: ${owner} and ${tour.id}`);
+      }
+      ownerByPath.set(path, tour.id);
+      statusByPath.set(path, tour.status);
+    }
+
+    return statusByPath;
+  }
 
   const statusByPath = new Map();
   for (const [tourId, slug] of slugMap) {
@@ -135,9 +209,9 @@ export async function getTourStatusByPublicPath(rootDir = process.cwd()) {
  * Sitemap = index-eligible URLs: static indexable routes + ONLY `active` tours.
  * `in_development` (noindex) and `hidden` tours are excluded.
  */
-export async function getSitemapRoutePaths(rootDir = process.cwd()) {
+export async function getSitemapRoutePaths(rootDir = process.cwd(), publishedCmsTours) {
   const { routesSource } = await loadSeoRouteSources(rootDir);
-  const statusByPath = await getTourStatusByPublicPath(rootDir);
+  const statusByPath = await getTourStatusByPublicPath(rootDir, publishedCmsTours);
   const activeTourPaths = [...statusByPath.entries()]
     .filter(([, status]) => status === 'active')
     .map(([path]) => path);
@@ -151,11 +225,16 @@ export async function getSitemapRoutePaths(rootDir = process.cwd()) {
  * Hidden tours are excluded — they render not-found at runtime and would time out the
  * prerender content gate.
  */
-export async function getRenderableRoutePaths(rootDir = process.cwd()) {
+export async function getRenderableRoutePaths(rootDir = process.cwd(), publishedCmsTours) {
   const { routesSource } = await loadSeoRouteSources(rootDir);
-  const statusByPath = await getTourStatusByPublicPath(rootDir);
+  const statusByPath = await getTourStatusByPublicPath(rootDir, publishedCmsTours);
   return [
-    ...new Set([...getStaticIndexableRoutePaths(routesSource), ...statusByPath.keys()]),
+    ...new Set([
+      ...getStaticIndexableRoutePaths(routesSource),
+      ...[...statusByPath.entries()]
+        .filter(([, status]) => status === 'active' || status === 'in_development')
+        .map(([path]) => path),
+    ]),
   ];
 }
 

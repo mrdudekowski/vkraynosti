@@ -21,7 +21,7 @@ import { renderLegacyRedirectRules } from './renderLegacyRedirectRules.ts';
 import { resolveOgShellMeta } from './resolveOgShellMeta.ts';
 import { routePathToDistFile } from './seoRoutes.mjs';
 import { OG_FALLBACK_JPEG_LOGICAL } from './ogShellTelegramImage.ts';
-import { loadCmsToursFile } from '../../src/cms/loadCmsToursFile.ts';
+import { loadBuildCmsToursFile } from './loadBuildCmsTours.ts';
 import { cmsDocumentToSiteTour } from '../../src/cms/cmsDocumentToSiteTour.ts';
 import { loadPublishedSiteContent } from '../../src/cms/loadSiteContent.ts';
 
@@ -51,12 +51,12 @@ export async function runGenerateOgShells(): Promise<void> {
     fallbackJpegPath,
   );
 
-  const routes = await getRenderableRoutePaths(rootDir);
-  const statusByPath = await getTourStatusByPublicPath(rootDir);
   const [cmsTours, siteSeoDocument] = await Promise.all([
-    loadCmsToursFile(),
+    loadBuildCmsToursFile(rootDir),
     loadPublishedSiteContent('seo'),
   ]);
+  const routes = await getRenderableRoutePaths(rootDir, cmsTours?.tours);
+  const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours?.tours);
   const overrides = {
     toursById: new Map((cmsTours?.tours ?? []).map((document) => [document.id, cmsDocumentToSiteTour(document)])),
     siteSeo: siteSeoDocument?.kind === 'seo' ? siteSeoDocument : null,

@@ -41,6 +41,29 @@ const session = (canEditSiteContent: boolean): CmsSession => ({
 });
 
 describe('site content routes', () => {
+  it('saves, reloads, and publishes the fixed site SEO document with its revision', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const initial = await app.request('/api/cms/site-content/seo');
+    const body = await initial.json() as { document: ReturnType<typeof seedSiteContentDocuments>['seo']; meta: { rev: number } };
+    const document = { ...body.document, pages: body.document.pages.map((page) => page.key === 'home'
+      ? { ...page, title: 'SEO главной', keywords: ['туры по Приморью'] }
+      : page) };
+    const saved = await app.request('/api/cms/site-content/seo', {
+      method: 'PUT', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: body.meta.rev, document }),
+    });
+    expect(saved.status).toBe(200);
+    const reloaded = await app.request('/api/cms/site-content/seo');
+    expect((await reloaded.json()).document.pages[0]).toMatchObject({ title: 'SEO главной', keywords: ['туры по Приморью'] });
+    const publish = await app.request('/api/cms/site-content/seo/publish', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: body.meta.rev + 1 }),
+    });
+    expect(publish.status).toBe(200);
+    expect(await store.getJson('published/site-seo/document.json')).toMatchObject({
+      pages: expect.arrayContaining([expect.objectContaining({ key: 'home', title: 'SEO главной' })]),
+    });
+  });
   it('denies an editor without the site content privilege', async () => {
     const { app } = createSiteApp(session(false));
     const response = await app.request('/api/cms/site-content/team');

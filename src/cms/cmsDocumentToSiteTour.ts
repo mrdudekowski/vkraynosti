@@ -118,6 +118,7 @@ export function cmsDocumentToSiteTour(document: CmsTourDocument): Tour {
       : {}),
     ...(document.descriptionAside != null ? { descriptionAside: document.descriptionAside } : {}),
     ...(document.seoDescription != null ? { seoDescription: document.seoDescription } : {}),
+    ...(document.seo != null ? { seo: document.seo } : document.seoDescription != null ? { seo: { description: document.seoDescription } } : {}),
     ...(document.contentSourceTourId != null
       ? { contentSourceTourId: document.contentSourceTourId }
       : {}),

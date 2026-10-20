@@ -43,6 +43,20 @@ const tour: Tour = {
 };
 
 describe('siteTourToCmsDocument', () => {
+  it('сохраняет управляемые SEO-поля при переходе между форматом сайта и CMS', () => {
+    const seoTour: Tour = {
+      ...tour,
+      seo: {
+        title: 'Остров Краббе — тур из Владивостока | Вкрайности',
+        description: 'Однодневная поездка на полуостров Краббе с выездом из Владивостока.',
+        h1: 'Поездка на полуостров Краббе',
+        keywords: ['полуостров Краббе', 'тур из Владивостока'],
+      },
+    };
+    const document = siteTourToCmsDocument(seoTour);
+    expect(cmsDocumentToSiteTour(document).seo).toEqual(seoTour.seo);
+  });
+
   it('сохраняет обложку, предисловие и слоты bento', () => {
     const document = siteTourToCmsDocument(tour);
     expect(document.coverAssetId).toBe('cover');

@@ -47,6 +47,7 @@ export const cmsTourSeoSchema = z.object({
   title: z.string().default(''),
   description: z.string().default(''),
   h1: z.string().default(''),
+  keywords: z.array(z.string().trim().min(1).max(80)).max(8).default([]),
 });
 
 export const CMS_TOUR_STATUSES = ['draft', 'in_development', 'active', 'hidden'] as const;

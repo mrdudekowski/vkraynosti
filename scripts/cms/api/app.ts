@@ -18,6 +18,7 @@ import {
   CMS_TOUR_STATUSES,
   cmsCoverCropSchema,
   cmsTourDocumentSchema,
+  cmsTourSeoSchema,
   parseCmsToursFile,
   type CmsTourDocument,
 } from '../../../src/cms/cmsTourDocument.ts';
@@ -99,7 +100,7 @@ const loginBodySchema = z.object({
   password: z.string().min(1),
 });
 
-const textPatchSchema = z.object({
+export const textPatchSchema = z.object({
   title: z.string().optional(),
   slug: z.string().optional(),
   subtitle: z.string().optional(),
@@ -113,6 +114,7 @@ const textPatchSchema = z.object({
   pricePrevious: z.string().optional(),
   priceFootnote: z.string().optional(),
   seoDescription: z.string().optional(),
+  seo: cmsTourSeoSchema.optional(),
   description: z.string(),
   descriptionLeadBold: z.string().optional(),
   descriptionAside: z.string().optional(),

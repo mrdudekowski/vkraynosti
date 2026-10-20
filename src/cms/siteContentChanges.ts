@@ -2,10 +2,20 @@ import type { SiteContentDocument, SiteContentDocumentKind } from './siteContent
 
 export type SiteContentChange = { label: string; from: string; to: string };
 export type SiteContentChangesItem = { kind: SiteContentDocumentKind; title: string; author: string; timestamp: string; rev: number; changes: SiteContentChange[] };
-export const SITE_CONTENT_KIND_LABELS: Record<SiteContentDocumentKind, string> = { team: 'Команда', contacts: 'Контакты', footer: 'Подвал', modal: 'Модальная заявка' };
+export const SITE_CONTENT_KIND_LABELS: Record<SiteContentDocumentKind, string> = { team: 'Команда', contacts: 'Контакты', footer: 'Подвал', modal: 'Модальная заявка', seo: 'SEO страниц сайта' };
 const display = (value: unknown): string => value == null || value === '' ? 'не задано' : typeof value === 'boolean' ? (value ? 'включено' : 'выключено') : String(value);
 export function siteContentChanges(kind: SiteContentDocumentKind, draft: SiteContentDocument, published: SiteContentDocument | null): SiteContentChange[] {
   if (published != null && JSON.stringify(draft) === JSON.stringify(published)) return [];
+  if (kind === 'seo' && draft.kind === 'seo') {
+    const previous = published?.kind === 'seo' ? published : null;
+    const previousByKey = new Map(previous?.pages.map((page) => [page.key, page]) ?? []);
+    return draft.pages.flatMap((page) => {
+      const old = previousByKey.get(page.key);
+      return (['title', 'description', 'h1', 'keywords'] as const)
+        .filter((field) => JSON.stringify(old?.[field] ?? []) !== JSON.stringify(page[field]))
+        .map((field) => ({ label: `${page.path} · ${field}`, from: display(old?.[field]), to: display(page[field]) }));
+    });
+  }
   if (kind === 'modal' && draft.kind === 'modal') {
     const previous = published?.kind === 'modal' ? published : null;
     return [['Режим CTA', previous?.requestFormEnabled == null ? 'не опубликован' : (previous.requestFormEnabled ? 'форма заявки' : 'контакты'), draft.requestFormEnabled ? 'форма заявки' : 'контакты'], ['Заголовок контактного окна', previous?.contactTitle, draft.contactTitle], ['Описание контактного окна', previous?.contactDescription, draft.contactDescription], ['Текст CTA со страницы тура', previous?.tourContactTitle, draft.tourContactTitle]].filter(([, from, to]) => display(from) !== display(to)).map(([label, from, to]) => ({ label: String(label), from: display(from), to: display(to) }));

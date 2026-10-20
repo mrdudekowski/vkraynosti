@@ -18,6 +18,7 @@ const siteSeoPageSchema = z.object({
   title: z.string().default(''),
   description: z.string().default(''),
   h1: z.string().default(''),
+  keywords: z.array(z.string().trim().min(1).max(80)).max(8).default([]),
 }).superRefine((page, ctx) => {
   if (SITE_SEO_PAGE_PATHS[page.key] !== page.path) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'SEO page path does not match its fixed key', path: ['path'] });
@@ -46,6 +47,6 @@ export function createDefaultSiteSeoDocument(): SiteSeoDocument {
   return {
     kind: 'seo',
     schemaVersion: SITE_SEO_SCHEMA_VERSION,
-    pages: SITE_SEO_PAGE_KEYS.map((key) => ({ key, path: SITE_SEO_PAGE_PATHS[key], title: '', description: '', h1: '' })),
+    pages: SITE_SEO_PAGE_KEYS.map((key) => ({ key, path: SITE_SEO_PAGE_PATHS[key], title: '', description: '', h1: '', keywords: [] })),
   };
 }

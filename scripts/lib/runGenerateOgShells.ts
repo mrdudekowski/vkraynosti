@@ -21,6 +21,9 @@ import { renderLegacyRedirectRules } from './renderLegacyRedirectRules.ts';
 import { resolveOgShellMeta } from './resolveOgShellMeta.ts';
 import { routePathToDistFile } from './seoRoutes.mjs';
 import { OG_FALLBACK_JPEG_LOGICAL } from './ogShellTelegramImage.ts';
+import { loadCmsToursFile } from '../../src/cms/loadCmsToursFile.ts';
+import { cmsDocumentToSiteTour } from '../../src/cms/cmsDocumentToSiteTour.ts';
+import { loadPublishedSiteContent } from '../../src/cms/loadSiteContent.ts';
 
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
@@ -50,9 +53,17 @@ export async function runGenerateOgShells(): Promise<void> {
 
   const routes = await getRenderableRoutePaths(rootDir);
   const statusByPath = await getTourStatusByPublicPath(rootDir);
+  const [cmsTours, siteSeoDocument] = await Promise.all([
+    loadCmsToursFile(),
+    loadPublishedSiteContent('seo'),
+  ]);
+  const overrides = {
+    toursById: new Map((cmsTours?.tours ?? []).map((document) => [document.id, cmsDocumentToSiteTour(document)])),
+    siteSeo: siteSeoDocument?.kind === 'seo' ? siteSeoDocument : null,
+  };
   const routeMetas = routes.map((routePath) => ({
     routePath,
-    meta: resolveOgShellMeta(routePath, statusByPath.get(routePath)),
+    meta: resolveOgShellMeta(routePath, statusByPath.get(routePath), overrides),
   }));
 
   const logicalPaths = collectOgShellImageLogicalPaths(

@@ -5,7 +5,16 @@ describe('siteSeoDocumentSchema', () => {
   it('создаёт ровно пять фиксированных публичных страниц', () => {
     const document = createDefaultSiteSeoDocument();
     expect(document.pages.map((page) => page.key)).toEqual(['home', 'winter', 'spring', 'summer', 'fall']);
+    expect(document.pages.every((page) => page.keywords.length === 0)).toBe(true);
     expect(parseSiteSeoDocument(document)).toEqual(document);
+  });
+
+  it('ограничивает SEO-фразы восемью на страницу', () => {
+    const document = createDefaultSiteSeoDocument();
+    const home = document.pages.map((page) => page.key === 'home'
+      ? { ...page, keywords: Array.from({ length: 9 }, (_, index) => `фраза ${index + 1}`) }
+      : page);
+    expect(siteSeoDocumentSchema.safeParse({ ...document, pages: home }).success).toBe(false);
   });
 
   it('отклоняет неизвестный или неправильный маршрут страницы', () => {

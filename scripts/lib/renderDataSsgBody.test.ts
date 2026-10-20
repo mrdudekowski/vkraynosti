@@ -57,4 +57,25 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.structuredData).toHaveLength(2);
     expect(page.structuredData[0]).toMatchObject({ '@type': 'TouristTrip' });
   });
+
+  it('renders CMS SEO H1 and schema name for the tour route', () => {
+    const base = findTourBySeasonAndSegment('summer', 'poluostrov-krabbe');
+    expect(base).toBeDefined();
+    const seo = {
+      title: 'Краббе — маршрут из Владивостока | Вкрайности',
+      description: 'Тестовое описание маршрута Краббе.',
+      h1: 'Поездка на полуостров Краббе',
+      keywords: ['полуостров Краббе'],
+    };
+    const tour = { ...base!, seo };
+    const page = resolveDataSsgForRoute(
+      '/tours/summer/poluostrov-krabbe',
+      emptySnapshot(),
+      'active',
+      { toursById: new Map([[tour.id, tour]]) },
+    );
+    expect(page.bodyHtml).toContain('<h1>Поездка на полуостров Краббе</h1>');
+    expect(page.bodyHtml).toContain('Тестовое описание маршрута Краббе.');
+    expect(page.structuredData[0]).toMatchObject({ name: 'Поездка на полуостров Краббе' });
+  });
 });

@@ -342,6 +342,51 @@ describe('CMS API', () => {
     expect(catalog.tours[0]?.description).toBe('Старый текст');
   });
 
+  it('сохраняет все SEO-поля тура через CMS API и отдаёт их после повторной загрузки', async () => {
+    const { app, store } = createApp();
+    const cookie = await login(app, editorLogin, 'editor-pass');
+    const response = await app.request('/api/cms/tours/winter-1', {
+      method: 'PUT',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        rev: 1,
+        patch: {
+          description: document.description,
+          prefaceAssetId: document.prefaceAssetId,
+          included: document.included,
+          program: document.program,
+          seo: {
+            title: 'Изюбриную зимой — тур из Владивостока | Вкрайности',
+            description: 'Зимний маршрут на Изюбриную, 16 часов, выезд из Владивостока.',
+            h1: 'Зимнее восхождение на Изюбриную',
+            keywords: ['восхождение на Изюбриную', 'зимний тур Приморье'],
+          },
+        },
+      }),
+    });
+    expect(response.status).toBe(200);
+
+    const reloaded = await app.request('/api/cms/tours/winter-1', { headers: { cookie } });
+    const body = (await reloaded.json()) as { document: CmsTourDocument };
+    expect(body.document.seo).toEqual({
+      title: 'Изюбриную зимой — тур из Владивостока | Вкрайности',
+      description: 'Зимний маршрут на Изюбриную, 16 часов, выезд из Владивостока.',
+      h1: 'Зимнее восхождение на Изюбриную',
+      keywords: ['восхождение на Изюбриную', 'зимний тур Приморье'],
+    });
+    expect(body.document.seoDescription).toBe('Зимний маршрут на Изюбриную, 16 часов, выезд из Владивостока.');
+
+    const adminCookie = await login(app);
+    const published = await app.request('/api/cms/tours/winter-1/publish', {
+      method: 'POST',
+      headers: { cookie: adminCookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: 2 }),
+    });
+    expect(published.status).toBe(200);
+    const catalog = (await store.getJson(CMS_PUBLISHED_CATALOG_KEY)) as { tours: CmsTourDocument[] };
+    expect(catalog.tours.find((tour) => tour.id === 'winter-1')?.seo).toEqual(body.document.seo);
+  });
+
   it('отдаёт 409 при устаревшем rev', async () => {
     const { app } = createApp();
     const cookie = await login(app);

@@ -15,6 +15,13 @@ export interface TourIncludedItem {
   icon: IconDefinition;
 }
 
+export interface TourSeo {
+  title?: string;
+  description?: string;
+  h1?: string;
+  keywords?: string[];
+}
+
 export interface Tour {
   id: string;
   /**
@@ -26,6 +33,7 @@ export interface Tour {
    * Stable SEO/OG description (≤120 chars). Overrides auto-generated text from subtitle.
    */
   seoDescription?: string;
+  seo?: TourSeo;
   season: 'winter' | 'spring' | 'summer' | 'fall';
   title: string;
   subtitle: string;

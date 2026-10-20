@@ -11,6 +11,7 @@ import {
 interface PageMetaProps {
   title: string;
   description: string;
+  keywords?: readonly string[];
   imageUrl?: string;
   path: string;
   robots?: RobotsDirective;
@@ -30,6 +31,7 @@ interface PageMetaProps {
 const PageMeta = ({
   title,
   description,
+  keywords,
   imageUrl,
   path,
   robots = SEO_DEFAULTS.robots,
@@ -57,6 +59,7 @@ const PageMeta = ({
       <title>{title}</title>
       <meta name="color-scheme" content={DOCUMENT_COLOR_SCHEME} />
       <meta name="description" content={description} />
+      {keywords != null && keywords.length > 0 ? <meta name="keywords" content={keywords.join(', ')} /> : null}
       <meta name="robots" content={robots} />
       <link rel="canonical" href={canonicalUrl} />
       <meta property="og:title" content={title} />

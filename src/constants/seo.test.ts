@@ -112,3 +112,25 @@ describe('SEO_DEFAULTS.defaultOgImage', () => {
     expect(SEO_DEFAULTS.defaultOgImage).toMatch(/^https:\/\//);
   });
 });
+
+describe('CMS tour SEO fields', () => {
+  it('prefers CMS title, description, H1, and curated keyword phrases', async () => {
+    vi.stubEnv('VITE_SITE_URL', 'https://vkraynosti.ru');
+    vi.resetModules();
+    const [{ getTourSeoEntry, getTourStructuredData }, { getRuntimeTourById }] = await Promise.all([
+      import('./seo'),
+      import('../data/runtimeCatalog'),
+    ]);
+    const base = getRuntimeTourById('summer-10');
+    if (!base) throw new Error('summer-10 missing');
+    const tour = { ...base, seo: {
+      title: 'Тестовый title тура', description: 'Тестовое описание маршрута.',
+      h1: 'Тестовый H1 тура', keywords: ['туры по Приморью', 'бухта Краббе'],
+    } };
+    expect(getTourSeoEntry(tour)).toMatchObject({
+      title: 'Тестовый title тура', description: 'Тестовое описание маршрута.',
+      h1: 'Тестовый H1 тура', keywords: ['туры по Приморью', 'бухта Краббе'],
+    });
+    expect(getTourStructuredData(tour).name).toBe('Тестовый H1 тура');
+  });
+});

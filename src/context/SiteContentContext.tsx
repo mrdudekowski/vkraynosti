@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { ContactsContentDocument, FooterContentDocument, ModalContentDocument, TeamContentDocument } from '../cms/siteContentDocument';
+import type { SiteSeoDocument } from '../cms/siteSeoDocument';
 import { loadPublishedSiteContent } from '../cms/loadSiteContent';
 import { seedSiteContentDocuments } from '../cms/siteContentSeed';
 import { TEAM_HERO_PAGES } from '../data/teamData';
 
-type SiteContentValue = { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument };
+type SiteContentValue = { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument; seo: SiteSeoDocument };
 const seeded = seedSiteContentDocuments();
-const fallback: SiteContentValue = { team: { ...seeded.team, members: TEAM_HERO_PAGES.flat().filter((member, index, all) => all.findIndex((candidate) => candidate.id === member.id) === index).map((member, order) => ({ ...(seeded.team.members.find((candidate) => candidate.id === member.id) ?? seeded.team.members[order]), order })) }, contacts: seeded.contacts, footer: seeded.footer, modal: seeded.modal };
+const fallback: SiteContentValue = { team: { ...seeded.team, members: TEAM_HERO_PAGES.flat().filter((member, index, all) => all.findIndex((candidate) => candidate.id === member.id) === index).map((member, order) => ({ ...(seeded.team.members.find((candidate) => candidate.id === member.id) ?? seeded.team.members[order]), order })) }, contacts: seeded.contacts, footer: seeded.footer, modal: seeded.modal, seo: seeded.seo };
 const SiteContentContext = createContext<SiteContentValue>(fallback);
 
 export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
@@ -18,13 +19,15 @@ export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
       loadPublishedSiteContent('contacts'),
       loadPublishedSiteContent('footer'),
       loadPublishedSiteContent('modal'),
-    ]).then(([team, contacts, footer, modal]) => {
+      loadPublishedSiteContent('seo'),
+    ]).then(([team, contacts, footer, modal, seo]) => {
       if (!alive) return;
       setValue({
         team: team?.kind === 'team' ? team : fallback.team,
         contacts: contacts?.kind === 'contacts' ? contacts : fallback.contacts,
         footer: footer?.kind === 'footer' ? footer : fallback.footer,
         modal: modal?.kind === 'modal' ? modal : fallback.modal,
+        seo: seo?.kind === 'seo' ? seo : fallback.seo,
       });
     }).catch(() => undefined);
     return () => { alive = false; };
@@ -35,3 +38,7 @@ export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useSiteContent = () => useContext(SiteContentContext);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useSiteSeoPage = (key: SiteSeoDocument['pages'][number]['key']) =>
+  useContext(SiteContentContext).seo.pages.find((page) => page.key === key);

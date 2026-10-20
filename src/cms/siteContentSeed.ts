@@ -3,6 +3,7 @@ import { getLegalDocumentUrl, LEGAL_DOCUMENTS } from '../constants/legalDocument
 import { LEGAL_ENTITY } from '../constants/legalEntity';
 import { UI } from '../constants/ui';
 import { TEAM } from '../data/teamData';
+import { createDefaultSiteSeoDocument } from './siteSeoDocument';
 import type {
   ContactsContentDocument,
   FooterContentDocument,
@@ -135,6 +136,8 @@ const modal: ModalContentDocument = {
   tourContactTitle: 'Свяжитесь с нами и забронируйте тур',
 };
 
-export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument } {
-  return { team, contacts, footer, modal };
+const seo = createDefaultSiteSeoDocument();
+
+export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument; seo: ReturnType<typeof createDefaultSiteSeoDocument> } {
+  return { team, contacts, footer, modal, seo };
 }

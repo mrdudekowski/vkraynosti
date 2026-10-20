@@ -28,6 +28,7 @@ const shellText = (value: string): string => escapeHtml(normalizeMetaContent(val
 export const renderOgShellHead = (meta: OgShellMeta): string => {
   const title = shellText(meta.title);
   const description = shellText(meta.description);
+  const keywords = meta.keywords?.length ? `<meta name="keywords" content="${escapeHtml(meta.keywords.join(', '))}" />` : '';
   const robots = escapeHtml(meta.robots);
   const canonicalUrl = escapeHtml(getCanonicalUrl(meta.canonicalPath ?? meta.path));
   const ogImage = escapeHtml(getOgShellAbsoluteImageUrl(meta.imagePathOrUrl));
@@ -57,7 +58,7 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
       <meta name="twitter:title" content="${title}" />
       <meta name="twitter:description" content="${description}" />
       <meta name="twitter:image" content="${ogImage}" />
-      <meta name="twitter:url" content="${canonicalUrl}" />`;
+      <meta name="twitter:url" content="${canonicalUrl}" />${keywords}`;
 };
 
 const ensureOgHtmlPrefix = (html: string): string => {
@@ -77,6 +78,7 @@ const ensureOgHtmlPrefix = (html: string): string => {
 export const stripOgShellMetaFromHead = (html: string): string =>
   html
     .replace(/<meta\s+name="description"[^>]*>\s*/gi, '')
+    .replace(/<meta\s+name="keywords"[^>]*>\s*/gi, '')
     .replace(/<meta\s+name="robots"[^>]*>\s*/gi, '')
     .replace(/<link\s+rel="canonical"[^>]*>\s*/gi, '')
     .replace(/<meta\s+property="og:[^"]+"[^>]*>\s*/gi, '')

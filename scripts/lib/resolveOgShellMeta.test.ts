@@ -81,6 +81,31 @@ describe('resolveOgShellMeta', () => {
     expect(meta.title).toContain('Вкрайности');
     expect(meta.title).not.toContain('|');
   });
+
+  it('uses CMS tour SEO fields in the generated crawlable shell', async () => {
+    const [{ resolveOgShellMeta }, { findTourBySeasonAndSegment }] = await Promise.all([
+      import('./resolveOgShellMeta.ts'),
+      import('../../src/data/tourLookup.ts'),
+    ]);
+    const base = findTourBySeasonAndSegment('summer', 'poluostrov-krabbe');
+    expect(base).toBeDefined();
+    const tour = {
+      ...base!,
+      seo: {
+        title: 'Краббе — маршрут из Владивостока | Вкрайности',
+        description: 'Тестовое описание маршрута Краббе.',
+        h1: 'Поездка на полуостров Краббе',
+        keywords: ['полуостров Краббе'],
+      },
+    };
+    const meta = resolveOgShellMeta('/tours/summer/poluostrov-krabbe', 'active', { toursById: new Map([[tour.id, tour]]) });
+    expect(meta).toMatchObject({
+      title: tour.seo.title,
+      description: tour.seo.description,
+      keywords: tour.seo.keywords,
+      imagePathOrUrl: expect.stringContaining('summer-8'),
+    });
+  });
 });
 
 describe('collectOgShellImageLogicalPaths', () => {

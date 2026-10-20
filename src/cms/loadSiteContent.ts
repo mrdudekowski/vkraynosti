@@ -21,6 +21,7 @@ function parseDocument(
   if (kind === 'team') return parseSiteContentDocument('team', input);
   if (kind === 'contacts') return parseSiteContentDocument('contacts', input);
   if (kind === 'modal') return parseSiteContentDocument('modal', input);
+  if (kind === 'seo') return parseSiteContentDocument('seo', input);
   return parseSiteContentDocument('footer', input);
 }
 

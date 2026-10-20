@@ -8,6 +8,7 @@ import HomeHeroContactRail from '../components/home/HomeHeroContactRail';
 import HomeSeasonBanner from '../components/home/HomeSeasonBanner';
 import HomeBelowFoldSuspenseFallback from '../components/home/HomeBelowFoldSuspenseFallback';
 import PageMeta from '../components/shared/PageMeta';
+import { useSiteSeoPage } from '../context/SiteContentContext';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
 import SeasonSwitcher from '../components/shared/SeasonSwitcher';
 import TourCard from '../components/shared/TourCard';
@@ -73,6 +74,7 @@ import {
 const HOME_TOURS_HEADING_ELEMENT_ID = 'home-tours-heading';
 
 const Home = () => {
+  const homeSeo = useSiteSeoPage('home');
   const location = useLocation();
   const lenis = useLenis();
   const { activeSeason } = useSeason();
@@ -312,8 +314,9 @@ const Home = () => {
   return (
     <>
       <PageMeta
-        title={SEO_DEFAULTS.home.title}
-        description={SEO_DEFAULTS.home.description}
+        title={homeSeo?.title?.trim() || SEO_DEFAULTS.home.title}
+        description={homeSeo?.description?.trim() || SEO_DEFAULTS.home.description}
+        keywords={homeSeo?.keywords}
         imageUrl={IMAGES.seasonSection[activeSeason]}
         path={SEO_DEFAULTS.home.path}
         structuredData={[ORGANIZATION_SCHEMA, WEBSITE_SCHEMA]}
@@ -357,7 +360,7 @@ const Home = () => {
             </div>
           </div>
 
-          <HeroCarousel ref={heroSectionRef} />
+          <HeroCarousel ref={heroSectionRef} heading={homeSeo?.h1?.trim()} />
           <HomeHeroContactRail />
 
           <section

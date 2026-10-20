@@ -136,6 +136,12 @@ export function siteTourToCmsDocument(tour: Tour): CmsTourDocument {
       iconKey: includedIconKey(item.icon),
     })),
     ...(tour.seoDescription != null ? { seoDescription: tour.seoDescription } : {}),
+    ...(tour.seo != null ? { seo: {
+      title: tour.seo.title ?? '',
+      description: tour.seo.description ?? '',
+      h1: tour.seo.h1 ?? '',
+      keywords: tour.seo.keywords ?? [],
+    } } : {}),
     ...(tour.contentSourceTourId != null
       ? { contentSourceTourId: tour.contentSourceTourId }
       : {}),

@@ -207,6 +207,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
       <PageMeta
         title={seoEntry.title}
         description={seoEntry.description}
+        keywords={seoEntry.keywords}
         imageUrl={heroImageUrl}
         path={seoEntry.path}
         robots={seoEntry.robots}
@@ -216,7 +217,7 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
         key={tour.id}
         imageUrl={heroImageUrl}
         imageAlt={tour.title}
-        title={tour.title}
+        title={seoEntry.h1 ?? tour.title}
         subtitle={tour.subtitle}
         backLinkTo={buildHomeSectionPath(UI.sections.homeToursSectionElementId)}
         backLinkSeason={tour.season}

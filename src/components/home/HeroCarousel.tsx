@@ -150,7 +150,7 @@ function HeroCarouselSlides({ activeSeason }: { activeSeason: Season }) {
   );
 }
 
-const HeroCarouselInner = forwardRef<HTMLElement>(function HeroCarousel(_props, ref) {
+const HeroCarouselInner = forwardRef<HTMLElement, { heading?: string }>(function HeroCarousel({ heading }, ref) {
   const { activeSeason } = useSeason();
   const sectionRef = useRef<HTMLElement | null>(null);
   const { ref: heroContentFadeRef } = useScrollScrubFade();
@@ -172,7 +172,7 @@ const HeroCarouselInner = forwardRef<HTMLElement>(function HeroCarousel(_props, 
       <div ref={heroContentFadeRef} className="absolute inset-0 z-10 transition-none">
         <header className="absolute top-home-hero-title-top right-6 z-20 max-w-md pl-4 text-right">
           <h1 className="font-hero-heading text-text-inverse text-home-hero-document-title drop-shadow-md">
-            {UI.hero.documentTitle}
+            {heading || UI.hero.documentTitle}
           </h1>
         </header>
         <HeroCarouselSlides key={activeSeason} activeSeason={activeSeason} />

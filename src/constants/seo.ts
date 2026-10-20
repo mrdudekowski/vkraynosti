@@ -19,6 +19,8 @@ export type RobotsDirective = 'index,follow' | 'noindex,nofollow' | 'noindex,fol
 export interface SeoEntry {
   title: string;
   description: string;
+  h1?: string;
+  keywords?: string[];
   path: string;
   robots?: RobotsDirective;
 }
@@ -140,11 +142,11 @@ export const getSeasonSeoEntry = (season: Season, path: string): SeoEntry => ({
   path,
 });
 
-export const getSeasonCollectionSchema = (season: Season, path: string) => ({
+export const getSeasonCollectionSchema = (season: Season, path: string, description?: string) => ({
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: UI.seasons[season].label,
-  description: SEASON_META_BY_KEY[season].description,
+  description: description ?? SEASON_META_BY_KEY[season].description,
   url: getCanonicalUrl(path),
   inLanguage: 'ru-RU',
   isPartOf: {
@@ -164,7 +166,7 @@ const buildTourSeoDescriptionDraft = (
   publicationStatus: TourPublicationStatus,
 ): string => {
   const explicit =
-    tour.seoDescription?.trim() ?? TOUR_SEO_DESCRIPTION_BY_ID[tour.id]?.trim();
+    tour.seo?.description?.trim() ?? tour.seoDescription?.trim() ?? TOUR_SEO_DESCRIPTION_BY_ID[tour.id]?.trim();
   if (explicit != null && explicit.length > 0) {
     return explicit;
   }
@@ -203,8 +205,10 @@ export const getTourSeoEntry = (
   );
 
   return {
-    title: `${tour.title} — ${UI.seasons[tour.season].label} | ${SITE_NAME}`,
+    title: tour.seo?.title?.trim() || `${tour.title} — ${UI.seasons[tour.season].label} | ${SITE_NAME}`,
     description,
+    ...(tour.seo?.h1?.trim() ? { h1: tour.seo.h1.trim() } : {}),
+    ...(tour.seo?.keywords?.length ? { keywords: tour.seo.keywords } : {}),
     path: getTourPublicPath(tour),
     robots: TOUR_ROBOTS_BY_STATUS[publicationStatus],
   };
@@ -267,7 +271,7 @@ export const getTourStructuredData = (
   return {
     '@context': 'https://schema.org',
     '@type': 'TouristTrip',
-    name: tour.title,
+    name: seoEntry.h1 ?? tour.title,
     description: seoEntry.description,
     url: getCanonicalUrl(seoEntry.path),
     image: getAbsoluteOgImageUrl(tour.imageUrl),

@@ -15,6 +15,8 @@ interface SeasonPageLayoutProps {
   metaTitle: string;
   metaDescription: string;
   metaPath: string;
+  heading?: string;
+  keywords?: readonly string[];
   children: ReactNode;
 }
 
@@ -23,6 +25,8 @@ const SeasonPageLayout = ({
   metaTitle,
   metaDescription,
   metaPath,
+  heading,
+  keywords,
   children,
 }: SeasonPageLayoutProps) => {
   const season = UI.seasons[seasonKey];
@@ -35,9 +39,10 @@ const SeasonPageLayout = ({
       <PageMeta
         title={metaTitle}
         description={metaDescription}
+        keywords={keywords}
         imageUrl={ogImageUrl}
         path={metaPath}
-        structuredData={[getSeasonCollectionSchema(seasonKey, metaPath)]}
+        structuredData={[getSeasonCollectionSchema(seasonKey, metaPath, metaDescription)]}
       />
 
       <div
@@ -47,7 +52,7 @@ const SeasonPageLayout = ({
         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-8 pb-8">
           <p className="text-4xl mb-2">{season.emoji}</p>
           <ScrollScrubFade as="h1" className="font-heading text-section font-normal text-white">
-            {season.label}
+            {heading || season.label}
           </ScrollScrubFade>
         </div>
       </div>

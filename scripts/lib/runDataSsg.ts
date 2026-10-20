@@ -9,6 +9,10 @@ import { loadTourScheduleSnapshot } from './loadTourScheduleSnapshot.ts';
 import { loadTourScheduleBootstrapPayload } from './loadTourScheduleBootstrapPayload.ts';
 import { resolveDataSsgForRoute } from './renderDataSsgBody.ts';
 import { runTelegramSpaShells } from './runTelegramSpaShells.ts';
+import { loadCmsToursFile } from '../../src/cms/loadCmsToursFile.ts';
+import { cmsDocumentToSiteTour } from '../../src/cms/cmsDocumentToSiteTour.ts';
+import { loadPublishedSiteContent } from '../../src/cms/loadSiteContent.ts';
+import type { SiteSeoDocument } from '../../src/cms/siteSeoDocument.ts';
 
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
@@ -29,6 +33,12 @@ export async function runDataSsg(): Promise<void> {
   const tourScheduleBootstrapJson = serializeJsonForScriptTag(bootstrapPayload);
   const routes = await getRenderableRoutePaths(rootDir);
   const statusByPath = await getTourStatusByPublicPath(rootDir);
+  const [cmsTours, siteSeoDocument] = await Promise.all([
+    loadCmsToursFile(),
+    loadPublishedSiteContent('seo'),
+  ]);
+  const toursById = new Map((cmsTours?.tours ?? []).map((document) => [document.id, cmsDocumentToSiteTour(document)]));
+  const siteSeo = siteSeoDocument?.kind === 'seo' ? siteSeoDocument as SiteSeoDocument : null;
 
   process.stdout.write(`Data-SSG: ${routes.length} routes\n`);
 
@@ -37,6 +47,7 @@ export async function runDataSsg(): Promise<void> {
       routePath,
       snapshot,
       statusByPath.get(routePath),
+      { toursById, siteSeo },
     );
     const html = injectDataSsgIntoHtml(templateHtml, {
       bodyHtml,

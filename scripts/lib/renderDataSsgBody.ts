@@ -26,6 +26,16 @@ import { getTourPublicPath } from '../../src/constants/tourUrls.ts';
 import { parseIsoDate } from '../../src/utils/tourSchedule/parseIsoDate.ts';
 import { escapeHtml } from './renderOgShellHead.ts';
 import type { TourScheduleSnapshot } from './loadTourScheduleSnapshot.ts';
+import type { SiteSeoDocument } from '../../src/cms/siteSeoDocument.ts';
+
+export type DataSsgOverrides = {
+  toursById?: ReadonlyMap<string, Tour>;
+  siteSeo?: SiteSeoDocument | null;
+};
+
+function siteSeoPage(document: SiteSeoDocument | null | undefined, key: SiteSeoDocument['pages'][number]['key']) {
+  return document?.pages.find((page) => page.key === key);
+}
 
 const SEASONS: Season[] = ['winter', 'spring', 'summer', 'fall'];
 
@@ -96,7 +106,10 @@ function visibleToursForSeason(season: Season, snapshot: TourScheduleSnapshot): 
   );
 }
 
-function renderHomeBody(snapshot: TourScheduleSnapshot): string {
+function renderHomeBody(snapshot: TourScheduleSnapshot, seo?: SiteSeoDocument | null): string {
+  const page = siteSeoPage(seo, 'home');
+  const title = page?.h1?.trim() || page?.title?.trim() || SEO_DEFAULTS.home.title;
+  const description = page?.description?.trim() || SEO_DEFAULTS.home.description;
   const seasonSections = SEASONS.map((season) => {
     const tours = visibleToursForSeason(season, snapshot);
     if (tours.length === 0) {
@@ -106,15 +119,16 @@ function renderHomeBody(snapshot: TourScheduleSnapshot): string {
   }).join('');
 
   return `<main>
-  <h1>${esc(SEO_DEFAULTS.home.title)}</h1>
-  <p>${esc(SEO_DEFAULTS.home.description)}</p>
+  <h1>${esc(title)}</h1>
+  <p>${esc(description)}</p>
   ${renderSiteNav()}
   <section><h2>${esc(UI.sections.tours)}</h2>${seasonSections}</section>
 </main>`;
 }
 
-function renderSeasonBody(season: Season, snapshot: TourScheduleSnapshot): string {
+function renderSeasonBody(season: Season, snapshot: TourScheduleSnapshot, seo?: SiteSeoDocument | null): string {
   const seoEntry = getSeasonSeoEntry(season, SEASON_TO_LIST_ROUTE[season]);
+  const page = siteSeoPage(seo, season);
   const tours = visibleToursForSeason(season, snapshot);
   const otherSeasonLinks = SEASONS.filter((s) => s !== season)
     .map(
@@ -124,8 +138,8 @@ function renderSeasonBody(season: Season, snapshot: TourScheduleSnapshot): strin
     .join('');
 
   return `<main>
-  <h1>${esc(seoEntry.title)}</h1>
-  <p>${esc(seoEntry.description)}</p>
+  <h1>${esc(page?.h1?.trim() || page?.title?.trim() || seoEntry.title)}</h1>
+  <p>${esc(page?.description?.trim() || seoEntry.description)}</p>
   ${renderSiteNav()}
   <section><h2>${esc(UI.sections.toursTitleBySeason[season])}</h2>${renderTourLinkList(tours)}</section>
   <nav aria-label="${esc(UI.sections.otherSeasons)}"><ul>${otherSeasonLinks}</ul></nav>
@@ -199,7 +213,7 @@ function renderTourBody(
       <a href="${esc(SEASON_TO_LIST_ROUTE[tour.season])}">${esc(UI.seasons[tour.season].label)}</a>
     </nav>
     <img src="${esc(imageUrl)}" alt="${esc(tour.title)}" width="1200" height="630" />
-    <h1>${esc(tour.title)}</h1>
+    <h1>${esc(seoEntry.h1 ?? tour.title)}</h1>
     <p>${esc(seoEntry.description)}</p>
     <p>${esc(tour.subtitle)}</p>
     ${isInDevelopment ? `<p>${esc(UI.tourDetail.inDevelopmentHeading)}</p>` : ''}
@@ -218,10 +232,11 @@ export function resolveDataSsgForRoute(
   routePath: string,
   snapshot: TourScheduleSnapshot,
   tourPublicationStatus?: TourPublicationStatus,
+  overrides: DataSsgOverrides = {},
 ): DataSsgPage {
   if (routePath === ROUTES.HOME) {
     return {
-      bodyHtml: renderHomeBody(snapshot),
+      bodyHtml: renderHomeBody(snapshot, overrides.siteSeo),
       structuredData: [ORGANIZATION_SCHEMA, WEBSITE_SCHEMA],
     };
   }
@@ -229,18 +244,19 @@ export function resolveDataSsgForRoute(
   const seasonKey = SEASON_BY_LIST_PATH[routePath];
   if (seasonKey != null) {
     return {
-      bodyHtml: renderSeasonBody(seasonKey, snapshot),
-      structuredData: [getSeasonCollectionSchema(seasonKey, SEASON_TO_LIST_ROUTE[seasonKey])],
+      bodyHtml: renderSeasonBody(seasonKey, snapshot, overrides.siteSeo),
+      structuredData: [getSeasonCollectionSchema(seasonKey, SEASON_TO_LIST_ROUTE[seasonKey], siteSeoPage(overrides.siteSeo, seasonKey)?.description)],
     };
   }
 
   const tourMatch = TOUR_DETAIL_PATH_PATTERN.exec(routePath);
   if (tourMatch != null) {
     const [, season, segment] = tourMatch;
-    const tour = findTourBySeasonAndSegment(season as Season, segment);
-    if (tour == null) {
+    const baseTour = findTourBySeasonAndSegment(season as Season, segment);
+    if (baseTour == null) {
       throw new Error(`Unknown tour for data-SSG: ${routePath}`);
     }
+    const tour = overrides.toursById?.get(baseTour.id) ?? baseTour;
     const publicationStatus = tourPublicationStatus ?? 'active';
     const durationType = snapshot.durationTypes.get(tour.id);
     const durationOptions = {

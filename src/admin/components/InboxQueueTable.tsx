@@ -86,13 +86,14 @@ const InboxQueueTable = ({
         {items.map((item) => {
           const ready = isInboxQueueItemReady(item);
           const canPublish = canPublishItem(item);
-          const sentAbsolute = item.timestamp == null ? null : formatAdminAbsoluteTime(item.timestamp);
-          const sentRelative = item.timestamp == null ? null : formatAdminRelativeTime(item.timestamp);
+          const timestamp = item.timestamp;
+          const sentAbsolute = timestamp == null ? null : formatAdminAbsoluteTime(timestamp);
+          const sentRelative = timestamp == null ? null : formatAdminRelativeTime(timestamp);
           const sentLabel =
-            sentRelative == null || sentAbsolute == null
+            timestamp == null || sentRelative == null || sentAbsolute == null
               ? null
               : sentRelative === sentAbsolute
-                ? formatAdminCompactDateTime(item.timestamp)
+                ? formatAdminCompactDateTime(timestamp)
                 : sentRelative;
           return (
             <li key={`${item.kind}:${item.id}`} className="admin-inbox-row admin-inbox-grid">

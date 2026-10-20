@@ -19,7 +19,6 @@ describe('TourCatalogFields', () => {
         priceFrom={false}
         pricePrevious=""
         priceFootnote=""
-        seoDescription=""
         onChange={onChange}
       />,
     );
@@ -49,7 +48,6 @@ describe('TourCatalogFields', () => {
         priceFrom={false}
         pricePrevious=""
         priceFootnote=""
-        seoDescription=""
         onChange={onChange}
       />,
     );
@@ -75,7 +73,6 @@ describe('TourCatalogFields', () => {
         priceFrom={true}
         pricePrevious=""
         priceFootnote=""
-        seoDescription=""
         onChange={onChange}
       />,
     );

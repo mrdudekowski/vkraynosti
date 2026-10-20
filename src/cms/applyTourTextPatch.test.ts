@@ -174,6 +174,29 @@ describe('applyTourTextPatch', () => {
     expect(next.status).toBe(document.status);
   });
 
+  it('сохраняет управляемые SEO-поля и синхронизирует legacy description', () => {
+    const next = applyTourTextPatch(document, {
+      description: 'x',
+      prefaceAssetId: 'preface',
+      included: document.included,
+      program: document.program,
+      seo: {
+        title: '  SEO title  ',
+        description: '  Маршрут из Владивостока.  ',
+        h1: '  SEO H1  ',
+        keywords: ['  тур по Приморью ', '', 'бухта'],
+      },
+    });
+
+    expect(next.seo).toEqual({
+      title: 'SEO title',
+      description: 'Маршрут из Владивостока.',
+      h1: 'SEO H1',
+      keywords: ['тур по Приморью', 'бухта'],
+    });
+    expect(next.seoDescription).toBe('Маршрут из Владивостока.');
+  });
+
   it('derives public duration from durationDays', () => {
     const next = applyTourTextPatch(document, {
       description: 'x',

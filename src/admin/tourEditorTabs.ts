@@ -9,6 +9,7 @@ export const EDITOR_SECTION_IDS = [
   'admin-included',
   'admin-program',
   'admin-gallery',
+  'admin-seo',
 ] as const;
 
 export type AdminEditorSectionId = (typeof EDITOR_SECTION_IDS)[number];
@@ -21,6 +22,7 @@ export const EDITOR_TAB_QUERY = {
   'admin-included': 'included',
   'admin-program': 'program',
   'admin-gallery': 'gallery',
+  'admin-seo': 'seo',
 } as const satisfies Record<AdminEditorSectionId, string>;
 
 const QUERY_TO_SECTION = {
@@ -29,6 +31,7 @@ const QUERY_TO_SECTION = {
   included: 'admin-included',
   program: 'admin-program',
   gallery: 'admin-gallery',
+  seo: 'admin-seo',
 } as const satisfies Record<(typeof EDITOR_TAB_QUERY)[AdminEditorSectionId], AdminEditorSectionId>;
 
 export const SECTION_COMPLETION_KEY = {
@@ -37,6 +40,7 @@ export const SECTION_COMPLETION_KEY = {
   'admin-included': 'included',
   'admin-program': 'program',
   'admin-gallery': 'gallery',
+  'admin-seo': 'catalog',
 } as const satisfies Record<AdminEditorSectionId, keyof TourSectionCompletion>;
 
 export const EDITOR_SECTION_NAV: Array<{ id: AdminEditorSectionId; label: string }> = [
@@ -45,6 +49,7 @@ export const EDITOR_SECTION_NAV: Array<{ id: AdminEditorSectionId; label: string
   { id: 'admin-included', label: ADMIN_UI.sectionNav.included },
   { id: 'admin-program', label: ADMIN_UI.sectionNav.program },
   { id: 'admin-gallery', label: ADMIN_UI.sectionNav.gallery },
+  { id: 'admin-seo', label: ADMIN_UI.sectionNav.seo },
 ];
 
 export const EDITOR_FOCUS_IDS = {

@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { parseSiteSeoDocument, type SiteSeoDocument } from './siteSeoDocument';
 
 export const SITE_CONTENT_SCHEMA_VERSION = 1 as const;
-export const SITE_CONTENT_KINDS = ['team', 'contacts', 'footer', 'modal'] as const;
+export const SITE_CONTENT_KINDS = ['team', 'contacts', 'footer', 'modal', 'seo'] as const;
 export type SiteContentDocumentKind = (typeof SITE_CONTENT_KINDS)[number];
 
 const visibilitySchema = z.boolean().default(true);
@@ -125,7 +126,8 @@ export type SiteContentDocument =
   | TeamContentDocument
   | ContactsContentDocument
   | FooterContentDocument
-  | ModalContentDocument;
+  | ModalContentDocument
+  | SiteSeoDocument;
 
 export function parseSiteContentDocument(
   kind: 'team',
@@ -143,6 +145,7 @@ export function parseSiteContentDocument(
   kind: 'modal',
   input: unknown,
 ): ModalContentDocument;
+export function parseSiteContentDocument(kind: 'seo', input: unknown): SiteSeoDocument;
 export function parseSiteContentDocument(
   kind: SiteContentDocumentKind,
   input: unknown,
@@ -150,5 +153,6 @@ export function parseSiteContentDocument(
   if (kind === 'team') return teamContentDocumentSchema.parse(input);
   if (kind === 'contacts') return contactsContentDocumentSchema.parse(input);
   if (kind === 'modal') return modalContentDocumentSchema.parse(input);
+  if (kind === 'seo') return parseSiteSeoDocument(input);
   return footerContentDocumentSchema.parse(input);
 }

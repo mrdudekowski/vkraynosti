@@ -20,6 +20,7 @@ import SiteFooterTab from './components/SiteFooterTab';
 import SiteModalTab from './components/SiteModalTab';
 import SiteSectionTabs from './components/SiteSectionTabs';
 import SiteTeamTab from './components/SiteTeamTab';
+import SiteSeoSection from './components/SiteSeoSection';
 import { ADMIN_UI } from './constants/ui';
 import { useAdminAutosave } from './hooks/useAdminAutosave';
 import { isSiteContentImageFile, isSiteContentPdfFile } from './siteContentMediaAccept';
@@ -32,8 +33,9 @@ import type {
   SiteContentDocument,
   TeamContentDocument,
 } from '../cms/siteContentDocument';
+import type { SiteSeoDocument } from '../cms/siteSeoDocument';
 
-type Kind = 'team' | 'contacts' | 'footer' | 'modal';
+type Kind = 'team' | 'contacts' | 'footer' | 'modal' | 'seo';
 type LoadErrors = Partial<Record<Kind, string>>;
 type TabStatus = 'saved' | 'dirty' | 'saving' | 'published' | 'error';
 
@@ -42,6 +44,7 @@ const SITE_TABS: Array<{ id: Kind; label: string }> = [
   { id: 'contacts', label: ADMIN_UI.siteTabContacts },
   { id: 'footer', label: ADMIN_UI.siteTabFooter },
   { id: 'modal', label: ADMIN_UI.siteTabModal },
+  { id: 'seo', label: 'SEO страниц' },
 ];
 
 const tabFromHash = (): Kind => {
@@ -336,6 +339,8 @@ const SitePage = () => {
         onChange={setDocument}
         onUploadPdf={uploadFooterPdf}
       />
+    ) : tab === 'seo' ? (
+      <SiteSeoSection value={document as SiteSeoDocument} onChange={setDocument} />
     ) : (
       <SiteModalTab
         value={document as ModalContentDocument}

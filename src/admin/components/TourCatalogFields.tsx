@@ -15,7 +15,7 @@ import { EDITOR_FOCUS_IDS } from '../tourEditorTabs';
 import AdminCharCount from './AdminCharCount';
 import AdminDisclosure from './AdminDisclosure';
 import AdminEditorSurface from './AdminEditorSurface';
-import { AdminFieldLabel, AdminTextArea, AdminTextInput } from './AdminFields';
+import { AdminFieldLabel, AdminTextInput } from './AdminFields';
 import AdminIcon from './AdminIcon';
 import AdminSelect from './AdminSelect';
 
@@ -45,7 +45,6 @@ type TourCatalogFieldsProps = {
   priceFrom: boolean;
   pricePrevious: string;
   priceFootnote: string;
-  seoDescription: string;
   onChange: (patch: Partial<CmsTourTextPatch>) => void;
 };
 
@@ -59,13 +58,12 @@ const TourCatalogFields = ({
   priceFrom,
   pricePrevious,
   priceFootnote,
-  seoDescription,
   onChange,
 }: TourCatalogFieldsProps) => {
   const normalizedPrice = normalizeTourPrice(price);
   const canUsePriceFrom = isNumericTourPrice(normalizedPrice.price);
   const extrasDeepOpen =
-    priceFootnote.trim().length > 0 || seoDescription.trim().length > 0;
+    priceFootnote.trim().length > 0;
 
   return (
     <>
@@ -214,22 +212,13 @@ const TourCatalogFields = ({
             />
           </label>
         </div>
-        <AdminDisclosure title={ADMIN_UI.seoDescriptionLabel} defaultOpen={extrasDeepOpen}>
+        <AdminDisclosure title={ADMIN_UI.priceFootnoteLabel} defaultOpen={extrasDeepOpen}>
           <label className="flex flex-col gap-1">
             <span className="text-sm font-medium text-text-primary">{ADMIN_UI.priceFootnoteLabel}</span>
             <AdminTextInput
               id="admin-price-footnote"
               value={priceFootnote}
               onChange={(event) => onChange({ priceFootnote: event.target.value })}
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-text-primary">{ADMIN_UI.seoDescriptionLabel}</span>
-            <AdminTextArea
-              id="admin-seo-description"
-              rows={2}
-              value={seoDescription}
-              onChange={(event) => onChange({ seoDescription: event.target.value })}
             />
           </label>
         </AdminDisclosure>

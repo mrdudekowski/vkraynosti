@@ -615,6 +615,7 @@ export const ADMIN_UI = {
     included: 'Включено',
     program: 'Программа',
     gallery: 'Галерея',
+    seo: 'SEO',
   },
   catalogHeading: 'Карточка и цена',
   subtitleLabel: 'Подзаголовок',

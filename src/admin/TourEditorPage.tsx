@@ -28,6 +28,7 @@ import BentoSection from './components/BentoSection';
 import IncludedSection from './components/IncludedSection';
 import ProgramSection from './components/ProgramSection';
 import TourCatalogFields from './components/TourCatalogFields';
+import TourSeoSection from './components/TourSeoSection';
 import TourIdentityFields from './components/TourIdentityFields';
 import TourPublishReviewDialog from './components/TourPublishReviewDialog';
 import AdminReadinessRing from './components/AdminReadinessRing';
@@ -71,6 +72,7 @@ const EMPTY_PATCH: CmsTourTextPatch = {
   pricePrevious: '',
   priceFootnote: '',
   seoDescription: '',
+  seo: { title: '', description: '', h1: '', keywords: [] },
   description: '',
   descriptionLeadBold: '',
   descriptionAside: '',
@@ -812,10 +814,23 @@ const TourEditorPage = () => {
               priceFrom={patch.priceFrom ?? document.priceFrom ?? false}
               pricePrevious={patch.pricePrevious ?? ''}
               priceFootnote={patch.priceFootnote ?? ''}
-              seoDescription={patch.seoDescription ?? ''}
               onChange={(next) => setPatch((current) => ({ ...current, ...next }))}
             />
           </div>
+        </div>
+        <div
+          role="tabpanel"
+          id="admin-panel-admin-seo"
+          aria-labelledby="admin-tab-admin-seo"
+          hidden={activeSection !== 'admin-seo'}
+          inert={activeSection !== 'admin-seo' ? true : undefined}
+        >
+          <TourSeoSection
+            title={patch.title ?? document.title}
+            imageUrl={document.assets.find((asset) => asset.id === layout.coverAssetId)?.stillUrl ?? ''}
+            value={patch.seo ?? { title: '', description: patch.seoDescription ?? '', h1: '', keywords: [] }}
+            onChange={(seo) => setPatch((current) => ({ ...current, seo, seoDescription: seo.description }))}
+          />
         </div>
         <div
           role="tabpanel"

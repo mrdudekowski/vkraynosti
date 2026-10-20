@@ -19,6 +19,7 @@ export type CmsTourTextPatch = {
   pricePrevious?: string;
   priceFootnote?: string;
   seoDescription?: string;
+  seo?: CmsTourDocument['seo'];
   description: string;
   descriptionLeadBold?: string;
   descriptionAside?: string;
@@ -125,7 +126,15 @@ export function applyTourTextPatch(
   const metaAudienceLabel = optionalOrCurrent(patch.metaAudienceLabel, document.metaAudienceLabel);
   const pricePrevious = optionalOrCurrent(patch.pricePrevious, document.pricePrevious);
   const priceFootnote = optionalOrCurrent(patch.priceFootnote, document.priceFootnote);
-  const seoDescription = optionalOrCurrent(patch.seoDescription, document.seoDescription);
+  const seo = patch.seo == null ? document.seo : {
+    title: patch.seo.title?.trim() ?? '',
+    description: patch.seo.description?.trim() ?? '',
+    h1: patch.seo.h1?.trim() ?? '',
+    keywords: (patch.seo.keywords ?? []).map((item) => item.trim()).filter(Boolean).slice(0, 8),
+  };
+  const seoDescription = patch.seo != null
+    ? optionalText(patch.seo.description)
+    : optionalOrCurrent(patch.seoDescription, document.seoDescription);
   const normalizedPrice = normalizeTourPrice(textOrCurrent(patch.price, document.price));
   const priceFrom = isNumericTourPrice(normalizedPrice.price)
     ? normalizedPrice.priceFrom || patch.priceFrom || document.priceFrom === true
@@ -158,6 +167,7 @@ export function applyTourTextPatch(
     ...(metaAudienceLabel != null ? { metaAudienceLabel } : {}),
     ...(pricePrevious != null ? { pricePrevious } : {}),
     ...(priceFootnote != null ? { priceFootnote } : {}),
+    ...(seo != null ? { seo: { ...seo, description: seoDescription ?? '' } } : {}),
     ...(seoDescription != null ? { seoDescription } : {}),
     description: trimOrEmpty(patch.description),
     ...(descriptionLeadBold != null ? { descriptionLeadBold } : {}),

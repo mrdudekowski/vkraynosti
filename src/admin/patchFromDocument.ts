@@ -37,6 +37,7 @@ function textPatchFromDocument(document: CmsTourDocument): CmsTourTextPatch {
     pricePrevious: document.pricePrevious ?? '',
     priceFootnote: document.priceFootnote ?? '',
     seoDescription: document.seoDescription ?? '',
+    seo: document.seo ?? { title: '', description: document.seoDescription ?? '', h1: '', keywords: [] },
     description: document.description,
     descriptionLeadBold: document.descriptionLeadBold ?? '',
     descriptionAside: document.descriptionAside ?? '',

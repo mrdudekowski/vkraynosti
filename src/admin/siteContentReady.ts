@@ -5,6 +5,7 @@ const hasPhoto = (url: string) => url.trim().length > 0;
 const hasPdfFile = (url: string | undefined) => (url ?? '').trim().length > 0;
 
 export function siteContentBlocker(document: SiteContentDocument): string | null {
+  if (document.kind === 'seo') return null;
   if (document.kind === 'team') {
     if (document.members.some((member) => !hasPhoto(member.photo.url))) {
       return ADMIN_UI.sitePhotoRequired;

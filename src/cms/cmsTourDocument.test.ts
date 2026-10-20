@@ -70,8 +70,9 @@ describe('cmsToursFileSchema', () => {
     });
     expect(parsed.success).toBe(true);
     if (parsed.success) {
-      expect(parsed.data.tours[0]?.seo).toEqual({ title: 'SEO title', description: 'SEO description', h1: 'SEO H1' });
+      expect(parsed.data.tours[0]?.seo).toEqual({ title: 'SEO title', description: 'SEO description', h1: 'SEO H1', keywords: [] });
       expect(parsed.data.tours[0]?.seoDescription).toBe('Старое описание');
+      expect(parsed.data.tours[0]?.seo?.keywords).toEqual([]);
     }
   });
 

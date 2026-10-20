@@ -8,6 +8,7 @@ import { getTourLegacyRedirectPaths } from '../../src/constants/tourSeoRoutes.ts
 import { getRenderableRoutePaths, getTourStatusByPublicPath } from './seoRoutes.mjs';
 import {
   collectOgShellImageLogicalPaths,
+  collectOgShellSourceUrls,
   copyOgShellAssets,
   OG_SHELL_FALLBACK_SOURCE_LOGICAL,
   resolveOgShellImageForMeta,
@@ -24,6 +25,7 @@ import { OG_FALLBACK_JPEG_LOGICAL } from './ogShellTelegramImage.ts';
 import { loadBuildCmsToursFile } from './loadBuildCmsTours.ts';
 import { cmsDocumentToSiteTour } from '../../src/cms/cmsDocumentToSiteTour.ts';
 import { loadPublishedSiteContent } from '../../src/cms/loadSiteContent.ts';
+import { resolveOgShellLogicalImagePath } from '../../src/constants/seo.ts';
 
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
@@ -66,12 +68,23 @@ export async function runGenerateOgShells(): Promise<void> {
     meta: resolveOgShellMeta(routePath, statusByPath.get(routePath), overrides),
   }));
 
-  const logicalPaths = collectOgShellImageLogicalPaths(
-    routeMetas.map(({ meta }) => meta.imagePathOrUrl),
+  const imageSources = routeMetas.map(({ meta }) => meta.imagePathOrUrl);
+  const logicalPaths = collectOgShellImageLogicalPaths(imageSources);
+  const sourceUrls = collectOgShellSourceUrls(imageSources);
+  const requiredTourCoverPaths = new Set(
+    routeMetas
+      .filter(({ routePath }) => /^\/tours\/(winter|spring|summer|fall)\//.test(routePath))
+      .map(({ meta }) => resolveOgShellLogicalImagePath(meta.imagePathOrUrl)),
   );
 
   process.stdout.write(`OG shells: ${routes.length} public routes\n`);
-  const resolvedPathByRequested = await copyOgShellAssets(distDir, rootDir, logicalPaths);
+  const resolvedPathByRequested = await copyOgShellAssets(
+    distDir,
+    rootDir,
+    logicalPaths,
+    sourceUrls,
+    requiredTourCoverPaths,
+  );
   const materializedPaths = [...new Set(resolvedPathByRequested.values())];
   await generateOgTestShell(distDir, rootDir);
   await generateTelegramOgTestShell20260610(distDir, rootDir);

@@ -13,6 +13,7 @@ import {
   getAbsoluteOgImageUrl,
 } from '../../src/constants/seo.ts';
 import { UI } from '../../src/constants/ui.ts';
+import { SAFETY_OFFER_HEADER, SAFETY_OFFER_SECTIONS } from '../../src/data/safetyOfferContent.ts';
 import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
 import type { Season, Tour } from '../../src/types/index.ts';
 import type { TourPublicationStatus } from '../../src/types/tourSchedule.ts';
@@ -146,6 +147,23 @@ function renderSeasonBody(season: Season, snapshot: TourScheduleSnapshot, seo?: 
 </main>`;
 }
 
+function renderSafetyBody(): string {
+  const sections = SAFETY_OFFER_SECTIONS.map((section) => {
+    const blocks = section.blocks.map((block) =>
+      block.type === 'p'
+        ? `<p>${esc(block.text)}</p>`
+        : `<ul>${block.items.map((item) => `<li>${esc(item)}</li>`).join('')}</ul>`,
+    ).join('');
+    return `<section aria-labelledby="${esc(section.id)}"><h2 id="${esc(section.id)}">${esc(section.title)}</h2>${blocks}</section>`;
+  }).join('');
+
+  return `<main>
+  <h1>${esc(SAFETY_OFFER_HEADER.title)}</h1>
+  <p>${esc(SAFETY_OFFER_HEADER.subtitle)}</p>
+  ${sections}
+</main>`;
+}
+
 function renderTourBody(
   tour: Tour,
   publicationStatus: TourPublicationStatus,
@@ -238,6 +256,13 @@ export function resolveDataSsgForRoute(
     return {
       bodyHtml: renderHomeBody(snapshot, overrides.siteSeo),
       structuredData: [ORGANIZATION_SCHEMA, WEBSITE_SCHEMA],
+    };
+  }
+
+  if (routePath === ROUTES.SAFETY) {
+    return {
+      bodyHtml: renderSafetyBody(),
+      structuredData: [],
     };
   }
 

@@ -256,6 +256,12 @@ const assertRoute = async (
   assertSingleTags(html, routePath, errors);
   assertTrailingSlashUrls(html, routePath, errors);
   assertNormalizedText(html, errors);
+  if (routePath === '/safety') {
+    const robots = extractMetaContent(html, 'name="robots"');
+    if (robots !== 'noindex,nofollow') {
+      errors.push(`Safety robots must be noindex,nofollow, got ${robots ?? 'missing'}`);
+    }
+  }
   assertOgImage(html, routePath, expectedOrigin, errors, false);
   if (requireRenderedBody) {
     assertRenderedBody(html, errors);

@@ -111,6 +111,9 @@ export async function loadSeoRouteSources(rootDir = process.cwd()) {
 /** Routes with noindex at runtime — excluded from sitemap and indexable OG shells. */
 export const NON_INDEXABLE_ROUTE_PATHS = new Set(['/privacy', '/safety']);
 
+/** Noindex public pages still need physical files so direct requests do not 404. */
+export const NON_INDEXABLE_RENDERABLE_ROUTE_PATHS = new Set(['/safety']);
+
 /** Telegram Mini App — CSR-only; no data-SSG, OG shells, or sitemap. */
 export const NON_SEO_ROUTE_PREFIX = '/telegram';
 
@@ -228,9 +231,13 @@ export async function getSitemapRoutePaths(rootDir = process.cwd(), publishedCms
 export async function getRenderableRoutePaths(rootDir = process.cwd(), publishedCmsTours) {
   const { routesSource } = await loadSeoRouteSources(rootDir);
   const statusByPath = await getTourStatusByPublicPath(rootDir, publishedCmsTours);
+  const nonIndexableStaticPaths = extractStaticRoutes(routesSource).filter((path) =>
+    NON_INDEXABLE_RENDERABLE_ROUTE_PATHS.has(path),
+  );
   return [
     ...new Set([
       ...getStaticIndexableRoutePaths(routesSource),
+      ...nonIndexableStaticPaths,
       ...[...statusByPath.entries()]
         .filter(([, status]) => status === 'active' || status === 'in_development')
         .map(([path]) => path),

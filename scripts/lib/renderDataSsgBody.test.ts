@@ -33,6 +33,15 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.structuredData).toHaveLength(2);
   });
 
+  it('renders Safety content for direct requests while remaining a noindex page', () => {
+    const page = resolveDataSsgForRoute('/safety', emptySnapshot());
+
+    expect(page.bodyHtml).toContain('<main>');
+    expect(page.bodyHtml).toContain('Правила безопасности и участия в активных поездках и маршрутах');
+    expect(page.bodyHtml).toContain('1. Общие положения');
+    expect(page.structuredData).toEqual([]);
+  });
+
   it('renders season catalog with CollectionPage JSON-LD', () => {
     const page = resolveDataSsgForRoute('/tours/summer', emptySnapshot());
     expect(page.structuredData).toHaveLength(1);

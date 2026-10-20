@@ -13,6 +13,14 @@ export const OG_FALLBACK_JPEG_LOGICAL = 'og-cover-prod.jpg' as const;
 
 const OG_JPEG_QUALITY = '2';
 const OG_FFMPEG_SCALE_FILTER = `scale=${OG_SHELL_IMAGE_WIDTH}:${OG_SHELL_IMAGE_HEIGHT}:force_original_aspect_ratio=increase,crop=${OG_SHELL_IMAGE_WIDTH}:${OG_SHELL_IMAGE_HEIGHT}`;
+const resolveFfmpegExecutable = (): string => {
+  const configured = process.env.FFMPEG_PATH?.trim();
+  if (configured) return configured;
+  if (ffmpegStatic && existsSync(ffmpegStatic)) return ffmpegStatic;
+  // Some deployment and developer environments provide ffmpeg on PATH while
+  // the optional ffmpeg-static binary was skipped or unavailable.
+  return 'ffmpeg';
+};
 
 const RASTER_EXTENSIONS = new Set(['.webp', '.png', '.jpg', '.jpeg']);
 
@@ -23,7 +31,7 @@ const toJpegLogicalPath = (logicalPath: string): string =>
 export async function ensureTelegramFriendlyOgImage(
   distDir: string,
   logicalPath: string,
-  fallbackLogicalPath: string = OG_FALLBACK_JPEG_LOGICAL,
+  fallbackLogicalPath: string | null = OG_FALLBACK_JPEG_LOGICAL,
 ): Promise<string> {
   const extension = extname(logicalPath).toLowerCase();
   if (!RASTER_EXTENSIONS.has(extension)) {
@@ -42,6 +50,9 @@ export async function ensureTelegramFriendlyOgImage(
   const jpegPath = resolve(distDir, jpegLogical);
 
   const resolveFallbackImage = async (): Promise<string> => {
+    if (fallbackLogicalPath == null) {
+      throw new Error(`Cannot create JPEG OG image for required asset: ${logicalPath}`);
+    }
     const fallbackPath = resolve(distDir, fallbackLogicalPath);
     if (!existsSync(fallbackPath)) {
       return logicalPath;
@@ -52,17 +63,9 @@ export async function ensureTelegramFriendlyOgImage(
     return fallbackLogicalPath;
   };
 
-  if (!ffmpegStatic) {
-    const fallback = await resolveFallbackImage();
-    process.stdout.write(
-      `[og-asset] ${fallback === logicalPath ? 'warn: ffmpeg-static missing, keeping' : 'fallback: ffmpeg-static missing, using'} ${fallback}\n`,
-    );
-    return fallback;
-  }
-
   try {
     await execFileAsync(
-      ffmpegStatic,
+      resolveFfmpegExecutable(),
       [
         '-y',
         '-i',

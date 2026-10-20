@@ -1,5 +1,5 @@
 import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
-import { IMAGES } from '../../src/constants/images.ts';
+import { IMAGES, SAFETY_PAGE_HERO_BACKGROUND } from '../../src/constants/images.ts';
 import { ROUTES } from '../../src/constants/routes.ts';
 import { normalizeMetaContent } from '../../src/constants/metaContent.ts';
 import {
@@ -38,9 +38,6 @@ const SEASON_BY_LIST_PATH: Record<string, Season> = {
 
 const TOUR_DETAIL_PATH_PATTERN = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)$/;
 
-const resolveOgJpegPath = (pathOrUrl: string): string =>
-  pathOrUrl.replace(/\.(?:webp|png|jpe?g)(?=$|[?#])/i, '.jpg');
-
 export const resolveOgShellMeta = (
   routePath: string,
   tourPublicationStatus?: TourPublicationStatus,
@@ -63,8 +60,8 @@ export const resolveOgShellMeta = (
       title: normalizeMetaContent(SEO_DEFAULTS.safety.title),
       description: normalizeMetaContent(SEO_DEFAULTS.safety.description),
       path: SEO_DEFAULTS.safety.path,
-      robots: SEO_DEFAULTS.robots,
-      imagePathOrUrl: IMAGES.seasonSection.summer,
+      robots: SEO_DEFAULTS.safety.robots ?? SEO_DEFAULTS.robots,
+      imagePathOrUrl: SAFETY_PAGE_HERO_BACKGROUND,
     };
   }
 
@@ -120,9 +117,9 @@ export const resolveOgShellMeta = (
       // Publication status drives index eligibility; keep the prerendered noindex for
       // in_development tours instead of overwriting it with the index,follow default.
       robots: seoEntry.robots ?? SEO_DEFAULTS.robots,
-      // Keep WebP for the UI, but use prebuilt JPEG OG assets so deployment
-      // does not need ffmpeg to convert images inside the build container.
-      imagePathOrUrl: resolveOgJpegPath(tour.imageUrl),
+      // Preserve the original CMS asset URL. The OG asset pipeline fetches it
+      // first and converts the local copy to JPEG for social crawlers.
+      imagePathOrUrl: tour.imageUrl,
       ...(seoEntry.keywords?.length ? { keywords: seoEntry.keywords } : {}),
     };
   }

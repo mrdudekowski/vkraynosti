@@ -21,10 +21,10 @@ describe('copyOgShellAssets', () => {
   it('copies assets from public when present', async () => {
     rootDir = await mkdtemp(join(tmpdir(), 'og-copy-root-'));
     distDir = await mkdtemp(join(tmpdir(), 'og-copy-dist-'));
-    const logical = 'tours/summer/summer-1/cover.webp';
+    const logical = 'tours/summer/summer-1/cover.jpg';
     const publicDir = join(rootDir, 'public', 'tours/summer/summer-1');
     await mkdir(publicDir, { recursive: true });
-    await writeFile(join(publicDir, 'cover.webp'), 'cover-bytes', 'utf8');
+    await writeFile(join(publicDir, 'cover.jpg'), 'cover-bytes', 'utf8');
 
     const { copyOgShellAssets } = await import('./copyOgShellAssets.ts');
     const resolved = await copyOgShellAssets(distDir, rootDir, [logical]);
@@ -51,6 +51,62 @@ describe('copyOgShellAssets', () => {
     const resolved = await copyOgShellAssets(distDir, rootDir, [logical]);
     expect(existsSync(join(distDir, logical))).toBe(true);
     expect(resolved.get(logical)).toBe(logical);
+  });
+
+  it('uses the public S3 base URL when the asset base alias is absent', async () => {
+    rootDir = await mkdtemp(join(tmpdir(), 'og-copy-root-'));
+    distDir = await mkdtemp(join(tmpdir(), 'og-copy-dist-'));
+    vi.stubEnv('VITE_PUBLIC_S3_BASE_URL', 'https://cdn.example.com/');
+    const logical = 'tours/summer-1/cover.jpg';
+    const fetchMock = vi.fn(async (url: string) => {
+      expect(url).toBe(`https://cdn.example.com/${logical}`);
+      return new Response('cover-bytes', { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { copyOgShellAssets } = await import('./copyOgShellAssets.ts');
+    const resolved = await copyOgShellAssets(distDir, rootDir, [logical]);
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(existsSync(join(distDir, logical))).toBe(true);
+    expect(resolved.get(logical)).toBe(logical);
+  });
+
+  it('fetches the original CMS WebP cover and maps the converted JPEG for OG metadata', async () => {
+    rootDir = await mkdtemp(join(tmpdir(), 'og-copy-root-'));
+    distDir = await mkdtemp(join(tmpdir(), 'og-copy-dist-'));
+    vi.stubEnv('VITE_PUBLIC_S3_BASE_URL', 'https://cdn.example.com/');
+    const logical = 'media/tours/fall-17/cover.webp';
+    const sourceUrl = 'https://ypnmfvotln.cdn.twcstorage.ru/media/tours/fall-17/cover.webp';
+    const fetchMock = vi.fn(async (url: string) => {
+      expect(url).toBe(sourceUrl);
+      return new Response('original-webp-bytes', { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    vi.resetModules();
+    const ensureMock = vi.fn(async (_distDir: string, path: string) => path.replace(/\.webp$/i, '.jpg'));
+    vi.doMock('./ogShellTelegramImage.ts', () => ({
+      ensureTelegramFriendlyOgImage: ensureMock,
+    }));
+
+    try {
+      const { copyOgShellAssets } = await import('./copyOgShellAssets.ts');
+      const resolved = await copyOgShellAssets(
+        distDir,
+        rootDir,
+        [logical],
+        new Map([[logical, sourceUrl]]),
+        new Set([logical]),
+      );
+
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(existsSync(join(distDir, logical))).toBe(true);
+      expect(resolved.get(logical)).toBe('media/tours/fall-17/cover.jpg');
+      expect(ensureMock).toHaveBeenCalledWith(distDir, logical, null);
+    } finally {
+      vi.doUnmock('./ogShellTelegramImage.ts');
+      vi.resetModules();
+    }
   });
 });
 
@@ -80,6 +136,13 @@ describe('resolveOgShellMeta', () => {
     const meta = resolveOgShellMeta('/');
     expect(meta.title).toContain('Вкрайности');
     expect(meta.title).not.toContain('|');
+  });
+
+  it('keeps Safety noindex in the generated crawlable shell', async () => {
+    const { resolveOgShellMeta } = await import('./resolveOgShellMeta.ts');
+    const meta = resolveOgShellMeta('/safety');
+
+    expect(meta.robots).toBe('noindex,nofollow');
   });
 
   it('uses CMS tour SEO fields in the generated crawlable shell', async () => {
@@ -120,6 +183,7 @@ describe('resolveOgShellMeta', () => {
       slug: 'odin-den-v-ta-chingouze-2',
       season: 'fall' as const,
       title: 'Один день в Та-Чингоузе',
+      imageUrl: 'https://cdn.example.com/media/tours/fall-17/cover.webp',
       seo: {
         title: 'Один день в Та-Чингоузе — осенний тур | Вкрайности',
         description: 'CMS описание маршрута из Владивостока.',
@@ -135,7 +199,7 @@ describe('resolveOgShellMeta', () => {
       title: tour.seo.title,
       description: tour.seo.description,
       path: '/tours/fall/odin-den-v-ta-chingouze-2/',
-      imagePathOrUrl: expect.stringContaining('summer-8'),
+      imagePathOrUrl: 'https://cdn.example.com/media/tours/fall-17/cover.webp',
     });
   });
 });
@@ -149,5 +213,14 @@ describe('collectOgShellImageLogicalPaths', () => {
     ]);
     expect(paths).toContain('banners_summer/summer.jpg');
     expect(paths.filter((p) => p === 'tours/summer-1/cover.webp')).toHaveLength(1);
+  });
+
+  it('retains the CMS CDN source URL for the original cover asset', async () => {
+    const { collectOgShellSourceUrls } = await import('./copyOgShellAssets.ts');
+    const url = 'https://ypnmfvotln.cdn.twcstorage.ru/media/tours/fall-17/cover.webp';
+
+    expect(collectOgShellSourceUrls([url])).toEqual(
+      new Map([['media/tours/fall-17/cover.webp', url]]),
+    );
   });
 });

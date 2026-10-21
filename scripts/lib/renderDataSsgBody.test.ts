@@ -42,6 +42,13 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.structuredData).toEqual([]);
   });
 
+  it('keeps the legacy privacy redirect route as an empty data-SSG page', () => {
+    const page = resolveDataSsgForRoute('/privacy', emptySnapshot());
+
+    expect(page.bodyHtml).toBe('');
+    expect(page.structuredData).toEqual([]);
+  });
+
   it('renders season catalog with CollectionPage JSON-LD', () => {
     const page = resolveDataSsgForRoute('/tours/summer', emptySnapshot());
     expect(page.structuredData).toHaveLength(1);

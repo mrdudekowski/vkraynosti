@@ -266,6 +266,14 @@ export function resolveDataSsgForRoute(
     };
   }
 
+  if (routePath === ROUTES.PRIVACY) {
+    return {
+      // The legacy route redirects to the official policy PDF in the SPA.
+      bodyHtml: '',
+      structuredData: [],
+    };
+  }
+
   const seasonKey = SEASON_BY_LIST_PATH[routePath];
   if (seasonKey != null) {
     return {

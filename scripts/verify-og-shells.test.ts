@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { assertSingleTags, getRoutesToVerify } from './verify-og-shells.ts';
+import {
+  assertSingleTags,
+  getRoutesToVerify,
+  shouldIncludeSocialMetadata,
+} from './verify-og-shells.ts';
 
 const coreTags = `
   <title>Safety</title>
@@ -8,6 +12,11 @@ const coreTags = `
   <link rel="canonical" href="https://vkraynosti.ru/safety/" />`;
 
 describe('verify-og-shells social metadata rules', () => {
+  it('does not resolve CMS-only tour slugs through the local tour catalog', () => {
+    expect(shouldIncludeSocialMetadata('/tours/fall/reka-milogradovka')).toBe(true);
+    expect(shouldIncludeSocialMetadata('/safety')).toBe(false);
+  });
+
   it('does not treat the legacy privacy PDF redirect file as a page under test', () => {
     const routes = getRoutesToVerify(['/', '/safety', '/privacy', '/tours/summer'], ['/og-test']);
     expect(routes).toEqual(['/', '/safety', '/tours/summer', '/og-test']);

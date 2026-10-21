@@ -37,6 +37,9 @@ export const getRoutesToVerify = (
   ...ogTestRoutes,
 ];
 
+export const shouldIncludeSocialMetadata = (routePath: string): boolean =>
+  routePath !== ROUTES.SAFETY;
+
 const REQUIRED_SINGLE_TAGS = [
   'property="og:title"',
   'property="og:description"',
@@ -284,7 +287,7 @@ export const assertRoute = async (
   const html = await readHtml(routePath);
   const errors: string[] = [];
 
-  const includeSocialMetadata = resolveOgShellMeta(routePath).includeSocialMetadata !== false;
+  const includeSocialMetadata = shouldIncludeSocialMetadata(routePath);
   assertSingleTags(html, routePath, errors, includeSocialMetadata);
   assertTrailingSlashUrls(html, routePath, errors, includeSocialMetadata);
   assertNormalizedText(html, errors);

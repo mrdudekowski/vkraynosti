@@ -5,7 +5,8 @@ import { routePathToDistFile } from './lib/seoRoutes.mjs';
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
 
-const SAMPLE_ROUTES = ['/', '/tours/summer/summer-1', '/privacy'];
+// `/privacy` is a legacy PDF redirect file, not a rendered site page.
+const SAMPLE_ROUTES = ['/', '/tours/summer/summer-1'];
 
 const readHtml = async (routePath) => {
   const filePath = routePathToDistFile(routePath, distDir);

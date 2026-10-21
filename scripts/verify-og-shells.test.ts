@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assertSingleTags } from './verify-og-shells.ts';
+import { assertSingleTags, getRoutesToVerify } from './verify-og-shells.ts';
 
 const coreTags = `
   <title>Safety</title>
@@ -8,6 +8,11 @@ const coreTags = `
   <link rel="canonical" href="https://vkraynosti.ru/safety/" />`;
 
 describe('verify-og-shells social metadata rules', () => {
+  it('does not treat the legacy privacy PDF redirect file as a page under test', () => {
+    const routes = getRoutesToVerify(['/', '/safety', '/privacy', '/tours/summer'], ['/og-test']);
+    expect(routes).toEqual(['/', '/safety', '/tours/summer', '/og-test']);
+  });
+
   it('accepts Safety core SEO tags without social tags', () => {
     const errors: string[] = [];
     assertSingleTags(coreTags, '/safety', errors, false);

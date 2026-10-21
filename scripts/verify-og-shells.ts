@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { isNormalizedMetaContent } from '../src/constants/metaContent.ts';
 import { normalizeCanonicalPath } from '../src/constants/canonicalUrl.ts';
+import { ROUTES } from '../src/constants/routes.ts';
 import { resolveOgShellMeta } from './lib/resolveOgShellMeta.ts';
 import { getRenderableRoutePaths, getTourLegacyRedirectPaths, routePathToDistFile } from './lib/seoRoutes.mjs';
 import {
@@ -27,6 +28,14 @@ const DIMENSION_SAMPLE_ROUTES = [
 ];
 
 const DEFAULT_SITE_URL = 'https://vkraynosti.ru';
+
+export const getRoutesToVerify = (
+  renderableRoutes: readonly string[],
+  ogTestRoutes: readonly string[],
+): string[] => [
+  ...renderableRoutes.filter((routePath) => routePath !== ROUTES.PRIVACY),
+  ...ogTestRoutes,
+];
 
 const REQUIRED_SINGLE_TAGS = [
   'property="og:title"',
@@ -353,7 +362,7 @@ export const run = async (): Promise<void> => {
   const expectedOrigin = resolveExpectedSiteOrigin();
   const renderableRoutes = await getRenderableRoutePaths(rootDir);
   const ogTestRoutes = [OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
-  const routes = [...renderableRoutes, ...ogTestRoutes];
+  const routes = getRoutesToVerify(renderableRoutes, ogTestRoutes);
 
   for (const routePath of routes) {
     const checkDimensions = DIMENSION_SAMPLE_ROUTES.includes(routePath);

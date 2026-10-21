@@ -73,12 +73,14 @@ describe('catalog-aware SEO route sets', () => {
     expect(staticRoutes).toContain('/');
   });
 
-  it('renders Safety directly but keeps the noindex page out of the sitemap', async () => {
+  it('includes Safety in the sitemap and renders Privacy without indexing it', async () => {
     const sitemap = await getSitemapRoutePaths(rootDir);
     const renderable = await getRenderableRoutePaths(rootDir);
 
     expect(renderable).toContain('/safety');
-    expect(sitemap).not.toContain('/safety');
+    expect(sitemap).toContain('/safety');
+    expect(renderable).toContain('/privacy');
+    expect(sitemap).not.toContain('/privacy');
   });
 
   it('no renderable tour path lacks a catalog status (hidden tours never leak)', async () => {

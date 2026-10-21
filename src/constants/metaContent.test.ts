@@ -36,4 +36,10 @@ describe('finalizeMetaDescription', () => {
     expect(finalizeMetaDescription(raw)).toBe('Лето: два дня у моря.');
     expect(isNormalizedMetaContent(finalizeMetaDescription(raw))).toBe(true);
   });
+
+  it('preserves a complete CMS description within the editor limit', () => {
+    const description = 'Из Владивостока на 1 день: Полуостров Краббе. Один день среди морских скал, бухт и тех видов, в которые влюбляешься сразу. Даты и условия — на странице тура.';
+    expect(description.length).toBeLessThanOrEqual(180);
+    expect(finalizeMetaDescription(description)).toBe(description);
+  });
 });

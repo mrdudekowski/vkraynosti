@@ -116,7 +116,7 @@ export const SEO_DEFAULTS = {
         'Правила безопасности «ВКрайности»: риски маршрута, обязанности участника и ответственность.',
     }),
     path: ROUTES.SAFETY,
-    robots: 'noindex,nofollow' as RobotsDirective,
+    robots: 'index,follow' as RobotsDirective,
   } satisfies SeoEntry,
   privacy: {
     ...finalizeSeoFields({

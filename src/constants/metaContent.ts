@@ -1,5 +1,5 @@
-/** Max length for meta / og / twitter description (social preview safe limit). */
-export const META_DESCRIPTION_MAX_LENGTH = 120 as const;
+/** Must match the CMS SEO description limit; search engines choose snippet length per result. */
+export const META_DESCRIPTION_MAX_LENGTH = 180 as const;
 
 /** Collapse whitespace in meta tag text values for OG / Twitter shells. */
 export const normalizeMetaContent = (value: string): string =>
@@ -14,7 +14,7 @@ export const isNormalizedMetaContent = (value: string): boolean =>
 
 /**
  * Truncate meta description at a word boundary, append ellipsis when shortened.
- * Result length is at most `maxLength` (default 120).
+ * Result length is at most `maxLength` (default 180, matching the CMS field).
  */
 export const truncateMetaDescription = (
   value: string,

@@ -35,7 +35,9 @@ const SafetyTeaserHeroCard = () => {
 
   return (
     <Link
-      ref={cardRevealRef}
+      ref={(node) => {
+        cardRevealRef(node);
+      }}
       to={ROUTES.SAFETY}
       prefetch="intent"
       aria-label={ariaLabel}

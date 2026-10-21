@@ -142,7 +142,7 @@ describe('resolveOgShellMeta', () => {
     const { resolveOgShellMeta } = await import('./resolveOgShellMeta.ts');
     const meta = resolveOgShellMeta('/safety');
 
-    expect(meta.robots).toBe('index,follow');
+    expect(meta).toMatchObject({ robots: 'index,follow', includeSocialMetadata: false });
   });
 
   it('uses CMS tour SEO fields in the generated crawlable shell', async () => {

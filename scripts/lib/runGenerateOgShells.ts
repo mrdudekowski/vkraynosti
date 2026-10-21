@@ -8,6 +8,7 @@ import { getTourLegacyRedirectPaths } from '../../src/constants/tourSeoRoutes.ts
 import { getRenderableRoutePaths, getTourStatusByPublicPath } from './seoRoutes.mjs';
 import {
   collectOgShellImageLogicalPaths,
+  collectOgShellImageSources,
   collectOgShellSourceUrls,
   copyOgShellAssets,
   OG_SHELL_FALLBACK_SOURCE_LOGICAL,
@@ -68,7 +69,7 @@ export async function runGenerateOgShells(): Promise<void> {
     meta: resolveOgShellMeta(routePath, statusByPath.get(routePath), overrides),
   }));
 
-  const imageSources = routeMetas.map(({ meta }) => meta.imagePathOrUrl);
+  const imageSources = collectOgShellImageSources(routeMetas.map(({ meta }) => meta));
   const logicalPaths = collectOgShellImageLogicalPaths(imageSources);
   const sourceUrls = collectOgShellSourceUrls(imageSources);
   const requiredTourCoverPaths = new Set(
@@ -92,7 +93,9 @@ export async function runGenerateOgShells(): Promise<void> {
   await writeOgShellAssetManifest(distDir, materializedPaths);
 
   for (const { routePath, meta } of routeMetas) {
-    const imagePathOrUrl = resolveOgShellImageForMeta(meta.imagePathOrUrl, resolvedPathByRequested);
+    const imagePathOrUrl = meta.includeSocialMetadata === false
+      ? ''
+      : resolveOgShellImageForMeta(meta.imagePathOrUrl, resolvedPathByRequested);
     const filePath = routePathToDistFile(routePath, distDir);
     // Overlay meta onto the route's data-SSG HTML when present: keeps rendered
     // <body> and JSON-LD from data-SSG, replaces only head meta with the Telegram-optimized

@@ -15,6 +15,13 @@ export interface OgShellAssetManifest {
   allowedRelativePaths: string[];
 }
 
+export const collectOgShellImageSources = (
+  metas: Iterable<{ imagePathOrUrl: string; includeSocialMetadata?: boolean }>,
+): string[] =>
+  [...metas]
+    .filter((meta) => meta.includeSocialMetadata !== false)
+    .map((meta) => meta.imagePathOrUrl);
+
 export const collectOgShellImageLogicalPaths = (imagePathOrUrls: Iterable<string>): string[] => {
   const unique = new Set<string>([DEFAULT_OG_SHELL_BANNER_LOGICAL]);
   for (const pathOrUrl of imagePathOrUrls) {

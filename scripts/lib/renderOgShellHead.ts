@@ -31,10 +31,13 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
   const keywords = meta.keywords?.length ? `<meta name="keywords" content="${escapeHtml(meta.keywords.join(', '))}" />` : '';
   const robots = escapeHtml(meta.robots);
   const canonicalUrl = escapeHtml(getCanonicalUrl(meta.canonicalPath ?? meta.path));
-  const ogImage = escapeHtml(getOgShellAbsoluteImageUrl(meta.imagePathOrUrl));
+  const includeSocialMetadata = meta.includeSocialMetadata !== false;
+  const ogImage = includeSocialMetadata
+    ? escapeHtml(getOgShellAbsoluteImageUrl(meta.imagePathOrUrl))
+    : '';
   const siteName = escapeHtml(SEO_DEFAULTS.siteName);
   const twitterCard = escapeHtml(SEO_DEFAULTS.twitterCard);
-  const ogImageDimensions = isJpegOgImagePath(meta.imagePathOrUrl)
+  const ogImageDimensions = includeSocialMetadata && isJpegOgImagePath(meta.imagePathOrUrl)
     ? `
       <meta property="og:image:secure_url" content="${ogImage}" />
       <meta property="og:image:type" content="image/jpeg" />
@@ -42,10 +45,8 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
       <meta property="og:image:height" content="${OG_SHELL_IMAGE_HEIGHT}" />`
     : '';
 
-  return `
-      <meta name="description" content="${description}" />
-      <meta name="robots" content="${robots}" />
-      <link rel="canonical" href="${canonicalUrl}" />
+  const socialTags = includeSocialMetadata
+    ? `
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="${siteName}" />
       <meta property="og:locale" content="ru_RU" />
@@ -58,7 +59,14 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
       <meta name="twitter:title" content="${title}" />
       <meta name="twitter:description" content="${description}" />
       <meta name="twitter:image" content="${ogImage}" />
-      <meta name="twitter:url" content="${canonicalUrl}" />${keywords}`;
+      <meta name="twitter:url" content="${canonicalUrl}" />`
+    : '';
+
+  return `
+      <meta name="description" content="${description}" />
+      <meta name="robots" content="${robots}" />
+      <link rel="canonical" href="${canonicalUrl}" />
+      ${socialTags}${keywords}`;
 };
 
 const ensureOgHtmlPrefix = (html: string): string => {
@@ -73,6 +81,9 @@ const ensureOgHtmlPrefix = (html: string): string => {
         : `<html${attrs} prefix="og: https://ogp.me/ns#">`,
   );
 };
+
+const stripOgHtmlPrefix = (html: string): string =>
+  html.replace(/\s+prefix=["'][^"']*og:[^"']*["']/i, '');
 
 /** Remove previously injected OG-shell meta so re-runs stay idempotent. */
 export const stripOgShellMetaFromHead = (html: string): string =>
@@ -95,7 +106,9 @@ export const injectOgShellIntoHtml = (templateHtml: string, meta: OgShellMeta): 
     /<title>[\s\S]*?<\/title>/i,
     `<title>${titleEscaped}</title>`,
   );
-  html = ensureOgHtmlPrefix(html);
+  html = normalizedMeta.includeSocialMetadata === false
+    ? stripOgHtmlPrefix(html)
+    : ensureOgHtmlPrefix(html);
   html = stripOgShellMetaFromHead(html);
   if (isTimewebAppBuild()) {
     html = stripGithubPagesSpaRedirectScript(html);

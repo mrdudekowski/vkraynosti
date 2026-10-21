@@ -1,7 +1,5 @@
 import { setupOgShellBuildEnv } from './lib/ogShellEnv.ts';
-
-setupOgShellBuildEnv();
-
+import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -105,7 +103,12 @@ const extractCanonicalHref = (html: string): string | null => {
   return match?.[1] ?? null;
 };
 
-const assertSingleTags = (html: string, routePath: string, errors: string[]): void => {
+export const assertSingleTags = (
+  html: string,
+  routePath: string,
+  errors: string[],
+  includeSocialMetadata = true,
+): void => {
   if (!/<title>[\s\S]*?<\/title>/i.test(html)) {
     errors.push('missing title');
   }
@@ -115,8 +118,14 @@ const assertSingleTags = (html: string, routePath: string, errors: string[]): vo
   if (!/<link\s+rel="canonical"/i.test(html)) {
     errors.push('missing canonical');
   }
+  if (!/<meta\s+name="robots"/i.test(html)) {
+    errors.push('missing robots directive');
+  }
 
-  for (const tag of REQUIRED_SINGLE_TAGS) {
+  const requiredTags = includeSocialMetadata
+    ? REQUIRED_SINGLE_TAGS
+    : REQUIRED_SINGLE_TAGS.filter((tag) => !/og:|twitter:/.test(tag));
+  for (const tag of requiredTags) {
     const count = countMatches(html, tag);
     if (count === 0) {
       errors.push(`missing ${tag}`);
@@ -124,11 +133,23 @@ const assertSingleTags = (html: string, routePath: string, errors: string[]): vo
       errors.push(`duplicate ${tag} (${count})`);
     }
   }
+
+  if (!includeSocialMetadata) {
+    if (/property="og:/i.test(html)) errors.push('unexpected Open Graph metadata');
+    if (/name="twitter:/i.test(html)) errors.push('unexpected Twitter metadata');
+    if (/prefix=["'][^"']*og:/i.test(html)) errors.push('unexpected Open Graph HTML prefix');
+  }
 };
 
-const assertTrailingSlashUrls = (html: string, routePath: string, errors: string[]): void => {
+const assertTrailingSlashUrls = (
+  html: string,
+  routePath: string,
+  errors: string[],
+  includeSocialMetadata = true,
+): void => {
   const expectedPath = normalizeCanonicalPath(routePath);
-  for (const tag of URL_TAGS) {
+  const urlTags = includeSocialMetadata ? URL_TAGS : ['rel="canonical"'];
+  for (const tag of urlTags) {
     const value =
       tag === 'rel="canonical"' ? extractCanonicalHref(html) : extractMetaContent(html, tag);
     if (!value) {
@@ -245,7 +266,7 @@ const assertRenderedBody = (html: string, errors: string[]): void => {
   }
 };
 
-const assertRoute = async (
+export const assertRoute = async (
   routePath: string,
   expectedOrigin: string,
   checkDimensions: boolean,
@@ -254,8 +275,9 @@ const assertRoute = async (
   const html = await readHtml(routePath);
   const errors: string[] = [];
 
-  assertSingleTags(html, routePath, errors);
-  assertTrailingSlashUrls(html, routePath, errors);
+  const includeSocialMetadata = resolveOgShellMeta(routePath).includeSocialMetadata !== false;
+  assertSingleTags(html, routePath, errors, includeSocialMetadata);
+  assertTrailingSlashUrls(html, routePath, errors, includeSocialMetadata);
   assertNormalizedText(html, errors);
   if (routePath === '/safety') {
     const robots = extractMetaContent(html, 'name="robots"');
@@ -327,7 +349,7 @@ const assertLegacyRedirectShell = async (
   }
 };
 
-const run = async (): Promise<void> => {
+export const run = async (): Promise<void> => {
   const expectedOrigin = resolveExpectedSiteOrigin();
   const renderableRoutes = await getRenderableRoutePaths(rootDir);
   const ogTestRoutes = [OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
@@ -365,9 +387,12 @@ const run = async (): Promise<void> => {
   );
 };
 
-run().catch((error) => {
-  process.stderr.write(
-    `verify-og-shells failed: ${error instanceof Error ? error.message : String(error)}\n`,
-  );
-  process.exitCode = 1;
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  setupOgShellBuildEnv();
+  run().catch((error) => {
+    process.stderr.write(
+      `verify-og-shells failed: ${error instanceof Error ? error.message : String(error)}\n`,
+    );
+    process.exitCode = 1;
+  });
+}

@@ -38,6 +38,34 @@ describe('injectOgShellIntoHtml idempotency', () => {
 });
 
 describe('renderOgShellHead', () => {
+  it('keeps core SEO metadata but omits social tags and prefix for Safety', () => {
+    const safetyMeta: OgShellMeta = {
+      ...sampleMeta,
+      path: '/safety',
+      imagePathOrUrl: '',
+      includeSocialMetadata: false,
+    };
+    const templateWithOgPrefix = templateHtml.replace(
+      '<html lang="ru">',
+      '<html lang="ru" prefix="og: https://ogp.me/ns#">',
+    );
+    const html = injectOgShellIntoHtml(templateWithOgPrefix, safetyMeta);
+
+    expect(html).toContain('<title>Tour Title — Season | Вкрайности</title>');
+    expect(html).toContain('name="description"');
+    expect(html).toContain('name="robots" content="index,follow"');
+    expect(html).toContain('rel="canonical"');
+    expect(html).not.toMatch(/property="og:/);
+    expect(html).not.toMatch(/name="twitter:/);
+    expect(html).not.toContain('prefix="og: https://ogp.me/ns#"');
+  });
+
+  it('continues to emit social tags for routes without an explicit opt-out', () => {
+    const html = injectOgShellIntoHtml(templateHtml, sampleMeta);
+    expect(html).toContain('property="og:title"');
+    expect(html).toContain('name="twitter:card"');
+  });
+
   it('includes secure_url and image dimensions for JPEG', () => {
     const head = renderOgShellHead(sampleMeta);
     expect(head).toContain('property="og:image:secure_url"');

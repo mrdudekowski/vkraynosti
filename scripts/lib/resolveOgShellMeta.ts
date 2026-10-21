@@ -25,6 +25,7 @@ export interface OgShellMeta {
   robots: RobotsDirective;
   imagePathOrUrl: string;
   keywords?: string[];
+  includeSocialMetadata?: boolean;
 }
 
 export type OgShellOverrides = { toursById?: ReadonlyMap<string, Tour>; siteSeo?: SiteSeoDocument | null };
@@ -62,6 +63,7 @@ export const resolveOgShellMeta = (
       path: SEO_DEFAULTS.safety.path,
       robots: SEO_DEFAULTS.safety.robots ?? SEO_DEFAULTS.robots,
       imagePathOrUrl: SAFETY_PAGE_HERO_BACKGROUND,
+      includeSocialMetadata: false,
     };
   }
 

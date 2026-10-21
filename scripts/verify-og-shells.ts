@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { isNormalizedMetaContent } from '../src/constants/metaContent.ts';
 import { normalizeCanonicalPath } from '../src/constants/canonicalUrl.ts';
+import { resolveOgShellMeta } from './lib/resolveOgShellMeta.ts';
 import { getRenderableRoutePaths, getTourLegacyRedirectPaths, routePathToDistFile } from './lib/seoRoutes.mjs';
 import {
   OG_SHELL_IMAGE_HEIGHT,
@@ -258,8 +259,9 @@ const assertRoute = async (
   assertNormalizedText(html, errors);
   if (routePath === '/safety') {
     const robots = extractMetaContent(html, 'name="robots"');
-    if (robots !== 'noindex,nofollow') {
-      errors.push(`Safety robots must be noindex,nofollow, got ${robots ?? 'missing'}`);
+    const expectedRobots = resolveOgShellMeta(routePath).robots;
+    if (robots !== expectedRobots) {
+      errors.push(`Safety robots must be ${expectedRobots}, got ${robots ?? 'missing'}`);
     }
   }
   assertOgImage(html, routePath, expectedOrigin, errors, false);

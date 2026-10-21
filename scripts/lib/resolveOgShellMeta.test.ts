@@ -138,11 +138,11 @@ describe('resolveOgShellMeta', () => {
     expect(meta.title).not.toContain('|');
   });
 
-  it('keeps Safety noindex in the generated crawlable shell', async () => {
+  it('keeps the indexable Safety directive in the generated crawlable shell', async () => {
     const { resolveOgShellMeta } = await import('./resolveOgShellMeta.ts');
     const meta = resolveOgShellMeta('/safety');
 
-    expect(meta.robots).toBe('noindex,nofollow');
+    expect(meta.robots).toBe('index,follow');
   });
 
   it('uses CMS tour SEO fields in the generated crawlable shell', async () => {

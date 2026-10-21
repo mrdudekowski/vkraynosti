@@ -17,7 +17,7 @@ describe('verify-seo-dist', () => {
     expect(errors).toContain('missing rendered HTML for sitemap route: /');
   });
 
-  it('accepts a complete indexable route and rejects closed routes in sitemap', async () => {
+  it('accepts a complete indexable route and rejects noindex routes in sitemap', async () => {
     const html = `<!doctype html><html><head>
       <title>Вкрайности</title>
       <meta name="description" content="Поездки по Приморью из Владивостока">
@@ -31,13 +31,13 @@ describe('verify-seo-dist', () => {
     const errors = await collectSeoDistErrors({
       rootDir: 'E:/fixture',
       distDir: 'E:/fixture/dist',
-      sitemapXml: '<urlset><url><loc>https://vkraynosti.ru/</loc></url><url><loc>https://vkraynosti.ru/safety/</loc></url></urlset>',
+      sitemapXml: '<urlset><url><loc>https://vkraynosti.ru/</loc></url><url><loc>https://vkraynosti.ru/privacy/</loc></url></urlset>',
       readFile: async () => html,
       fileExists: (filePath) => filePath.endsWith('index.html'),
       expectedRoutes: ['/'],
       renderableRoutes: ['/'],
     });
 
-    expect(errors).toContain('non-indexable route is present in sitemap: /safety/');
+    expect(errors).toContain('non-indexable route is present in sitemap: /privacy/');
   });
 });

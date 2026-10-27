@@ -15,7 +15,7 @@ import {
   cmsMediaObjectKey,
 } from '../../../src/cms/cmsPackageKeys';
 import { mergeTourDataToSchedulePayload } from '../../../src/utils/tourData/mergeTourDataPayload';
-import { createCmsApiApp, loadTourDocumentForDepartureWrite } from './app';
+import { createCmsApiApp, loadTourDocumentForDepartureWrite, type CmsApiDeps } from './app';
 import { createAuthRepository } from './auth/authRepository.ts';
 import { createDatabase } from './db/client.ts';
 import { auditLog, sessions, tourDepartures, users } from './db/schema.ts';
@@ -23,7 +23,8 @@ import type { CmsApiEnv } from './env';
 import { hashCmsPassword } from './password.ts';
 import { createDepartureRepository } from './schedule/departureRepository.ts';
 import { CMS_SESSION_COOKIE, hashSessionToken } from './session.ts';
-import { createMemoryJsonStore } from './store';
+import { StorageUnavailableError } from './storageUnavailable';
+import { createMemoryJsonStore, createSplitJsonStore } from './store';
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
 if (testDatabaseUrl == null || testDatabaseUrl.trim() === '') {
@@ -115,7 +116,10 @@ const env: CmsApiEnv = {
     publicBaseUrl: 'https://s3.example/vkraynosti-cms-dev',
   },
   storeKind: 's3',
+  jsonStoreKind: 's3',
   localStoreDir: path.join(process.cwd(), 'tmp', 'cms-catalog'),
+  deploySecret: '',
+  storageCanaryKey: 'media/tours/fall-1/cover.webp',
 };
 
 function cookieFrom(response: Response): string {
@@ -133,8 +137,8 @@ function rawSessionTokenFromSetCookie(setCookie: string | null): string {
   return decodeURIComponent(first.slice(prefix.length));
 }
 
-function createApp() {
-  const store = createMemoryJsonStore({
+function createApp(extra: Partial<CmsApiDeps> = {}) {
+  const store = extra.store ?? createMemoryJsonStore({
     'draft/tours/winter-1/document.json': document,
     'draft/tours/winter-1/meta.json': {
       rev: 1,
@@ -156,7 +160,7 @@ function createApp() {
     loadTourDocument: (tourId) => loadTourDocumentForDepartureWrite(store, tourId),
   });
   return {
-    app: createCmsApiApp({ env, store, authRepository, departureRepository }),
+    app: createCmsApiApp({ env, store, authRepository, departureRepository, ...extra }),
     departureRepository,
     store,
   };
@@ -2128,5 +2132,110 @@ describe('CMS publish flags and inbox', () => {
     expect(schedule.events.map((event) => event.date)).toEqual(
       expect.arrayContaining(['2031-11-05', '2031-11-06']),
     );
+  });
+});
+
+describe('CMS storage failswitch', () => {
+  const openCircuit = { state: () => 'open' as const };
+
+  it('reports ok true when storage is open and kv is up', async () => {
+    const { app } = createApp({ storageCircuit: openCircuit });
+    const response = await app.request('/api/cms/health');
+    expect(response.status).toBe(200);
+    const body = await response.json() as { ok: boolean; storage: string };
+    expect(body.ok).toBe(true);
+    expect(body.storage).toBe('open');
+  });
+
+  it('returns tours from json when byte storage throws', async () => {
+    const json = createMemoryJsonStore({
+      [CMS_PUBLISHED_CATALOG_KEY]: { schemaVersion: 1, tours: [document] },
+      [CMS_DRAFT_INDEX_KEY]: { schemaVersion: 1, tourIds: ['winter-1'] },
+      [cmsDraftDocumentKey('winter-1')]: document,
+    });
+    const store = createSplitJsonStore(json, {
+      ...createMemoryJsonStore(),
+      getBytes: async () => {
+        throw new StorageUnavailableError();
+      },
+      putBytes: async () => {
+        throw new StorageUnavailableError();
+      },
+      deleteBytes: async () => {
+        throw new StorageUnavailableError();
+      },
+    });
+    const { app } = createApp({ store });
+    const cookie = await login(app);
+    const response = await app.request('/api/cms/tours', { headers: { cookie } });
+    expect(response.status).toBe(200);
+  });
+
+  it('rejects create tour while storage is open', async () => {
+    const { app } = createApp({ storageCircuit: openCircuit });
+    const cookie = await login(app);
+    const response = await app.request('/api/cms/tours', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ title: 'Новый', season: 'winter' }),
+    });
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: 'storage_unavailable' });
+  });
+
+  it('publishes json while storage is open', async () => {
+    const { app } = createApp({ storageCircuit: openCircuit });
+    const cookie = await login(app);
+    const response = await app.request('/api/cms/tours/winter-1/publish', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: 1 }),
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it('reads and writes CRM json while byte storage throws', async () => {
+    const json = createMemoryJsonStore();
+    const store = createSplitJsonStore(json, {
+      ...createMemoryJsonStore(),
+      getBytes: async () => {
+        throw new StorageUnavailableError();
+      },
+      putBytes: async () => {
+        throw new StorageUnavailableError();
+      },
+      deleteBytes: async () => {
+        throw new StorageUnavailableError();
+      },
+    });
+    const { app } = createApp({ store });
+    const cookie = await login(app);
+    const response = await app.request('/api/cms/crm', { headers: { cookie } });
+    expect(response.status).toBe(200);
+  });
+});
+
+describe('CMS bake endpoint', () => {
+  it('disables bake when the deploy secret is empty', async () => {
+    const { app } = createApp();
+    const response = await app.request('/api/cms/internal/bake');
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: 'bake_disabled' });
+  });
+
+  it('rejects bake without the deploy secret', async () => {
+    const { app } = createApp({ env: { ...env, deploySecret: 'deploy-secret' } });
+    const response = await app.request('/api/cms/internal/bake');
+    expect(response.status).toBe(401);
+  });
+
+  it('returns published tours from kv when the deploy secret matches', async () => {
+    const { app } = createApp({ env: { ...env, deploySecret: 'deploy-secret' } });
+    const response = await app.request('/api/cms/internal/bake', {
+      headers: { 'x-cms-deploy-secret': 'deploy-secret' },
+    });
+    expect(response.status).toBe(200);
+    const body = await response.json() as { tours: { tours: Array<{ id: string }> } };
+    expect(body.tours.tours[0]?.id).toBe('winter-1');
   });
 });

@@ -12,13 +12,14 @@
  * as authoritative and must be complete before any snapshots are replaced.
  */
 import { copyFile, mkdir, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { loadDotEnvLocal } from './lib/loadDotEnvLocal.mjs';
 import { resolveCatalogSource } from './lib/catalogSource.mjs';
 import {
   TOUR_CATALOG_FIXTURE_DIR,
   seedTourCatalogFromFixtures,
 } from './lib/readTourCatalogFile.mjs';
+import { rewriteBakeStills } from './lib/rewriteBakeStills.mjs';
 
 const rootDir = process.cwd();
 
@@ -69,6 +70,52 @@ export async function syncCatalog({
 
   await mkdir(scheduleDir, { recursive: true });
 
+  if (source.kind === 'bakeApi') {
+    const response = await fetchImpl(source.bakeUrl, {
+      headers: { 'x-cms-deploy-secret': source.deploySecret },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const payload = typeof response.json === 'function'
+      ? await response.json()
+      : JSON.parse(await response.text());
+    const tours = payload?.tours ?? { schemaVersion: 1, tours: [] };
+    const toursList = payload?.toursList ?? { schemaVersion: 1, tours: [] };
+    const schedule = payload?.schedule ?? { schemaVersion: 1, events: [] };
+    const toursListText = `${JSON.stringify(toursList)}\n`;
+    const scheduleText = `${JSON.stringify(schedule)}\n`;
+    await mkdir(cmsDir, { recursive: true });
+    const rewritten = await rewriteBakeStills({ root, tours, fetchImpl });
+    const rewrittenToursText = `${JSON.stringify(rewritten)}\n`;
+    const cmsScheduleDir = resolve(cmsDir, 'tour-schedule');
+    await mkdir(cmsScheduleDir, { recursive: true });
+    const siteContentWrites = Object.entries(payload?.siteContent ?? {}).flatMap(([kind, document]) => {
+      if (document == null) {
+        return [];
+      }
+      const dest = kind === 'seo'
+        ? resolve(cmsDir, 'site-seo/document.json')
+        : resolve(cmsDir, 'site-content', kind, 'document.json');
+      return [[dest, `${JSON.stringify(document)}\n`]];
+    });
+    await Promise.all([
+      writeFile(resolve(cmsDir, 'tours.json'), rewrittenToursText, 'utf8'),
+      writeFile(resolve(scheduleDir, 'tours_list.json'), toursListText, 'utf8'),
+      writeFile(resolve(scheduleDir, 'schedule.json'), scheduleText, 'utf8'),
+      writeFile(resolve(cmsScheduleDir, 'tours_list.json'), toursListText, 'utf8'),
+      writeFile(resolve(cmsScheduleDir, 'schedule.json'), scheduleText, 'utf8'),
+      writeFile(resolve(cmsDir, 'build-source.json'), '{"kind":"cms"}\n', 'utf8'),
+      ...siteContentWrites.map(async ([dest, body]) => {
+        await mkdir(dirname(dest), { recursive: true });
+        await writeFile(dest, body, 'utf8');
+      }),
+    ]);
+    process.stdout.write(`[sync:catalog] baked CMS tours and schedule (${rewritten.tours?.length ?? 0} tours)\n`);
+    return;
+  }
+
   if (source.kind === 'cms') {
     const [toursText, toursListText, scheduleText] = await Promise.all([
       fetchCatalogJson(source.toursUrl, fetchImpl),
@@ -79,10 +126,20 @@ export async function syncCatalog({
     parsePackage(toursListText, source.toursListUrl, 'tours');
     parsePackage(scheduleText, source.scheduleUrl, 'events');
     await mkdir(cmsDir, { recursive: true });
+    const rewritten = await rewriteBakeStills({
+      root,
+      tours: JSON.parse(toursText),
+      fetchImpl,
+    });
+    const rewrittenToursText = `${JSON.stringify(rewritten)}\n`;
+    const cmsScheduleDir = resolve(cmsDir, 'tour-schedule');
+    await mkdir(cmsScheduleDir, { recursive: true });
     await Promise.all([
-      writeFile(resolve(cmsDir, 'tours.json'), toursText, 'utf8'),
+      writeFile(resolve(cmsDir, 'tours.json'), rewrittenToursText, 'utf8'),
       writeFile(resolve(scheduleDir, 'tours_list.json'), toursListText, 'utf8'),
       writeFile(resolve(scheduleDir, 'schedule.json'), scheduleText, 'utf8'),
+      writeFile(resolve(cmsScheduleDir, 'tours_list.json'), toursListText, 'utf8'),
+      writeFile(resolve(cmsScheduleDir, 'schedule.json'), scheduleText, 'utf8'),
       writeFile(resolve(cmsDir, 'build-source.json'), '{"kind":"cms"}\n', 'utf8'),
     ]);
     process.stdout.write(`[sync:catalog] updated published CMS tours and schedule (${JSON.parse(toursText).tours.length} tours)\n`);

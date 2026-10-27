@@ -1,4 +1,4 @@
-import { Fragment, useRef, type CSSProperties } from "react";
+import { Fragment, useRef, useSyncExternalStore, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons/faCircleQuestion';
@@ -10,6 +10,11 @@ import {
   getTourGalleryLayoutVariant,
 } from "../constants/tourGalleryLayoutVariant";
 import { UI } from "../constants/ui";
+import {
+  getStorageCircuitState,
+  shouldShowGuestHeavyGallery,
+  subscribeStorageCircuit,
+} from "../cms/storageCircuit";
 import { tourHeroObjectProps } from "../utils/tourCoverPresentation";
 import { getTourGalleryGridUrls } from "../utils/tourGalleryUrls";
 import { splitTourDescription } from "../utils/splitTourDescription";
@@ -63,6 +68,12 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
   const { openTourRequestModal } = useModal();
   const isLgOrAbove = useMatchMinWidth(BREAKPOINT_LG_PX);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const storageCircuit = useSyncExternalStore(
+    subscribeStorageCircuit,
+    getStorageCircuitState,
+    getStorageCircuitState,
+  );
+  const showHeavyGallery = shouldShowGuestHeavyGallery(storageCircuit);
   const programRevealEnabled = isLgOrAbove && !prefersReducedMotion;
   const mainColumnRef = useRef<HTMLDivElement>(null);
   const programViewportRef = useRef<HTMLDivElement>(null);
@@ -115,8 +126,9 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
     isLgOrAbove,
   });
 
+  const heavyGalleryAvailable = gridGalleryUrls.length > 2;
   const galleryGridImages =
-    !tour || gridGalleryUrls.length <= 2 ? [] : gridGalleryUrls.slice(2);
+    !showHeavyGallery || !tour || !heavyGalleryAvailable ? [] : gridGalleryUrls.slice(2);
   const heroImageUrl = resolveTourHeroImageUrl({
     tour,
     gridGalleryUrls,
@@ -338,6 +350,9 @@ const TourDetailPageFull = ({ tour }: TourDetailPageFullProps) => {
                 </div>
               )}
 
+              {heavyGalleryAvailable && !showHeavyGallery && (
+                <p className="text-text-muted">{UI.tourDetail.galleryUnavailable}</p>
+              )}
               {galleryGridImages.length > 0 && (
                 <div className="w-full min-w-0">
                   <TourDetailSectionHeading

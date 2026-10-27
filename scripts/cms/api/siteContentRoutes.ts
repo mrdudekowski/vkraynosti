@@ -21,6 +21,7 @@ import { SITE_CONTENT_KIND_LABELS, siteContentChanges, type SiteContentChangesIt
 import type { CmsApiEnv } from './env.ts';
 import { prepareCmsImageUpload } from './heic.ts';
 import type { CmsSession } from './session.ts';
+import type { StorageCircuit } from './storageCircuit.ts';
 import type { CmsJsonStore } from './store.ts';
 
 type SiteContentEnv = { Variables: { session: CmsSession } };
@@ -80,7 +81,11 @@ function siteContentMediaPublicBaseUrl(env: CmsApiEnv): string {
 
 export function registerSiteContentRoutes(
   app: SiteContentApp,
-  deps: { store: CmsJsonStore; env: CmsApiEnv },
+  deps: {
+    store: CmsJsonStore;
+    env: CmsApiEnv;
+    storageCircuit?: Pick<StorageCircuit, 'state'>;
+  },
 ): void {
   app.get('/api/cms/site-content/:kind', async (c: SiteContentContext) => {
     const kind = c.req.param('kind');
@@ -146,6 +151,9 @@ export function registerSiteContentRoutes(
   });
 
   app.post('/api/cms/site-content/:kind/assets', async (c: SiteContentContext) => {
+    if (deps.storageCircuit?.state() === 'open') {
+      return c.json({ error: 'storage_unavailable' }, 503);
+    }
     const kind = c.req.param('kind');
     if (!isSiteContentKind(kind)) return invalidKind(c);
     const session = c.get('session') as CmsSession;

@@ -1,11 +1,14 @@
 import { serve } from '@hono/node-server';
 import path from 'node:path';
+import { sql } from 'drizzle-orm';
+import { CMS_PUBLISHED_CATALOG_KEY } from '../../../src/cms/cmsPackageKeys.ts';
 import { createAuthRepository } from './auth/authRepository.ts';
 import { createDatabase } from './db/client.ts';
 import { loadDatabaseConfig } from './db/config.ts';
 import { loadCmsApiEnv, readDotEnvFile } from './env.ts';
 import { createCmsApiApp, loadTourDocumentForDepartureWrite } from './app.ts';
 import { createDepartureRepository } from './schedule/departureRepository.ts';
+import { createStorageCircuit } from './storageCircuit.ts';
 import { createCmsJsonStore } from './store.ts';
 
 const rootDir = process.cwd();
@@ -20,7 +23,10 @@ const database = createDatabase(
       process.env.DATABASE_MAX_CONNECTIONS ?? fileEnv.DATABASE_MAX_CONNECTIONS,
   })
 );
-const store = createCmsJsonStore(env);
+const store = createCmsJsonStore(env, database.db);
+const storageCircuit = createStorageCircuit(async () => {
+  await store.getBytes(env.storageCanaryKey);
+});
 const app = createCmsApiApp({
   env,
   store,
@@ -28,6 +34,13 @@ const app = createCmsApiApp({
   departureRepository: createDepartureRepository(database.db, {
     loadTourDocument: (tourId) => loadTourDocumentForDepartureWrite(store, tourId),
   }),
+  storageCircuit,
+  probePostgres: async () => {
+    await database.db.execute(sql`select 1`);
+  },
+  probeJsonStore: async () => {
+    await store.getJson(CMS_PUBLISHED_CATALOG_KEY);
+  },
 });
 
 serve(
@@ -38,7 +51,7 @@ serve(
   },
   (info) => {
     console.info(
-      `CMS API http://0.0.0.0:${info.port} (store: ${env.storeKind}, proxy: /api/cms)`
+      `CMS API http://0.0.0.0:${info.port} (json: ${env.jsonStoreKind}, bytes: ${env.storeKind}, proxy: /api/cms)`
     );
   }
 );

@@ -13,9 +13,13 @@ function stripTrailingSlash(value: string): string {
   return value.replace(/\/+$/, '');
 }
 
-function cmsLocalDataBasePath(): string {
+function publicDataBasePath(): string {
   const basePath = (readViteEnv('BASE_URL') ?? '/').replace(/\/+$/, '');
-  return `${basePath}/data/cms`;
+  return `${basePath}/data`;
+}
+
+function cmsLocalDataBasePath(): string {
+  return `${publicDataBasePath()}/cms`;
 }
 
 export function resolveCmsContentBaseUrl(): string | null {
@@ -57,23 +61,34 @@ export function resolveCmsLocalScheduleFallbackUrl(): string {
   return `${cmsLocalDataBasePath()}/tour-schedule/schedule.json`;
 }
 
-/** URL overlay календаря: cms-dev, затем локальный fallback. Прод-путь сюда не входит. */
+export function resolveCmsLocalSiteContentUrl(kind: SiteContentDocumentKind): string {
+  if (kind === 'seo') {
+    return `${cmsLocalDataBasePath()}/site-seo/document.json`;
+  }
+  return `${cmsLocalDataBasePath()}/site-content/${kind}/document.json`;
+}
+
+export function cmsTourScheduleBakeCandidates(): {
+  toursList: string[];
+  schedule: string[];
+} {
+  const data = publicDataBasePath();
+  return {
+    toursList: [
+      resolveCmsLocalToursListFallbackUrl(),
+      `${data}/tour-schedule/tours_list.json`,
+    ],
+    schedule: [
+      resolveCmsLocalScheduleFallbackUrl(),
+      `${data}/tour-schedule/schedule.json`,
+    ],
+  };
+}
+
+/** Same-origin bake only. Guest never fetches CDN JSON. */
 export function cmsTourScheduleOverlayCandidates(): {
   toursList: string[];
   schedule: string[];
 } {
-  const remoteBase = resolveCmsContentBaseUrl();
-  if (remoteBase == null) {
-    return { toursList: [], schedule: [] };
-  }
-  return {
-    toursList: [
-      buildCmsPublishedToursListUrl(remoteBase),
-      resolveCmsLocalToursListFallbackUrl(),
-    ],
-    schedule: [
-      buildCmsPublishedScheduleUrl(remoteBase),
-      resolveCmsLocalScheduleFallbackUrl(),
-    ],
-  };
+  return cmsTourScheduleBakeCandidates();
 }

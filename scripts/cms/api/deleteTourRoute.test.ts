@@ -33,7 +33,10 @@ const env = {
     publicBaseUrl: 'https://cdn.example',
   },
   storeKind: 's3',
+  jsonStoreKind: 's3',
   localStoreDir: 'tmp/cms',
+  deploySecret: '',
+  storageCanaryKey: 'media/tours/fall-1/cover.webp',
 } satisfies CmsApiEnv;
 
 function makeTour(): CmsTourDocument {

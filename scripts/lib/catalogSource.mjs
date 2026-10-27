@@ -4,6 +4,15 @@ function normalizedBase(value) {
 }
 
 export function resolveCatalogSource(env = process.env) {
+  const bakeUrl = normalizedBase(env.CMS_BAKE_URL);
+  if (bakeUrl) {
+    return {
+      kind: 'bakeApi',
+      bakeUrl: `${bakeUrl}/api/cms/internal/bake`,
+      deploySecret: env.CMS_DEPLOY_SECRET ?? '',
+    };
+  }
+
   const cmsBase = normalizedBase(env.VITE_CMS_S3_BASE_URL);
   if (cmsBase) {
     return {

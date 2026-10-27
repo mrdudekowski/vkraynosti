@@ -152,4 +152,22 @@ describe('site content routes', () => {
     const stored = await store.getBytes(`media/site-content/team/${body.asset.assetId}.jpg`);
     expect(stored?.body).toEqual(new Uint8Array([255, 216, 255, 224]));
   });
+
+  it('rejects site-content assets while storage is open', async () => {
+    const app = new Hono<{ Variables: { session: CmsSession } }>();
+    app.use('*', async (c, next) => {
+      c.set('session', session(true));
+      await next();
+    });
+    registerSiteContentRoutes(app, {
+      store: createMemoryJsonStore(),
+      env,
+      storageCircuit: { state: () => 'open' },
+    });
+    const form = new FormData();
+    form.set('file', new File([new Uint8Array([1, 2, 3])], 'elena.jpg', { type: 'image/jpeg' }));
+    const response = await app.request('/api/cms/site-content/team/assets', { method: 'POST', body: form });
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: 'storage_unavailable' });
+  });
 });

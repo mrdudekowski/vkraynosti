@@ -40,20 +40,21 @@ describe('resolveCmsContentBaseUrl', () => {
     );
   });
 
-  it('календарный overlay пуст без CMS env', () => {
+  it('календарный overlay всегда same-origin, даже без CMS env', () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', '');
-    expect(cmsTourScheduleOverlayCandidates()).toEqual({ toursList: [], schedule: [] });
+    vi.stubEnv('BASE_URL', '/');
+    const candidates = cmsTourScheduleOverlayCandidates();
+    expect(candidates.toursList[0]).toBe('/data/cms/tour-schedule/tours_list.json');
+    expect(candidates.schedule[0]).toBe('/data/cms/tour-schedule/schedule.json');
   });
 
-  it('календарный overlay начинается с published/tour-schedule', () => {
+  it('календарный overlay не ходит на CDN JSON', () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://s3.twcstorage.ru/vkraynosti-cms-dev/');
     vi.stubEnv('BASE_URL', '/');
     const candidates = cmsTourScheduleOverlayCandidates();
-    expect(candidates.toursList[0]).toBe(
-      'https://s3.twcstorage.ru/vkraynosti-cms-dev/published/tour-schedule/tours_list.json'
-    );
-    expect(candidates.schedule[0]).toBe(
-      'https://s3.twcstorage.ru/vkraynosti-cms-dev/published/tour-schedule/schedule.json'
-    );
+    expect(candidates.toursList[0]).toBe('/data/cms/tour-schedule/tours_list.json');
+    expect(candidates.schedule[0]).toBe('/data/cms/tour-schedule/schedule.json');
+    expect(candidates.toursList.join(' ')).not.toContain('s3.twcstorage.ru');
+    expect(candidates.schedule.join(' ')).not.toContain('s3.twcstorage.ru');
   });
 });

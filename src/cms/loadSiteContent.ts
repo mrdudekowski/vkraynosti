@@ -1,8 +1,5 @@
 import { parseSiteContentDocument, type SiteContentDocument, type SiteContentDocumentKind } from './siteContentDocument';
-import {
-  buildCmsPublishedSiteContentUrl,
-  resolveCmsContentBaseUrl,
-} from './cmsContentUrls';
+import { resolveCmsLocalSiteContentUrl } from './cmsContentUrls';
 
 const lastValidByKind = new Map<SiteContentDocumentKind, SiteContentDocument>();
 
@@ -28,12 +25,7 @@ function parseDocument(
 export async function loadPublishedSiteContent(
   kind: SiteContentDocumentKind,
 ): Promise<SiteContentDocument | null> {
-  const baseUrl = resolveCmsContentBaseUrl();
-  if (baseUrl == null) {
-    return null;
-  }
-
-  const url = buildCmsPublishedSiteContentUrl(baseUrl, kind);
+  const url = resolveCmsLocalSiteContentUrl(kind);
   try {
     const document = parseDocument(kind, await fetchJson(url));
     lastValidByKind.set(kind, document);

@@ -10,7 +10,10 @@ export type CmsApiUser = {
 };
 
 export type CmsStoreKind = 's3' | 'filesystem';
+export type CmsJsonStoreKind = 's3' | 'filesystem' | 'postgres';
 export type CmsCookieSameSite = 'Strict' | 'Lax' | 'None';
+
+export const CMS_STORAGE_CANARY_KEY_DEFAULT = 'media/tours/fall-1/cover.webp';
 
 export type CmsApiS3Config = {
   bucket: string;
@@ -30,8 +33,11 @@ export type CmsApiEnv = {
   crmInboundSecret: string;
   users: CmsApiUser[];
   storeKind: CmsStoreKind;
+  jsonStoreKind: CmsJsonStoreKind;
   localStoreDir: string;
   s3: CmsApiS3Config;
+  deploySecret: string;
+  storageCanaryKey: string;
 };
 
 export async function readDotEnvFile(filePath: string): Promise<Record<string, string>> {
@@ -101,6 +107,11 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
   const storeKindRaw = get('CMS_STORE').toLowerCase();
   const storeKind: CmsStoreKind =
     storeKindRaw === 'filesystem' || storeKindRaw === 'local' ? 'filesystem' : 's3';
+  const jsonStoreRaw = get('CMS_JSON_STORE').toLowerCase();
+  const jsonStoreKind: CmsJsonStoreKind =
+    jsonStoreRaw === 'postgres' || jsonStoreRaw === 'filesystem' || jsonStoreRaw === 's3'
+      ? jsonStoreRaw
+      : storeKind;
   const localStoreDir = path.resolve(
     rootDir,
     get('CMS_LOCAL_STORE_DIR') || 'tmp/cms-catalog'
@@ -131,6 +142,7 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
     crmInboundSecret: get('CMS_CRM_INBOUND_SECRET'),
     users,
     storeKind,
+    jsonStoreKind,
     localStoreDir,
     s3: {
       bucket: bucket.length > 0 ? bucket : 'local-cms-catalog',
@@ -141,5 +153,7 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
       forcePathStyle: get('S3_FORCE_PATH_STYLE') !== 'false',
       publicBaseUrl,
     },
+    deploySecret: get('CMS_DEPLOY_SECRET'),
+    storageCanaryKey: get('CMS_STORAGE_CANARY_KEY') || CMS_STORAGE_CANARY_KEY_DEFAULT,
   };
 }

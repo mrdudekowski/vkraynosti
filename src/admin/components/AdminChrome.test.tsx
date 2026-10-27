@@ -5,6 +5,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ADMIN_SIDEBAR_COLLAPSED_STORAGE_KEY } from '../../constants/adminUiTokens';
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import type { AdminSession } from '../api';
+
+const healthState = vi.hoisted(() => ({
+  adminCmsHealth: vi.fn(),
+}));
+
+vi.mock('../api', async () => {
+  const actual = await vi.importActual('../api');
+  return {
+    ...actual,
+    adminCmsHealth: (...args: unknown[]) => healthState.adminCmsHealth(...args),
+  };
+});
 import { ADMIN_UI } from '../constants/ui';
 import type { AdminNavItem } from '../constants/nav';
 import AdminChrome from './AdminChrome';
@@ -97,6 +109,7 @@ describe('AdminChrome', () => {
   beforeEach(() => {
     window.localStorage.clear();
     navState.items?.splice(0, navState.items.length, ...(navState.canonicalItems ?? []));
+    healthState.adminCmsHealth.mockResolvedValue({ ok: true, storage: 'closed' });
   });
 
   const setPermittedItemCount = (count: 7 | 8 | 9) => {
@@ -339,6 +352,17 @@ describe('AdminChrome', () => {
     await user.click(trigger);
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Переместить .* в сайдбар/ })).not.toBeInTheDocument();
+  });
+
+  it('shows a storage banner and disables creating a tour while storage is open', async () => {
+    healthState.adminCmsHealth.mockResolvedValue({ ok: true, storage: 'open' });
+    const user = userEvent.setup();
+    renderChrome(adminSession);
+    expect(await screen.findByRole('status')).toHaveTextContent(ADMIN_UI.storageBanner);
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.quickAdd }));
+    const addTour = screen.getByRole('menuitem', { name: ADMIN_UI.addTour });
+    expect(addTour).toBeDisabled();
+    expect(addTour).toHaveAttribute('title', ADMIN_UI.storageUnavailable);
   });
 
 });

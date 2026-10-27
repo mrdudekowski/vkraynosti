@@ -1,5 +1,7 @@
 import { useRef, type ChangeEvent, type DragEvent, type ReactNode } from 'react';
 import { CMS_MEDIA_ACCEPT } from '../../cms/cmsMediaAccept';
+import { useAdminStorage } from '../adminStorageContext';
+import { ADMIN_UI } from '../constants/ui';
 
 type AdminMediaDropzoneProps = {
   id: string;
@@ -25,9 +27,11 @@ const AdminMediaDropzone = ({
   children,
 }: AdminMediaDropzoneProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { storage } = useAdminStorage();
+  const blocked = disabled || storage !== 'closed';
 
   const emit = (files: File[]) => {
-    if (disabled || files.length === 0) {
+    if (blocked || files.length === 0) {
       return;
     }
     onFiles(files);
@@ -48,7 +52,8 @@ const AdminMediaDropzone = ({
   return (
     <label
       htmlFor={id}
-      className={`admin-dropzone ${disabled ? 'pointer-events-none opacity-50' : ''} ${className}`.trim()}
+      className={`admin-dropzone ${blocked ? 'pointer-events-none opacity-50' : ''} ${className}`.trim()}
+      title={storage !== 'closed' ? ADMIN_UI.storageUnavailable : undefined}
       onDragOver={(event) => event.preventDefault()}
       onDrop={onDrop}
     >
@@ -59,7 +64,7 @@ const AdminMediaDropzone = ({
         className="sr-only"
         accept={accept}
         multiple={multiple}
-        disabled={disabled}
+        disabled={blocked}
         aria-label={label}
         onChange={onChange}
       />

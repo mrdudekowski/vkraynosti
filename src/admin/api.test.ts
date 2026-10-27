@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { adminCloneTour, adminDeleteTour } from './api';
+import { adminCloneTour, adminCmsHealth, adminCreateTour, adminDeleteTour } from './api';
 
 describe('adminCloneTour', () => {
   afterEach(() => {
@@ -56,5 +56,46 @@ describe('adminDeleteTour', () => {
     );
 
     await expect(adminDeleteTour('winter-1')).rejects.toThrow('tour_has_dependencies');
+  });
+});
+
+describe('adminCmsHealth', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reads storage state from the health endpoint', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, postgres: 'up', jsonStore: 'up', storage: 'open' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(adminCmsHealth()).resolves.toEqual({
+      ok: true,
+      postgres: 'up',
+      jsonStore: 'up',
+      storage: 'open',
+    });
+    expect(fetchMock).toHaveBeenCalledWith('/api/cms/health', { credentials: 'include' });
+  });
+});
+
+describe('adminCreateTour', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('maps a storage 503 to storage_unavailable', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ error: 'storage_unavailable' }), { status: 503 }),
+      ),
+    );
+    await expect(adminCreateTour({ title: 'Новый', season: 'winter' })).rejects.toThrow(
+      'storage_unavailable',
+    );
   });
 });

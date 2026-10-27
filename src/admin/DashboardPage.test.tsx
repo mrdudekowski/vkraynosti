@@ -12,6 +12,7 @@ vi.mock('./api', () => ({
   adminListPublishQueue: vi.fn(),
   adminListSiteContentChanges: vi.fn(),
   adminUpdateDeparture: vi.fn(),
+  adminCmsHealth: vi.fn(async () => ({ ok: true, storage: 'open' })),
 }));
 
 import { adminListDepartures, adminListPublishQueue, adminListTours, adminUpdateDeparture } from './api';
@@ -276,5 +277,20 @@ describe('DashboardPage', () => {
     expect(screen.getByTestId('location')).toHaveTextContent(
       `/schedule?date=${second}&departure=dep-open`,
     );
+  });
+
+  it('keeps the dashboard heading when object storage is open', async () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route element={<Outlet context={{ session }} />}>
+            <Route path="/" element={<DashboardPage />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('heading', { name: ADMIN_UI.dashboardTitle })).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

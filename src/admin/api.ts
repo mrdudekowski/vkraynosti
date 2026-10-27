@@ -59,7 +59,24 @@ export type AdminDeparture = {
   publishedAt?: string | null;
 };
 
+export type AdminStorageState = 'closed' | 'open' | 'half-open';
+
+export type AdminCmsHealth = {
+  ok: boolean;
+  postgres?: string;
+  jsonStore?: string;
+  storage?: AdminStorageState;
+};
+
 export type AdminSiteContentResponse = { document: SiteContentDocument; meta: CmsTourMeta };
+
+export async function adminCmsHealth(): Promise<AdminCmsHealth> {
+  const response = await fetch('/api/cms/health', { credentials: 'include' });
+  if (!response.ok) {
+    throw new Error('health_failed');
+  }
+  return readJson<AdminCmsHealth>(response);
+}
 
 async function readSiteContent(response: Response, fallback: string): Promise<AdminSiteContentResponse> {
   if (response.status === 403) throw new Error('forbidden');
@@ -262,6 +279,10 @@ export async function adminCreateTour(input: {
   if (response.status === 400) {
     const body = await readJson<{ error?: string }>(response);
     throw new Error(body.error === 'invalid_slug' ? 'invalid_slug' : 'create_failed');
+  }
+  if (response.status === 503) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error === 'storage_unavailable' ? 'storage_unavailable' : 'create_failed');
   }
   if (!response.ok) {
     throw new Error('create_failed');

@@ -13,6 +13,8 @@ export const ADMIN_UI = {
   overflowNavMoved: 'Раздел перемещён в сайдбар',
   closeOverlay: 'Закрыть',
   quickAdd: 'Создать',
+  storageBanner: 'Хранилище фото недоступно. Тексты, расписание и CRM можно править. Новый тур и замена обложки — после восстановления.',
+  storageUnavailable: 'Сейчас нельзя загрузить файлы: хранилище недоступно.',
   soon: 'скоро',
   moveUp: 'Выше',
   moveDown: 'Ниже',

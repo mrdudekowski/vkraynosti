@@ -3,7 +3,8 @@ import { ChevronDown, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search 
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
-import type { AdminSession } from '../api';
+import { adminCmsHealth, type AdminSession, type AdminStorageState } from '../api';
+import { AdminStorageContext } from '../adminStorageContext';
 import { ADMIN_NAV_ITEMS, type AdminNavId, type AdminNavItem } from '../constants/nav';
 import { ADMIN_PATHS } from '../constants/routes';
 import { ADMIN_UI } from '../constants/ui';
@@ -14,6 +15,7 @@ import { useAdminToast } from '../toast/adminToastContext';
 import AdminIcon from './AdminIcon';
 import AdminSidebarNav from './AdminSidebarNav';
 import AdminSidebarOverflowDialog from './AdminSidebarOverflowDialog';
+import AdminStorageBanner from './AdminStorageBanner';
 import CreateTourModal from './CreateTourModal';
 import AdminProfileMenu from './AdminProfileMenu';
 import AdminCommandMenu from './AdminCommandMenu';
@@ -71,6 +73,7 @@ type SidebarBodyProps = {
   onToggleCollapsed: () => void;
   onQuickAddTour: () => void;
   onQuickAddDeparture: () => void;
+  tourCreateDisabled?: boolean;
   onNavigate?: () => void;
   desktopLayout?: boolean;
   visibleItems?: readonly AdminNavItem[];
@@ -90,6 +93,7 @@ const SidebarBody = ({
   onToggleCollapsed,
   onQuickAddTour,
   onQuickAddDeparture,
+  tourCreateDisabled = false,
   onNavigate,
   desktopLayout = false,
   visibleItems,
@@ -170,7 +174,12 @@ const SidebarBody = ({
                 type="button"
                 role="menuitem"
                 className="admin-btn-ghost w-full justify-start"
+                disabled={tourCreateDisabled}
+                title={tourCreateDisabled ? ADMIN_UI.storageUnavailable : undefined}
                 onClick={() => {
+                  if (tourCreateDisabled) {
+                    return;
+                  }
                   setQuickOpen(false);
                   onQuickAddTour();
                 }}
@@ -407,6 +416,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   const [moreOpen, setMoreOpen] = useState(false);
   const [createTourOpen, setCreateTourOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const [storage, setStorage] = useState<AdminStorageState>('closed');
   const items = useMemo(() => visibleNavItems(session), [session]);
   const {
     layout,
@@ -437,6 +447,28 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   const compact = viewport === 'desktop' && collapsed;
 
   useEffect(() => {
+    let cancelled = false;
+    const loadHealth = async () => {
+      try {
+        const health = await adminCmsHealth();
+        if (!cancelled && health.storage != null) {
+          setStorage(health.storage);
+        }
+      } catch {
+        /* keep last known state */
+      }
+    };
+    void loadHealth();
+    const timer = window.setInterval(() => {
+      void loadHealth();
+    }, 15_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  useEffect(() => {
     const openFromShortcut = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
@@ -451,6 +483,9 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   }, [commandOpen]);
 
   const openQuickTour = () => {
+    if (storage === 'open') {
+      return;
+    }
     setCreateTourOpen(true);
     setOverlayOpen(false);
     setMoreOpen(false);
@@ -471,6 +506,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   };
 
   return (
+    <AdminStorageContext.Provider value={{ storage }}>
     <div className="flex h-dvh max-h-dvh overflow-hidden bg-surface-light">
       <a
         href="#admin-main"
@@ -492,6 +528,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             onToggleCollapsed={onToggleCollapsed}
             onQuickAddTour={openQuickTour}
             onQuickAddDeparture={openQuickDeparture}
+            tourCreateDisabled={storage === 'open'}
             desktopLayout={layoutEnabled}
             visibleItems={layoutEnabled ? visibleSidebarItems : undefined}
             overflowItems={layoutEnabled ? overflowItems : undefined}
@@ -535,6 +572,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
           <AdminIcon icon={Search} size={16} />
           {ADMIN_UI.commandMenu}
         </button>
+        {storage !== 'closed' ? <AdminStorageBanner /> : null}
         <main
           id="admin-main"
           className={`min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto ${
@@ -633,6 +671,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
         />
       ) : null}
     </div>
+    </AdminStorageContext.Provider>
   );
 };
 

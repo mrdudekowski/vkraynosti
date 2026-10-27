@@ -66,7 +66,9 @@ const CreateTourModal = ({ lockedSeason, onClose, onCreated }: CreateTourModalPr
           ? ADMIN_UI.slugTaken
           : message === 'invalid_slug'
             ? ADMIN_UI.invalidSlug
-            : ADMIN_UI.createTourError,
+            : message === 'storage_unavailable'
+              ? ADMIN_UI.storageUnavailable
+              : ADMIN_UI.createTourError,
       );
     } finally {
       setBusy(false);

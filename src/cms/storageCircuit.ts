@@ -3,7 +3,7 @@ import type { Tour } from '../types';
 export type StorageCircuitState = 'closed' | 'open' | 'half-open';
 export type StorageFetchClass = 'storage_down' | 'asset_missing' | 'not_storage';
 
-const BACKOFF_MS = [5_000, 15_000, 30_000, 60_000] as const;
+export const GUEST_STORAGE_BACKOFF_MS = [5_000, 15_000, 30_000, 60_000] as const;
 
 let state: StorageCircuitState = 'closed';
 let backoffIndex = 0;
@@ -104,8 +104,8 @@ async function probe(url: string, runId: number): Promise<void> {
 
 function openAndRetry(url: string, runId: number): void {
   setState('open');
-  const delay = BACKOFF_MS[Math.min(backoffIndex, BACKOFF_MS.length - 1)];
-  backoffIndex = Math.min(backoffIndex + 1, BACKOFF_MS.length - 1);
+  const delay = GUEST_STORAGE_BACKOFF_MS[Math.min(backoffIndex, GUEST_STORAGE_BACKOFF_MS.length - 1)];
+  backoffIndex = Math.min(backoffIndex + 1, GUEST_STORAGE_BACKOFF_MS.length - 1);
   clearTimer();
   timer = setTimeout(() => {
     if (runId !== generation) {

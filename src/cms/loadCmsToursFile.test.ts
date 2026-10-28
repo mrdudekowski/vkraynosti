@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { loadCmsToursFile } from './loadCmsToursFile';
+import { loadCmsToursFile, loadLiveCmsToursFile } from './loadCmsToursFile';
 
 const bakeFile = {
   schemaVersion: 1 as const,
@@ -51,7 +51,10 @@ describe('loadCmsToursFile', () => {
       return { ok: true, json: async () => bakeFile };
     });
     vi.stubGlobal('fetch', fetchSpy);
-    await expect(loadCmsToursFile()).resolves.toMatchObject({ tours: [{ title: 'Live' }] });
+    await expect(loadCmsToursFile()).resolves.toMatchObject({
+      source: 'live',
+      file: { tours: [{ title: 'Live' }] },
+    });
   });
 
   it('uses bake when live published tours.json is 403', async () => {
@@ -63,7 +66,32 @@ describe('loadCmsToursFile', () => {
       return { ok: true, json: async () => bakeFile };
     });
     vi.stubGlobal('fetch', fetchSpy);
-    await expect(loadCmsToursFile()).resolves.toMatchObject({ tours: [{ title: 'Test' }] });
+    await expect(loadCmsToursFile()).resolves.toMatchObject({
+      source: 'bake',
+      file: { tours: [{ title: 'Test' }] },
+    });
+  });
+
+  it('marks source live vs bake', async () => {
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
+      if (String(url).includes('published/tours.json')) {
+        return { ok: false, status: 403 };
+      }
+      return { ok: true, json: async () => bakeFile };
+    }));
+    await expect(loadCmsToursFile()).resolves.toMatchObject({ source: 'bake' });
+  });
+
+  it('loadLiveCmsToursFile returns null on 403 and the live file on 200', async () => {
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
+    const live = { ...bakeFile, tours: [{ ...bakeFile.tours[0], title: 'Live' }] };
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 403 })));
+    await expect(loadLiveCmsToursFile()).resolves.toBeNull();
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => live })));
+    await expect(loadLiveCmsToursFile()).resolves.toMatchObject({
+      tours: [{ title: 'Live' }],
+    });
   });
 
   it('returns null when bake is missing', async () => {

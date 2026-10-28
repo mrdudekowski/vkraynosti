@@ -4,6 +4,7 @@ import { CmsToursRevisionContext } from './cms-tours-revision-context';
 import { setCmsCatalogStatus } from './cmsCatalogStatus';
 import { loadCmsToursFile } from './loadCmsToursFile';
 import { clearCmsTourOverlay, setCmsTourOverlay } from './cmsTourOverlay';
+import { resolveCmsContentBaseUrl } from './cmsContentUrls';
 import { selectGuestCanaryUrl, startGuestStorageCircuit } from './storageCircuit';
 
 export function CmsToursProvider({ children }: { children: ReactNode }) {
@@ -24,7 +25,7 @@ export function CmsToursProvider({ children }: { children: ReactNode }) {
         const overlayTours = file.tours.map(cmsDocumentToSiteTour);
         setCmsTourOverlay(overlayTours);
         setCmsCatalogStatus('ready');
-        const canary = selectGuestCanaryUrl(overlayTours);
+        const canary = selectGuestCanaryUrl(overlayTours, resolveCmsContentBaseUrl());
         if (canary != null) {
           startGuestStorageCircuit(canary);
         }

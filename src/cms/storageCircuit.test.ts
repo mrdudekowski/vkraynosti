@@ -37,13 +37,49 @@ describe('guest storage circuit', () => {
   });
 
   it('picks a CDN gallery URL, not a bake cover', () => {
-    const canary = selectGuestCanaryUrl([
-      tourWith({
-        cover: '/data/cms/media/tours/fall-1/cover.webp',
-        gallery: 'https://ypnmfvotln.cdn.twcstorage.ru/media/tours/fall-1/g-0.webp',
-      }),
-    ]);
+    const canary = selectGuestCanaryUrl(
+      [
+        tourWith({
+          cover: '/data/cms/media/tours/fall-1/cover.webp',
+          gallery: 'https://ypnmfvotln.cdn.twcstorage.ru/media/tours/fall-1/g-0.webp',
+        }),
+      ],
+      'https://ypnmfvotln.cdn.twcstorage.ru',
+    );
     expect(canary).toBe('https://ypnmfvotln.cdn.twcstorage.ru/media/tours/fall-1/g-0.webp');
+  });
+
+  it('skips bake and s3.twcstorage.ru when live origin is the CDN', () => {
+    const canary = selectGuestCanaryUrl(
+      [
+        tourWith({
+          cover: 'https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-1/cover.webp',
+          gallery: 'https://s3.twcstorage.ru/vkraynosti-cms-dev/media/tours/fall-1/ld.hero.webp',
+        }),
+        tourWith({
+          cover: '/data/cms/media/tours/fall-12/cover.webp',
+          gallery: 'https://ypnmfvotln.cdn.twcstorage.ru/media/tours/fall-12/cover.webp',
+        }),
+      ],
+      'https://ypnmfvotln.cdn.twcstorage.ru',
+    );
+    expect(canary).toBe(
+      'https://ypnmfvotln.cdn.twcstorage.ru/media/tours/fall-12/cover.webp',
+    );
+  });
+
+  it('returns null when no URL matches the live origin', () => {
+    expect(
+      selectGuestCanaryUrl(
+        [
+          tourWith({
+            cover: 'https://s3.twcstorage.ru/vkraynosti-cms-dev/x.webp',
+            gallery: 'https://s3.twcstorage.ru/vkraynosti-cms-dev/y.webp',
+          }),
+        ],
+        'https://ypnmfvotln.cdn.twcstorage.ru',
+      ),
+    ).toBeNull();
   });
 
   it('classifies canary 403 as storage_down and non-canary 404 as asset_missing', () => {

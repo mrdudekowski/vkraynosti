@@ -43,11 +43,18 @@ export function classifyStorageFetchError(
   return 'not_storage';
 }
 
-export function selectGuestCanaryUrl(tours: readonly Tour[]): string | null {
+export function selectGuestCanaryUrl(
+  tours: readonly Tour[],
+  liveBaseUrl: string | null = null,
+): string | null {
+  if (liveBaseUrl == null || liveBaseUrl.length === 0) {
+    return null;
+  }
+  const prefix = liveBaseUrl.replace(/\/+$/, '');
   for (const tour of tours) {
     const urls = [...(tour.galleryGridUrls ?? []), ...tour.galleryImages];
     for (const url of urls) {
-      if (url.startsWith('https://') && !url.includes('/data/cms/media/')) {
+      if (url.startsWith(prefix)) {
         return url;
       }
     }

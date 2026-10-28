@@ -85,10 +85,24 @@ export function cmsTourScheduleBakeCandidates(): {
   };
 }
 
-/** Same-origin bake only. Guest never fetches CDN JSON. */
+export function cmsPublishedCatalogCandidates(): string[] {
+  const live = resolveCmsContentBaseUrl();
+  const bake = resolveCmsLocalFallbackUrl();
+  return live != null ? [buildCmsPublishedToursUrl(live), bake] : [bake];
+}
+
+/** Live published JSON first when CMS env is set, then same-origin bake. */
 export function cmsTourScheduleOverlayCandidates(): {
   toursList: string[];
   schedule: string[];
 } {
-  return cmsTourScheduleBakeCandidates();
+  const live = resolveCmsContentBaseUrl();
+  const bake = cmsTourScheduleBakeCandidates();
+  if (live == null) {
+    return bake;
+  }
+  return {
+    toursList: [buildCmsPublishedToursListUrl(live), ...bake.toursList],
+    schedule: [buildCmsPublishedScheduleUrl(live), ...bake.schedule],
+  };
 }

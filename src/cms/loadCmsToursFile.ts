@@ -1,5 +1,5 @@
 import { parseCmsToursFile, type CmsToursFile } from './cmsTourDocument';
-import { resolveCmsLocalFallbackUrl } from './cmsContentUrls';
+import { cmsPublishedCatalogCandidates } from './cmsContentUrls';
 
 async function fetchJson(url: string): Promise<unknown> {
   const response = await fetch(url);
@@ -10,10 +10,12 @@ async function fetchJson(url: string): Promise<unknown> {
 }
 
 export async function loadCmsToursFile(): Promise<CmsToursFile | null> {
-  try {
-    return parseCmsToursFile(await fetchJson(resolveCmsLocalFallbackUrl()));
-  } catch (error) {
-    console.warn('[cms] Failed to load bake tours', error);
-    return null;
+  for (const url of cmsPublishedCatalogCandidates()) {
+    try {
+      return parseCmsToursFile(await fetchJson(url));
+    } catch (error) {
+      console.warn('[cms] Failed to load tours from', url, error);
+    }
   }
+  return null;
 }

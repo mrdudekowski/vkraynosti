@@ -9,6 +9,7 @@ import { loadCmsApiEnv, readDotEnvFile } from './env.ts';
 import { createCmsApiApp, loadTourDocumentForDepartureWrite } from './app.ts';
 import { createDepartureRepository } from './schedule/departureRepository.ts';
 import { createStorageCircuit } from './storageCircuit.ts';
+import { probeCatalogMirrorNow, runStorageBootProbes } from './storageBootProbe.ts';
 import { createCmsJsonStore } from './store.ts';
 
 const rootDir = process.cwd();
@@ -24,9 +25,14 @@ const database = createDatabase(
   })
 );
 const store = createCmsJsonStore(env, database.db);
-const storageCircuit = createStorageCircuit(async () => {
-  await store.getBytes(env.storageCanaryKey);
-});
+const storageCircuit = createStorageCircuit(
+  async () => {
+    await store.getBytes(env.storageCanaryKey);
+  },
+  {
+    onStorageRecovery: () => probeCatalogMirrorNow({ env }),
+  },
+);
 const app = createCmsApiApp({
   env,
   store,
@@ -53,5 +59,6 @@ serve(
     console.info(
       `CMS API http://0.0.0.0:${info.port} (json: ${env.jsonStoreKind}, bytes: ${env.storeKind}, proxy: /api/cms)`
     );
+    void runStorageBootProbes({ env, store, storageCircuit });
   }
 );

@@ -9,6 +9,7 @@ import path from 'node:path';
 import type { CmsDatabase } from './db/client';
 import type { CmsApiEnv, CmsApiS3Config } from './env';
 import { createPostgresJsonStore } from './postgresJsonStore';
+import { createPublishedJsonMirror } from './publishedCatalogMirror';
 
 export type CmsJsonStore = {
   getJson: (key: string) => Promise<unknown | null>;
@@ -278,5 +279,9 @@ export function createCmsJsonStore(env: CmsApiEnv, db?: CmsDatabase): CmsJsonSto
   if (env.jsonStoreKind === env.storeKind) {
     return json;
   }
-  return createSplitJsonStore(json, createByteStore(env));
+  const bytes = createByteStore(env);
+  if (env.jsonStoreKind === 'postgres' && env.storeKind === 's3') {
+    return createSplitJsonStore(createPublishedJsonMirror(json, bytes), bytes);
+  }
+  return createSplitJsonStore(json, bytes);
 }

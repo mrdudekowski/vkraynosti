@@ -30,6 +30,7 @@ describe('CMS API startup', () => {
       postgres: 'up',
       jsonStore: 'up',
       storage: 'closed',
+      catalogMirror: 'down',
     });
     expect(listUsersCalled).toBe(false);
   });

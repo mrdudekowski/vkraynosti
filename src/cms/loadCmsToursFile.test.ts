@@ -41,18 +41,29 @@ describe('loadCmsToursFile', () => {
     vi.unstubAllGlobals();
   });
 
-  it('loads bake JSON and does not fetch CDN', async () => {
+  it('prefers live published tours.json then falls back to bake', async () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
-    const fetchSpy = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => bakeFile,
+    const live = { ...bakeFile, tours: [{ ...bakeFile.tours[0], title: 'Live' }] };
+    const fetchSpy = vi.fn(async (url: string) => {
+      if (String(url).includes('published/tours.json')) {
+        return { ok: true, json: async () => live };
+      }
+      return { ok: true, json: async () => bakeFile };
     });
     vi.stubGlobal('fetch', fetchSpy);
+    await expect(loadCmsToursFile()).resolves.toMatchObject({ tours: [{ title: 'Live' }] });
+  });
 
-    await expect(loadCmsToursFile()).resolves.toMatchObject({ schemaVersion: 1 });
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(String(fetchSpy.mock.calls[0]?.[0])).toMatch(/\/data\/cms\/tours\.json$/);
-    expect(String(fetchSpy.mock.calls[0]?.[0])).not.toContain('cdn.example');
+  it('uses bake when live published tours.json is 403', async () => {
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
+    const fetchSpy = vi.fn(async (url: string) => {
+      if (String(url).includes('published/tours.json')) {
+        return { ok: false, status: 403 };
+      }
+      return { ok: true, json: async () => bakeFile };
+    });
+    vi.stubGlobal('fetch', fetchSpy);
+    await expect(loadCmsToursFile()).resolves.toMatchObject({ tours: [{ title: 'Test' }] });
   });
 
   it('returns null when bake is missing', async () => {

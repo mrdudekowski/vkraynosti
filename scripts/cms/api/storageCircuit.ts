@@ -50,7 +50,14 @@ export function classifyStorageError(error: unknown): StorageFetchClass {
   return 'not_storage';
 }
 
-export function createStorageCircuit(probe: () => Promise<void>): StorageCircuit {
+export type StorageCircuitOptions = {
+  onStorageRecovery?: () => void | Promise<void>;
+};
+
+export function createStorageCircuit(
+  probe: () => Promise<void>,
+  options: StorageCircuitOptions = {},
+): StorageCircuit {
   let current: StorageCircuitState = 'closed';
   let backoffIndex = 0;
   let timer: ReturnType<typeof setTimeout> | null = null;
@@ -102,6 +109,7 @@ export function createStorageCircuit(probe: () => Promise<void>): StorageCircuit
     backoffIndex = 0;
     generation += 1;
     clearTimer();
+    void options.onStorageRecovery?.();
   }
 
   return {

@@ -80,6 +80,7 @@ import {
 } from './session.ts';
 import type { CmsJsonStore } from './store.ts';
 import { createStorageCircuit, type StorageCircuit } from './storageCircuit.ts';
+import { getCatalogMirrorState } from './catalogMirrorState.ts';
 import { StorageUnavailableError } from './storageUnavailable.ts';
 import { CmsLastAdminError, type AuthRepository, type UserRecord } from './auth/authRepository.ts';
 import { registerCrmRoutes } from './crmRoutes.ts';
@@ -892,6 +893,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       postgres,
       jsonStore,
       storage: storageCircuit.state(),
+      catalogMirror: getCatalogMirrorState(),
     });
   });
 
@@ -1355,7 +1357,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       await departureRepository.markPublished(publishable, new Date());
     }
     await writePublishedGuestSchedule();
-    return c.json({ ok: true });
+    return c.json({ ok: true, catalogMirror: getCatalogMirrorState() });
   });
 
   app.post('/api/cms/departures/publish', async (c) => {
@@ -1835,7 +1837,11 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       await departureRepository.deleteDeparture(departureId, { allowPublished: true });
     }
     await writePublishedGuestSchedule();
-    return c.json({ document: toPublish, meta: nextMeta });
+    return c.json({
+      document: toPublish,
+      meta: nextMeta,
+      catalogMirror: getCatalogMirrorState(),
+    });
   });
 
   app.get('/api/cms/users', async (c) => {

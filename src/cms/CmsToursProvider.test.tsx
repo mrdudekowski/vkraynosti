@@ -90,4 +90,46 @@ describe('CmsToursProvider', () => {
     expect(getCmsOverlayTourById('fall-1')?.title).toBe('Live');
     expect(loadLiveCmsToursFile).toHaveBeenCalled();
   });
+
+  it('keeps live retrying across backoff until live catalog succeeds', async () => {
+    const liveFile = {
+      ...bakeFile,
+      tours: [{ ...bakeFile.tours[0], title: 'Live' }],
+    };
+
+    vi.mocked(loadCmsToursFile).mockResolvedValue({
+      file: bakeFile,
+      source: 'bake',
+    });
+    let liveAttempts = 0;
+    vi.mocked(loadLiveCmsToursFile).mockImplementation(async () => {
+      liveAttempts += 1;
+      return liveAttempts < 2 ? null : liveFile;
+    });
+
+    render(
+      <CmsToursProvider>
+        <span />
+      </CmsToursProvider>,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(getCmsOverlayTourById('fall-1')?.title).toBe('Test');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5_000);
+      await Promise.resolve();
+    });
+    expect(getCmsOverlayTourById('fall-1')?.title).toBe('Test');
+    expect(liveAttempts).toBe(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(15_000);
+      await Promise.resolve();
+    });
+    expect(getCmsOverlayTourById('fall-1')?.title).toBe('Live');
+    expect(liveAttempts).toBe(2);
+  });
 });

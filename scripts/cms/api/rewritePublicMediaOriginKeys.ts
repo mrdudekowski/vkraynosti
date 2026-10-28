@@ -17,29 +17,128 @@ import type { CmsJsonStore } from './store.ts';
 export const DEFAULT_LEGACY_S3_PUBLIC_ORIGIN = 'https://s3.twcstorage.ru/vkraynosti-cms-dev';
 export const DEFAULT_CDN_PUBLIC_ORIGIN = 'https://ypnmfvotln.cdn.twcstorage.ru';
 
+function stripTrailingSlashes(value: string): string {
+  return value.replace(/\/+$/, '');
+}
+
+export function normalizePublicMediaOriginPrefix(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) {
+    return null;
+  }
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'https:') {
+    return null;
+  }
+  if (url.search.length > 0 || url.hash.length > 0) {
+    return null;
+  }
+  const pathSegments = url.pathname.split('/').filter((segment) => segment.length > 0);
+  if (pathSegments.length > 1) {
+    return null;
+  }
+  const normalized = stripTrailingSlashes(trimmed);
+  if (normalized.length === 0 || !normalized.startsWith('https://')) {
+    return null;
+  }
+  return normalized;
+}
+
+function lenientTourIdsFromCatalogRaw(raw: unknown): string[] {
+  if (raw == null || typeof raw !== 'object' || !('tours' in raw)) {
+    return [];
+  }
+  const tours = (raw as { tours?: unknown }).tours;
+  if (!Array.isArray(tours)) {
+    return [];
+  }
+  const ids: string[] = [];
+  for (const tour of tours) {
+    if (tour == null || typeof tour !== 'object' || !('id' in tour)) {
+      continue;
+    }
+    const id = (tour as { id?: unknown }).id;
+    if (typeof id === 'string' && id.length > 0) {
+      ids.push(id);
+    }
+  }
+  return ids;
+}
+
+function lenientTourIdsFromDraftIndexRaw(raw: unknown): string[] {
+  if (raw == null || typeof raw !== 'object' || !('tourIds' in raw)) {
+    return [];
+  }
+  const tourIds = (raw as { tourIds?: unknown }).tourIds;
+  if (!Array.isArray(tourIds)) {
+    return [];
+  }
+  return tourIds.filter((id): id is string => typeof id === 'string' && id.length > 0);
+}
+
+function tourIdsFromCatalogRaw(
+  catalogRaw: unknown,
+  warnings: string[],
+): string[] {
+  try {
+    return parseCmsToursFile(catalogRaw).tours.map((tour) => tour.id);
+  } catch {
+    const lenientIds = lenientTourIdsFromCatalogRaw(catalogRaw);
+    if (lenientIds.length > 0) {
+      warnings.push(
+        `${CMS_PUBLISHED_CATALOG_KEY}: schema validation failed; extracted ${lenientIds.length} tour id(s) leniently`,
+      );
+      return lenientIds;
+    }
+    warnings.push(
+      `${CMS_PUBLISHED_CATALOG_KEY}: schema validation failed; no tour ids extracted`,
+    );
+    return [];
+  }
+}
+
+function tourIdsFromDraftIndexRaw(indexRaw: unknown, warnings: string[]): string[] {
+  try {
+    return parseCmsDraftIndex(indexRaw);
+  } catch {
+    const lenientIds = lenientTourIdsFromDraftIndexRaw(indexRaw);
+    if (lenientIds.length > 0) {
+      warnings.push(
+        `${CMS_DRAFT_INDEX_KEY}: schema validation failed; extracted ${lenientIds.length} tour id(s) leniently`,
+      );
+      return lenientIds;
+    }
+    warnings.push(`${CMS_DRAFT_INDEX_KEY}: schema validation failed; no tour ids extracted`);
+    return [];
+  }
+}
+
+export type CollectRewriteCandidateKeysResult = {
+  keys: string[];
+  warnings: string[];
+};
+
 export async function collectRewriteCandidateKeys(
   store: Pick<CmsJsonStore, 'getJson'>,
-): Promise<string[]> {
+): Promise<CollectRewriteCandidateKeysResult> {
   const keys = new Set<string>([CMS_PUBLISHED_CATALOG_KEY, CMS_DRAFT_INDEX_KEY]);
+  const warnings: string[] = [];
   const catalogRaw = await store.getJson(CMS_PUBLISHED_CATALOG_KEY);
   const indexRaw = await store.getJson(CMS_DRAFT_INDEX_KEY);
   const ids = new Set<string>();
   if (catalogRaw != null) {
-    try {
-      for (const tour of parseCmsToursFile(catalogRaw).tours) {
-        ids.add(tour.id);
-      }
-    } catch {
-      // ignore invalid catalog during key collection
+    for (const id of tourIdsFromCatalogRaw(catalogRaw, warnings)) {
+      ids.add(id);
     }
   }
   if (indexRaw != null) {
-    try {
-      for (const id of parseCmsDraftIndex(indexRaw)) {
-        ids.add(id);
-      }
-    } catch {
-      // ignore invalid draft index during key collection
+    for (const id of tourIdsFromDraftIndexRaw(indexRaw, warnings)) {
+      ids.add(id);
     }
   }
   for (const id of ids) {
@@ -50,20 +149,21 @@ export async function collectRewriteCandidateKeys(
     keys.add(siteContentPublishedKey(kind));
     keys.add(siteContentDraftKey(kind));
   }
-  return [...keys];
+  return { keys: [...keys], warnings };
 }
 
 export type PublicMediaOriginRewriteResult = {
   scanned: number;
   changedKeys: string[];
   replacements: number;
+  warnings: string[];
 };
 
 export async function rewritePublicMediaOriginKeys(
   store: CmsJsonStore,
   options: { from: string; to: string; dryRun: boolean },
 ): Promise<PublicMediaOriginRewriteResult> {
-  const keys = await collectRewriteCandidateKeys(store);
+  const { keys, warnings } = await collectRewriteCandidateKeys(store);
   const changes: Array<{ key: string; value: unknown; replacements: number }> = [];
   let replacements = 0;
 
@@ -99,5 +199,6 @@ export async function rewritePublicMediaOriginKeys(
     scanned: keys.length,
     changedKeys: changes.map((change) => change.key),
     replacements,
+    warnings,
   };
 }

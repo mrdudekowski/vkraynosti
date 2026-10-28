@@ -88,6 +88,7 @@ import { registerSiteContentRoutes } from './siteContentRoutes.ts';
 import {
   DEFAULT_CDN_PUBLIC_ORIGIN,
   DEFAULT_LEGACY_S3_PUBLIC_ORIGIN,
+  normalizePublicMediaOriginPrefix,
   rewritePublicMediaOriginKeys,
 } from './rewritePublicMediaOriginKeys.ts';
 import {
@@ -390,6 +391,24 @@ async function readJsonBody(c: { req: { json: () => Promise<unknown> } }): Promi
     return await c.req.json();
   } catch {
     return null;
+  }
+}
+
+async function readRewriteMediaOriginBody(
+  c: { req: { text: () => Promise<string> } },
+): Promise<{ ok: true; value: Record<string, unknown> } | { ok: false }> {
+  const raw = await c.req.text();
+  if (raw.trim().length === 0) {
+    return { ok: true, value: {} };
+  }
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { ok: false };
+    }
+    return { ok: true, value: parsed as Record<string, unknown> };
+  } catch {
+    return { ok: false };
   }
 }
 
@@ -956,12 +975,21 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       return c.json({ error: 'forbidden' }, 403);
     }
     const dryRun = (c.req.query('dryRun') ?? '1') !== '0';
-    const parsed = rewriteMediaOriginBodySchema.safeParse((await readJsonBody(c)) ?? {});
+    const bodyRead = await readRewriteMediaOriginBody(c);
+    if (!bodyRead.ok) {
+      return c.json({ error: 'invalid_body' }, 400);
+    }
+    const parsed = rewriteMediaOriginBodySchema.safeParse(bodyRead.value);
     if (!parsed.success) {
       return c.json({ error: 'invalid_body' }, 400);
     }
-    const from = parsed.data.from ?? DEFAULT_LEGACY_S3_PUBLIC_ORIGIN;
-    const to = parsed.data.to ?? DEFAULT_CDN_PUBLIC_ORIGIN;
+    const fromRaw = parsed.data.from ?? DEFAULT_LEGACY_S3_PUBLIC_ORIGIN;
+    const toRaw = parsed.data.to ?? DEFAULT_CDN_PUBLIC_ORIGIN;
+    const from = normalizePublicMediaOriginPrefix(fromRaw);
+    const to = normalizePublicMediaOriginPrefix(toRaw);
+    if (from == null || to == null || from === to) {
+      return c.json({ error: 'invalid_body' }, 400);
+    }
     const result = await rewritePublicMediaOriginKeys(store, { from, to, dryRun });
     return c.json({
       ok: true,
@@ -971,6 +999,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       scanned: result.scanned,
       changedKeys: result.changedKeys,
       replacements: result.replacements,
+      warnings: result.warnings,
     });
   });
 

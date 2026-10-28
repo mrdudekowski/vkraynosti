@@ -2278,6 +2278,40 @@ describe('CMS rewrite-media-origin endpoint', () => {
     expect(response.status).toBe(403);
   });
 
+  it('rejects degenerate from/to and unparseable JSON bodies', async () => {
+    const { app } = createApp({ env: { ...env, deploySecret: 'deploy-secret' } });
+    const headers = {
+      'x-cms-deploy-secret': 'deploy-secret',
+      'content-type': 'application/json',
+    };
+
+    const sameOrigin = await app.request('/api/cms/internal/rewrite-media-origin?dryRun=1', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        from: LEGACY_S3_PUBLIC_ORIGIN,
+        to: LEGACY_S3_PUBLIC_ORIGIN,
+      }),
+    });
+    expect(sameOrigin.status).toBe(400);
+    expect(await sameOrigin.json()).toEqual({ error: 'invalid_body' });
+
+    const slashFrom = await app.request('/api/cms/internal/rewrite-media-origin?dryRun=1', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ from: '/', to: CDN_PUBLIC_ORIGIN }),
+    });
+    expect(slashFrom.status).toBe(400);
+
+    const brokenJson = await app.request('/api/cms/internal/rewrite-media-origin?dryRun=1', {
+      method: 'POST',
+      headers,
+      body: '{not-json',
+    });
+    expect(brokenJson.status).toBe(400);
+    expect(await brokenJson.json()).toEqual({ error: 'invalid_body' });
+  });
+
   it('reports replacements in dry-run without persisting', async () => {
     const fallTour = tourDocumentWithMediaOrigin('fall-1', LEGACY_S3_PUBLIC_ORIGIN);
     const store = createMemoryJsonStore({

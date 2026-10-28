@@ -53,17 +53,33 @@ export function CmsToursProvider({ children }: { children: ReactNode }) {
       publishOverlayFromFile(load.file);
 
       if (load.source === 'bake' && resolveCmsContentBaseUrl() != null) {
-        liveRetryTimer = setTimeout(() => {
+        let backoffStep = 0;
+
+        const scheduleLiveRetry = (): void => {
           if (cancelled) {
             return;
           }
-          void loadLiveCmsToursFile().then((liveFile) => {
-            if (cancelled || liveFile == null) {
+          const delay =
+            GUEST_STORAGE_BACKOFF_MS[Math.min(backoffStep, GUEST_STORAGE_BACKOFF_MS.length - 1)];
+          liveRetryTimer = setTimeout(() => {
+            if (cancelled) {
               return;
             }
-            publishOverlayFromFile(liveFile);
-          });
-        }, GUEST_STORAGE_BACKOFF_MS[0]);
+            void loadLiveCmsToursFile().then((liveFile) => {
+              if (cancelled) {
+                return;
+              }
+              if (liveFile != null) {
+                publishOverlayFromFile(liveFile);
+                return;
+              }
+              backoffStep = Math.min(backoffStep + 1, GUEST_STORAGE_BACKOFF_MS.length - 1);
+              scheduleLiveRetry();
+            });
+          }, delay);
+        };
+
+        scheduleLiveRetry();
       }
     });
 

@@ -57,6 +57,9 @@ export const getOgShellAbsoluteImageUrl = (pathOrUrl: string): string => {
   return `${origin}/${logical}`;
 };
 
+/** Marks build-time SEO tags so the client can drop them after Helmet writes the live set. */
+export const SEO_SHELL_TAG_ATTRIBUTE = 'data-seo-shell';
+
 /** Absolute HTTPS URL for Open Graph / Twitter (social crawlers require full URL). */
 export const getAbsoluteOgImageUrl = (pathOrUrl: string): string => {
   if (/^https?:\/\//i.test(pathOrUrl)) {

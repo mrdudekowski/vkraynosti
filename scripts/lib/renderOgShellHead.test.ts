@@ -68,6 +68,7 @@ describe('renderOgShellHead', () => {
 
   it('includes secure_url and image dimensions for JPEG', () => {
     const head = renderOgShellHead(sampleMeta);
+    expect(head).toContain('data-seo-shell="true"');
     expect(head).toContain('property="og:image:secure_url"');
     expect(head).toContain('property="og:image:width" content="1200"');
     expect(head).toContain('property="og:image:height" content="630"');

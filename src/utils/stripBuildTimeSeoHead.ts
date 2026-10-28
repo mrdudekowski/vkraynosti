@@ -1,13 +1,13 @@
+import { SEO_SHELL_TAG_ATTRIBUTE } from '../constants/seo';
+
 /**
- * Drop data-SSG / OG-shell head tags before react-helmet-async (PageMeta) mounts.
- * ponytail: static HTML keeps them for no-JS crawlers; after JS boot Helmet is SSOT.
+ * Drop data-SSG / OG-shell head tags after react-helmet-async has written replacements.
+ * Only elements marked `data-seo-shell` are removed. Helmet's React 19 tags do not
+ * carry that attribute, and stripping every description/OG tag deletes the live head.
  * Keep selectors aligned with `stripOgShellMetaFromHead` in scripts/lib/renderOgShellHead.ts.
  */
 export function stripBuildTimeSeoHead(doc: Document = document): void {
-  const { head } = doc;
-  head.querySelectorAll('meta[name="description"]').forEach((node) => node.remove());
-  head.querySelectorAll('meta[name="robots"]').forEach((node) => node.remove());
-  head.querySelectorAll('link[rel="canonical"]').forEach((node) => node.remove());
-  head.querySelectorAll('meta[property^="og:"]').forEach((node) => node.remove());
-  head.querySelectorAll('meta[name^="twitter:"]').forEach((node) => node.remove());
+  doc.head.querySelectorAll(`[${SEO_SHELL_TAG_ATTRIBUTE}]`).forEach((node) => {
+    node.remove();
+  });
 }

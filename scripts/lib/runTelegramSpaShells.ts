@@ -32,11 +32,11 @@ export async function collectTelegramCsrShellRoutePaths(
 
 const stripIndexableHeadMeta = (html: string): string =>
   html
-    .replace(/\s*<link rel="canonical"[^>]*>/gi, '')
-    .replace(/\s*<meta name="robots"[^>]*>/gi, '')
-    .replace(/\s*<meta property="og:[^"]*"[^>]*>/gi, '')
-    .replace(/\s*<meta name="twitter:[^"]*"[^>]*>/gi, '')
-    .replace(/\s*<meta name="description"[^>]*>/gi, '');
+    .replace(/\s*<link\b[^>]*\brel="canonical"[^>]*>/gi, '')
+    .replace(/\s*<meta\b[^>]*\bname="robots"[^>]*>/gi, '')
+    .replace(/\s*<meta\b[^>]*\bproperty="og:[^"]*"[^>]*>/gi, '')
+    .replace(/\s*<meta\b[^>]*\bname="twitter:[^"]*"[^>]*>/gi, '')
+    .replace(/\s*<meta\b[^>]*\bname="description"[^>]*>/gi, '');
 
 const patchTelegramMiniAppShellHead = (html: string, routePath: string): string => {
   const siteRoot = resolveSiteRoot();

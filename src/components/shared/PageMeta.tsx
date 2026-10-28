@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import type { HomeSeasonBannerVideoPreloadLink } from '../../constants/homeSeasonBannerVideoPreload';
 import { DOCUMENT_COLOR_SCHEME } from '../../constants/documentColorScheme';
@@ -7,6 +8,7 @@ import {
   getCanonicalUrl,
   type RobotsDirective,
 } from '../../constants/seo';
+import { stripBuildTimeSeoHead } from '../../utils/stripBuildTimeSeoHead';
 
 interface PageMetaProps {
   title: string;
@@ -45,6 +47,10 @@ const PageMeta = ({
   preloadHeroImageFetchPriority,
 }: PageMetaProps) => {
   const heroPreloadPriority = preloadHeroImageFetchPriority ?? 'high';
+
+  useEffect(() => {
+    stripBuildTimeSeoHead();
+  }, [title, description, imageUrl, includeSocialMetadata, path, robots, canonicalPath]);
 
   const canonicalUrl = getCanonicalUrl(canonicalPath ?? path);
   const ogImage = includeSocialMetadata

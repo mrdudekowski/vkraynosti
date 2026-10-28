@@ -33,7 +33,7 @@ import {
 import { CROSSFADE_VIDEO_INTERSECTION_ROOT_MARGIN } from '../constants/crossfadeVideoIntersection';
 import { ROUTES } from '../constants/routes';
 import { UI } from '../constants/ui';
-import { ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
+import { getOgShellAbsoluteImageUrl, ORGANIZATION_SCHEMA, SEO_DEFAULTS, WEBSITE_SCHEMA } from '../constants/seo';
 import { useSeason } from '../context/useSeason';
 import { useVisibleToursBySeason } from '../hooks/useVisibleToursBySeason';
 import { HOME_PAGE_SKY_BG_CLASS, SEASON_PAGE_BG_CLASS } from '../constants/seasonTheme';
@@ -317,7 +317,7 @@ const Home = () => {
         title={homeSeo?.title?.trim() || SEO_DEFAULTS.home.title}
         description={homeSeo?.description?.trim() || SEO_DEFAULTS.home.description}
         keywords={homeSeo?.keywords}
-        imageUrl={IMAGES.seasonSection[activeSeason]}
+        imageUrl={getOgShellAbsoluteImageUrl(IMAGES.seasonSection[activeSeason])}
         path={SEO_DEFAULTS.home.path}
         structuredData={[ORGANIZATION_SCHEMA, WEBSITE_SCHEMA]}
         preloadHeroImageUrl={lcpPreloadImageUrl}

@@ -52,7 +52,36 @@ describe('PageMeta social metadata', () => {
     });
   });
 
+  it('drops the shell social tags once Helmet has written the live ones', async () => {
+    document.head.insertAdjacentHTML(
+      'beforeend',
+      `
+      <meta data-seo-shell="true" name="description" content="Build description" />
+      <meta data-seo-shell="true" property="og:image" content="https://cdn.example.com/old.jpg" />
+      <meta data-seo-shell="true" name="twitter:card" content="summary" />
+      `,
+    );
+    renderPageMeta();
+
+    await waitFor(() => {
+      expect(document.head.querySelectorAll('meta[name="description"]')).toHaveLength(1);
+      expect(document.head.querySelectorAll('meta[property="og:image"]')).toHaveLength(1);
+      expect(document.head.querySelectorAll('meta[name="twitter:card"]')).toHaveLength(1);
+    });
+
+    expect(document.head.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
+      'Test description',
+    );
+    expect(document.head.querySelector('meta[property="og:image"]')?.getAttribute('content')).not.toBe(
+      'https://cdn.example.com/old.jpg',
+    );
+  });
+
   it('retains core SEO metadata and omits social metadata when disabled', async () => {
+    document.head.insertAdjacentHTML(
+      'beforeend',
+      '<meta data-seo-shell="true" property="og:title" content="Shell title" />',
+    );
     renderPageMeta(false);
 
     await waitFor(() => {

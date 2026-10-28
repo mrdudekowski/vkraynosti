@@ -1,5 +1,6 @@
 import {
   SEO_DEFAULTS,
+  SEO_SHELL_TAG_ATTRIBUTE,
   getCanonicalUrl,
   getOgShellAbsoluteImageUrl,
 } from '../../src/constants/seo.ts';
@@ -66,7 +67,10 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
       <meta name="description" content="${description}" />
       <meta name="robots" content="${robots}" />
       <link rel="canonical" href="${canonicalUrl}" />
-      ${socialTags}${keywords}`;
+      ${socialTags}${keywords}`.replace(
+    /<(meta|link)\b/g,
+    `<$1 ${SEO_SHELL_TAG_ATTRIBUTE}="true"`,
+  );
 };
 
 const ensureOgHtmlPrefix = (html: string): string => {
@@ -88,12 +92,12 @@ const stripOgHtmlPrefix = (html: string): string =>
 /** Remove previously injected OG-shell meta so re-runs stay idempotent. */
 export const stripOgShellMetaFromHead = (html: string): string =>
   html
-    .replace(/<meta\s+name="description"[^>]*>\s*/gi, '')
-    .replace(/<meta\s+name="keywords"[^>]*>\s*/gi, '')
-    .replace(/<meta\s+name="robots"[^>]*>\s*/gi, '')
-    .replace(/<link\s+rel="canonical"[^>]*>\s*/gi, '')
-    .replace(/<meta\s+property="og:[^"]+"[^>]*>\s*/gi, '')
-    .replace(/<meta\s+name="twitter:[^"]+"[^>]*>\s*/gi, '');
+    .replace(/<meta\b[^>]*\bname="description"[^>]*>\s*/gi, '')
+    .replace(/<meta\b[^>]*\bname="keywords"[^>]*>\s*/gi, '')
+    .replace(/<meta\b[^>]*\bname="robots"[^>]*>\s*/gi, '')
+    .replace(/<link\b[^>]*\brel="canonical"[^>]*>\s*/gi, '')
+    .replace(/<meta\b[^>]*\bproperty="og:[^"]+"[^>]*>\s*/gi, '')
+    .replace(/<meta\b[^>]*\bname="twitter:[^"]+"[^>]*>\s*/gi, '');
 
 export const injectOgShellIntoHtml = (templateHtml: string, meta: OgShellMeta): string => {
   const normalizedMeta: OgShellMeta = {

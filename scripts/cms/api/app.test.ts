@@ -917,6 +917,29 @@ describe('CMS API', () => {
     const body = (await created.json()) as { error: string };
     expect(body.error).toBe('slug_taken');
   });
+
+  it('открывает тур, который есть только в published catalog overlay', async () => {
+    const overlayTour = { ...document, id: 'fall-14', slug: 'milogradovka' };
+    const store = createMemoryJsonStore({
+      [CMS_PUBLISHED_CATALOG_KEY]: { schemaVersion: 1, tours: [overlayTour] },
+    });
+    const { app } = createApp({ store });
+    const cookie = await login(app);
+    const list = await app.request('/api/cms/tours', { headers: { cookie } });
+    expect(list.status).toBe(200);
+    const listed = (await list.json()) as { tours: Array<{ id: string }> };
+    expect(listed.tours.map((tour) => tour.id)).toContain('fall-14');
+
+    const response = await app.request('/api/cms/tours/fall-14', { headers: { cookie } });
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as {
+      document: { id: string; title: string };
+      published: boolean;
+    };
+    expect(body.document.id).toBe('fall-14');
+    expect(body.document.title).toBe(overlayTour.title);
+    expect(body.published).toBe(true);
+  });
 });
 
 describe('CMS CRM API', () => {

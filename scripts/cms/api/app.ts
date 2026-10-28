@@ -428,11 +428,7 @@ export async function loadDraftOrPublished(
   if (draft != null) {
     return cmsTourDocumentSchema.parse(draft);
   }
-  const published = await store.getJson(cmsPublishedDocumentKey(tourId));
-  if (published != null) {
-    return cmsTourDocumentSchema.parse(published);
-  }
-  return null;
+  return loadPublishedDocument(store, tourId);
 }
 
 async function persistDraft(

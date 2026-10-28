@@ -86,6 +86,11 @@ import { CmsLastAdminError, type AuthRepository, type UserRecord } from './auth/
 import { registerCrmRoutes } from './crmRoutes.ts';
 import { registerSiteContentRoutes } from './siteContentRoutes.ts';
 import {
+  DEFAULT_CDN_PUBLIC_ORIGIN,
+  DEFAULT_LEGACY_S3_PUBLIC_ORIGIN,
+  rewritePublicMediaOriginKeys,
+} from './rewritePublicMediaOriginKeys.ts';
+import {
   CmsDepartureCompletedError,
   CmsDepartureDuplicateError,
   CmsDepartureNotFoundError,
@@ -103,6 +108,11 @@ const SEASON_ORDER = ['winter', 'spring', 'summer', 'fall'] as const;
 const loginBodySchema = z.object({
   login: z.string().min(1),
   password: z.string().min(1),
+});
+
+const rewriteMediaOriginBodySchema = z.object({
+  from: z.string().min(1).optional(),
+  to: z.string().min(1).optional(),
 });
 
 export const textPatchSchema = z.object({
@@ -934,6 +944,36 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     return c.json({ tours, toursList, schedule, siteContent, stills });
   });
 
+  app.post('/api/cms/internal/rewrite-media-origin', async (c) => {
+    if (!env.deploySecret) {
+      return c.json({ error: 'rewrite_disabled' }, 503);
+    }
+    const secret = c.req.header('x-cms-deploy-secret') ?? '';
+    if (secret.length === 0) {
+      return c.json({ error: 'unauthorized' }, 401);
+    }
+    if (secret !== env.deploySecret) {
+      return c.json({ error: 'forbidden' }, 403);
+    }
+    const dryRun = (c.req.query('dryRun') ?? '1') !== '0';
+    const parsed = rewriteMediaOriginBodySchema.safeParse((await readJsonBody(c)) ?? {});
+    if (!parsed.success) {
+      return c.json({ error: 'invalid_body' }, 400);
+    }
+    const from = parsed.data.from ?? DEFAULT_LEGACY_S3_PUBLIC_ORIGIN;
+    const to = parsed.data.to ?? DEFAULT_CDN_PUBLIC_ORIGIN;
+    const result = await rewritePublicMediaOriginKeys(store, { from, to, dryRun });
+    return c.json({
+      ok: true,
+      dryRun,
+      from,
+      to,
+      scanned: result.scanned,
+      changedKeys: result.changedKeys,
+      replacements: result.replacements,
+    });
+  });
+
   app.post('/api/cms/login', async (c) => {
     await ensureLocalCmsUsersSeeded();
     const parsed = loginBodySchema.safeParse(await readJsonBody(c));
@@ -986,6 +1026,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       c.req.path === '/api/cms/login' ||
       c.req.path === '/api/cms/health' ||
       c.req.path === '/api/cms/internal/bake' ||
+      c.req.path === '/api/cms/internal/rewrite-media-origin' ||
       c.req.path === '/api/cms/crm/inbound'
     ) {
       return next();

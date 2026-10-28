@@ -2239,3 +2239,103 @@ describe('CMS bake endpoint', () => {
     expect(body.tours.tours[0]?.id).toBe('winter-1');
   });
 });
+
+const LEGACY_S3_PUBLIC_ORIGIN = 'https://s3.twcstorage.ru/vkraynosti-cms-dev';
+const CDN_PUBLIC_ORIGIN = 'https://ypnmfvotln.cdn.twcstorage.ru';
+
+function tourDocumentWithMediaOrigin(tourId: string, origin: string): CmsTourDocument {
+  return {
+    ...document,
+    id: tourId,
+    slug: tourId,
+    assets: document.assets.map((asset) => ({
+      ...asset,
+      stillUrl: `${origin}/media/tours/${tourId}/${asset.id}.webp`,
+    })),
+  };
+}
+
+describe('CMS rewrite-media-origin endpoint', () => {
+  it('disables rewrite when the deploy secret is empty', async () => {
+    const { app } = createApp();
+    const response = await app.request('/api/cms/internal/rewrite-media-origin', { method: 'POST' });
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: 'rewrite_disabled' });
+  });
+
+  it('rejects rewrite without the deploy secret', async () => {
+    const { app } = createApp({ env: { ...env, deploySecret: 'deploy-secret' } });
+    const response = await app.request('/api/cms/internal/rewrite-media-origin', { method: 'POST' });
+    expect(response.status).toBe(401);
+  });
+
+  it('rejects rewrite when the deploy secret does not match', async () => {
+    const { app } = createApp({ env: { ...env, deploySecret: 'deploy-secret' } });
+    const response = await app.request('/api/cms/internal/rewrite-media-origin', {
+      method: 'POST',
+      headers: { 'x-cms-deploy-secret': 'wrong-secret' },
+    });
+    expect(response.status).toBe(403);
+  });
+
+  it('reports replacements in dry-run without persisting', async () => {
+    const fallTour = tourDocumentWithMediaOrigin('fall-1', LEGACY_S3_PUBLIC_ORIGIN);
+    const store = createMemoryJsonStore({
+      [CMS_PUBLISHED_CATALOG_KEY]: { schemaVersion: 1, tours: [fallTour] },
+      [cmsDraftDocumentKey('fall-1')]: fallTour,
+      [CMS_DRAFT_INDEX_KEY]: { schemaVersion: 1, tourIds: ['fall-1'] },
+    });
+    const { app } = createApp({ store, env: { ...env, deploySecret: 'deploy-secret' } });
+    const catalogBefore = await store.getJson(CMS_PUBLISHED_CATALOG_KEY);
+    const draftBefore = await store.getJson(cmsDraftDocumentKey('fall-1'));
+
+    const response = await app.request('/api/cms/internal/rewrite-media-origin?dryRun=1', {
+      method: 'POST',
+      headers: {
+        'x-cms-deploy-secret': 'deploy-secret',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ from: LEGACY_S3_PUBLIC_ORIGIN, to: CDN_PUBLIC_ORIGIN }),
+    });
+    expect(response.status).toBe(200);
+    const body = await response.json() as {
+      ok: boolean;
+      dryRun: boolean;
+      replacements: number;
+      changedKeys: string[];
+    };
+    expect(body.ok).toBe(true);
+    expect(body.dryRun).toBe(true);
+    expect(body.replacements).toBeGreaterThan(0);
+    expect(body.changedKeys).toContain(CMS_PUBLISHED_CATALOG_KEY);
+    expect(body.changedKeys).toContain(cmsDraftDocumentKey('fall-1'));
+    expect(await store.getJson(CMS_PUBLISHED_CATALOG_KEY)).toEqual(catalogBefore);
+    expect(await store.getJson(cmsDraftDocumentKey('fall-1'))).toEqual(draftBefore);
+  });
+
+  it('persists rewritten documents when dryRun=0', async () => {
+    const fallTour = tourDocumentWithMediaOrigin('fall-1', LEGACY_S3_PUBLIC_ORIGIN);
+    const store = createMemoryJsonStore({
+      [CMS_PUBLISHED_CATALOG_KEY]: { schemaVersion: 1, tours: [fallTour] },
+      [cmsDraftDocumentKey('fall-1')]: fallTour,
+      [CMS_DRAFT_INDEX_KEY]: { schemaVersion: 1, tourIds: ['fall-1'] },
+    });
+    const { app } = createApp({ store, env: { ...env, deploySecret: 'deploy-secret' } });
+
+    const response = await app.request('/api/cms/internal/rewrite-media-origin?dryRun=0', {
+      method: 'POST',
+      headers: {
+        'x-cms-deploy-secret': 'deploy-secret',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ from: LEGACY_S3_PUBLIC_ORIGIN, to: CDN_PUBLIC_ORIGIN }),
+    });
+    expect(response.status).toBe(200);
+    const catalog = await store.getJson(CMS_PUBLISHED_CATALOG_KEY);
+    const draft = await store.getJson(cmsDraftDocumentKey('fall-1'));
+    expect(JSON.stringify(catalog)).not.toContain(LEGACY_S3_PUBLIC_ORIGIN);
+    expect(JSON.stringify(draft)).not.toContain(LEGACY_S3_PUBLIC_ORIGIN);
+    expect(JSON.stringify(catalog)).toContain(CDN_PUBLIC_ORIGIN);
+    expect(JSON.stringify(draft)).toContain(CDN_PUBLIC_ORIGIN);
+  });
+});

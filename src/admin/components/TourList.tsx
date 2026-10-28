@@ -20,6 +20,7 @@ import {
   type AdminTourVisibilityFilter,
 } from '../adminTourVisibility';
 import { adminTourLiveVisibility, adminTourLiveVisibilityTone } from '../tourLiveVisibility';
+import { adminIncidentBlocksMedia, useAdminIncident } from '../adminIncidentContext';
 import { ADMIN_PATHS } from '../constants/routes';
 import { ADMIN_UI } from '../constants/ui';
 import { useAdminStoredState } from '../hooks/useAdminStoredState';
@@ -72,6 +73,8 @@ const TourList = ({
   onAddTour,
 }: TourListProps) => {
   const navigate = useNavigate();
+  const { incident } = useAdminIncident();
+  const tourCreateDisabled = adminIncidentBlocksMedia(incident);
   const [query, setQuery] = useState('');
   const [visibility, setVisibility] = useState<AdminTourVisibilityFilter>('all');
   const [readiness, setReadiness] = useState<TourReadinessFilter>('all');
@@ -154,7 +157,18 @@ const TourList = ({
                 <AdminIcon icon={List} size={16} />
               </AdminButton>
               {onAddTour != null ? (
-                <AdminButton type="button" className="ml-2" onClick={onAddTour}>
+                <AdminButton
+                  type="button"
+                  className="ml-2"
+                  disabled={tourCreateDisabled}
+                  title={tourCreateDisabled ? ADMIN_UI.storageUnavailable : undefined}
+                  onClick={() => {
+                    if (tourCreateDisabled) {
+                      return;
+                    }
+                    onAddTour();
+                  }}
+                >
                   {ADMIN_UI.addTour}
                 </AdminButton>
               ) : null}

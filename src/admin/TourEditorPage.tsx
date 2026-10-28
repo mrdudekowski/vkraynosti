@@ -33,6 +33,8 @@ import TourIdentityFields from './components/TourIdentityFields';
 import TourPublishReviewDialog from './components/TourPublishReviewDialog';
 import AdminReadinessRing from './components/AdminReadinessRing';
 import MediaConversionModal from './components/MediaConversionModal';
+import { useAdminIncident } from './adminIncidentContext';
+import { adminPublishGuestMessage } from './adminPublishGuestMessage';
 import { ADMIN_UI } from './constants/ui';
 import { formatAdminReadiness } from './formatAdminCopy';
 import { useAdminAutosave } from './hooks/useAdminAutosave';
@@ -154,6 +156,7 @@ function editorTourDocument(
 const TourEditorPage = () => {
   const { tourId } = useParams<{ tourId: string }>();
   const { session } = useOutletContext<{ session: AdminSession }>();
+  const { catalogMirror } = useAdminIncident();
   const [searchParams, setSearchParams] = useSearchParams();
   const viewport = useAdminViewport();
   const [document, setDocument] = useState<CmsTourDocument | null>(null);
@@ -178,6 +181,9 @@ const TourEditorPage = () => {
   const [problemsOpen, setProblemsOpen] = useState(false);
   const [publishReviewOpen, setPublishReviewOpen] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
+  const [publishCatalogMirror, setPublishCatalogMirror] = useState<'up' | 'down' | undefined>(
+    undefined,
+  );
   const [status, setStatus] = useState<
     | 'saved'
     | 'conflict'
@@ -573,6 +579,7 @@ const TourEditorPage = () => {
   const onPublish = async (confirmDeleteFutureDepartures = false) => {
     setPublishing(true);
     setStatus(null);
+    setPublishCatalogMirror(undefined);
     try {
       const flushed = await flushDraft();
       if (flushed == null) {
@@ -597,6 +604,7 @@ const TourEditorPage = () => {
       );
       savedSnapshotRef.current = nextSnapshot;
       setSavedSnapshot(nextSnapshot);
+      setPublishCatalogMirror(payload.catalogMirror);
       setStatus('published');
       setHideDeparturesConfirm(false);
     } catch (error) {
@@ -644,7 +652,7 @@ const TourEditorPage = () => {
 
   const statusMessage =
     status === 'published'
-      ? ADMIN_UI.published
+      ? adminPublishGuestMessage(publishCatalogMirror ?? catalogMirror)
       : status === 'conflict'
           ? ADMIN_UI.conflict
           : status === 'error'

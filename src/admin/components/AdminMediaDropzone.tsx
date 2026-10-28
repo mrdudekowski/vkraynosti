@@ -1,6 +1,6 @@
 import { useRef, type ChangeEvent, type DragEvent, type ReactNode } from 'react';
 import { CMS_MEDIA_ACCEPT } from '../../cms/cmsMediaAccept';
-import { useAdminStorage } from '../adminStorageContext';
+import { adminIncidentBlocksMedia, useAdminIncident } from '../adminIncidentContext';
 import { ADMIN_UI } from '../constants/ui';
 
 type AdminMediaDropzoneProps = {
@@ -27,8 +27,8 @@ const AdminMediaDropzone = ({
   children,
 }: AdminMediaDropzoneProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { storage } = useAdminStorage();
-  const blocked = disabled || storage !== 'closed';
+  const { incident } = useAdminIncident();
+  const blocked = disabled || adminIncidentBlocksMedia(incident);
 
   const emit = (files: File[]) => {
     if (blocked || files.length === 0) {
@@ -53,7 +53,7 @@ const AdminMediaDropzone = ({
     <label
       htmlFor={id}
       className={`admin-dropzone ${blocked ? 'pointer-events-none opacity-50' : ''} ${className}`.trim()}
-      title={storage !== 'closed' ? ADMIN_UI.storageUnavailable : undefined}
+      title={adminIncidentBlocksMedia(incident) ? ADMIN_UI.storageUnavailable : undefined}
       onDragOver={(event) => event.preventDefault()}
       onDrop={onDrop}
     >

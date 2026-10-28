@@ -3,8 +3,11 @@ import { ChevronDown, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Plus, Search 
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_SIDEBAR_LOGO } from '../../constants/images';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
-import { adminCmsHealth, type AdminSession, type AdminStorageState } from '../api';
-import { AdminStorageContext } from '../adminStorageContext';
+import { adminCmsHealth, type AdminCmsHealth, type AdminSession } from '../api';
+import {
+  AdminIncidentContext,
+  adminIncidentBlocksMedia,
+} from '../adminIncidentContext';
 import { ADMIN_NAV_ITEMS, type AdminNavId, type AdminNavItem } from '../constants/nav';
 import { ADMIN_PATHS } from '../constants/routes';
 import { ADMIN_UI } from '../constants/ui';
@@ -12,10 +15,12 @@ import { useAdminSidebarCollapsed } from '../hooks/useAdminSidebarCollapsed';
 import { useAdminViewport } from '../hooks/useAdminViewport';
 import { useAdminSidebarLayout } from '../hooks/useAdminSidebarLayout';
 import { useAdminToast } from '../toast/adminToastContext';
+import { resolveAdminIncident, type AdminIncident } from '../resolveAdminIncident';
 import AdminIcon from './AdminIcon';
 import AdminSidebarNav from './AdminSidebarNav';
 import AdminSidebarOverflowDialog from './AdminSidebarOverflowDialog';
-import AdminStorageBanner from './AdminStorageBanner';
+import AdminIncidentDialog from './AdminIncidentDialog';
+import AdminIncidentStrip from './AdminIncidentStrip';
 import CreateTourModal from './CreateTourModal';
 import AdminProfileMenu from './AdminProfileMenu';
 import AdminCommandMenu from './AdminCommandMenu';
@@ -287,6 +292,7 @@ type OverlaySidebarProps = {
   onLogout: () => void;
   onQuickAddTour: () => void;
   onQuickAddDeparture: () => void;
+  tourCreateDisabled?: boolean;
 };
 
 const OverlaySidebar = ({
@@ -296,6 +302,7 @@ const OverlaySidebar = ({
   onLogout,
   onQuickAddTour,
   onQuickAddDeparture,
+  tourCreateDisabled = false,
 }: OverlaySidebarProps) => {
   const overlayRef = useRef<HTMLElement>(null);
   useModalFocusTrap(overlayRef, onClose);
@@ -320,6 +327,7 @@ const OverlaySidebar = ({
           onToggleCollapsed={onClose}
           onQuickAddTour={onQuickAddTour}
           onQuickAddDeparture={onQuickAddDeparture}
+          tourCreateDisabled={tourCreateDisabled}
           onNavigate={onClose}
         />
       </aside>
@@ -333,6 +341,7 @@ type MoreSheetProps = {
   onLogout: () => void;
   onQuickAddTour: () => void;
   onQuickAddDeparture: () => void;
+  tourCreateDisabled?: boolean;
 };
 
 const MoreSheet = ({
@@ -341,6 +350,7 @@ const MoreSheet = ({
   onLogout,
   onQuickAddTour,
   onQuickAddDeparture,
+  tourCreateDisabled = false,
 }: MoreSheetProps) => {
   const moreRef = useRef<HTMLDivElement>(null);
   useModalFocusTrap(moreRef, onClose);
@@ -364,7 +374,12 @@ const MoreSheet = ({
           <button
             type="button"
             className="admin-btn-ghost justify-start"
+            disabled={tourCreateDisabled}
+            title={tourCreateDisabled ? ADMIN_UI.storageUnavailable : undefined}
             onClick={() => {
+              if (tourCreateDisabled) {
+                return;
+              }
               onClose();
               onQuickAddTour();
             }}
@@ -416,7 +431,16 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   const [moreOpen, setMoreOpen] = useState(false);
   const [createTourOpen, setCreateTourOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [storage, setStorage] = useState<AdminStorageState>('closed');
+  const [health, setHealth] = useState<AdminCmsHealth | null>(null);
+  const [fetchFailed, setFetchFailed] = useState(false);
+  const [mediaDialogDismissed, setMediaDialogDismissed] = useState(false);
+  const [reopenMediaDialog, setReopenMediaDialog] = useState(false);
+  const prevIncidentRef = useRef<AdminIncident | null>(null);
+  const incident = useMemo(
+    () => resolveAdminIncident(health, fetchFailed),
+    [fetchFailed, health],
+  );
+  const tourCreateDisabled = adminIncidentBlocksMedia(incident);
   const items = useMemo(() => visibleNavItems(session), [session]);
   const {
     layout,
@@ -450,12 +474,17 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
     let cancelled = false;
     const loadHealth = async () => {
       try {
-        const health = await adminCmsHealth();
-        if (!cancelled && health.storage != null) {
-          setStorage(health.storage);
+        const next = await adminCmsHealth();
+        if (cancelled) {
+          return;
         }
+        setFetchFailed(false);
+        setHealth(next);
       } catch {
-        /* keep last known state */
+        if (!cancelled) {
+          setFetchFailed(true);
+          setHealth(null);
+        }
       }
     };
     void loadHealth();
@@ -467,6 +496,33 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
       window.clearInterval(timer);
     };
   }, []);
+
+  useEffect(() => {
+    if (incident === null) {
+      setMediaDialogDismissed(false);
+      setReopenMediaDialog(false);
+    } else if (incident === 'media_down' && prevIncidentRef.current !== 'media_down') {
+      setMediaDialogDismissed(false);
+      setReopenMediaDialog(false);
+    }
+    prevIncidentRef.current = incident;
+  }, [incident]);
+
+  const retryHealth = async () => {
+    try {
+      const next = await adminCmsHealth();
+      setFetchFailed(false);
+      setHealth(next);
+    } catch {
+      setFetchFailed(true);
+      setHealth(null);
+    }
+  };
+
+  const showMediaIncidentDialog =
+    incident === 'media_down' && (!mediaDialogDismissed || reopenMediaDialog);
+  const showBlockingIncidentDialog =
+    incident === 'api_down' || incident === 'catalog_down' || showMediaIncidentDialog;
 
   useEffect(() => {
     const openFromShortcut = (event: KeyboardEvent) => {
@@ -483,7 +539,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   }, [commandOpen]);
 
   const openQuickTour = () => {
-    if (storage === 'open') {
+    if (tourCreateDisabled) {
       return;
     }
     setCreateTourOpen(true);
@@ -506,7 +562,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
   };
 
   return (
-    <AdminStorageContext.Provider value={{ storage }}>
+    <AdminIncidentContext.Provider value={{ incident, catalogMirror: health?.catalogMirror }}>
     <div className="flex h-dvh max-h-dvh overflow-hidden bg-surface-light">
       <a
         href="#admin-main"
@@ -528,7 +584,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
             onToggleCollapsed={onToggleCollapsed}
             onQuickAddTour={openQuickTour}
             onQuickAddDeparture={openQuickDeparture}
-            tourCreateDisabled={storage === 'open'}
+            tourCreateDisabled={tourCreateDisabled}
             desktopLayout={layoutEnabled}
             visibleItems={layoutEnabled ? visibleSidebarItems : undefined}
             overflowItems={layoutEnabled ? overflowItems : undefined}
@@ -560,6 +616,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
           onLogout={onLogout}
           onQuickAddTour={openQuickTour}
           onQuickAddDeparture={openQuickDeparture}
+          tourCreateDisabled={tourCreateDisabled}
         />
       ) : null}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -572,7 +629,14 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
           <AdminIcon icon={Search} size={16} />
           {ADMIN_UI.commandMenu}
         </button>
-        {storage !== 'closed' ? <AdminStorageBanner /> : null}
+        {incident === 'media_down' ? (
+          <AdminIncidentStrip
+            onOpenDialog={() => {
+              setReopenMediaDialog(true);
+              setMediaDialogDismissed(false);
+            }}
+          />
+        ) : null}
         <main
           id="admin-main"
           className={`min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto ${
@@ -621,6 +685,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
           onLogout={onLogout}
           onQuickAddTour={openQuickTour}
           onQuickAddDeparture={openQuickDeparture}
+          tourCreateDisabled={tourCreateDisabled}
         />
       ) : null}
       {sidebarOverflowOpen && viewport === 'desktop' ? (
@@ -661,6 +726,20 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
         />
       ) : null}
       {commandOpen ? <AdminCommandMenu items={items} onClose={() => setCommandOpen(false)} /> : null}
+      {showBlockingIncidentDialog && incident != null ? (
+        <AdminIncidentDialog
+          incident={incident}
+          onClose={() => {
+            if (incident === 'media_down') {
+              setMediaDialogDismissed(true);
+              setReopenMediaDialog(false);
+            }
+          }}
+          onRetry={() => {
+            void retryHealth();
+          }}
+        />
+      ) : null}
       {createTourOpen ? (
         <CreateTourModal
           onClose={() => setCreateTourOpen(false)}
@@ -671,7 +750,7 @@ const AdminChrome = ({ session, onLogout, children }: AdminChromeProps) => {
         />
       ) : null}
     </div>
-    </AdminStorageContext.Provider>
+    </AdminIncidentContext.Provider>
   );
 };
 

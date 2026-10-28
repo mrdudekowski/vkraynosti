@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -109,7 +109,11 @@ describe('AdminChrome', () => {
   beforeEach(() => {
     window.localStorage.clear();
     navState.items?.splice(0, navState.items.length, ...(navState.canonicalItems ?? []));
-    healthState.adminCmsHealth.mockResolvedValue({ ok: true, storage: 'closed' });
+    healthState.adminCmsHealth.mockResolvedValue({
+      ok: true,
+      storage: 'closed',
+      catalogMirror: 'up',
+    });
   });
 
   const setPermittedItemCount = (count: 7 | 8 | 9) => {
@@ -354,15 +358,101 @@ describe('AdminChrome', () => {
     expect(screen.queryByRole('button', { name: /Переместить .* в сайдбар/ })).not.toBeInTheDocument();
   });
 
-  it('shows a storage banner and disables creating a tour while storage is open', async () => {
+  it('shows no danger strip when storage is closed and catalog mirror is up', async () => {
+    renderChrome(adminSession);
+    await waitFor(() => expect(healthState.adminCmsHealth).toHaveBeenCalled());
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('shows danger strip and incident dialog when storage is open', async () => {
+    healthState.adminCmsHealth.mockResolvedValue({ ok: true, storage: 'open' });
+    renderChrome(adminSession);
+    expect(
+      await screen.findByRole('alertdialog', { name: ADMIN_UI.incident.media_down.title }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(ADMIN_UI.incident.media_down.title);
+  });
+
+  it('keeps danger strip after dismissing the media incident dialog', async () => {
     healthState.adminCmsHealth.mockResolvedValue({ ok: true, storage: 'open' });
     const user = userEvent.setup();
     renderChrome(adminSession);
-    expect(await screen.findByRole('status')).toHaveTextContent(ADMIN_UI.storageBanner);
+    const dialog = await screen.findByRole('alertdialog', {
+      name: ADMIN_UI.incident.media_down.title,
+    });
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.closeOverlay }));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(ADMIN_UI.incident.media_down.title);
+  });
+
+  it('reopens the media incident dialog when the danger strip is clicked', async () => {
+    healthState.adminCmsHealth.mockResolvedValue({ ok: true, storage: 'open' });
+    const user = userEvent.setup();
+    renderChrome(adminSession);
+    const dialog = await screen.findByRole('alertdialog', {
+      name: ADMIN_UI.incident.media_down.title,
+    });
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.closeOverlay }));
+    await user.click(screen.getByRole('alert'));
+    expect(
+      screen.getByRole('alertdialog', { name: ADMIN_UI.incident.media_down.title }),
+    ).toBeInTheDocument();
+  });
+
+  it('removes the danger strip after storage recovers', async () => {
+    healthState.adminCmsHealth
+      .mockResolvedValueOnce({ ok: true, storage: 'open' })
+      .mockResolvedValueOnce({ ok: true, storage: 'closed', catalogMirror: 'up' });
+    const user = userEvent.setup();
+    renderChrome(adminSession);
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    const dialog = screen.getByRole('alertdialog', { name: ADMIN_UI.incident.media_down.title });
+    await user.click(within(dialog).getByRole('button', { name: ADMIN_UI.incident.media_down.action }));
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+  });
+
+  it('disables creating a tour while a media incident is active', async () => {
+    healthState.adminCmsHealth.mockResolvedValue({ ok: true, storage: 'open' });
+    const user = userEvent.setup();
+    renderChrome(adminSession);
+    await screen.findByRole('alert');
     await user.click(screen.getByRole('button', { name: ADMIN_UI.quickAdd }));
     const addTour = screen.getByRole('menuitem', { name: ADMIN_UI.addTour });
     expect(addTour).toBeDisabled();
     expect(addTour).toHaveAttribute('title', ADMIN_UI.storageUnavailable);
+  });
+
+  it('shows the media incident dialog again after storage recovers and opens again', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    healthState.adminCmsHealth
+      .mockResolvedValueOnce({ ok: true, storage: 'open' })
+      .mockResolvedValueOnce({ ok: true, storage: 'closed', catalogMirror: 'up' })
+      .mockResolvedValueOnce({ ok: true, storage: 'open' });
+    renderChrome(adminSession);
+    const dialog = await screen.findByRole('alertdialog', {
+      name: ADMIN_UI.incident.media_down.title,
+    });
+    await user.click(
+      within(dialog).getByRole('button', { name: ADMIN_UI.incident.media_down.action }),
+    );
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+    await act(async () => {
+      vi.advanceTimersByTime(15_000);
+    });
+    expect(
+      await screen.findByRole('alertdialog', { name: ADMIN_UI.incident.media_down.title }),
+    ).toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it('shows api_down alertdialog when health fetch rejects', async () => {
+    healthState.adminCmsHealth.mockRejectedValue(new Error('network'));
+    renderChrome(adminSession);
+    expect(
+      await screen.findByRole('alertdialog', { name: ADMIN_UI.incident.api_down.title }),
+    ).toBeInTheDocument();
   });
 
 });

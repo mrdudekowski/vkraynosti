@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { SEASON_ORDER } from '../../constants/seasonNavbarAppearance';
 import type { Season } from '../../types';
 import type { AdminTourListItem } from '../api';
+import { adminIncidentBlocksMedia, useAdminIncident } from '../adminIncidentContext';
 import { ADMIN_UI } from '../constants/ui';
 import AdminAlert from './AdminAlert';
 import AdminButton from './AdminButton';
@@ -34,14 +35,17 @@ function errorMessage(error: string | null): string | null {
 }
 
 const CloneTourModal = ({ tour, busy, error, onClose, onSubmit }: CloneTourModalProps) => {
+  const { incident } = useAdminIncident();
+  const mediaBlocked = adminIncidentBlocksMedia(incident);
   const [season, setSeason] = useState<Season | ''>('');
   const message = errorMessage(error);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (season !== '') {
-      onSubmit(season);
+    if (mediaBlocked || season === '') {
+      return;
     }
+    onSubmit(season);
   };
 
   return (
@@ -80,7 +84,11 @@ const CloneTourModal = ({ tour, busy, error, onClose, onSubmit }: CloneTourModal
         <p className="text-sm text-text-muted">{ADMIN_UI.cloneTourHelper}</p>
         {message != null ? <AdminAlert tone="danger">{message}</AdminAlert> : null}
         <div className="flex flex-wrap gap-2">
-          <AdminButton type="submit" disabled={busy || season === ''}>
+          <AdminButton
+            type="submit"
+            disabled={busy || season === '' || mediaBlocked}
+            title={mediaBlocked ? ADMIN_UI.storageUnavailable : undefined}
+          >
             {busy ? ADMIN_UI.cloneTourSubmitting : ADMIN_UI.cloneTourSubmit}
           </AdminButton>
           <AdminButton type="button" variant="secondary" onClick={onClose} disabled={busy}>

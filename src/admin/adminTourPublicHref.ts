@@ -1,13 +1,9 @@
 import type { CmsTourDocument } from '../cms/cmsTourDocument';
-import { getTourPublicPath, type TourUrlSource } from '../constants/tourUrls';
+import { getTourCanonicalUrl, type TourUrlSource } from '../constants/tourUrls';
 import { adminTourLiveVisibility } from './tourLiveVisibility';
 
-export function adminTourPublicHref(
-  tour: TourUrlSource,
-  baseUrl: string = import.meta.env.BASE_URL,
-): string {
-  const prefix = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-  return `${prefix}${getTourPublicPath(tour)}`;
+export function adminTourPublicHref(tour: TourUrlSource): string {
+  return getTourCanonicalUrl(tour);
 }
 
 export function adminTourHasPublicPage(tour: {

@@ -52,6 +52,8 @@ import {
   type InboxReadinessFilter,
 } from './inboxQueueView';
 import { useAdminToast } from './toast/adminToastContext';
+import { useAdminIncident } from './adminIncidentContext';
+import { adminPublishGuestMessage } from './adminPublishGuestMessage';
 import { ADMIN_UI } from './constants/ui';
 
 const KIND_FILTER_LABEL: Record<InboxKindFilter, string> = {
@@ -89,6 +91,7 @@ const InboxPage = () => {
   const navigate = useNavigate();
   const { session } = useOutletContext<{ session: AdminSession }>();
   const { push } = useAdminToast();
+  const { catalogMirror } = useAdminIncident();
   const [items, setItems] = useState<AdminPublishQueueItem[] | null>(() => peekAdminPublishQueue() ?? null);
   const [siteChanges, setSiteChanges] = useState<AdminSiteContentChangesItem[]>([]);
   const [tourImageUrls, setTourImageUrls] = useState<Record<string, string | null>>(
@@ -191,9 +194,9 @@ const InboxPage = () => {
         ? { ...payload, confirmDeleteFutureDepartures: true }
         : payload,
     )
-      .then(() => {
+      .then((result) => {
         setHideConfirmPayload(null);
-        push({ message: ADMIN_UI.inboxPublished });
+        push({ message: adminPublishGuestMessage(result.catalogMirror ?? catalogMirror) });
         refreshAfterMutation();
       })
       .catch((error: unknown) => {

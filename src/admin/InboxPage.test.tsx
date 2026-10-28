@@ -79,7 +79,7 @@ describe('InboxPage', () => {
       },
     ]);
     vi.mocked(adminListTours).mockResolvedValue([]);
-    vi.mocked(adminPublishQueue).mockResolvedValue(undefined);
+    vi.mocked(adminPublishQueue).mockResolvedValue({});
     vi.mocked(adminReturnPublishQueue).mockResolvedValue(undefined);
   });
 

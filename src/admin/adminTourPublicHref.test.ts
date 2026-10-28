@@ -2,13 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { adminTourHasPublicPage, adminTourPublicHref } from './adminTourPublicHref';
 
 describe('adminTourPublicHref', () => {
-  it('собирает публичный путь из сезона и slug, не из id', () => {
+  it('собирает абсолютный URL гостевого сайта из сезона и slug, не из id', () => {
     expect(
-      adminTourPublicHref(
-        { id: 'winter-1', season: 'winter', slug: 'izubrinaya' },
-        '/vkraynosti/',
-      ),
-    ).toBe('/vkraynosti/tours/winter/izubrinaya/');
+      adminTourPublicHref({ id: 'winter-1', season: 'winter', slug: 'izubrinaya' }),
+    ).toBe('https://vkraynosti.ru/tours/winter/izubrinaya/');
+  });
+
+  it('использует SITE_URL, а не BASE_URL админки', () => {
+    expect(
+      adminTourPublicHref({ id: 'fall-3', season: 'fall', slug: 'reka-milogradovka' }),
+    ).toBe('https://vkraynosti.ru/tours/fall/reka-milogradovka/');
   });
 });
 

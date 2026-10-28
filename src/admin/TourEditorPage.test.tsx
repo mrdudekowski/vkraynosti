@@ -6,6 +6,7 @@ import type { CmsTourDocument } from '../cms/cmsTourDocument';
 import { createCmsTourMeta } from '../cms/cmsTourMeta';
 import type { AdminSession } from './api';
 import { adminTourPublicHref } from './adminTourPublicHref';
+import { AdminIncidentContext } from './adminIncidentContext';
 import { ADMIN_UI } from './constants/ui';
 import { AdminToastProvider } from './components/AdminToast';
 
@@ -67,16 +68,22 @@ function readyTour(): CmsTourDocument {
   };
 }
 
-function renderEditor(session: AdminSession, path = '/tours/winter-1') {
+function renderEditor(
+  session: AdminSession,
+  path = '/tours/winter-1',
+  catalogMirror: 'up' | 'down' | undefined = undefined,
+) {
   return render(
     <AdminToastProvider>
-      <MemoryRouter initialEntries={[path]}>
-        <Routes>
-          <Route element={<Outlet context={{ session }} />}>
-            <Route path="/tours/:tourId" element={<TourEditorPage />} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <AdminIncidentContext.Provider value={{ incident: null, catalogMirror }}>
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route element={<Outlet context={{ session }} />}>
+              <Route path="/tours/:tourId" element={<TourEditorPage />} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AdminIncidentContext.Provider>
     </AdminToastProvider>,
   );
 }
@@ -182,6 +189,29 @@ describe('TourEditorPage publish actions', () => {
         confirmDeleteFutureDepartures: false,
       });
     });
+    expect(screen.getByRole('status')).toHaveTextContent(ADMIN_UI.publishedAfterDeploy);
+  });
+
+  it('shows live guest copy after publish when catalog mirror is up', async () => {
+    const user = userEvent.setup();
+    vi.mocked(adminPublishTour).mockResolvedValue({
+      document: { ...readyTour(), status: 'active' },
+      meta: createCmsTourMeta({ rev: 3 }),
+      catalogMirror: 'up',
+    });
+    renderEditor(
+      {
+        login: 'alice',
+        role: 'admin',
+        canPublishTours: true,
+        canPublishSchedule: true,
+      },
+      '/tours/winter-1',
+    );
+    await screen.findByLabelText(ADMIN_UI.tourNameLabel);
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.publish }));
+    await user.click(screen.getByRole('button', { name: 'Подтвердить публикацию' }));
+    expect(await screen.findByRole('status')).toHaveTextContent(ADMIN_UI.publishedLive);
   });
 
   it('autosaves the draft into the sticky bar without a toast', async () => {

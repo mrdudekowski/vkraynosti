@@ -66,6 +66,7 @@ export type AdminCmsHealth = {
   postgres?: string;
   jsonStore?: string;
   storage?: AdminStorageState;
+  catalogMirror?: 'up' | 'down';
 };
 
 export type AdminSiteContentResponse = { document: SiteContentDocument; meta: CmsTourMeta };
@@ -419,7 +420,7 @@ export async function adminPublishTour(
   id: string,
   rev: number,
   options: { confirmDeleteFutureDepartures?: boolean } = {},
-): Promise<{ document: CmsTourDocument; meta: CmsTourMeta }> {
+): Promise<{ document: CmsTourDocument; meta: CmsTourMeta; catalogMirror?: 'up' | 'down' }> {
   const response = await fetch(`/api/cms/tours/${id}/publish`, {
     method: 'POST',
     credentials: 'include',
@@ -473,7 +474,7 @@ export async function adminPublishQueue(input: {
   departureIds?: string[];
   tourRevs?: Record<string, number>;
   confirmDeleteFutureDepartures?: boolean;
-} = {}): Promise<void> {
+} = {}): Promise<{ ok?: boolean; catalogMirror?: 'up' | 'down' }> {
   const response = await fetch('/api/cms/publish-queue/publish', {
     method: 'POST',
     credentials: 'include',
@@ -487,6 +488,7 @@ export async function adminPublishQueue(input: {
     const body = await readJson<{ error?: string }>(response);
     throw new Error(body.error ?? 'publish_failed');
   }
+  return readJson(response);
 }
 
 export async function adminReturnPublishQueue(input: {

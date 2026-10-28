@@ -13,6 +13,9 @@ type AdminDialogProps = {
   onClose: () => void;
   restoreFocusRef?: RefObject<HTMLElement | null>;
   allowUnderlyingPointerEvents?: boolean;
+  dismissible?: boolean;
+  alertDialog?: boolean;
+  danger?: boolean;
   children: ReactNode;
 };
 
@@ -30,12 +33,17 @@ const AdminDialog = ({
   onClose,
   restoreFocusRef,
   allowUnderlyingPointerEvents = false,
+  dismissible = true,
+  alertDialog = false,
+  danger = false,
   children,
 }: AdminDialogProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useCallback(() => {
-    onClose();
-  }, [onClose]);
+    if (dismissible) {
+      onClose();
+    }
+  }, [dismissible, onClose]);
   useModalFocusTrap(panelRef, onCloseRef);
 
   useEffect(() => {
@@ -58,20 +66,23 @@ const AdminDialog = ({
         type="button"
         className={`absolute inset-0 z-overlay bg-surface-dark/70 ${allowUnderlyingPointerEvents ? 'pointer-events-none' : ''}`}
         aria-label={closeLabel}
-        onClick={onClose}
+        onClick={onCloseRef}
+        tabIndex={dismissible ? undefined : -1}
       />
       <div
         ref={panelRef}
-        role="dialog"
+        role={alertDialog ? 'alertdialog' : 'dialog'}
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`relative z-modal-raised flex max-h-modal-body w-full ${PANEL_WIDTH[size]} flex-col overflow-hidden rounded-admin-overlay border border-divider bg-surface-light shadow-admin-overlay pointer-events-auto`}
+        className={`relative z-modal-raised flex max-h-modal-body w-full ${PANEL_WIDTH[size]} flex-col overflow-hidden rounded-admin-overlay border bg-surface-light shadow-admin-overlay pointer-events-auto ${
+          danger ? 'border-difficulty-hard-fg/30' : 'border-divider'
+        }`}
       >
         <div className="flex shrink-0 items-start justify-between gap-3 px-4 pb-3 pt-4">
           <h2 id={titleId} className="min-w-0 text-base font-semibold text-text-primary">
             {title}
           </h2>
-          <AdminIconButton icon={X} label={closeLabel} onClick={onClose} />
+          {dismissible ? <AdminIconButton icon={X} label={closeLabel} onClick={onClose} /> : null}
         </div>
         <div className="min-h-0 overflow-y-auto px-4 pb-4 pb-safe-bottom">{children}</div>
       </div>

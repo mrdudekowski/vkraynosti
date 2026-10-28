@@ -2,6 +2,7 @@ import { Copy, Eye, EyeOff, MoreHorizontal } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { AdminTourListItem } from '../api';
 import { adminTourGuestVisibilityAction } from '../adminTourVisibility';
+import { adminIncidentBlocksMedia, useAdminIncident } from '../adminIncidentContext';
 import { ADMIN_UI } from '../constants/ui';
 import AdminIcon from './AdminIcon';
 import AdminIconButton from './AdminIconButton';
@@ -29,6 +30,8 @@ const AdminTourActionsMenu = ({
   onDelete,
   queuesVisibility = false,
 }: AdminTourActionsMenuProps) => {
+  const { incident } = useAdminIncident();
+  const cloneBlocked = adminIncidentBlocksMedia(incident);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const action = adminTourGuestVisibilityAction(tour);
@@ -89,8 +92,12 @@ const AdminTourActionsMenu = ({
               type="button"
               role="menuitem"
               className="admin-btn-ghost w-full justify-start gap-2"
-              disabled={busy}
+              disabled={busy || cloneBlocked}
+              title={cloneBlocked ? ADMIN_UI.storageUnavailable : undefined}
               onClick={(event) => {
+                if (cloneBlocked) {
+                  return;
+                }
                 event.preventDefault();
                 event.stopPropagation();
                 onOpenChange(false);

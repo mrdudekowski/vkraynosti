@@ -78,6 +78,17 @@ describe('getAbsoluteOgImageUrl', () => {
       'https://cdn.example.com/tours/summer-1/first.webp',
     );
   });
+
+  it('drops the bake prefix so a CDN key stays media/tours', async () => {
+    vi.stubEnv('VITE_SITE_URL', 'https://prod.example.com');
+    vi.stubEnv('VITE_BASE_PATH', '/');
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', 'https://cdn.example.com/');
+    vi.resetModules();
+    const { getAbsoluteOgImageUrl } = await import('./seo');
+    expect(getAbsoluteOgImageUrl('/data/cms/media/tours/fall-1/cover.webp')).toBe(
+      'https://cdn.example.com/media/tours/fall-1/cover.webp',
+    );
+  });
 });
 
 describe('getOgShellAbsoluteImageUrl', () => {

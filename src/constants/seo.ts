@@ -62,7 +62,9 @@ export const getAbsoluteOgImageUrl = (pathOrUrl: string): string => {
   if (/^https?:\/\//i.test(pathOrUrl)) {
     return pathOrUrl;
   }
-  const resolved = resolveMediaAssetUrl(pathOrUrl);
+  // Bake stores the S3 key under /data/cms/, but the CDN object is the key itself.
+  const logicalMediaPath = pathOrUrl.replace(/^\/data\/cms(?=\/media\/)/, '');
+  const resolved = resolveMediaAssetUrl(logicalMediaPath);
   if (/^https?:\/\//i.test(resolved)) {
     return resolved;
   }

@@ -5,6 +5,7 @@ import {
   renderOgShellHead,
   stripOgShellMetaFromHead,
 } from './renderOgShellHead.ts';
+import { assertSingleTags } from '../verify-og-shells.ts';
 
 const templateHtml = `<!doctype html>
 <html lang="ru">
@@ -62,6 +63,9 @@ describe('renderOgShellHead', () => {
 
   it('continues to emit social tags for routes without an explicit opt-out', () => {
     const html = injectOgShellIntoHtml(templateHtml, sampleMeta);
+    const errors: string[] = [];
+    assertSingleTags(html, '/', errors);
+    expect(errors).toEqual([]);
     expect(html).toContain('property="og:title"');
     expect(html).toContain('name="twitter:card"');
   });
@@ -69,6 +73,7 @@ describe('renderOgShellHead', () => {
   it('includes secure_url and image dimensions for JPEG', () => {
     const head = renderOgShellHead(sampleMeta);
     expect(head).toContain('data-seo-shell="true"');
+    expect(head).toMatch(/<meta name="description"[^>]*data-seo-shell="true"/);
     expect(head).toContain('property="og:image:secure_url"');
     expect(head).toContain('property="og:image:width" content="1200"');
     expect(head).toContain('property="og:image:height" content="630"');

@@ -68,8 +68,8 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
       <meta name="robots" content="${robots}" />
       <link rel="canonical" href="${canonicalUrl}" />
       ${socialTags}${keywords}`.replace(
-    /<(meta|link)\b/g,
-    `<$1 ${SEO_SHELL_TAG_ATTRIBUTE}="true"`,
+    /<(meta|link)\b([^>]*?)(\s*\/)?>/g,
+    `<$1$2 ${SEO_SHELL_TAG_ATTRIBUTE}="true"$3>`,
   );
 };
 

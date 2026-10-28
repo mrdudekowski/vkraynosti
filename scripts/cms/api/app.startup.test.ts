@@ -25,7 +25,12 @@ describe('CMS API startup', () => {
     const response = await app.request('/api/cms/health');
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true });
+    expect(await response.json()).toEqual({
+      ok: true,
+      postgres: 'up',
+      jsonStore: 'up',
+      storage: 'closed',
+    });
     expect(listUsersCalled).toBe(false);
   });
 });

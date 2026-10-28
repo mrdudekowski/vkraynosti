@@ -6,7 +6,9 @@ import {
 } from '@aws-sdk/client-s3';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import type { CmsDatabase } from './db/client';
 import type { CmsApiEnv, CmsApiS3Config } from './env';
+import { createPostgresJsonStore } from './postgresJsonStore';
 
 export type CmsJsonStore = {
   getJson: (key: string) => Promise<unknown | null>;
@@ -240,9 +242,41 @@ export function createFilesystemJsonStore(rootDir: string): CmsJsonStore {
   };
 }
 
-export function createCmsJsonStore(env: CmsApiEnv): CmsJsonStore {
+export function createSplitJsonStore(json: CmsJsonStore, bytes: CmsJsonStore): CmsJsonStore {
+  return {
+    getJson: (key) => json.getJson(key),
+    putJson: (key, value) => json.putJson(key, value),
+    deleteJson: (key) => json.deleteJson(key),
+    getBytes: (key) => bytes.getBytes(key),
+    putBytes: (key, body, contentType) => bytes.putBytes(key, body, contentType),
+    deleteBytes: (key) => bytes.deleteBytes(key),
+  };
+}
+
+function createByteStore(env: CmsApiEnv): CmsJsonStore {
   if (env.storeKind === 'filesystem') {
     return createFilesystemJsonStore(env.localStoreDir);
   }
   return createS3JsonStore(env.s3);
+}
+
+function createJsonBackend(env: CmsApiEnv, db?: CmsDatabase): CmsJsonStore {
+  if (env.jsonStoreKind === 'postgres') {
+    if (db == null) {
+      throw new Error('CMS_JSON_STORE=postgres requires a database');
+    }
+    return createPostgresJsonStore(db);
+  }
+  if (env.jsonStoreKind === 'filesystem') {
+    return createFilesystemJsonStore(env.localStoreDir);
+  }
+  return createS3JsonStore(env.s3);
+}
+
+export function createCmsJsonStore(env: CmsApiEnv, db?: CmsDatabase): CmsJsonStore {
+  const json = createJsonBackend(env, db);
+  if (env.jsonStoreKind === env.storeKind) {
+    return json;
+  }
+  return createSplitJsonStore(json, createByteStore(env));
 }

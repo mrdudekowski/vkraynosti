@@ -10,6 +10,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ModalProvider } from './context/ModalContext';
 import { SeasonProvider } from './context/SeasonContext';
 import { SiteContentProvider } from './context/SiteContentContext';
+import { CmsCatalogGate } from './cms/CmsCatalogGate';
 import { CmsToursProvider } from './cms/CmsToursProvider';
 import { TourScheduleProvider } from './context/TourScheduleContext';
 import ErrorBoundary from './components/errors/ErrorBoundary';
@@ -33,11 +34,13 @@ createRoot(document.getElementById('root')!).render(
           <SeasonProvider>
             <SiteContentProvider>
             <CmsToursProvider>
+              <CmsCatalogGate>
               <TourScheduleProvider>
                 <ModalProvider>
                   <RouterProvider router={router} />
                 </ModalProvider>
               </TourScheduleProvider>
+              </CmsCatalogGate>
             </CmsToursProvider>
             </SiteContentProvider>
           </SeasonProvider>

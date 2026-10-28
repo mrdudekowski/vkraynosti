@@ -80,3 +80,9 @@ export const tourDepartures = pgTable('tour_departures', {
     .on(table.tourId, table.startsOn)
     .where(sql`${table.status} <> 'cancelled'`),
 ]);
+
+export const cmsJson = pgTable('cms_json', {
+  key: varchar('key', { length: 512 }).primaryKey(),
+  value: jsonb('value').$type<unknown>().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});

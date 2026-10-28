@@ -33,6 +33,20 @@ describe('resolveCatalogSource', () => {
   it('returns fixtures when neither source is configured', () => {
     expect(resolveCatalogSource({})).toBeNull();
   });
+
+  it('prefers the authenticated bake API over CDN packages', () => {
+    expect(
+      resolveCatalogSource({
+        CMS_BAKE_URL: 'https://cms.test/',
+        CMS_DEPLOY_SECRET: 'deploy-secret',
+        VITE_CMS_S3_BASE_URL: 'https://cdn.example.test/cms/',
+      }),
+    ).toEqual({
+      kind: 'bakeApi',
+      bakeUrl: 'https://cms.test/api/cms/internal/bake',
+      deploySecret: 'deploy-secret',
+    });
+  });
 });
 
 describe('syncCatalog', () => {
@@ -55,6 +69,8 @@ describe('syncCatalog', () => {
       expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tours.json'), 'utf8')).tours[0].slug).toBe('test');
       expect(JSON.parse(await readFile(resolve(root, 'public/data/tour-schedule/tours_list.json'), 'utf8')).tours[0].id).toBe('fall-1');
       expect(JSON.parse(await readFile(resolve(root, 'public/data/tour-schedule/schedule.json'), 'utf8')).events).toEqual([]);
+      expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tour-schedule/tours_list.json'), 'utf8')).tours[0].id).toBe('fall-1');
+      expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tour-schedule/schedule.json'), 'utf8')).events).toEqual([]);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -66,6 +82,43 @@ describe('syncCatalog', () => {
     try {
       await expect(syncCatalog({ root, env: { VITE_CMS_S3_BASE_URL: 'https://cms.test' }, fetchImpl })).rejects.toThrow('HTTP 404');
       await expect(readFile(resolve(root, 'public/data/cms/build-source.json'), 'utf8')).rejects.toMatchObject({ code: 'ENOENT' });
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it('writes cms tours from the bake API even when the CDN returns 403', async () => {
+    const root = await mkdtemp(resolve(tmpdir(), 'vkr-catalog-'));
+    const payload = {
+      tours: { schemaVersion: 1, tours: [{ id: 'fall-1', slug: 'test', season: 'fall', status: 'active', assets: [] }] },
+      toursList: { schemaVersion: 1, tours: [{ id: 'fall-1', publicationStatus: 'active' }] },
+      schedule: { schemaVersion: 1, events: [] },
+      siteContent: {},
+      stills: [],
+    };
+    const fetchImpl = async (url) => {
+      if (String(url).includes('/api/cms/internal/bake')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => payload,
+          text: async () => JSON.stringify(payload),
+        };
+      }
+      return { ok: false, status: 403, text: async () => '', json: async () => ({}) };
+    };
+    try {
+      await syncCatalog({
+        root,
+        env: {
+          CMS_BAKE_URL: 'https://cms.test',
+          CMS_DEPLOY_SECRET: 'deploy-secret',
+          VITE_CMS_S3_BASE_URL: 'https://cdn.example.test/cms',
+        },
+        fetchImpl,
+      });
+      expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tours.json'), 'utf8')).tours[0].id).toBe('fall-1');
+      expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tour-schedule/tours_list.json'), 'utf8')).tours[0].id).toBe('fall-1');
     } finally {
       await rm(root, { recursive: true, force: true });
     }

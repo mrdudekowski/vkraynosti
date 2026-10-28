@@ -3,6 +3,7 @@ import { getTableConfig, PgDialect } from 'drizzle-orm/pg-core';
 import { describe, expect, it } from 'vitest';
 import {
   auditLog,
+  cmsJson,
   departureStatus,
   sessions,
   tourDepartures,
@@ -83,5 +84,11 @@ describe('tour departure schema', () => {
     expect(new PgDialect().sqlToQuery(where).sql).toBe(
       '"tour_departures"."status" <> \'cancelled\'',
     );
+  });
+});
+
+describe('cms json store schema', () => {
+  it('stores CMS JSON documents by object key', () => {
+    expect(Object.keys(getTableColumns(cmsJson))).toEqual(['key', 'value', 'updatedAt']);
   });
 });

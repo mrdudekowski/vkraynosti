@@ -104,7 +104,10 @@ const env: CmsApiEnv = {
     publicBaseUrl: 'https://s3.example/vkraynosti-cms-e2e',
   },
   storeKind: 's3',
+  jsonStoreKind: 's3',
   localStoreDir: path.join(process.cwd(), 'tmp', 'cms-catalog'),
+  deploySecret: '',
+  storageCanaryKey: 'media/tours/fall-1/cover.webp',
 };
 
 const database = createDatabase(

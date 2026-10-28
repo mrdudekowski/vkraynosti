@@ -48,6 +48,8 @@ import { checkHideTourPublish } from '../../../src/cms/hideTourFutureDepartures.
 import { resolvePublishedTourDocument } from '../../../src/cms/publishedTourSnapshot.ts';
 import { loadCrmFile } from './crmStore.ts';
 import { allocateUniqueSlug, nextSeasonTourId, slugFromTitle } from '../../../src/cms/cmsTourSlug.ts';
+import { SITE_CONTENT_KINDS } from '../../../src/cms/siteContentDocument.ts';
+import { siteContentPublishedKey } from '../../../src/cms/siteContentPackageKeys.ts';
 import {
   CMS_DRAFT_INDEX_KEY,
   CMS_PUBLISHED_CATALOG_KEY,
@@ -77,6 +79,8 @@ import {
   type CmsSession,
 } from './session.ts';
 import type { CmsJsonStore } from './store.ts';
+import { createStorageCircuit, type StorageCircuit } from './storageCircuit.ts';
+import { StorageUnavailableError } from './storageUnavailable.ts';
 import { CmsLastAdminError, type AuthRepository, type UserRecord } from './auth/authRepository.ts';
 import { registerCrmRoutes } from './crmRoutes.ts';
 import { registerSiteContentRoutes } from './siteContentRoutes.ts';
@@ -236,6 +240,9 @@ export type CmsApiDeps = {
   store: CmsJsonStore;
   authRepository: AuthRepository;
   departureRepository: DepartureRepository;
+  storageCircuit?: Pick<StorageCircuit, 'state'> & Partial<Pick<StorageCircuit, 'guardBytes' | 'reportFailure' | 'reportSuccess'>>;
+  probePostgres?: () => Promise<void>;
+  probeJsonStore?: () => Promise<void>;
 };
 
 function publicAuthUsers(records: UserRecord[]): Array<{
@@ -734,8 +741,27 @@ function departureErrorResponse(error: unknown): {
   return null;
 }
 
+async function probeStatus(probe?: () => Promise<void>): Promise<'up' | 'down'> {
+  if (probe == null) {
+    return 'up';
+  }
+  try {
+    await probe();
+    return 'up';
+  } catch {
+    return 'down';
+  }
+}
+
+function defaultByteProbe(store: CmsJsonStore, canaryKey: string | undefined): () => Promise<void> {
+  return async () => {
+    await store.getBytes(canaryKey || 'media/tours/fall-1/cover.webp');
+  };
+}
+
 export function createCmsApiApp(deps: CmsApiDeps) {
   const { env, store, authRepository, departureRepository } = deps;
+  const storageCircuit = deps.storageCircuit ?? createStorageCircuit(defaultByteProbe(store, env.storageCanaryKey));
   const app = new Hono<{ Variables: AppVariables }>();
   const allowedOrigins = new Set(
     (process.env.CMS_CORS_ORIGINS ??
@@ -858,7 +884,53 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     return { ok: true, deleteIds: check.deleteIds };
   }
 
-  app.get('/api/cms/health', (c) => c.json({ ok: true }));
+  app.get('/api/cms/health', async (c) => {
+    const postgres = await probeStatus(deps.probePostgres);
+    const jsonStore = await probeStatus(deps.probeJsonStore);
+    return c.json({
+      ok: postgres === 'up' && jsonStore === 'up',
+      postgres,
+      jsonStore,
+      storage: storageCircuit.state(),
+    });
+  });
+
+  app.get('/api/cms/internal/bake', async (c) => {
+    if (!env.deploySecret) {
+      return c.json({ error: 'bake_disabled' }, 503);
+    }
+    const secret = c.req.header('x-cms-deploy-secret') ?? '';
+    if (secret.length === 0) {
+      return c.json({ error: 'unauthorized' }, 401);
+    }
+    if (secret !== env.deploySecret) {
+      return c.json({ error: 'forbidden' }, 403);
+    }
+    const tours = (await store.getJson(CMS_PUBLISHED_CATALOG_KEY)) ?? { schemaVersion: 1, tours: [] };
+    const toursList = (await store.getJson(CMS_PUBLISHED_TOURS_LIST_KEY)) ?? { schemaVersion: 1, tours: [] };
+    const schedule = (await store.getJson(CMS_PUBLISHED_SCHEDULE_KEY)) ?? { schemaVersion: 1, events: [] };
+    const siteContent: Record<string, unknown | null> = {};
+    for (const kind of SITE_CONTENT_KINDS) {
+      siteContent[kind] = await store.getJson(siteContentPublishedKey(kind));
+    }
+    const stills: Array<{ key: string; url: string }> = [];
+    const catalogTours = Array.isArray((tours as { tours?: unknown }).tours)
+      ? (tours as { tours: CmsTourDocument[] }).tours
+      : [];
+    for (const tour of catalogTours) {
+      for (const assetId of [tour.coverAssetId, tour.prefaceAssetId]) {
+        const asset = (tour.assets ?? []).find((item) => item.id === assetId);
+        if (asset?.stillUrl == null || asset.stillUrl.length === 0) {
+          continue;
+        }
+        const key = cmsMediaObjectKeyFromPublicUrl(tour.id, asset.stillUrl);
+        if (key != null) {
+          stills.push({ key, url: asset.stillUrl });
+        }
+      }
+    }
+    return c.json({ tours, toursList, schedule, siteContent, stills });
+  });
 
   app.post('/api/cms/login', async (c) => {
     await ensureLocalCmsUsersSeeded();
@@ -911,6 +983,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     if (
       c.req.path === '/api/cms/login' ||
       c.req.path === '/api/cms/health' ||
+      c.req.path === '/api/cms/internal/bake' ||
       c.req.path === '/api/cms/crm/inbound'
     ) {
       return next();
@@ -933,7 +1006,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     await next();
   });
 
-  registerSiteContentRoutes(app, { store, env });
+  registerSiteContentRoutes(app, { store, env, storageCircuit });
 
   app.get('/api/cms/me', (c) => {
     const session = c.get('session');
@@ -1351,7 +1424,18 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     });
   });
 
+  function rejectIfStorageOpen(c: { json: (body: { error: string }, status: 503) => Response }): Response | null {
+    if (storageCircuit.state() === 'open') {
+      return c.json({ error: 'storage_unavailable' }, 503);
+    }
+    return null;
+  }
+
   app.post('/api/cms/tours', async (c) => {
+    const blocked = rejectIfStorageOpen(c);
+    if (blocked) {
+      return blocked;
+    }
     const parsed = createTourBodySchema.safeParse(await readJsonBody(c));
     if (!parsed.success) {
       return c.json({ error: 'invalid_body' }, 400);
@@ -1392,6 +1476,10 @@ export function createCmsApiApp(deps: CmsApiDeps) {
   });
 
   app.post('/api/cms/tours/:id/clone', async (c) => {
+    const blocked = rejectIfStorageOpen(c);
+    if (blocked) {
+      return blocked;
+    }
     const sourceId = readTourId(c.req.param('id'));
     if (sourceId == null) {
       return c.json({ error: 'invalid_id' }, 400);
@@ -1442,6 +1530,10 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       }
       if (error instanceof Error && error.message === 'source_media_not_found') {
         return c.json({ error: 'source_media_not_found' }, 422);
+      }
+      if (error instanceof StorageUnavailableError) {
+        storageCircuit.reportFailure?.(error);
+        return c.json({ error: 'storage_unavailable' }, 503);
       }
       throw error;
     }
@@ -1538,6 +1630,10 @@ export function createCmsApiApp(deps: CmsApiDeps) {
   });
 
   app.post('/api/cms/tours/:id/assets', async (c) => {
+    const blocked = rejectIfStorageOpen(c);
+    if (blocked) {
+      return blocked;
+    }
     const tourId = readTourId(c.req.param('id'));
     if (tourId == null) {
       return c.json({ error: 'invalid_id' }, 400);
@@ -1589,17 +1685,24 @@ export function createCmsApiApp(deps: CmsApiDeps) {
 
     const assetId = allocateUploadAssetId(document.assets.map((asset) => asset.id));
     const stillKey = cmsMediaObjectKey(tourId, `${assetId}.${preparedStill.extension}`);
-    await store.putBytes(stillKey, preparedStill.bytes, preparedStill.mimeType);
-
     let videoUrl: string | null = null;
-    if (videoFile != null && videoExt != null) {
-      const videoKey = cmsMediaObjectKey(tourId, `${assetId}.${videoExt}`);
-      await store.putBytes(
-        videoKey,
-        new Uint8Array(await videoFile.arrayBuffer()),
-        videoFile.type || `video/${videoExt}`
-      );
-      videoUrl = publicMediaUrl(env.s3.publicBaseUrl, videoKey);
+    try {
+      await store.putBytes(stillKey, preparedStill.bytes, preparedStill.mimeType);
+      if (videoFile != null && videoExt != null) {
+        const videoKey = cmsMediaObjectKey(tourId, `${assetId}.${videoExt}`);
+        await store.putBytes(
+          videoKey,
+          new Uint8Array(await videoFile.arrayBuffer()),
+          videoFile.type || `video/${videoExt}`
+        );
+        videoUrl = publicMediaUrl(env.s3.publicBaseUrl, videoKey);
+      }
+    } catch (error) {
+      if (error instanceof StorageUnavailableError) {
+        storageCircuit.reportFailure?.(error);
+        return c.json({ error: 'storage_unavailable' }, 503);
+      }
+      throw error;
     }
 
     const alt = typeof form.alt === 'string' ? form.alt.trim() : '';

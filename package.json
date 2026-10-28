@@ -131,6 +131,8 @@
 
     "cms:sync-schedule-dev": "tsx scripts/cms/sync-schedule-dev.ts",
 
+    "cms:seed-json": "tsx scripts/cms/seed-cms-json.ts",
+
     "cms:restore-summer-14": "tsx scripts/cms/restore-summer-14-petrov.ts",
 
     "cms:sync-site-media": "tsx scripts/cms/sync-site-media-from-prod.ts",

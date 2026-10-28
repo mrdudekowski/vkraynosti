@@ -1,3 +1,13 @@
+import type { AdminIncident } from '../resolveAdminIncident';
+
+export type AdminIncidentCopy = {
+  readonly title: string;
+  readonly action: string;
+  readonly cannot: string;
+  readonly can?: string;
+  readonly note?: string;
+};
+
 export const ADMIN_UI = {
   documentTitle: 'Админка Вкрайности',
   skipToContent: 'К содержанию',
@@ -35,7 +45,7 @@ export const ADMIN_UI = {
       note: 'Гости увидят новые тексты сразу, только если копия каталога в облаке жива. Иначе — после выкладки сайта.',
       action: 'Повторить',
     },
-  },
+  } satisfies Record<AdminIncident, AdminIncidentCopy>,
   soon: 'скоро',
   moveUp: 'Выше',
   moveDown: 'Ниже',

@@ -1,4 +1,4 @@
-import { ADMIN_UI } from '../constants/ui';
+import { ADMIN_UI, type AdminIncidentCopy } from '../constants/ui';
 import type { AdminIncident } from '../resolveAdminIncident';
 import AdminButton from './AdminButton';
 import AdminDialog from './AdminDialog';
@@ -10,7 +10,7 @@ type AdminIncidentDialogProps = {
 };
 
 const AdminIncidentDialog = ({ incident, onClose, onRetry }: AdminIncidentDialogProps) => {
-  const copy = ADMIN_UI.incident[incident];
+  const copy: AdminIncidentCopy = ADMIN_UI.incident[incident];
   const dismissible = incident === 'media_down';
   const titleId = 'admin-incident-dialog-title';
 

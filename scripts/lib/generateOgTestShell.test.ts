@@ -1,3 +1,4 @@
+/** @vitest-environment node */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -32,5 +33,25 @@ describe('generateStaticOgTestPage', () => {
 
     const html = await readFile(join(distDir, 'og-test', 'index.html'), 'utf8');
     expect(html).toContain('og-cover-prod.jpg');
+  });
+
+  it('copies repo-root og-cover-prod.jpg when public banners are absent', async () => {
+    const rootDir = await mkdtemp(join(tmpdir(), 'vkraynosti-og-root-'));
+    const distDir = await mkdtemp(join(tmpdir(), 'vkraynosti-og-dist-'));
+    tempDirectories.push(rootDir, distDir);
+    await writeFile(join(rootDir, 'og-cover-prod.jpg'), Buffer.from([0xff, 0xd8, 0xff, 0xd9]));
+
+    await generateStaticOgTestPage(distDir, rootDir, {
+      route: '/og-test',
+      distDirName: 'og-test',
+      imageLogical: 'og-test/cover.jpg',
+      sourceLogical: 'og-test/cover.jpg',
+      title: 'OG Test',
+      description: 'OG test page',
+      bodyText: 'OG Test',
+    });
+
+    const html = await readFile(join(distDir, 'og-test', 'index.html'), 'utf8');
+    expect(html).toContain('og-test/cover.jpg');
   });
 });

@@ -1,6 +1,6 @@
 # TimeWeb App Platform: shrink Docker build context for web-vkr.
 # Tour/team/banner/safety media load from S3 (VITE_PUBLIC_ASSET_BASE_URL).
-# Keep public/fonts/, public/data/, favicon, og, robots, sitemap, 404.html.
+# Keep public/fonts/, public/data/, og-cover-prod.jpg, favicon, og, robots, sitemap, 404.html.
 
 # S3/CDN scope (mirrors scripts/lib/pruneDistForCdn.ts + s3SyncScope)
 public/tours/

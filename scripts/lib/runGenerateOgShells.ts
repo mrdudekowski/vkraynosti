@@ -11,7 +11,7 @@ import {
   collectOgShellImageSources,
   collectOgShellSourceUrls,
   copyOgShellAssets,
-  OG_SHELL_FALLBACK_SOURCE_LOGICAL,
+  resolveOgShellFallbackSourcePath,
   resolveOgShellImageForMeta,
   writeOgShellAssetManifest,
 } from './copyOgShellAssets.ts';
@@ -25,7 +25,7 @@ import { routePathToDistFile } from './seoRoutes.mjs';
 import { OG_FALLBACK_JPEG_LOGICAL } from './ogShellTelegramImage.ts';
 import { loadBuildCmsToursFile } from './loadBuildCmsTours.ts';
 import { cmsDocumentToSiteTour } from '../../src/cms/cmsDocumentToSiteTour.ts';
-import { loadPublishedSiteContent } from '../../src/cms/loadSiteContent.ts';
+import { loadBuildPublishedSiteContent } from './loadBuildSiteContent.ts';
 import { resolveOgShellLogicalImagePath } from '../../src/constants/seo.ts';
 
 const rootDir = process.cwd();
@@ -46,17 +46,19 @@ export async function runGenerateOgShells(): Promise<void> {
 
   const fallbackJpegSource = resolve(rootDir, OG_FALLBACK_JPEG_LOGICAL);
   const fallbackJpegPath = resolve(distDir, OG_FALLBACK_JPEG_LOGICAL);
+  const localOgFallback = resolveOgShellFallbackSourcePath(rootDir);
   await mkdir(dirname(fallbackJpegPath), { recursive: true });
-  await copyFile(
-    existsSync(fallbackJpegSource)
-      ? fallbackJpegSource
-      : resolve(rootDir, 'public', OG_SHELL_FALLBACK_SOURCE_LOGICAL),
-    fallbackJpegPath,
-  );
+  const jpegSource = existsSync(fallbackJpegSource)
+    ? fallbackJpegSource
+    : localOgFallback;
+  if (jpegSource == null) {
+    throw new Error('OG shell fallback JPEG is missing from the build context');
+  }
+  await copyFile(jpegSource, fallbackJpegPath);
 
   const [cmsTours, siteSeoDocument] = await Promise.all([
     loadBuildCmsToursFile(rootDir),
-    loadPublishedSiteContent('seo'),
+    loadBuildPublishedSiteContent('seo', rootDir),
   ]);
   const routes = await getRenderableRoutePaths(rootDir, cmsTours?.tours);
   const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours?.tours);

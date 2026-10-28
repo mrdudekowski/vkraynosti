@@ -99,6 +99,14 @@ export const stripOgShellMetaFromHead = (html: string): string =>
     .replace(/<meta\b[^>]*\bproperty="og:[^"]+"[^>]*>\s*/gi, '')
     .replace(/<meta\b[^>]*\bname="twitter:[^"]+"[^>]*>\s*/gi, '');
 
+const insertShellAtStartOfHead = (html: string, shell: string): string => {
+  const charset = /<meta\s+charset=["'][^"']+["']\s*\/?>/i;
+  if (charset.test(html)) {
+    return html.replace(charset, (match) => `${match}\n${shell}`);
+  }
+  return html.replace(/<head[^>]*>/i, (match) => `${match}\n${shell}`);
+};
+
 export const injectOgShellIntoHtml = (templateHtml: string, meta: OgShellMeta): string => {
   const normalizedMeta: OgShellMeta = {
     ...meta,
@@ -117,5 +125,5 @@ export const injectOgShellIntoHtml = (templateHtml: string, meta: OgShellMeta): 
   if (isTimewebAppBuild()) {
     html = stripGithubPagesSpaRedirectScript(html);
   }
-  return html.replace('</head>', `${renderOgShellHead(normalizedMeta)}\n  </head>`);
+  return insertShellAtStartOfHead(html, renderOgShellHead(normalizedMeta));
 };

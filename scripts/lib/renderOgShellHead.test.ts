@@ -25,6 +25,15 @@ const sampleMeta: OgShellMeta = {
 };
 
 describe('injectOgShellIntoHtml idempotency', () => {
+  it('places the social tags before a large head script', () => {
+    const html = injectOgShellIntoHtml(
+      `<!doctype html><html><head><meta charset="UTF-8" /><script type="application/json">{"events":[]}</script></head><body></body></html>`,
+      sampleMeta,
+    );
+    expect(html.indexOf('property="og:title"')).toBeGreaterThan(0);
+    expect(html.indexOf('property="og:title"')).toBeLessThan(html.indexOf('application/json'));
+  });
+
   it('does not duplicate OG tags when injected twice', () => {
     const once = injectOgShellIntoHtml(templateHtml, sampleMeta);
     const twice = injectOgShellIntoHtml(once, sampleMeta);

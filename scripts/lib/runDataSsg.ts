@@ -11,7 +11,7 @@ import { resolveDataSsgForRoute } from './renderDataSsgBody.ts';
 import { runTelegramSpaShells } from './runTelegramSpaShells.ts';
 import { loadBuildCmsToursFile } from './loadBuildCmsTours.ts';
 import { cmsDocumentToSiteTour } from '../../src/cms/cmsDocumentToSiteTour.ts';
-import { loadPublishedSiteContent } from '../../src/cms/loadSiteContent.ts';
+import { loadBuildPublishedSiteContent } from './loadBuildSiteContent.ts';
 import type { SiteSeoDocument } from '../../src/cms/siteSeoDocument.ts';
 
 const rootDir = process.cwd();
@@ -33,7 +33,7 @@ export async function runDataSsg(): Promise<void> {
   const tourScheduleBootstrapJson = serializeJsonForScriptTag(bootstrapPayload);
   const [cmsTours, siteSeoDocument] = await Promise.all([
     loadBuildCmsToursFile(rootDir),
-    loadPublishedSiteContent('seo'),
+    loadBuildPublishedSiteContent('seo', rootDir),
   ]);
   const routes = await getRenderableRoutePaths(rootDir, cmsTours?.tours);
   const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours?.tours);

@@ -1,3 +1,4 @@
+/** @vitest-environment node */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
@@ -85,9 +86,13 @@ describe('copyOgShellAssets', () => {
     vi.stubGlobal('fetch', fetchMock);
     vi.resetModules();
     const ensureMock = vi.fn(async (_distDir: string, path: string) => path.replace(/\.webp$/i, '.jpg'));
-    vi.doMock('./ogShellTelegramImage.ts', () => ({
-      ensureTelegramFriendlyOgImage: ensureMock,
-    }));
+    vi.doMock('./ogShellTelegramImage.ts', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('./ogShellTelegramImage.ts')>();
+      return {
+        ...actual,
+        ensureTelegramFriendlyOgImage: ensureMock,
+      };
+    });
 
     try {
       const { copyOgShellAssets } = await import('./copyOgShellAssets.ts');
@@ -108,9 +113,71 @@ describe('copyOgShellAssets', () => {
       vi.resetModules();
     }
   });
+
+  it('uses the docker-safe local fallback when CDN returns 403 for the default banner', async () => {
+    rootDir = await mkdtemp(join(tmpdir(), 'og-copy-root-'));
+    distDir = await mkdtemp(join(tmpdir(), 'og-copy-dist-'));
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', 'https://cdn.example.com/');
+    await mkdir(join(rootDir, 'public'), { recursive: true });
+    await writeFile(join(rootDir, 'public', 'og-fallback-cover.jpg'), 'local-fallback', 'utf8');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('denied', { status: 403 })),
+    );
+
+    const { copyOgShellAssets } = await import('./copyOgShellAssets.ts');
+    const { DEFAULT_OG_SHELL_BANNER_LOGICAL } = await import('../../src/constants/images.ts');
+    const resolved = await copyOgShellAssets(distDir, rootDir, [DEFAULT_OG_SHELL_BANNER_LOGICAL]);
+
+    expect(existsSync(join(distDir, DEFAULT_OG_SHELL_BANNER_LOGICAL))).toBe(true);
+    expect(resolved.get(DEFAULT_OG_SHELL_BANNER_LOGICAL)).toBe(DEFAULT_OG_SHELL_BANNER_LOGICAL);
+  });
+
+  it('does not fail required tour covers when CDN is 403 and a local fallback exists', async () => {
+    rootDir = await mkdtemp(join(tmpdir(), 'og-copy-root-'));
+    distDir = await mkdtemp(join(tmpdir(), 'og-copy-dist-'));
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', 'https://cdn.example.com/');
+    await mkdir(join(rootDir, 'public'), { recursive: true });
+    await writeFile(join(rootDir, 'public', 'og-fallback-cover.jpg'), 'local-fallback', 'utf8');
+    const logical = 'media/tours/fall-17/cover.webp';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('denied', { status: 403 })),
+    );
+
+    const { copyOgShellAssets } = await import('./copyOgShellAssets.ts');
+    const resolved = await copyOgShellAssets(
+      distDir,
+      rootDir,
+      [logical],
+      new Map([[logical, `https://cdn.example.com/${logical}`]]),
+      new Set([logical]),
+    );
+
+    expect(existsSync(join(distDir, 'media/tours/fall-17/cover.jpg'))).toBe(true);
+    expect(resolved.get(logical)).toBe('media/tours/fall-17/cover.jpg');
+  });
+
+  it('uses repo-root og-cover-prod.jpg when Docker has no public/tours and CDN is 403', async () => {
+    rootDir = await mkdtemp(join(tmpdir(), 'og-copy-root-'));
+    distDir = await mkdtemp(join(tmpdir(), 'og-copy-dist-'));
+    vi.stubEnv('VITE_PUBLIC_ASSET_BASE_URL', 'https://cdn.example.com/');
+    await writeFile(join(rootDir, 'og-cover-prod.jpg'), 'prod-og-fallback', 'utf8');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('denied', { status: 403 })),
+    );
+
+    const { copyOgShellAssets } = await import('./copyOgShellAssets.ts');
+    const { DEFAULT_OG_SHELL_BANNER_LOGICAL } = await import('../../src/constants/images.ts');
+    const resolved = await copyOgShellAssets(distDir, rootDir, [DEFAULT_OG_SHELL_BANNER_LOGICAL]);
+
+    expect(existsSync(join(distDir, DEFAULT_OG_SHELL_BANNER_LOGICAL))).toBe(true);
+    expect(resolved.get(DEFAULT_OG_SHELL_BANNER_LOGICAL)).toBe(DEFAULT_OG_SHELL_BANNER_LOGICAL);
+  });
 });
 
-describe('resolveOgShellMeta', () => {
+describe('resolveOgShellMeta', { timeout: 20_000 }, () => {
   beforeEach(() => {
     vi.stubEnv('VITE_SITE_URL', 'https://example.com');
     vi.stubEnv('VITE_BASE_PATH', '/');

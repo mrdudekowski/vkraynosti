@@ -3,10 +3,29 @@ import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { DEFAULT_OG_SHELL_BANNER_LOGICAL } from '../../src/constants/images.ts';
 import { resolveOgShellLogicalImagePath } from '../../src/constants/seo.ts';
-import { ensureTelegramFriendlyOgImage } from './ogShellTelegramImage.ts';
+import { ensureTelegramFriendlyOgImage, OG_FALLBACK_JPEG_LOGICAL } from './ogShellTelegramImage.ts';
 
 export const OG_SHELL_ASSET_MANIFEST = '.og-shell-assets.json' as const;
 export const OG_SHELL_FALLBACK_SOURCE_LOGICAL = 'tours/fall-13/cover.jpg' as const;
+export const OG_SHELL_DOCKER_FALLBACK_LOGICAL = 'og-fallback-cover.jpg' as const;
+
+export function resolveOgShellFallbackSourcePath(rootDir: string): string | null {
+  const candidates = [
+    resolve(rootDir, OG_FALLBACK_JPEG_LOGICAL),
+    resolve(rootDir, 'public', OG_SHELL_DOCKER_FALLBACK_LOGICAL),
+    resolve(rootDir, 'public', OG_SHELL_FALLBACK_SOURCE_LOGICAL),
+  ];
+  for (const sourcePath of candidates) {
+    if (existsSync(sourcePath)) {
+      return sourcePath;
+    }
+  }
+  return null;
+}
+
+function jpegLogicalPath(logical: string): string {
+  return logical.replace(/\.(webp|png|jpe?g)$/i, '.jpg');
+}
 
 const ensureOgImage = (distDir: string, logical: string, requiredTourCover: boolean): Promise<string> =>
   ensureTelegramFriendlyOgImage(distDir, logical, requiredTourCover ? null : undefined);
@@ -69,6 +88,18 @@ async function copyLocalAsset(sourcePath: string, targetPath: string, logical: s
   process.stdout.write(`[og-asset] copied ${logical}\n`);
 }
 
+async function copyLocalJpgFallback(
+  distDir: string,
+  logical: string,
+  fallbackSourcePath: string,
+): Promise<string> {
+  const jpegLogical = jpegLogicalPath(logical);
+  const targetPath = resolve(distDir, jpegLogical);
+  await mkdir(dirname(targetPath), { recursive: true });
+  await copyLocalAsset(fallbackSourcePath, targetPath, jpegLogical);
+  return jpegLogical;
+}
+
 async function fetchRemoteAsset(url: string, targetPath: string, logical: string): Promise<void> {
   await fetchCdnAsset(url, targetPath);
   process.stdout.write(`[og-asset] fetched ${logical} from CDN\n`);
@@ -90,12 +121,9 @@ async function materializeOgShellAsset(
     return ensureOgImage(distDir, logical, requiredTourCover);
   }
 
-  if (logical === DEFAULT_OG_SHELL_BANNER_LOGICAL) {
-    const fallbackSourcePath = resolve(rootDir, 'public', OG_SHELL_FALLBACK_SOURCE_LOGICAL);
-    if (existsSync(fallbackSourcePath)) {
-      await copyLocalAsset(fallbackSourcePath, targetPath, logical);
-      return logical;
-    }
+  const localFallback = resolveOgShellFallbackSourcePath(rootDir);
+  if (logical === DEFAULT_OG_SHELL_BANNER_LOGICAL && localFallback != null) {
+    return copyLocalJpgFallback(distDir, logical, localFallback);
   }
 
   const cdnUrl = sourceUrl ?? buildCdnAssetUrl(logical);
@@ -104,6 +132,12 @@ async function materializeOgShellAsset(
       await fetchRemoteAsset(cdnUrl, targetPath, logical);
       return ensureOgImage(distDir, logical, requiredTourCover);
     } catch (error) {
+      if (localFallback != null) {
+        process.stdout.write(
+          `[og-asset] warn: ${logical} unavailable (${error instanceof Error ? error.message : String(error)}), using local fallback\n`,
+        );
+        return copyLocalJpgFallback(distDir, logical, localFallback);
+      }
       if (requiredTourCover) {
         throw new Error(
           `Required tour cover unavailable (${logical}): ${error instanceof Error ? error.message : String(error)}`,
@@ -119,6 +153,13 @@ async function materializeOgShellAsset(
       );
       return materializeOgShellAsset(distDir, rootDir, DEFAULT_OG_SHELL_BANNER_LOGICAL);
     }
+  }
+
+  if (localFallback != null) {
+    process.stdout.write(
+      `[og-asset] warn: ${logical} unavailable (CDN is unset), using local fallback\n`,
+    );
+    return copyLocalJpgFallback(distDir, logical, localFallback);
   }
 
   if (logical !== DEFAULT_OG_SHELL_BANNER_LOGICAL) {

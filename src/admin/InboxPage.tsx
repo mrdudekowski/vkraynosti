@@ -76,11 +76,14 @@ function canPublishItem(session: AdminSession, item: AdminPublishQueueItem): boo
   return item.kind === 'tour' ? session.canPublishTours : session.canPublishSchedule;
 }
 
-function queuePayload(items: readonly AdminPublishQueueItem[]): {
+type PublishPayload = {
   tourIds: string[];
   departureIds: string[];
   tourRevs: Record<string, number>;
-} {
+  seoRev?: number | null;
+};
+
+function queuePayload(items: readonly AdminPublishQueueItem[]): PublishPayload {
   const tours = items.filter((item) => item.kind === 'tour');
   return {
     tourIds: tours.map((item) => item.id),
@@ -109,12 +112,7 @@ const InboxPage = () => {
   const [returnFor, setReturnFor] = useState<AdminPublishQueueItem[] | null>(null);
   const [returnReason, setReturnReason] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
-  const [hideConfirmPayload, setHideConfirmPayload] = useState<{
-    tourIds: string[];
-    departureIds: string[];
-    tourRevs: Record<string, number>;
-    seoRev: number | null;
-  } | null>(null);
+  const [hideConfirmPayload, setHideConfirmPayload] = useState<PublishPayload | null>(null);
   const [query, setQuery] = useState('');
   const [author, setAuthor] = useState<string>(INBOX_AUTHOR_ALL);
   const [readiness, setReadiness] = useState<InboxReadinessFilter>('all');
@@ -195,12 +193,7 @@ const InboxPage = () => {
   };
 
   const runPayload = (
-    payload: {
-      tourIds: string[];
-      departureIds: string[];
-      tourRevs: Record<string, number>;
-      seoRev: number | null;
-    },
+    payload: PublishPayload,
     confirmDeleteFutureDepartures = false,
   ) => {
     setBusy(true);

@@ -15,6 +15,8 @@ describe('injectDataSsgIntoHtml', () => {
     expect(html).toContain('id="tour-schedule-bootstrap"');
     expect(html).toContain('"spring-1":"active"');
     expect(html).toContain('application/ld+json');
+    expect(html).toContain('type="application/ld+json" data-seo-shell="true"');
+    expect(html).not.toMatch(/id="tour-schedule-bootstrap"[^>]*data-seo-shell/);
     expect(html.indexOf('tour-schedule-bootstrap')).toBeLessThan(html.indexOf('application/ld+json'));
   });
 });

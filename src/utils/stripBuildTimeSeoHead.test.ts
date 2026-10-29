@@ -43,4 +43,22 @@ describe('stripBuildTimeSeoHead', () => {
       'https://vkraynosti.ru/banners_fall/fall.jpg',
     );
   });
+
+  it('drops the build-time JSON-LD script and keeps the Helmet copy', () => {
+    document.head.insertAdjacentHTML(
+      'beforeend',
+      `
+      <script type="application/ld+json" data-seo-shell="true">{"@type":"WebSite","name":"shell"}</script>
+      <script type="application/ld+json">{"@type":"WebSite","name":"live"}</script>
+      <script type="application/json" id="tour-schedule-bootstrap">{}</script>
+      `,
+    );
+
+    stripBuildTimeSeoHead();
+
+    const schemas = [...document.head.querySelectorAll('script[type="application/ld+json"]')];
+    expect(schemas).toHaveLength(1);
+    expect(schemas[0]?.textContent).toContain('"name":"live"');
+    expect(document.head.querySelector('#tour-schedule-bootstrap')).not.toBeNull();
+  });
 });

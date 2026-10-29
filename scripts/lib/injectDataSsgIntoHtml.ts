@@ -1,3 +1,5 @@
+import { SEO_SHELL_TAG_ATTRIBUTE } from '../../src/constants/seo.ts';
+
 /** Inject data-SSG body into the SPA shell and append JSON-LD to `<head>`. */
 export function injectDataSsgIntoHtml(
   templateHtml: string,
@@ -30,7 +32,10 @@ export function injectDataSsgIntoHtml(
     structuredData.length === 0
       ? ''
       : structuredData
-          .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`)
+          .map(
+            (schema) =>
+              `<script type="application/ld+json" ${SEO_SHELL_TAG_ATTRIBUTE}="true">${JSON.stringify(schema)}</script>`,
+          )
           .join('\n      ');
 
   const headInjection = `${bootstrapBlock}${jsonLdBlock}`;

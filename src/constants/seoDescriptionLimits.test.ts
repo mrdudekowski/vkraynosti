@@ -65,4 +65,11 @@ describe('SEO_DEFAULTS paths', () => {
     expect(SEO_DEFAULTS.safety.robots).toBe('index,follow');
     expect(SEO_DEFAULTS.privacy.robots).toBe('noindex,nofollow');
   });
+
+  it('keeps the safety snippet in the search result band', () => {
+    expect(SEO_DEFAULTS.safety.title.length).toBeGreaterThanOrEqual(50);
+    expect(SEO_DEFAULTS.safety.title.length).toBeLessThanOrEqual(60);
+    expect(SEO_DEFAULTS.safety.description.length).toBeGreaterThanOrEqual(150);
+    expect(SEO_DEFAULTS.safety.description.length).toBeLessThanOrEqual(160);
+  });
 });

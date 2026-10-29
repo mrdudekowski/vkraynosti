@@ -22,6 +22,7 @@ import type { CmsApiEnv } from './env.ts';
 import { prepareCmsImageUpload } from './heic.ts';
 import type { CmsSession } from './session.ts';
 import type { StorageCircuit } from './storageCircuit.ts';
+import { sameStoredJson } from './publishedStoreSync.ts';
 import type { CmsJsonStore } from './store.ts';
 
 type SiteContentEnv = { Variables: { session: CmsSession } };
@@ -56,19 +57,24 @@ async function loadDraft(
   kind: SiteContentDocumentKind,
   editor: string,
 ): Promise<{ document: SiteContentDocument; meta: CmsTourMeta }> {
-  const seeded = seedSiteContentDocuments()[kind];
-  const rawDocument = await store.getJson(siteContentDraftKey(kind));
-  if (rawDocument == null) {
-    const document = parseSiteContentDocument(kind, seeded);
-    const meta = createCmsTourMeta({ editor });
-    await store.putJson(siteContentDraftKey(kind), document);
-    await store.putJson(siteContentDraftMetaKey(kind), meta);
-    return { document, meta };
-  }
-  const document = parseSiteContentDocument(kind, rawDocument);
+  const seededDocument = parseSiteContentDocument(kind, seedSiteContentDocuments()[kind]);
+  const rawPublished = await store.getJson(siteContentPublishedKey(kind));
+  const published = rawPublished == null ? null : parseSiteContentDocument(kind, rawPublished);
+  const rawDraft = await store.getJson(siteContentDraftKey(kind));
   const rawMeta = await store.getJson(siteContentDraftMetaKey(kind));
   const meta = rawMeta == null ? createCmsTourMeta({ editor }) : parseCmsTourMeta(rawMeta);
-  return { document, meta };
+  const draft = rawDraft == null ? null : parseSiteContentDocument(kind, rawDraft);
+  const draftIsCodeSeed = draft != null && sameStoredJson(draft, seededDocument);
+  const publishedIsLive = published != null && !sameStoredJson(published, seededDocument);
+  if (draft == null || (draftIsCodeSeed && publishedIsLive)) {
+    const document = published ?? seededDocument;
+    await store.putJson(siteContentDraftKey(kind), document);
+    if (rawMeta == null) {
+      await store.putJson(siteContentDraftMetaKey(kind), meta);
+    }
+    return { document, meta };
+  }
+  return { document: draft, meta };
 }
 
 function invalidKind(context: SiteContentContext): Response {

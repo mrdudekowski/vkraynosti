@@ -10,7 +10,10 @@ import { createCmsApiApp, loadTourDocumentForDepartureWrite } from './app.ts';
 import { createDepartureRepository } from './schedule/departureRepository.ts';
 import { createStorageCircuit } from './storageCircuit.ts';
 import { probeCatalogMirrorNow, runStorageBootProbes } from './storageBootProbe.ts';
-import { createCmsJsonStore } from './store.ts';
+import { createPostgresJsonStore } from './postgresJsonStore.ts';
+import { setPublishedSyncState } from './publishedSyncState.ts';
+import { reconcilePublishedJson } from './publishedStoreSync.ts';
+import { createCmsJsonStore, createS3JsonStore } from './store.ts';
 
 const rootDir = process.cwd();
 const env = await loadCmsApiEnv(rootDir);
@@ -24,6 +27,21 @@ const database = createDatabase(
       process.env.DATABASE_MAX_CONNECTIONS ?? fileEnv.DATABASE_MAX_CONNECTIONS,
   })
 );
+const publishedMirror =
+  env.jsonStoreKind === 'postgres' && env.storeKind === 's3' ? createS3JsonStore(env.s3) : null;
+if (publishedMirror == null) {
+  setPublishedSyncState('match');
+} else {
+  try {
+    const report = await reconcilePublishedJson(createPostgresJsonStore(database.db), publishedMirror);
+    const drifted = report.filter((row) => row.status === 'differ').length;
+    const repaired = report.filter((row) => row.repaired).length;
+    console.info(`CMS published sync: ${report.length} keys, drift ${drifted}, repaired ${repaired}`);
+  } catch (error) {
+    setPublishedSyncState('unknown');
+    console.error('CMS published sync failed', error);
+  }
+}
 const store = createCmsJsonStore(env, database.db);
 const storageCircuit = createStorageCircuit(
   async () => {
@@ -47,6 +65,7 @@ const app = createCmsApiApp({
   probeJsonStore: async () => {
     await store.getJson(CMS_PUBLISHED_CATALOG_KEY);
   },
+  publishedMirror,
 });
 
 serve(

@@ -20,7 +20,23 @@ export function createPublishedJsonMirror(
   };
 
   return {
-    getJson: (key) => primary.getJson(key),
+    async getJson(key) {
+      const primaryValue = await primary.getJson(key);
+      if (primaryValue != null || !isPublishedCatalogKey(key)) {
+        return primaryValue;
+      }
+      try {
+        const mirrored = await mirror.getJson(key);
+        if (mirrored != null) {
+          await primary.putJson(key, mirrored);
+          setCatalogMirrorState('up');
+        }
+        return mirrored;
+      } catch (error) {
+        reportMirrorFailure(error);
+        return null;
+      }
+    },
     async putJson(key, value) {
       await primary.putJson(key, value);
       if (!isPublishedCatalogKey(key)) {

@@ -153,6 +153,61 @@ describe('site content routes', () => {
     expect(stored?.body).toEqual(new Uint8Array([255, 216, 255, 224]));
   });
 
+  it('opens a missing draft from the published document instead of the code seed', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const seeded = seedSiteContentDocuments().seo;
+    const published = {
+      ...seeded,
+      pages: seeded.pages.map((page) => page.key === 'home' ? { ...page, title: 'Уже на сайте' } : page),
+    };
+    await store.putJson(siteContentPublishedKey('seo'), published);
+
+    const response = await app.request('/api/cms/site-content/seo');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { document: { pages: Array<{ key: string; title: string }> } };
+    expect(body.document.pages.find((page) => page.key === 'home')?.title).toBe('Уже на сайте');
+    expect(await store.getJson(siteContentDraftKey('seo'))).toMatchObject({
+      pages: expect.arrayContaining([expect.objectContaining({ key: 'home', title: 'Уже на сайте' })]),
+    });
+  });
+
+  it('keeps an edited draft when the published document is different', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const seeded = seedSiteContentDocuments().seo;
+    const edited = {
+      ...seeded,
+      pages: seeded.pages.map((page) => page.key === 'home' ? { ...page, title: 'Черновик редактора' } : page),
+    };
+    const published = {
+      ...seeded,
+      pages: seeded.pages.map((page) => page.key === 'home' ? { ...page, title: 'На сайте' } : page),
+    };
+    await store.putJson(siteContentDraftKey('seo'), edited);
+    await store.putJson(siteContentPublishedKey('seo'), published);
+
+    const response = await app.request('/api/cms/site-content/seo');
+
+    const body = await response.json() as { document: { pages: Array<{ key: string; title: string }> } };
+    expect(body.document.pages.find((page) => page.key === 'home')?.title).toBe('Черновик редактора');
+  });
+
+  it('replaces a draft that is still the code seed when the published document differs', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const seeded = seedSiteContentDocuments().seo;
+    const published = {
+      ...seeded,
+      pages: seeded.pages.map((page) => page.key === 'home' ? { ...page, title: 'Опубликованный заголовок' } : page),
+    };
+    await store.putJson(siteContentDraftKey('seo'), seeded);
+    await store.putJson(siteContentPublishedKey('seo'), published);
+
+    const response = await app.request('/api/cms/site-content/seo');
+
+    const body = await response.json() as { document: { pages: Array<{ key: string; title: string }> } };
+    expect(body.document.pages.find((page) => page.key === 'home')?.title).toBe('Опубликованный заголовок');
+  });
+
   it('rejects site-content assets while storage is open', async () => {
     const app = new Hono<{ Variables: { session: CmsSession } }>();
     app.use('*', async (c, next) => {

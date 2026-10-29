@@ -88,6 +88,8 @@ import {
 import type { CmsJsonStore } from './store.ts';
 import { createStorageCircuit, type StorageCircuit } from './storageCircuit.ts';
 import { getCatalogMirrorState } from './catalogMirrorState.ts';
+import { getPublishedSyncState } from './publishedSyncState.ts';
+import { comparePublishedJson } from './publishedStoreSync.ts';
 import { StorageUnavailableError } from './storageUnavailable.ts';
 import { CmsLastAdminError, type AuthRepository, type UserRecord } from './auth/authRepository.ts';
 import { registerCrmRoutes } from './crmRoutes.ts';
@@ -262,6 +264,7 @@ export type CmsApiDeps = {
   storageCircuit?: Pick<StorageCircuit, 'state'> & Partial<Pick<StorageCircuit, 'guardBytes' | 'reportFailure' | 'reportSuccess'>>;
   probePostgres?: () => Promise<void>;
   probeJsonStore?: () => Promise<void>;
+  publishedMirror?: Pick<CmsJsonStore, 'getJson'> | null;
 };
 
 function publicAuthUsers(records: UserRecord[]): Array<{
@@ -930,6 +933,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       jsonStore,
       storage: storageCircuit.state(),
       catalogMirror: getCatalogMirrorState(),
+      publishedSync: getPublishedSyncState(),
     });
   });
 
@@ -1086,6 +1090,19 @@ export function createCmsApiApp(deps: CmsApiDeps) {
   });
 
   registerSiteContentRoutes(app, { store, env, storageCircuit });
+
+  app.get('/api/cms/storage-sync', async (c) => {
+    const session = c.get('session');
+    if (session.role !== 'admin') {
+      return c.json({ error: 'forbidden' }, 403);
+    }
+    const mirror = deps.publishedMirror;
+    if (mirror == null) {
+      return c.json({ publishedSync: getPublishedSyncState(), rows: [] });
+    }
+    const rows = await comparePublishedJson(store, mirror);
+    return c.json({ publishedSync: getPublishedSyncState(), rows });
+  });
 
   app.get('/api/cms/me', (c) => {
     const session = c.get('session');

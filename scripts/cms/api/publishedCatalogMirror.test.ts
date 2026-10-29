@@ -63,6 +63,24 @@ describe('createPublishedJsonMirror', () => {
     expect(await mirror.getJson('draft/tours/fall-1/document.json')).toEqual({ id: 'fall-1' });
   });
 
+  it('copies a published object from the mirror when the primary is empty', async () => {
+    const primary = createMemoryJsonStore();
+    const mirror = createMemoryJsonStore({ 'published/site-seo/document.json': { title: 'С сайта' } });
+    const store = createPublishedJsonMirror(primary, mirror);
+
+    expect(await store.getJson('published/site-seo/document.json')).toEqual({ title: 'С сайта' });
+    expect(await primary.getJson('published/site-seo/document.json')).toEqual({ title: 'С сайта' });
+  });
+
+  it('does not copy a draft from the mirror when the primary draft is empty', async () => {
+    const primary = createMemoryJsonStore();
+    const mirror = createMemoryJsonStore({ 'draft/site-seo/document.json': { title: 'Черновик' } });
+    const store = createPublishedJsonMirror(primary, mirror);
+
+    expect(await store.getJson('draft/site-seo/document.json')).toBeNull();
+    expect(await primary.getJson('draft/site-seo/document.json')).toBeNull();
+  });
+
   it('getJson always reads from primary', async () => {
     const primary = createMemoryJsonStore({ 'published/tours.json': { from: 'primary' } });
     const mirror = createMemoryJsonStore({ 'published/tours.json': { from: 'mirror' } });

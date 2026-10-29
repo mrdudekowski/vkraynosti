@@ -36,6 +36,19 @@ describe('sanitizeTimeweb404Html', () => {
     const html = `<head><script>// GitHub Pages SPA redirect: encode</script></head>`;
     expect(sanitizeTimeweb404Html(html, { VITE_BASE_PATH: '/vkraynosti/' })).toContain('SPA redirect');
   });
+
+  it('points the production 404 home link at the site root', () => {
+    const html = '<link rel="icon" href="/vkraynosti/flavicon-light.png" /><p><a href="/vkraynosti/">Вернуться на главную</a></p>';
+    const sanitized = sanitizeTimeweb404Html(html, { VITE_BASE_PATH: '/' });
+    expect(sanitized).toContain('href="/"');
+    expect(sanitized).toContain('href="/flavicon-light.png"');
+    expect(sanitized).not.toContain('/vkraynosti/');
+  });
+
+  it('keeps the GitHub Pages home link on the pages build', () => {
+    const html = '<p><a href="/vkraynosti/">Вернуться на главную</a></p>';
+    expect(sanitizeTimeweb404Html(html, { VITE_BASE_PATH: '/vkraynosti/' })).toContain('href="/vkraynosti/"');
+  });
 });
 
 describe('isTimewebAppBuild', () => {

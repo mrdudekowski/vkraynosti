@@ -26,6 +26,8 @@ export interface OgShellMeta {
   imagePathOrUrl: string;
   keywords?: string[];
   includeSocialMetadata?: boolean;
+  /** Static 404 has no single URL, so it must not canonicalize to the homepage. */
+  omitCanonical?: boolean;
 }
 
 export type OgShellOverrides = { toursById?: ReadonlyMap<string, Tour>; siteSeo?: SiteSeoDocument | null };

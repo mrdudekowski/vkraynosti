@@ -31,7 +31,9 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
   const description = shellText(meta.description);
   const keywords = meta.keywords?.length ? `<meta name="keywords" content="${escapeHtml(meta.keywords.join(', '))}" />` : '';
   const robots = escapeHtml(meta.robots);
-  const canonicalUrl = escapeHtml(getCanonicalUrl(meta.canonicalPath ?? meta.path));
+  const canonicalUrl = meta.omitCanonical
+    ? ''
+    : escapeHtml(getCanonicalUrl(meta.canonicalPath ?? meta.path));
   const includeSocialMetadata = meta.includeSocialMetadata !== false;
   const ogImage = includeSocialMetadata
     ? escapeHtml(getOgShellAbsoluteImageUrl(meta.imagePathOrUrl))
@@ -66,7 +68,7 @@ export const renderOgShellHead = (meta: OgShellMeta): string => {
   return `
       <meta name="description" content="${description}" />
       <meta name="robots" content="${robots}" />
-      <link rel="canonical" href="${canonicalUrl}" />
+      ${canonicalUrl ? `<link rel="canonical" href="${canonicalUrl}" />` : ''}
       ${socialTags}${keywords}`.replace(
     /<(meta|link)\b([^>]*?)(\s*\/)?>/g,
     `<$1$2 ${SEO_SHELL_TAG_ATTRIBUTE}="true"$3>`,

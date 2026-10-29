@@ -35,16 +35,18 @@ export async function patch404OgShell(distDir: string): Promise<void> {
     basePath === '/' ? '/apple-touch-icon.png' : `${basePath}apple-touch-icon.png`;
 
   const meta: OgShellMeta = {
-    title: SEO_DEFAULTS.home.title,
-    description: SEO_DEFAULTS.home.description,
-    path: SEO_DEFAULTS.home.path,
+    title: SEO_DEFAULTS.notFound.title,
+    description: SEO_DEFAULTS.notFound.description,
+    path: SEO_DEFAULTS.notFound.path,
     robots: 'noindex,nofollow',
     imagePathOrUrl: DEFAULT_OG_SHELL_BANNER_LOGICAL.replace(/\.webp$/i, '.jpg'),
+    includeSocialMetadata: false,
+    omitCanonical: true,
   };
 
   let patched = html.replace(
     /<title>[\s\S]*?<\/title>/i,
-    `<title>${SEO_DEFAULTS.home.title}</title>`,
+    `<title>${SEO_DEFAULTS.notFound.title}</title>`,
   );
   patched = stripOgShellMetaFromHead(patched);
   if (isTimewebAppBuild()) {

@@ -70,6 +70,23 @@ describe('renderOgShellHead', () => {
     expect(html).not.toContain('prefix="og: https://ogp.me/ns#"');
   });
 
+  it('omits canonical and social tags when a missing page must not point at the homepage', () => {
+    const html = renderOgShellHead({
+      ...sampleMeta,
+      title: 'Страница не найдена | Вкрайности',
+      description: 'Такой страницы нет.',
+      path: '/',
+      robots: 'noindex,nofollow',
+      includeSocialMetadata: false,
+      omitCanonical: true,
+    });
+
+    expect(html).toContain('content="Такой страницы нет."');
+    expect(html).toContain('name="robots" content="noindex,nofollow"');
+    expect(html).not.toContain('rel="canonical"');
+    expect(html).not.toContain('property="og:url"');
+  });
+
   it('continues to emit social tags for routes without an explicit opt-out', () => {
     const html = injectOgShellIntoHtml(templateHtml, sampleMeta);
     const errors: string[] = [];

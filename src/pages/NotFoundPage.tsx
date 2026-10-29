@@ -14,7 +14,6 @@ const NotFoundPage = () => {
         title={SEO_DEFAULTS.notFound.title}
         description={SEO_DEFAULTS.notFound.description}
         path={location.pathname}
-        canonicalPath={SEO_DEFAULTS.notFound.path}
         robots={SEO_DEFAULTS.notFound.robots}
       />
       <div className="min-h-screen flex flex-col items-center justify-center bg-surface-light px-4">

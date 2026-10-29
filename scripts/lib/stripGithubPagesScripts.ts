@@ -18,5 +18,8 @@ export const sanitizeTimeweb404Html = (
   env: NodeJS.ProcessEnv = process.env,
 ): string => {
   if (!isTimewebAppBuild(env)) return html;
-  return stripGithubPagesSpaRedirectScript(stripGithubPages404RedirectScript(html));
+  return stripGithubPagesSpaRedirectScript(stripGithubPages404RedirectScript(html)).replaceAll(
+    '"/vkraynosti/',
+    '"/',
+  );
 };

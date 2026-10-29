@@ -8,6 +8,7 @@ import {
   guestScheduleDeparturesFromSnapshots,
   livePublishQueue,
   nextSubmittedForPublishAt,
+  publishedDocumentWithDraftSeo,
   toGuestSchedulePayload,
   toGuestTourDataFiles,
 } from './publishQueue';
@@ -41,6 +42,30 @@ function readyTour(overrides: Partial<CmsTourDocument> = {}): CmsTourDocument {
     ...overrides,
   };
 }
+
+const longTourSeo = {
+  title: 'Восхождение на Изюбриную — зима | Вкрайности',
+  description: 'Зимний маршрут на Изюбриную из Владивостока: набор, программа и места. Смотрите даты и бронируйте выезд.',
+  h1: 'Восхождение на Изюбриную',
+  keywords: ['Изюбриная'],
+};
+
+describe('publishedDocumentWithDraftSeo', () => {
+  it('copies only the draft seo onto the published snapshot', () => {
+    const published = readyTour();
+    const draft = readyTour({
+      price: '9 000 ₽',
+      description: 'Новый текст программы',
+      seo: longTourSeo,
+    });
+
+    const next = publishedDocumentWithDraftSeo(published, draft);
+
+    expect(next.seo).toEqual(longTourSeo);
+    expect(next.price).toBe(published.price);
+    expect(next.description).toBe(published.description);
+  });
+});
 
 describe('livePublishQueue', () => {
   it('does not expose departures whose tour is missing from the catalog', () => {
@@ -88,6 +113,36 @@ describe('livePublishQueue', () => {
       }),
     ]);
     expect(livePublishQueue([{ ...submitted, published: true }], [])).toEqual([]);
+  });
+
+  it('queues seo of a published tour beside the unfinished card', () => {
+    const published = readyTour();
+    const draft = readyTour({ price: '9 000 ₽', seo: longTourSeo });
+    const queued = livePublishQueue([{
+      id: 'winter-1',
+      title: 'Изюбриная',
+      document: draft,
+      meta: { rev: 4, updatedAt: '2026-08-18T00:00:00.000Z', editor: 'cms' },
+      published: true,
+      publishedDocument: published,
+    }], []);
+
+    expect(queued).toEqual([
+      expect.objectContaining({ kind: 'tour', id: 'winter-1', summary: 'tour_draft' }),
+      expect.objectContaining({ kind: 'tour_seo', id: 'winter-1', tourId: 'winter-1', ready: true, rev: 4, summary: 'tour_seo' }),
+    ]);
+  });
+
+  it('does not queue seo for a tour that is not on the site yet', () => {
+    const queued = livePublishQueue([{
+      id: 'winter-2',
+      title: 'Новый',
+      document: readyTour({ id: 'winter-2', title: 'Новый', seo: longTourSeo }),
+      meta: { rev: 1, updatedAt: '2026-08-18T00:00:00.000Z', editor: 'cms' },
+      published: false,
+    }], []);
+
+    expect(queued.map((item) => item.kind)).toEqual(['tour']);
   });
 
   it('queues unpublished and dirty drafts even before an explicit submit', () => {

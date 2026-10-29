@@ -26,6 +26,7 @@ export type InboxQueueFilters = {
 export const QUEUE_SUMMARY_LABEL: Record<PublishQueueSummary, string> = {
   new_tour: ADMIN_UI.inboxSummaryNewTour,
   tour_draft: ADMIN_UI.inboxSummaryTourDraft,
+  tour_seo: ADMIN_UI.inboxSummaryTourSeo,
   new_departure: ADMIN_UI.inboxSummaryNewDeparture,
   departure_draft: ADMIN_UI.inboxSummaryDepartureDraft,
 };

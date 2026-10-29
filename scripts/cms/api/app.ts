@@ -30,8 +30,10 @@ import { unusedBentoPoolAssets } from '../../../src/cms/bentoPoolAssets.ts';
 import { cmsPublishBlockersForIntent } from '../../../src/cms/cmsPublishRules.ts';
 import {
   departureNeedsPublication,
+  draftSeoDiffersFromPublished,
   livePublishQueue,
   documentToPublishForQueue,
+  publishedDocumentWithDraftSeo,
   guestScheduleDeparturesFromSnapshots,
   nextSubmittedForPublishAt,
   toGuestTourDataFiles,
@@ -1452,6 +1454,57 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     }
     await writePublishedGuestSchedule();
     return c.json({ ok: true, catalogMirror: getCatalogMirrorState() });
+  });
+
+  app.post('/api/cms/publish-queue/publish-seo', async (c) => {
+    const session = c.get('session');
+    if (!session.canPublishTours) {
+      return c.json({ error: 'forbidden' }, 403);
+    }
+    const parsed = z
+      .object({
+        tourIds: z.array(z.string().min(1)).min(1),
+        tourRevs: z.record(z.string().min(1), z.number().int().positive()).optional(),
+      })
+      .safeParse((await readJsonBody(c)) ?? {});
+    if (!parsed.success) {
+      return c.json({ error: 'invalid_body' }, 400);
+    }
+    const tours = await loadQueueTours();
+    const byId = new Map(tours.map((tour) => [tour.id, tour]));
+    const ready: QueueTourInput[] = [];
+    for (const tourId of parsed.data.tourIds) {
+      const tour = byId.get(tourId);
+      if (tour == null) {
+        return c.json({ error: 'not_found', tourId }, 404);
+      }
+      if (tour.publishedDocument == null) {
+        return c.json({ error: 'tour_not_published', tourId }, 400);
+      }
+      const expectedRev = parsed.data.tourRevs?.[tourId];
+      if (expectedRev != null && expectedRev !== tour.meta.rev) {
+        return c.json({ error: 'rev_conflict', rev: tour.meta.rev, tourId }, 409);
+      }
+      if (draftSeoDiffersFromPublished(tour.document, tour.publishedDocument)) {
+        ready.push(tour);
+      }
+    }
+    for (const tour of ready) {
+      const published = tour.publishedDocument;
+      if (published == null) {
+        continue;
+      }
+      await publishToCatalog(
+        store,
+        tour.id,
+        publishedDocumentWithDraftSeo(published, tour.document),
+      );
+    }
+    return c.json({
+      ok: true,
+      publishedTourIds: ready.map((tour) => tour.id),
+      catalogMirror: getCatalogMirrorState(),
+    });
   });
 
   app.post('/api/cms/departures/publish', async (c) => {

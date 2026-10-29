@@ -321,6 +321,7 @@ export const ADMIN_UI = {
   inboxChanged: 'Изменено',
   inboxSummaryNewTour: 'Новый тур',
   inboxSummaryTourDraft: 'Изменения в черновике',
+  inboxSummaryTourSeo: 'SEO тура',
   inboxSummaryNewDeparture: 'Новый выезд',
   inboxSummaryDepartureDraft: 'Изменения выезда',
   inboxDiffTitle: 'Что изменится на сайте',

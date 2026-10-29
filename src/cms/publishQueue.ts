@@ -8,10 +8,10 @@ import { CATALOG_PRICE_ON_REQUEST, isTourReady, tourReadiness } from './tourComp
 export const GUEST_SCHEDULE_STATUSES = ['open', 'full', 'completed'] as const;
 type QueueDepartureStatus = TourScheduleEvent['status'];
 
-export type PublishQueueSummary = 'new_tour' | 'tour_draft' | 'new_departure' | 'departure_draft';
+export type PublishQueueSummary = 'new_tour' | 'tour_draft' | 'tour_seo' | 'new_departure' | 'departure_draft';
 
 export type PublishQueueItem = {
-  kind: 'tour' | 'departure';
+  kind: 'tour' | 'departure' | 'tour_seo';
   id: string;
   tourId: string;
   title?: string;
@@ -85,6 +85,32 @@ export function departureNeedsPublication(departure: {
   );
 }
 
+export function publishedDocumentWithDraftSeo(
+  published: CmsTourDocument,
+  draft: CmsTourDocument,
+): CmsTourDocument {
+  if (draft.seo == null) {
+    const rest = { ...published };
+    delete rest.seo;
+    return rest;
+  }
+  return { ...published, seo: draft.seo };
+}
+
+export function draftSeoDiffersFromPublished(
+  draft: CmsTourDocument,
+  published: CmsTourDocument | null | undefined,
+): boolean {
+  if (published == null) {
+    return false;
+  }
+  return JSON.stringify(draft.seo ?? null) !== JSON.stringify(published.seo ?? null);
+}
+
+function tourSeoDiffersFromPublished(tour: QueueTourInput): boolean {
+  return draftSeoDiffersFromPublished(tour.document, tour.publishedDocument);
+}
+
 function tourDraftDiffersFromSnapshot(tour: QueueTourInput): boolean {
   if (tour.publishedDocument == null) {
     return false;
@@ -151,6 +177,22 @@ export function livePublishQueue(
       publishedSeason: tour.publishedDocument?.season ?? null,
       status: tour.document.status,
       publishedStatus: tour.publishedDocument?.status ?? null,
+    });
+  }
+  for (const tour of tours) {
+    if (!tourSeoDiffersFromPublished(tour)) {
+      continue;
+    }
+    items.push({
+      kind: 'tour_seo',
+      id: tour.id,
+      tourId: tour.id,
+      title: tour.title,
+      author: tour.meta.editor,
+      timestamp: tour.meta.updatedAt,
+      ready: true,
+      rev: tour.meta.rev,
+      summary: 'tour_seo',
     });
   }
   for (const departure of departures) {

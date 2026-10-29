@@ -10,6 +10,7 @@ import {
 import {
   inboxQueueItemSubtitle,
   inboxQueueItemTitle,
+  inboxQueueKindLabel,
   inboxQueueStatusLabel,
   isInboxQueueItemReady,
 } from '../inboxQueueView';
@@ -101,13 +102,13 @@ const InboxQueueTable = ({
                 <input
                   type="checkbox"
                   checked={selectedKeys.has(`${item.kind}:${item.id}`)}
-                  aria-label={`${ADMIN_UI.inboxSelectItem} ${item.kind === 'tour' ? ADMIN_UI.inboxTourItem : ADMIN_UI.inboxDepartureItem}: ${inboxQueueItemTitle(item)}`}
+                  aria-label={`${ADMIN_UI.inboxSelectItem} ${inboxQueueKindLabel(item)}: ${inboxQueueItemTitle(item)}`}
                   onChange={() => onToggleSelected(item)}
                 />
               </label>
               <div className="min-w-0">
-                <AdminBadge tone={item.kind === 'tour' ? 'success' : 'warning'}>
-                  {item.kind === 'tour' ? ADMIN_UI.inboxTourItem : ADMIN_UI.inboxDepartureItem}
+                <AdminBadge tone={item.kind === 'departure' ? 'warning' : 'success'}>
+                  {inboxQueueKindLabel(item)}
                 </AdminBadge>
               </div>
               <div className="flex min-w-0 items-center gap-3">
@@ -128,7 +129,7 @@ const InboxQueueTable = ({
                 </div>
               </div>
               <div className="min-w-0 overflow-hidden" title={inboxQueueStatusLabel(item)}>
-                <AdminStatus level="primary" tone={ready ? (item.kind === 'tour' ? 'info' : 'warning') : 'danger'}>
+                <AdminStatus level="primary" tone={ready ? (item.kind === 'departure' ? 'warning' : 'info') : 'danger'}>
                   {inboxQueueStatusLabel(item)}
                 </AdminStatus>
               </div>
@@ -177,7 +178,7 @@ const InboxQueueTable = ({
                     <AdminIcon icon={Send} size={16} />
                   </AdminButton>
                 ) : null}
-                {canReturnItems ? (
+                {canReturnItems && item.kind !== 'tour_seo' ? (
                   <AdminIconButton
                     icon={Undo2}
                     label={ADMIN_UI.inboxReturnShort}

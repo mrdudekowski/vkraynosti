@@ -8,10 +8,10 @@ import { CATALOG_PRICE_ON_REQUEST, isTourReady, tourReadiness } from './tourComp
 export const GUEST_SCHEDULE_STATUSES = ['open', 'full', 'completed'] as const;
 type QueueDepartureStatus = TourScheduleEvent['status'];
 
-export type PublishQueueSummary = 'new_tour' | 'tour_draft' | 'new_departure' | 'departure_draft';
+export type PublishQueueSummary = 'new_tour' | 'tour_draft' | 'tour_seo' | 'new_departure' | 'departure_draft';
 
 export type PublishQueueItem = {
-  kind: 'tour' | 'departure';
+  kind: 'tour' | 'departure' | 'tour_seo';
   id: string;
   tourId: string;
   title?: string;

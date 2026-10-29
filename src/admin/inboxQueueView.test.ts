@@ -135,20 +135,51 @@ describe('inboxQueueView', () => {
       tourIds: ['winter-1'],
       departureIds: [],
       tourRevs: {},
+      tourSeoIds: [],
+      tourSeoRevs: {},
       seoRev: null,
     });
     expect(inboxBulkPublishPlan('departure', items, 8)).toEqual({
       tourIds: [],
       departureIds: ['dep-1'],
       tourRevs: {},
+      tourSeoIds: [],
+      tourSeoRevs: {},
       seoRev: null,
     });
     expect(inboxBulkPublishPlan('seo', items, 8)).toEqual({
       tourIds: [],
       departureIds: [],
       tourRevs: {},
+      tourSeoIds: [],
+      tourSeoRevs: {},
       seoRev: 8,
     });
+    const tourSeo: AdminPublishQueueItem = {
+      ...tour,
+      kind: 'tour_seo',
+      rev: 4,
+      summary: 'tour_seo',
+    };
+    expect(inboxBulkPublishPlan('seo', [...items, tourSeo], 8)).toEqual({
+      tourIds: [],
+      departureIds: [],
+      tourRevs: {},
+      tourSeoIds: ['winter-1'],
+      tourSeoRevs: { 'winter-1': 4 },
+      seoRev: 8,
+    });
+    expect(inboxBulkPublishPlan('all', [...items, tourSeo], null).tourIds).toEqual(['winter-1']);
+    expect(inboxBulkPublishPlan('all', [...items, tourSeo], null).tourSeoIds).toEqual([]);
+    expect(
+      filterInboxQueueItems([tour, departure, tourSeo], {
+        kind: 'seo',
+        readiness: 'all',
+        author: '',
+        query: '',
+        sort: 'newest',
+      }).map((item) => item.kind),
+    ).toEqual(['tour_seo']);
     expect(inboxBulkPublishPlan('all', items, 8).seoRev).toBe(8);
     expect(inboxBulkPublishPlan('all', items, 8).tourIds).toEqual(['winter-1']);
     expect(inboxBulkPublishPlan('all', items, 8).departureIds).toEqual(['dep-1']);

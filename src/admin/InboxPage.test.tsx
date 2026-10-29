@@ -13,10 +13,11 @@ vi.mock('./api', () => ({
   adminSubmitPublishQueue: vi.fn(),
   adminPublishQueue: vi.fn(),
   adminPublishSiteContent: vi.fn(),
+  adminPublishTourSeo: vi.fn(),
   adminReturnPublishQueue: vi.fn(),
 }));
 
-import { adminListPublishQueue, adminListSiteContentChanges, adminListTours, adminPublishQueue, adminPublishSiteContent, adminReturnPublishQueue } from './api';
+import { adminListPublishQueue, adminListSiteContentChanges, adminListTours, adminPublishQueue, adminPublishSiteContent, adminPublishTourSeo, adminReturnPublishQueue } from './api';
 import { clearAdminDataCache } from './adminDataCache';
 import { AdminToastProvider } from './components/AdminToast';
 import InboxPage from './InboxPage';
@@ -81,6 +82,7 @@ describe('InboxPage', () => {
     ]);
     vi.mocked(adminListTours).mockResolvedValue([]);
     vi.mocked(adminPublishQueue).mockResolvedValue({});
+    vi.mocked(adminPublishTourSeo).mockResolvedValue({});
     vi.mocked(adminPublishSiteContent).mockResolvedValue({
       document: { kind: 'seo', schemaVersion: 1, pages: [] },
       meta: { rev: 9, editor: 'alice', updatedAt: '2026-10-29T00:00:00.000Z', submittedForPublishAt: null },
@@ -236,6 +238,58 @@ describe('InboxPage', () => {
     await user.click(screen.getByRole('button', { name: 'SEO' }));
     await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxPublishSeo }));
 
+    expect(adminPublishSiteContent).toHaveBeenCalledWith('seo', 4);
+    expect(adminPublishQueue).not.toHaveBeenCalled();
+    expect(adminPublishTourSeo).not.toHaveBeenCalled();
+  });
+
+  it('публикует SEO страниц и SEO уже опубликованных туров одной кнопкой', async () => {
+    vi.mocked(adminListPublishQueue).mockResolvedValue([
+      {
+        kind: 'tour',
+        id: 'winter-1',
+        tourId: 'winter-1',
+        title: 'Изюбриная',
+        ready: true,
+        rev: 2,
+        summary: 'tour_draft',
+      },
+      {
+        kind: 'tour_seo',
+        id: 'winter-1',
+        tourId: 'winter-1',
+        title: 'Изюбриная',
+        ready: true,
+        rev: 2,
+        summary: 'tour_seo',
+      },
+    ]);
+    vi.mocked(adminListSiteContentChanges).mockResolvedValue([
+      {
+        kind: 'seo',
+        title: 'SEO страниц сайта',
+        author: 'alice',
+        timestamp: '2026-10-29T00:00:00.000Z',
+        rev: 4,
+        changes: [{ label: '/ · description', from: 'коротко', to: 'длиннее' }],
+      },
+    ]);
+    const user = userEvent.setup();
+    renderInbox(adminSession);
+
+    expect(await screen.findByText('SEO страниц сайта')).toBeInTheDocument();
+    vi.mocked(adminPublishQueue).mockClear();
+    vi.mocked(adminPublishSiteContent).mockClear();
+    vi.mocked(adminPublishTourSeo).mockClear();
+    await user.click(screen.getByRole('button', { name: 'SEO' }));
+    expect(screen.getAllByText(ADMIN_UI.inboxSeoItem).length).toBeGreaterThan(0);
+    expect(screen.queryByText(ADMIN_UI.inboxTourItem)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.inboxPublishSeo }));
+
+    expect(adminPublishTourSeo).toHaveBeenCalledWith({
+      tourIds: ['winter-1'],
+      tourRevs: { 'winter-1': 2 },
+    });
     expect(adminPublishSiteContent).toHaveBeenCalledWith('seo', 4);
     expect(adminPublishQueue).not.toHaveBeenCalled();
   });

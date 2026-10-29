@@ -521,6 +521,26 @@ export async function adminSubmitPublishQueue(input: {
   }
 }
 
+export async function adminPublishTourSeo(input: {
+  tourIds: string[];
+  tourRevs?: Record<string, number>;
+}): Promise<{ ok?: boolean; catalogMirror?: 'up' | 'down'; publishedTourIds?: string[] }> {
+  const response = await fetch('/api/cms/publish-queue/publish-seo', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (response.status === 403) {
+    throw new Error('forbidden');
+  }
+  if (!response.ok) {
+    const body = await readJson<{ error?: string }>(response);
+    throw new Error(body.error ?? 'publish_failed');
+  }
+  return readJson(response);
+}
+
 export async function adminPublishQueue(input: {
   tourIds?: string[];
   departureIds?: string[];

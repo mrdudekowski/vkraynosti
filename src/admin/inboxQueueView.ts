@@ -26,6 +26,7 @@ export type InboxQueueFilters = {
 export const QUEUE_SUMMARY_LABEL: Record<PublishQueueSummary, string> = {
   new_tour: ADMIN_UI.inboxSummaryNewTour,
   tour_draft: ADMIN_UI.inboxSummaryTourDraft,
+  tour_seo: ADMIN_UI.inboxSummaryTourSeo,
   new_departure: ADMIN_UI.inboxSummaryNewDeparture,
   departure_draft: ADMIN_UI.inboxSummaryDepartureDraft,
 };
@@ -88,7 +89,11 @@ export function matchesInboxQueueFilters(
   item: AdminPublishQueueItem,
   filters: InboxQueueFilters,
 ): boolean {
-  if (filters.kind !== 'all' && item.kind !== filters.kind) {
+  if (filters.kind === 'seo') {
+    if (item.kind !== 'tour_seo') {
+      return false;
+    }
+  } else if (item.kind === 'tour_seo' || (filters.kind !== 'all' && item.kind !== filters.kind)) {
     return false;
   }
   if (filters.readiness === 'ready' && !isInboxQueueItemReady(item)) {
@@ -137,6 +142,8 @@ export function inboxBulkPublishPlan(
   tourIds: string[];
   departureIds: string[];
   tourRevs: Record<string, number>;
+  tourSeoIds: string[];
+  tourSeoRevs: Record<string, number>;
   seoRev: number | null;
 } {
   const tours = kind === 'all' || kind === 'tour'
@@ -145,11 +152,18 @@ export function inboxBulkPublishPlan(
   const departures = kind === 'all' || kind === 'departure'
     ? items.filter((item) => item.kind === 'departure' && item.ready !== false)
     : [];
+  const tourSeo = kind === 'seo'
+    ? items.filter((item) => item.kind === 'tour_seo' && item.ready !== false)
+    : [];
   return {
     tourIds: tours.map((item) => item.id),
     departureIds: departures.map((item) => item.id),
     tourRevs: Object.fromEntries(
       tours.flatMap((item) => (item.rev == null ? [] : [[item.id, item.rev]])),
+    ),
+    tourSeoIds: tourSeo.map((item) => item.id),
+    tourSeoRevs: Object.fromEntries(
+      tourSeo.flatMap((item) => (item.rev == null ? [] : [[item.id, item.rev]])),
     ),
     seoRev: kind === 'all' || kind === 'seo' ? seoRev : null,
   };
@@ -165,11 +179,17 @@ export function filterInboxQueueItems(
   );
 }
 
+export function inboxQueueKindLabel(item: AdminPublishQueueItem): string {
+  if (item.kind === 'tour_seo') return ADMIN_UI.inboxSeoItem;
+  if (item.kind === 'tour') return ADMIN_UI.inboxTourItem;
+  return ADMIN_UI.inboxDepartureItem;
+}
+
 export function inboxQueueItemTitle(item: AdminPublishQueueItem): string {
-  if (item.kind === 'tour') {
-    return item.title ?? item.tourId;
+  if (item.kind === 'departure') {
+    return item.title ?? ADMIN_UI.inboxDepartureItem;
   }
-  return item.title ?? ADMIN_UI.inboxDepartureItem;
+  return item.title ?? item.tourId;
 }
 
 export function inboxQueueChangeLine(item: AdminPublishQueueItem): string {

@@ -6,6 +6,7 @@ import { ADMIN_INBOX_SORT_STORAGE_KEY, ADMIN_INBOX_TAB_STORAGE_KEY } from '../co
 import {
   adminPublishQueue,
   adminPublishSiteContent,
+  adminPublishTourSeo,
   adminReturnPublishQueue,
   adminListSiteContentChanges,
   type AdminPublishQueueItem,
@@ -73,24 +74,32 @@ const READY_FILTER_LABEL: Record<InboxReadinessFilter, string> = {
 };
 
 function canPublishItem(session: AdminSession, item: AdminPublishQueueItem): boolean {
-  return item.kind === 'tour' ? session.canPublishTours : session.canPublishSchedule;
+  if (item.kind === 'departure') return session.canPublishSchedule;
+  return session.canPublishTours;
 }
 
 type PublishPayload = {
   tourIds: string[];
   departureIds: string[];
   tourRevs: Record<string, number>;
+  tourSeoIds: string[];
+  tourSeoRevs: Record<string, number>;
   seoRev?: number | null;
 };
 
+function revsById(items: readonly AdminPublishQueueItem[]): Record<string, number> {
+  return Object.fromEntries(items.flatMap((item) => (item.rev == null ? [] : [[item.id, item.rev]])));
+}
+
 function queuePayload(items: readonly AdminPublishQueueItem[]): PublishPayload {
   const tours = items.filter((item) => item.kind === 'tour');
+  const tourSeo = items.filter((item) => item.kind === 'tour_seo');
   return {
     tourIds: tours.map((item) => item.id),
     departureIds: items.filter((item) => item.kind === 'departure').map((item) => item.id),
-    tourRevs: Object.fromEntries(
-      tours.flatMap((item) => (item.rev == null ? [] : [[item.id, item.rev]])),
-    ),
+    tourRevs: revsById(tours),
+    tourSeoIds: tourSeo.map((item) => item.id),
+    tourSeoRevs: revsById(tourSeo),
     seoRev: null,
   };
 }
@@ -175,7 +184,7 @@ const InboxPage = () => {
     publishable,
     canPublishSeo ? seoChange?.rev ?? null : null,
   );
-  const canBulkPublish = publishPlan.tourIds.length > 0 || publishPlan.departureIds.length > 0 || publishPlan.seoRev != null;
+  const canBulkPublish = publishPlan.tourIds.length > 0 || publishPlan.departureIds.length > 0 || publishPlan.tourSeoIds.length > 0 || publishPlan.seoRev != null;
   const selectedItems = visible.filter((item) => selectedKeys.has(`${item.kind}:${item.id}`));
   const selectedPublishable = selectedItems.filter(
     (item) => canPublishItem(session, item) && item.ready !== false,
@@ -216,12 +225,17 @@ const InboxPage = () => {
       : Promise.resolve(null);
     void queueRequest
       .then(async (result) => {
+        const tourSeoResult = payload.tourSeoIds.length > 0
+          ? await adminPublishTourSeo({ tourIds: payload.tourSeoIds, tourRevs: payload.tourSeoRevs })
+          : null;
         if (payload.seoRev != null) {
           await adminPublishSiteContent('seo', payload.seoRev);
         }
         setHideConfirmPayload(null);
         push({
-          message: adminPublishGuestMessage(result?.catalogMirror ?? catalogMirror),
+          message: adminPublishGuestMessage(
+            tourSeoResult?.catalogMirror ?? result?.catalogMirror ?? catalogMirror,
+          ),
         });
         refreshAfterMutation();
       })
@@ -429,7 +443,7 @@ const InboxPage = () => {
                       >
                         {ADMIN_UI.inboxClearSelection}
                       </AdminButton>
-                      {session.role === 'admin' ? (
+                      {session.role === 'admin' && selectedItems.some((item) => item.kind !== 'tour_seo') ? (
                         <AdminButton
                           type="button"
                           variant="ghost"
@@ -476,7 +490,7 @@ const InboxPage = () => {
                     });
                   }}
                   onNavigate={(item) => {
-                    navigate(item.kind === 'tour' ? ADMIN_PATHS.tour(item.tourId) : ADMIN_PATHS.scheduleDeparture(item.id, item.startsOn ?? ''));
+                    navigate(item.kind === 'departure' ? ADMIN_PATHS.scheduleDeparture(item.id, item.startsOn ?? '') : ADMIN_PATHS.tour(item.tourId));
                   }}
                   onPublish={(item) => {
                     runPayload(queuePayload([item]));

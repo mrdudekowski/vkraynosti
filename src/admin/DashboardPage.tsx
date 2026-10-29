@@ -200,8 +200,8 @@ const DashboardPage = () => {
       to:
         item.kind === 'departure' && item.startsOn != null
           ? ADMIN_PATHS.scheduleDeparture(item.id, item.startsOn)
-          : item.kind === 'tour'
-            ? ADMIN_PATHS.tour(item.id)
+          : item.kind === 'tour' || item.kind === 'tour_seo'
+            ? ADMIN_PATHS.tour(item.tourId)
             : ADMIN_PATHS.inbox,
       imageUrl: tours.find((tour) => tour.id === item.tourId)?.imageUrl ?? null,
     })),

@@ -243,6 +243,26 @@ describe('InboxPage', () => {
     expect(adminPublishTourSeo).not.toHaveBeenCalled();
   });
 
+  it('оставляет серую кнопку публикации, когда публиковать нечего', async () => {
+    vi.mocked(adminListPublishQueue).mockResolvedValue([]);
+    vi.mocked(adminListSiteContentChanges).mockResolvedValue([]);
+    const user = userEvent.setup();
+    renderInbox(adminSession);
+
+    const publishAll = await screen.findByRole('button', { name: ADMIN_UI.inboxPublishAll });
+    expect(publishAll).toBeDisabled();
+    expect(publishAll).toHaveAttribute('data-idle', 'true');
+    await user.hover(publishAll.parentElement as HTMLElement);
+    expect(screen.getByRole('tooltip')).toHaveTextContent(ADMIN_UI.inboxPublishedAll);
+    expect(screen.getByRole('tooltip').className).not.toContain('sr-only');
+
+    await user.click(screen.getByRole('button', { name: 'SEO' }));
+    const publishSeo = screen.getByRole('button', { name: ADMIN_UI.inboxPublishSeo });
+    expect(publishSeo).toBeDisabled();
+    await user.hover(publishSeo.parentElement as HTMLElement);
+    expect(screen.getByRole('tooltip')).toHaveTextContent(ADMIN_UI.inboxPublishedSeo);
+  });
+
   it('публикует SEO страниц и SEO уже опубликованных туров одной кнопкой', async () => {
     vi.mocked(adminListPublishQueue).mockResolvedValue([
       {

@@ -134,6 +134,13 @@ export function inboxBulkPublishLabel(kind: InboxKindFilter): string {
   return ADMIN_UI.inboxPublishAll;
 }
 
+export function inboxBulkPublishIdleHint(kind: InboxKindFilter): string {
+  if (kind === 'tour') return ADMIN_UI.inboxPublishedTours;
+  if (kind === 'departure') return ADMIN_UI.inboxPublishedDepartures;
+  if (kind === 'seo') return ADMIN_UI.inboxPublishedSeo;
+  return ADMIN_UI.inboxPublishedAll;
+}
+
 export function inboxBulkPublishPlan(
   kind: InboxKindFilter,
   items: readonly AdminPublishQueueItem[],

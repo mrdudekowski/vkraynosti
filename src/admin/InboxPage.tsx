@@ -43,6 +43,7 @@ import {
   INBOX_READINESS_FILTERS,
   QUEUE_SUMMARY_LABEL,
   filterInboxQueueItems,
+  inboxBulkPublishIdleHint,
   inboxBulkPublishLabel,
   inboxBulkPublishPlan,
   inboxQueueAuthors,
@@ -122,6 +123,7 @@ const InboxPage = () => {
   const [returnReason, setReturnReason] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [hideConfirmPayload, setHideConfirmPayload] = useState<PublishPayload | null>(null);
+  const [publishHintOpen, setPublishHintOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [author, setAuthor] = useState<string>(INBOX_AUTHOR_ALL);
   const [readiness, setReadiness] = useState<InboxReadinessFilter>('all');
@@ -185,6 +187,9 @@ const InboxPage = () => {
     canPublishSeo ? seoChange?.rev ?? null : null,
   );
   const canBulkPublish = publishPlan.tourIds.length > 0 || publishPlan.departureIds.length > 0 || publishPlan.tourSeoIds.length > 0 || publishPlan.seoRev != null;
+  const publishBlockedByPermission = visible.some((item) => item.ready !== false && !canPublishItem(session, item))
+    || ((kind === 'all' || kind === 'seo') && seoChange != null && !canPublishSeo);
+  const showPublishedHint = items != null && !busy && !canBulkPublish && !publishBlockedByPermission;
   const selectedItems = visible.filter((item) => selectedKeys.has(`${item.kind}:${item.id}`));
   const selectedPublishable = selectedItems.filter(
     (item) => canPublishItem(session, item) && item.ready !== false,
@@ -277,18 +282,39 @@ const InboxPage = () => {
                 </AdminButton>
               ))}
             </div>
-            {canBulkPublish ? (
+            <span
+              className="relative inline-grid"
+              onPointerEnter={() => {
+                if (showPublishedHint) setPublishHintOpen(true);
+              }}
+              onPointerLeave={() => setPublishHintOpen(false)}
+            >
+              <span className="invisible col-start-1 row-start-1 px-4 text-sm font-semibold" aria-hidden="true">
+                {ADMIN_UI.inboxPublishDepartures}
+              </span>
               <AdminButton
                 type="button"
                 variant="publish"
-                disabled={busy || items == null}
+                className="col-start-1 row-start-1 w-full"
+                data-idle={showPublishedHint ? 'true' : undefined}
+                disabled={!canBulkPublish || busy || items == null}
+                aria-describedby={showPublishedHint ? 'inbox-publish-idle-hint' : undefined}
                 onClick={() => {
                   runPayload(publishPlan);
                 }}
               >
                 {busy ? ADMIN_UI.inboxPublishing : inboxBulkPublishLabel(kind)}
               </AdminButton>
-            ) : null}
+              {showPublishedHint ? (
+                <span
+                  id="inbox-publish-idle-hint"
+                  role="tooltip"
+                  className={`absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap rounded-admin-control bg-text-primary px-2 py-1 text-xs text-text-inverse shadow-admin-overlay ${publishHintOpen ? '' : 'sr-only'}`}
+                >
+                  {inboxBulkPublishIdleHint(kind)}
+                </span>
+              ) : null}
+            </span>
           </div>
         }
       />

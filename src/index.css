@@ -605,6 +605,10 @@
     @apply px-4 font-semibold;
   }
 
+  .admin-btn-publish[data-idle='true']:disabled {
+    @apply cursor-not-allowed bg-divider text-text-muted opacity-100 hover:bg-divider active:bg-divider;
+  }
+
   .admin-btn-secondary {
     @apply admin-btn border border-divider bg-surface-light text-text-primary hover:bg-surface-dark/5 active:bg-surface-dark/10;
   }

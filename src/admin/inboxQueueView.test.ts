@@ -3,6 +3,7 @@ import type { AdminPublishQueueItem } from './api';
 import {
   INBOX_AUTHOR_UNKNOWN,
   filterInboxQueueItems,
+  inboxBulkPublishIdleHint,
   inboxBulkPublishLabel,
   inboxBulkPublishPlan,
   inboxQueueAuthors,
@@ -127,6 +128,10 @@ describe('inboxQueueView', () => {
     expect(inboxBulkPublishLabel('tour')).toBe('Опубликовать туры');
     expect(inboxBulkPublishLabel('departure')).toBe('Опубликовать выезды');
     expect(inboxBulkPublishLabel('seo')).toBe('Опубликовать SEO');
+    expect(inboxBulkPublishIdleHint('all')).toBe('Всё опубликовано');
+    expect(inboxBulkPublishIdleHint('tour')).toBe('Все туры опубликованы');
+    expect(inboxBulkPublishIdleHint('departure')).toBe('Все выезды опубликованы');
+    expect(inboxBulkPublishIdleHint('seo')).toBe('Все SEO опубликованы');
   });
 
   it('в план публикации попадает только выбранный тип', () => {

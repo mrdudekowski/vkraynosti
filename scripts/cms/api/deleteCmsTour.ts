@@ -6,6 +6,7 @@ import {
   cmsMediaObjectKeyFromPublicUrl,
   cmsPublishedDocumentKey,
 } from '../../../src/cms/cmsPackageKeys.ts';
+import { removeTourIdFromCatalogOrder } from './tourCatalogOrderStore.ts';
 import { cmsDraftIndexFile, parseCmsDraftIndex } from '../../../src/cms/cmsDraftIndex.ts';
 import { parseCmsToursFile, type CmsTourDocument } from '../../../src/cms/cmsTourDocument.ts';
 import type { CmsJsonStore } from './store.ts';
@@ -52,6 +53,7 @@ async function removeFromPublishedCatalog(store: CmsJsonStore, tourId: string): 
 export async function deleteCmsTour(store: CmsJsonStore, tour: CmsTourDocument): Promise<void> {
   await removeFromDraftIndex(store, tour.id);
   await removeFromPublishedCatalog(store, tour.id);
+  await removeTourIdFromCatalogOrder(store, tour.id);
   await Promise.all([
     store.deleteJson(cmsDraftDocumentKey(tour.id)),
     store.deleteJson(cmsDraftMetaKey(tour.id)),

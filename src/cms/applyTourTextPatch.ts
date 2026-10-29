@@ -2,6 +2,7 @@ import { isValidTourSlug } from '../constants/tourUrls';
 import { cmsTourDocumentSchema, type CmsTourDocument } from './cmsTourDocument';
 import { isTourDurationDays, publicDurationFromDays } from './durationDays';
 import { isIncludedIconKey, isUnsetIncludedIconKey } from './includedIconCatalog';
+import { insertTourAtDraftSlot } from './tourCatalogOrder';
 
 export type CmsTourTextPatch = {
   title?: string;
@@ -186,18 +187,25 @@ export function applyTourTextPatch(
 /** Hidden остаётся в overlay: календарь гостя может показать прошедшую дату, карточки при этом нет. */
 export function upsertTourInPublishedCatalog(
   catalog: { schemaVersion: 1; tours: CmsTourDocument[] },
-  document: CmsTourDocument
+  document: CmsTourDocument,
+  orderedIds?: readonly string[],
 ): { schemaVersion: 1; tours: CmsTourDocument[] } {
+  const staysOnSite = document.status === 'active' || document.status === 'hidden';
+  if (!staysOnSite) {
+    return {
+      schemaVersion: catalog.schemaVersion,
+      tours: catalog.tours.filter((tour) => tour.id !== document.id),
+    };
+  }
   const existingIndex = catalog.tours.findIndex((tour) => tour.id === document.id);
-  const tours =
-    existingIndex >= 0
-      ? catalog.tours.map((tour, index) => (index === existingIndex ? document : tour))
-      : [...catalog.tours, document];
+  if (existingIndex >= 0) {
+    return {
+      schemaVersion: catalog.schemaVersion,
+      tours: catalog.tours.map((tour, index) => (index === existingIndex ? document : tour)),
+    };
+  }
   return {
     schemaVersion: catalog.schemaVersion,
-    tours:
-      document.status === 'active' || document.status === 'hidden'
-        ? tours
-        : tours.filter((tour) => tour.id !== document.id),
+    tours: insertTourAtDraftSlot(catalog.tours, document, orderedIds ?? null),
   };
 }

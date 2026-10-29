@@ -7,6 +7,7 @@ import {
   upsertTourInPublishedCatalog,
   type CmsTourTextPatch,
 } from '../../../src/cms/applyTourTextPatch.ts';
+import { orderByIds } from '../../../src/cms/tourCatalogOrder.ts';
 import { allocateUploadAssetId, applyTourLayoutPatch } from '../../../src/cms/applyTourLayoutPatch.ts';
 import {
   CMS_STILL_MAX_BYTES,
@@ -43,6 +44,12 @@ import { cmsDraftIndexFile, parseCmsDraftIndex } from '../../../src/cms/cmsDraft
 import { createEmptyCmsTour } from '../../../src/cms/createEmptyCmsTour.ts';
 import { cloneCmsTourDocument } from '../../../src/cms/cloneCmsTour.ts';
 import { deleteCmsTour } from './deleteCmsTour.ts';
+import {
+  publishStoredTourCatalogOrder,
+  readDraftTourOrderIds,
+  readTourCatalogOrderState,
+  saveSeasonTourOrder,
+} from './tourCatalogOrderStore.ts';
 import { cmsTourCoverUrl } from '../../../src/cms/cmsTourCoverUrl.ts';
 import { checkHideTourPublish } from '../../../src/cms/hideTourFutureDepartures.ts';
 import { resolvePublishedTourDocument } from '../../../src/cms/publishedTourSnapshot.ts';
@@ -453,7 +460,11 @@ async function publishToCatalog(
     catalogRaw == null
       ? { schemaVersion: 1 as const, tours: [] }
       : parseCmsToursFile(catalogRaw);
-  await store.putJson(CMS_PUBLISHED_CATALOG_KEY, upsertTourInPublishedCatalog(catalog, document));
+  const orderedIds = await readDraftTourOrderIds(store);
+  await store.putJson(
+    CMS_PUBLISHED_CATALOG_KEY,
+    upsertTourInPublishedCatalog(catalog, document, orderedIds ?? undefined),
+  );
 }
 
 function publicMediaUrl(baseUrl: string, key: string): string {
@@ -1466,7 +1477,12 @@ export function createCmsApiApp(deps: CmsApiDeps) {
 
   app.get('/api/cms/tours', async (c) => {
     const { documents, publishedById } = await listCmsTourDocumentsWithPublication(store);
-    const tours = sortCmsTourSummaries(documents);
+    const catalog = await loadPublishedCatalogTours(store);
+    const catalogOrder = await readTourCatalogOrderState(
+      store,
+      catalog.map((tour) => tour.id),
+    );
+    const tours = orderByIds(sortCmsTourSummaries(documents), catalogOrder.tourIds);
     return c.json({
       tours: await Promise.all(
         tours.map(async (tour) => {
@@ -1489,6 +1505,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
           };
         }),
       ),
+      catalogOrder: { rev: catalogOrder.rev, unpublished: catalogOrder.unpublished },
     });
   });
 
@@ -1627,6 +1644,46 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     }
     await deleteCmsTour(store, tour);
     return c.body(null, 204);
+  });
+
+  app.get('/api/cms/tours/order', async (c) => {
+    const catalog = await loadPublishedCatalogTours(store);
+    const state = await readTourCatalogOrderState(
+      store,
+      catalog.map((tour) => tour.id),
+    );
+    return c.json(state);
+  });
+
+  app.put('/api/cms/tours/order', async (c) => {
+    const documents = await listCmsTourDocuments(store);
+    const catalog = await loadPublishedCatalogTours(store);
+    const result = await saveSeasonTourOrder(store, {
+      documents,
+      catalogIds: catalog.map((tour) => tour.id),
+      body: await readJsonBody(c),
+    });
+    if (!result.ok) {
+      return c.json(
+        result.rev == null ? { error: result.error } : { error: result.error, rev: result.rev },
+        result.error === 'rev_conflict' ? 409 : 400,
+      );
+    }
+    return c.json(result.state);
+  });
+
+  app.post('/api/cms/tours/order/publish', async (c) => {
+    if (!c.get('session').canPublishTours) {
+      return c.json({ error: 'forbidden' }, 403);
+    }
+    const result = await publishStoredTourCatalogOrder(store, await readJsonBody(c));
+    if (!result.ok) {
+      return c.json(
+        result.rev == null ? { error: result.error } : { error: result.error, rev: result.rev },
+        result.error === 'rev_conflict' ? 409 : 400,
+      );
+    }
+    return c.json(result.state);
   });
 
   app.get('/api/cms/tours/:id', async (c) => {

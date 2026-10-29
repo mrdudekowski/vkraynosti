@@ -9,6 +9,8 @@ export function assertCmsTourId(tourId: string): string {
 
 export const CMS_PUBLISHED_CATALOG_KEY = 'published/tours.json' as const;
 export const CMS_DRAFT_INDEX_KEY = 'draft/tours-index.json' as const;
+/** Черновик порядка карточек. На сайте порядок берётся из массива `published/tours.json`, не из этого файла. */
+export const CMS_TOUR_CATALOG_ORDER_KEY = 'draft/tour-catalog-order.json' as const;
 export const CMS_LEGACY_DRAFT_CATALOG_KEY = 'draft/tours.json' as const;
 export const CMS_USERS_KEY = 'private/users.json' as const;
 export const CMS_CRM_KEY = 'private/crm.json' as const;

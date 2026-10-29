@@ -3,7 +3,7 @@ import type { AdminPublishQueueItem } from './api';
 import { ADMIN_UI } from './constants/ui';
 import { formatAdminQueueDate } from './formatAdminCopy';
 
-export const INBOX_KIND_FILTERS = ['all', 'tour', 'departure'] as const;
+export const INBOX_KIND_FILTERS = ['all', 'tour', 'departure', 'seo'] as const;
 export type InboxKindFilter = (typeof INBOX_KIND_FILTERS)[number];
 
 export const INBOX_READINESS_FILTERS = ['all', 'ready', 'blockers'] as const;
@@ -120,6 +120,39 @@ export function sortInboxQueueItems(
     const rightTime = right.timestamp ?? '';
     return sort === 'newest' ? rightTime.localeCompare(leftTime) : leftTime.localeCompare(rightTime);
   });
+}
+
+export function inboxBulkPublishLabel(kind: InboxKindFilter): string {
+  if (kind === 'tour') return ADMIN_UI.inboxPublishTours;
+  if (kind === 'departure') return ADMIN_UI.inboxPublishDepartures;
+  if (kind === 'seo') return ADMIN_UI.inboxPublishSeo;
+  return ADMIN_UI.inboxPublishAll;
+}
+
+export function inboxBulkPublishPlan(
+  kind: InboxKindFilter,
+  items: readonly AdminPublishQueueItem[],
+  seoRev: number | null,
+): {
+  tourIds: string[];
+  departureIds: string[];
+  tourRevs: Record<string, number>;
+  seoRev: number | null;
+} {
+  const tours = kind === 'all' || kind === 'tour'
+    ? items.filter((item) => item.kind === 'tour' && item.ready !== false)
+    : [];
+  const departures = kind === 'all' || kind === 'departure'
+    ? items.filter((item) => item.kind === 'departure' && item.ready !== false)
+    : [];
+  return {
+    tourIds: tours.map((item) => item.id),
+    departureIds: departures.map((item) => item.id),
+    tourRevs: Object.fromEntries(
+      tours.flatMap((item) => (item.rev == null ? [] : [[item.id, item.rev]])),
+    ),
+    seoRev: kind === 'all' || kind === 'seo' ? seoRev : null,
+  };
 }
 
 export function filterInboxQueueItems(

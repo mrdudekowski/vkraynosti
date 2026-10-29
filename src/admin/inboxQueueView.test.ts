@@ -3,6 +3,8 @@ import type { AdminPublishQueueItem } from './api';
 import {
   INBOX_AUTHOR_UNKNOWN,
   filterInboxQueueItems,
+  inboxBulkPublishLabel,
+  inboxBulkPublishPlan,
   inboxQueueAuthors,
   inboxQueueChangeLine,
   inboxQueueHasUnknownAuthor,
@@ -118,6 +120,38 @@ describe('inboxQueueView', () => {
   it('для выезда показывает название тура и дату', () => {
     expect(inboxQueueItemTitle(departure)).toBe('Изюбриная');
     expect(inboxQueueItemTitle(tour)).toBe('Изюбриная');
+  });
+
+  it('называет кнопку по выбранному типу публикации', () => {
+    expect(inboxBulkPublishLabel('all')).toBe('Опубликовать все');
+    expect(inboxBulkPublishLabel('tour')).toBe('Опубликовать туры');
+    expect(inboxBulkPublishLabel('departure')).toBe('Опубликовать выезды');
+    expect(inboxBulkPublishLabel('seo')).toBe('Опубликовать SEO');
+  });
+
+  it('в план публикации попадает только выбранный тип', () => {
+    const items = [tour, departure];
+    expect(inboxBulkPublishPlan('tour', items, 8)).toEqual({
+      tourIds: ['winter-1'],
+      departureIds: [],
+      tourRevs: {},
+      seoRev: null,
+    });
+    expect(inboxBulkPublishPlan('departure', items, 8)).toEqual({
+      tourIds: [],
+      departureIds: ['dep-1'],
+      tourRevs: {},
+      seoRev: null,
+    });
+    expect(inboxBulkPublishPlan('seo', items, 8)).toEqual({
+      tourIds: [],
+      departureIds: [],
+      tourRevs: {},
+      seoRev: 8,
+    });
+    expect(inboxBulkPublishPlan('all', items, 8).seoRev).toBe(8);
+    expect(inboxBulkPublishPlan('all', items, 8).tourIds).toEqual(['winter-1']);
+    expect(inboxBulkPublishPlan('all', items, 8).departureIds).toEqual(['dep-1']);
   });
 
   it('собирает строку изменения цены для тура в очереди', () => {

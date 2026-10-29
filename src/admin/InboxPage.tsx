@@ -5,6 +5,7 @@ import { ADMIN_PATHS } from './constants/routes';
 import { ADMIN_INBOX_SORT_STORAGE_KEY, ADMIN_INBOX_TAB_STORAGE_KEY } from '../constants/adminUiTokens';
 import {
   adminPublishQueue,
+  adminPublishSiteContent,
   adminReturnPublishQueue,
   adminListSiteContentChanges,
   type AdminPublishQueueItem,
@@ -41,6 +42,8 @@ import {
   INBOX_READINESS_FILTERS,
   QUEUE_SUMMARY_LABEL,
   filterInboxQueueItems,
+  inboxBulkPublishLabel,
+  inboxBulkPublishPlan,
   inboxQueueAuthors,
   inboxQueueHasUnknownAuthor,
   inboxQueueItemTitle,
@@ -60,6 +63,7 @@ const KIND_FILTER_LABEL: Record<InboxKindFilter, string> = {
   all: ADMIN_UI.tourVisibility.all,
   tour: ADMIN_UI.inboxTabTours,
   departure: ADMIN_UI.inboxTabDepartures,
+  seo: 'SEO',
 };
 
 const READY_FILTER_LABEL: Record<InboxReadinessFilter, string> = {
@@ -84,6 +88,7 @@ function queuePayload(items: readonly AdminPublishQueueItem[]): {
     tourRevs: Object.fromEntries(
       tours.flatMap((item) => (item.rev == null ? [] : [[item.id, item.rev]])),
     ),
+    seoRev: null,
   };
 }
 
@@ -108,6 +113,7 @@ const InboxPage = () => {
     tourIds: string[];
     departureIds: string[];
     tourRevs: Record<string, number>;
+    seoRev: number | null;
   } | null>(null);
   const [query, setQuery] = useState('');
   const [author, setAuthor] = useState<string>(INBOX_AUTHOR_ALL);
@@ -163,7 +169,15 @@ const InboxPage = () => {
     [author, items, kind, query, readiness, sort],
   );
   const publishable = visible.filter((item) => canPublishItem(session, item) && item.ready !== false);
-  const canBulkPublish = publishable.length > 0;
+  const shownSiteChanges = kind === 'seo' ? siteChanges.filter((item) => item.kind === 'seo') : siteChanges;
+  const seoChange = siteChanges.find((item) => item.kind === 'seo') ?? null;
+  const canPublishSeo = session.role === 'admin' || session.canEditSiteContent === true;
+  const publishPlan = inboxBulkPublishPlan(
+    kind,
+    publishable,
+    canPublishSeo ? seoChange?.rev ?? null : null,
+  );
+  const canBulkPublish = publishPlan.tourIds.length > 0 || publishPlan.departureIds.length > 0 || publishPlan.seoRev != null;
   const selectedItems = visible.filter((item) => selectedKeys.has(`${item.kind}:${item.id}`));
   const selectedPublishable = selectedItems.filter(
     (item) => canPublishItem(session, item) && item.ready !== false,
@@ -185,18 +199,37 @@ const InboxPage = () => {
       tourIds: string[];
       departureIds: string[];
       tourRevs: Record<string, number>;
+      seoRev: number | null;
     },
     confirmDeleteFutureDepartures = false,
   ) => {
     setBusy(true);
-    void adminPublishQueue(
-      confirmDeleteFutureDepartures
-        ? { ...payload, confirmDeleteFutureDepartures: true }
-        : payload,
-    )
-      .then((result) => {
+    const hasQueue = payload.tourIds.length > 0 || payload.departureIds.length > 0;
+    const queueRequest = hasQueue
+      ? adminPublishQueue(
+          confirmDeleteFutureDepartures
+            ? {
+                tourIds: payload.tourIds,
+                departureIds: payload.departureIds,
+                tourRevs: payload.tourRevs,
+                confirmDeleteFutureDepartures: true,
+              }
+            : {
+                tourIds: payload.tourIds,
+                departureIds: payload.departureIds,
+                tourRevs: payload.tourRevs,
+              },
+        )
+      : Promise.resolve(null);
+    void queueRequest
+      .then(async (result) => {
+        if (payload.seoRev != null) {
+          await adminPublishSiteContent('seo', payload.seoRev);
+        }
         setHideConfirmPayload(null);
-        push({ message: adminPublishGuestMessage(result.catalogMirror ?? catalogMirror) });
+        push({
+          message: adminPublishGuestMessage(result?.catalogMirror ?? catalogMirror),
+        });
         refreshAfterMutation();
       })
       .catch((error: unknown) => {
@@ -220,18 +253,36 @@ const InboxPage = () => {
         description={ADMIN_UI.inboxDescription}
         breadcrumbs={[{ label: ADMIN_UI.dashboardNav, to: ADMIN_PATHS.dashboard }, { label: ADMIN_UI.inboxNav }]}
         action={
-          canBulkPublish ? (
-            <AdminButton
-              type="button"
-              variant="publish"
-              disabled={busy || items == null}
-              onClick={() => {
-                runPayload(queuePayload(publishable));
-              }}
-            >
-              {busy ? ADMIN_UI.inboxPublishing : ADMIN_UI.inboxPublishAll}
-            </AdminButton>
-          ) : null
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex flex-wrap gap-1" role="group" aria-label={ADMIN_UI.inboxTablist}>
+              {INBOX_KIND_FILTERS.map((item) => (
+                <AdminButton
+                  key={item}
+                  type="button"
+                  variant={kind === item ? 'secondary' : 'ghost'}
+                  aria-pressed={kind === item}
+                  onClick={() => {
+                    setCardKind(null);
+                    setStoredKind(item);
+                  }}
+                >
+                  {KIND_FILTER_LABEL[item]}
+                </AdminButton>
+              ))}
+            </div>
+            {canBulkPublish ? (
+              <AdminButton
+                type="button"
+                variant="publish"
+                disabled={busy || items == null}
+                onClick={() => {
+                  runPayload(publishPlan);
+                }}
+              >
+                {busy ? ADMIN_UI.inboxPublishing : inboxBulkPublishLabel(kind)}
+              </AdminButton>
+            ) : null}
+          </div>
         }
       />
       {loadError ? (
@@ -272,27 +323,11 @@ const InboxPage = () => {
               </div>
               <AdminButton type="button" variant="ghost" onClick={() => navigate(ADMIN_PATHS.site)}>Открыть «Сайт»</AdminButton>
             </div>
-            {siteChanges.length === 0 ? <p className="text-sm text-text-muted">Новых изменений нет.</p> : <div className="grid gap-3 md:grid-cols-2">{siteChanges.map((item) => <article key={item.kind} className="rounded-admin-control border border-divider p-3"><div className="flex items-start justify-between gap-3"><strong>{item.title}</strong><span className="text-xs text-text-muted">rev {item.rev}</span></div><ul className="mt-2 grid gap-1 text-sm text-text-muted">{item.changes.map((change) => <li key={`${item.kind}-${change.label}`}><span className="text-text-primary">{change.label}:</span> {change.from} → {change.to}</li>)}</ul></article>)}</div>}
+            {shownSiteChanges.length === 0 ? <p className="text-sm text-text-muted">Новых изменений нет.</p> : <div className="grid gap-3 md:grid-cols-2">{shownSiteChanges.map((item) => <article key={item.kind} className="rounded-admin-control border border-divider p-3"><div className="flex items-start justify-between gap-3"><strong>{item.title}</strong><span className="text-xs text-text-muted">rev {item.rev}</span></div><ul className="mt-2 grid gap-1 text-sm text-text-muted">{item.changes.map((change) => <li key={`${item.kind}-${change.label}`}><span className="text-text-primary">{change.label}:</span> {change.from} → {change.to}</li>)}</ul></article>)}</div>}
           </section>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
               <div className="flex min-w-0 flex-col gap-2">
-                <div className="flex flex-wrap gap-1" role="group" aria-label={ADMIN_UI.inboxTablist}>
-                  {INBOX_KIND_FILTERS.map((item) => (
-                    <AdminButton
-                      key={item}
-                      type="button"
-                      variant={kind === item ? 'secondary' : 'ghost'}
-                      aria-pressed={kind === item}
-                      onClick={() => {
-                        setCardKind(null);
-                        setStoredKind(item);
-                      }}
-                    >
-                      {KIND_FILTER_LABEL[item]}
-                    </AdminButton>
-                  ))}
-                </div>
                 <div className="flex flex-wrap gap-1" role="group" aria-label={ADMIN_UI.inboxReadyFilter}>
                   {INBOX_READINESS_FILTERS.map((item) => (
                     <AdminButton

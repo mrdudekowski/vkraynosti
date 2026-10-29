@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -256,5 +256,34 @@ describe('TourList', () => {
     await user.click(screen.getAllByRole('button', { name: ADMIN_UI.tourMenu })[0]);
     await user.click(screen.getByRole('menuitem', { name: ADMIN_UI.deleteTourAction }));
     expect(onDelete).toHaveBeenCalledWith('winter-1');
+  });
+
+  it('не показывает смену порядка, пока список не умеет сохранять', () => {
+    render(
+      <MemoryRouter>
+        <TourList tours={tours} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('button', { name: ADMIN_UI.reorderTours })).not.toBeInTheDocument();
+  });
+
+  it('сдвигает тур стрелкой и возвращает прежний порядок, если сохранение не удалось', async () => {
+    const user = userEvent.setup();
+    const onReorder = vi.fn().mockRejectedValue(new Error('order_save_failed'));
+    const seasonTours = [tours[0], tours[1]];
+    render(
+      <MemoryRouter>
+        <TourList tours={seasonTours} onReorder={onReorder} />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: ADMIN_UI.reorderTours }));
+    await user.click(screen.getByRole('button', { name: `${ADMIN_UI.moveDown}, ${tours[0].title}` }));
+
+    expect(onReorder).toHaveBeenCalledWith([tours[1].id, tours[0].id]);
+    await waitFor(() => {
+      expect(screen.getAllByRole('listitem')[0]).toHaveTextContent(tours[0].title);
+    });
   });
 });

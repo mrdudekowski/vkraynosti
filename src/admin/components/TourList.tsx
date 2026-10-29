@@ -1,8 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
+  ChevronDown,
+  ChevronUp,
   EyeOff,
   FilePen,
   Globe,
+  GripVertical,
   Layers,
   LayoutGrid,
   List,
@@ -24,8 +27,10 @@ import { adminIncidentBlocksMedia, useAdminIncident } from '../adminIncidentCont
 import { ADMIN_PATHS } from '../constants/routes';
 import { ADMIN_UI } from '../constants/ui';
 import { useAdminStoredState } from '../hooks/useAdminStoredState';
+import { moveItemToIndex } from '../moveItem';
 import AdminBadge from './AdminBadge';
 import AdminButton from './AdminButton';
+import AdminIconButton from './AdminIconButton';
 import AdminDataList from './AdminDataList';
 import AdminEmptyState from './AdminEmptyState';
 import { AdminTextInput } from './AdminFields';
@@ -44,7 +49,70 @@ type TourListProps = {
   onClone?: (tourId: string) => void;
   onDelete?: (tourId: string) => void;
   onAddTour?: () => void;
+  onReorder?: (tourIds: string[]) => Promise<void> | void;
+  reorderDisabled?: boolean;
+  orderUnpublished?: boolean;
+  onPublishOrder?: () => Promise<void> | void;
 };
+
+const TOUR_ORDER_DRAG = 'application/x-vkr-tour-order';
+
+type TourReorderListProps = {
+  tours: AdminTourListItem[];
+  busy: boolean;
+  onMove: (fromIndex: number, toIndex: number) => void;
+};
+
+const TourReorderList = ({ tours, busy, onMove }: TourReorderListProps) => (
+  <ul className="flex flex-col gap-2" aria-label={ADMIN_UI.reorderTours}>
+    {tours.map((tour, index) => (
+      <li
+        key={tour.id}
+        className="flex items-center gap-2 rounded-admin-control border border-divider bg-surface-light px-2 py-1"
+        onDragOver={(event) => {
+          event.preventDefault();
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          const fromIndex = Number.parseInt(event.dataTransfer.getData(TOUR_ORDER_DRAG), 10);
+          if (!Number.isInteger(fromIndex)) {
+            return;
+          }
+          onMove(fromIndex, index);
+        }}
+      >
+        <button
+          type="button"
+          draggable
+          disabled={busy}
+          className="admin-icon-btn cursor-grab"
+          aria-label={`${ADMIN_UI.dragItem}, ${tour.title}`}
+          onDragStart={(event) => {
+            event.dataTransfer.setData(TOUR_ORDER_DRAG, String(index));
+            event.dataTransfer.effectAllowed = 'move';
+          }}
+        >
+          <GripVertical aria-hidden size={16} strokeWidth={1.75} />
+        </button>
+        <span className="min-w-0 flex-1 truncate font-heading text-card text-text-primary">{tour.title}</span>
+        <AdminIconButton
+          icon={ChevronUp}
+          label={`${ADMIN_UI.moveUp}, ${tour.title}`}
+          className="admin-desktop:hidden"
+          disabled={busy || index === 0}
+          onClick={() => onMove(index, index - 1)}
+        />
+        <AdminIconButton
+          icon={ChevronDown}
+          label={`${ADMIN_UI.moveDown}, ${tour.title}`}
+          className="admin-desktop:hidden"
+          disabled={busy || index === tours.length - 1}
+          onClick={() => onMove(index, index + 1)}
+        />
+      </li>
+    ))}
+  </ul>
+);
 
 type TourListView = 'cards' | 'list';
 type TourReadinessFilter = 'all' | 'ready' | 'blockers';
@@ -71,6 +139,10 @@ const TourList = ({
   onClone,
   onDelete,
   onAddTour,
+  onReorder,
+  reorderDisabled = false,
+  orderUnpublished = false,
+  onPublishOrder,
 }: TourListProps) => {
   const navigate = useNavigate();
   const { incident } = useAdminIncident();
@@ -81,7 +153,47 @@ const TourList = ({
   const [sort, setSort] = useState<TourSort>('default');
   const [storedView, setView] = useAdminStoredState(ADMIN_TOUR_LIST_VIEW_STORAGE_KEY, isTourListView);
   const [openMenuTourId, setOpenMenuTourId] = useState<string | null>(null);
+  const [reordering, setReordering] = useState(false);
+  const [draftOrder, setDraftOrder] = useState<AdminTourListItem[] | null>(null);
+  const [reorderBusy, setReorderBusy] = useState(false);
+  const reorderLock = useRef(false);
   const view = storedView ?? 'cards';
+  const reorderItems = draftOrder ?? tours;
+
+  const toggleReorder = () => {
+    if (reorderBusy) {
+      return;
+    }
+    if (reordering) {
+      setReordering(false);
+      setDraftOrder(null);
+      return;
+    }
+    setDraftOrder(tours);
+    setReordering(true);
+  };
+
+  const moveTour = (fromIndex: number, toIndex: number) => {
+    if (onReorder == null || reorderLock.current) {
+      return;
+    }
+    const next = moveItemToIndex(reorderItems, fromIndex, toIndex);
+    if (next === reorderItems) {
+      return;
+    }
+    const previous = reorderItems;
+    reorderLock.current = true;
+    setReorderBusy(true);
+    setDraftOrder(next);
+    void Promise.resolve(onReorder(next.map((tour) => tour.id)))
+      .catch(() => {
+        setDraftOrder(previous);
+      })
+      .finally(() => {
+        reorderLock.current = false;
+        setReorderBusy(false);
+      });
+  };
 
   const visible = useMemo(
     () => {
@@ -172,6 +284,17 @@ const TourList = ({
                   {ADMIN_UI.addTour}
                 </AdminButton>
               ) : null}
+              {onReorder != null ? (
+                <AdminButton
+                  type="button"
+                  variant="secondary"
+                  className="ml-2"
+                  disabled={reorderDisabled || reorderBusy}
+                  onClick={toggleReorder}
+                >
+                  {reordering ? ADMIN_UI.reorderToursDone : ADMIN_UI.reorderTours}
+                </AdminButton>
+              ) : null}
             </div>
           </div>
         </div>
@@ -216,7 +339,19 @@ const TourList = ({
           </select>
         </label>
       </div>
-      {visible.length === 0 ? (
+      {orderUnpublished ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-text-muted">{ADMIN_UI.reorderToursPending}</p>
+          {onPublishOrder != null ? (
+            <AdminButton type="button" variant="publish" onClick={() => void onPublishOrder()}>
+              {ADMIN_UI.reorderToursPublish}
+            </AdminButton>
+          ) : null}
+        </div>
+      ) : null}
+      {reordering ? (
+        <TourReorderList tours={reorderItems} busy={reorderBusy} onMove={moveTour} />
+      ) : visible.length === 0 ? (
         <AdminEmptyState
           title={ADMIN_UI.emptySearch}
           icon={Search}

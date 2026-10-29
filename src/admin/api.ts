@@ -196,6 +196,58 @@ export async function adminListTours(): Promise<AdminTourListItem[]> {
   return body.tours;
 }
 
+export type AdminTourCatalogOrder = {
+  rev: number;
+  unpublished: boolean;
+};
+
+async function readTourCatalogOrder(response: Response, fallback: string): Promise<AdminTourCatalogOrder> {
+  if (response.status === 409) {
+    throw new Error('rev_conflict');
+  }
+  if (response.status === 403) {
+    throw new Error('forbidden');
+  }
+  if (!response.ok) {
+    throw new Error(fallback);
+  }
+  const body = await readJson<AdminTourCatalogOrder>(response);
+  return { rev: body.rev, unpublished: body.unpublished };
+}
+
+export async function adminGetTourCatalogOrder(): Promise<AdminTourCatalogOrder> {
+  const response = await fetch('/api/cms/tours/order', { credentials: 'include' });
+  return readTourCatalogOrder(response, 'order_failed');
+}
+
+export async function adminSaveTourOrder(input: {
+  rev: number;
+  season: CmsTourDocument['season'];
+  tourIds: string[];
+}): Promise<AdminTourCatalogOrder> {
+  const response = await fetch('/api/cms/tours/order', {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      rev: input.rev,
+      season: input.season,
+      tourIds: input.tourIds,
+    }),
+  });
+  return readTourCatalogOrder(response, 'order_save_failed');
+}
+
+export async function adminPublishTourOrder(rev: number): Promise<AdminTourCatalogOrder> {
+  const response = await fetch('/api/cms/tours/order/publish', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ rev }),
+  });
+  return readTourCatalogOrder(response, 'order_publish_failed');
+}
+
 export async function adminListDepartures(input: {
   from: string;
   to: string;

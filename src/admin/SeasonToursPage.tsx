@@ -1,10 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, Navigate, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { adminCalendarSeason } from './adminCalendarSeason';
 import {
   adminCloneTour,
   adminDeleteTour,
+  adminGetTourCatalogOrder,
+  adminPublishTourOrder,
+  adminSaveTourOrder,
   type AdminDeparture,
+  type AdminSession,
+  type AdminTourCatalogOrder,
   type AdminTourListItem,
 } from './api';
 import {
@@ -39,6 +44,32 @@ import {
 import { addIsoDays, vladivostokCalendarDate } from './scheduleCalendar';
 import type { Season } from '../types';
 
+function reorderToursInSeason(
+  tours: AdminTourListItem[],
+  season: Season,
+  tourIds: string[],
+): AdminTourListItem[] {
+  const toursById = new Map(
+    tours.filter((tour) => tour.season === season).map((tour) => [tour.id, tour]),
+  );
+  const orderedSeasonTours: AdminTourListItem[] = [];
+  for (const tourId of tourIds) {
+    const tour = toursById.get(tourId);
+    if (tour != null) {
+      orderedSeasonTours.push(tour);
+    }
+  }
+  let nextSeasonTourIndex = 0;
+  return tours.map((tour) => {
+    if (tour.season !== season) {
+      return tour;
+    }
+    const replacement = orderedSeasonTours[nextSeasonTourIndex];
+    nextSeasonTourIndex += 1;
+    return replacement ?? tour;
+  });
+}
+
 function nearestByTourId(departures: AdminDeparture[], todayIso: string): Record<string, string> {
   const next: Record<string, string> = {};
   for (const departure of departures) {
@@ -58,8 +89,13 @@ function nearestByTourId(departures: AdminDeparture[], todayIso: string): Record
 
 const SeasonToursPage = () => {
   const { season: seasonParam, tourId } = useParams<{ season?: string; tourId?: string }>();
+  const { session } = useOutletContext<{ session: AdminSession }>();
   const { push } = useAdminToast();
   const navigate = useNavigate();
+  const catalogOrderRef = useRef<AdminTourCatalogOrder>({ rev: 0, unpublished: false });
+  const catalogOrderQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const [catalogOrderReady, setCatalogOrderReady] = useState(false);
+  const [catalogOrderUnpublished, setCatalogOrderUnpublished] = useState(false);
   const requested = seasonParam ?? tourId;
   const season: Season | undefined = isAdminSeasonParam(requested)
     ? requested
@@ -123,6 +159,33 @@ const SeasonToursPage = () => {
     };
   }, [departureRange, reloadToken]);
 
+  useEffect(() => {
+    let cancelled = false;
+    void adminGetTourCatalogOrder()
+      .then((order) => {
+        if (cancelled) {
+          return;
+        }
+        catalogOrderRef.current = { rev: order.rev, unpublished: order.unpublished };
+        setCatalogOrderUnpublished(order.unpublished);
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+        catalogOrderRef.current = { rev: 0, unpublished: false };
+        setCatalogOrderUnpublished(false);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setCatalogOrderReady(true);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   if (requested != null && !isAdminSeasonParam(requested)) {
     return <Navigate to={ADMIN_PATHS.tours} replace />;
   }
@@ -152,6 +215,48 @@ const SeasonToursPage = () => {
   const seasonTours = tours.filter((tour) => tour.season === season);
   const nearest = nearestByTourId(departures, todayIso);
   const onSiteCount = countToursOnSite(seasonTours);
+
+  const enqueueCatalogOrder = (task: () => Promise<void>) => {
+    const run = catalogOrderQueueRef.current.then(task);
+    catalogOrderQueueRef.current = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    return run;
+  };
+
+  const saveTourOrder = (tourIds: string[]) =>
+    enqueueCatalogOrder(async () => {
+      try {
+        const saved = await adminSaveTourOrder({
+          rev: catalogOrderRef.current.rev,
+          season,
+          tourIds,
+        });
+        catalogOrderRef.current = { rev: saved.rev, unpublished: saved.unpublished };
+        setCatalogOrderUnpublished(saved.unpublished);
+        setTours((current) =>
+          current == null ? current : reorderToursInSeason(current, season, tourIds),
+        );
+      } catch (caught) {
+        push({ message: ADMIN_UI.reorderToursError });
+        throw caught;
+      }
+    });
+
+  const publishTourOrder = () =>
+    enqueueCatalogOrder(async () => {
+      try {
+        const published = await adminPublishTourOrder(catalogOrderRef.current.rev);
+        catalogOrderRef.current = { rev: published.rev, unpublished: false };
+        setCatalogOrderUnpublished(false);
+        invalidateAdminTours();
+        setTours(await refreshAdminTours());
+        push({ message: ADMIN_UI.reorderToursPublished });
+      } catch {
+        push({ message: ADMIN_UI.reorderToursPublishError });
+      }
+    });
 
   const changeGuestVisibility = async (tourIdToUpdate: string, status: 'hidden' | 'active') => {
     setBusyTourId(tourIdToUpdate);
@@ -213,6 +318,10 @@ const SeasonToursPage = () => {
         onChangeGuestVisibility={(id, status) => {
           void changeGuestVisibility(id, status);
         }}
+        onReorder={saveTourOrder}
+        reorderDisabled={!catalogOrderReady}
+        orderUnpublished={catalogOrderUnpublished}
+        onPublishOrder={session.canPublishTours ? publishTourOrder : undefined}
       />
       {cloneTour != null ? (
         <CloneTourModal

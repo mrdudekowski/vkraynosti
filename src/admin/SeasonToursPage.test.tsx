@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,6 +15,9 @@ vi.mock('./api', () => ({
   adminCreateTour: vi.fn(),
   adminCloneTour: vi.fn(),
   adminDeleteTour: vi.fn(),
+  adminGetTourCatalogOrder: vi.fn(),
+  adminSaveTourOrder: vi.fn(),
+  adminPublishTourOrder: vi.fn(),
 }));
 
 vi.mock('./applyAdminTourGuestVisibility', () => ({
@@ -25,8 +28,11 @@ import {
   adminCloneTour,
   adminCreateTour,
   adminDeleteTour,
+  adminGetTourCatalogOrder,
   adminListDepartures,
   adminListTours,
+  adminPublishTourOrder,
+  adminSaveTourOrder,
 } from './api';
 import { applyAdminTourGuestVisibility } from './applyAdminTourGuestVisibility';
 import { clearAdminDataCache } from './adminDataCache';
@@ -97,8 +103,12 @@ describe('SeasonToursPage', () => {
     vi.mocked(adminCreateTour).mockReset();
     vi.mocked(adminCloneTour).mockReset();
     vi.mocked(adminDeleteTour).mockReset();
+    vi.mocked(adminGetTourCatalogOrder).mockReset();
+    vi.mocked(adminSaveTourOrder).mockReset();
+    vi.mocked(adminPublishTourOrder).mockReset();
     vi.mocked(applyAdminTourGuestVisibility).mockReset();
     vi.mocked(adminListTours).mockResolvedValue([onSiteTour]);
+    vi.mocked(adminGetTourCatalogOrder).mockResolvedValue({ rev: 1, unpublished: false });
     vi.mocked(adminListDepartures).mockResolvedValue([]);
     vi.mocked(adminCreateTour).mockResolvedValue({
       document: createdDocument,
@@ -293,5 +303,39 @@ describe('SeasonToursPage', () => {
     expect(adminDeleteTour).toHaveBeenCalledTimes(1);
     resolveDelete();
     await screen.findByText(ADMIN_UI.deleteTourSuccess);
+  });
+
+  it('сохраняет новый порядок сезона и публикует его', async () => {
+    const user = userEvent.setup();
+    const secondTour: AdminTourListItem = {
+      ...onSiteTour,
+      id: 'winter-2',
+      title: 'Второй зимний',
+      slug: 'vtoroy-zimniy',
+    };
+    vi.mocked(adminListTours).mockResolvedValue([onSiteTour, secondTour]);
+    vi.mocked(adminSaveTourOrder).mockResolvedValue({ rev: 2, unpublished: true });
+    vi.mocked(adminPublishTourOrder).mockResolvedValue({ rev: 3, unpublished: false });
+    renderSeason();
+
+    expect(await screen.findByRole('link', { name: /Изюбриная/ })).toBeInTheDocument();
+    const reorder = await screen.findByRole('button', { name: ADMIN_UI.reorderTours });
+    await waitFor(() => expect(reorder).toBeEnabled());
+    expect(screen.queryByRole('button', { name: ADMIN_UI.reorderToursPublish })).not.toBeInTheDocument();
+
+    await user.click(reorder);
+    await user.click(screen.getByRole('button', { name: `${ADMIN_UI.moveDown}, ${onSiteTour.title}` }));
+
+    await waitFor(() => {
+      expect(adminSaveTourOrder).toHaveBeenCalledWith({
+        rev: 1,
+        season: 'winter',
+        tourIds: [secondTour.id, onSiteTour.id],
+      });
+    });
+    await user.click(await screen.findByRole('button', { name: ADMIN_UI.reorderToursPublish }));
+    await waitFor(() => {
+      expect(adminPublishTourOrder).toHaveBeenCalledWith(2);
+    });
   });
 });

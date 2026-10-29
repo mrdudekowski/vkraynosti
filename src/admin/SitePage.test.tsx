@@ -42,6 +42,20 @@ describe('SitePage', () => {
     } as never));
   });
 
+  it('reloads a saved section from the server when that section is opened again', async () => {
+    renderSite();
+    await screen.findByRole('tabpanel', { name: ADMIN_UI.siteTabTeam });
+
+    fireEvent.click(screen.getByRole('tab', { name: ADMIN_UI.siteTabContacts }));
+    await screen.findByRole('tabpanel', { name: ADMIN_UI.siteTabContacts });
+    fireEvent.click(screen.getByRole('tab', { name: ADMIN_UI.siteTabTeam }));
+
+    await waitFor(() => {
+      const teamLoads = vi.mocked(adminGetSiteContent).mock.calls.filter((call) => call[0] === 'team');
+      expect(teamLoads).toHaveLength(2);
+    });
+  });
+
   it('switches panels without replacing the HashRouter route', async () => {
     renderSite();
     await screen.findByRole('tabpanel', { name: ADMIN_UI.siteTabTeam });

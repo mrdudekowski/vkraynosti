@@ -144,10 +144,27 @@ const SitePage = () => {
     };
   }, []);
 
+  const kindsForTab = (nextTab: Kind): Kind[] => (
+    nextTab === 'modal' ? ['modal', 'contacts'] : [nextTab]
+  );
+
+  const kindsToRefresh = (kinds: Kind[]): Kind[] => kinds.filter((kind) => {
+    const current = statusRef.current[kind];
+    return current !== 'dirty' && current !== 'saving';
+  });
+
   useEffect(() => {
-    const kinds: Kind[] = tab === 'modal' ? ['modal', 'contacts'] : [tab];
-    return loadKinds(kinds, false);
+    return loadKinds(kindsToRefresh(kindsForTab(tab)), true);
   }, [loadKinds, tab]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (window.document.visibilityState !== 'visible') return;
+      loadKinds(kindsToRefresh(kindsForTab(tabRef.current)), true);
+    };
+    window.document.addEventListener('visibilitychange', onVisible);
+    return () => window.document.removeEventListener('visibilitychange', onVisible);
+  }, [loadKinds]);
 
   useEffect(() => {
     if (reloadToken === 0) return;

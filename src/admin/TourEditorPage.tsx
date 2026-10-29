@@ -252,6 +252,22 @@ const TourEditorPage = () => {
     };
   }, [tourId, reloadToken]);
 
+  useEffect(() => {
+    const onVisible = () => {
+      if (window.document.visibilityState !== 'visible' || tourId == null || saving || publishing || uploading) return;
+      const current = documentRef.current;
+      if (
+        current != null
+        && editorSnapshot(patchRef.current, layoutRef.current, current.status) !== savedSnapshotRef.current
+      ) {
+        return;
+      }
+      setReloadToken((token) => token + 1);
+    };
+    window.document.addEventListener('visibilitychange', onVisible);
+    return () => window.document.removeEventListener('visibilitychange', onVisible);
+  }, [publishing, saving, tourId, uploading]);
+
   const dirty = useMemo(
     () =>
       document != null && editorSnapshot(patch, layout, document.status) !== savedSnapshot,

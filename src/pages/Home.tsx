@@ -376,7 +376,7 @@ const Home = () => {
                 </div>
                 <ScrollScrubFade
                   as="div"
-                  className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                  className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4"
                 >
                   {visibleTours.map((tour, index) => (
                     <div
@@ -402,7 +402,7 @@ const Home = () => {
                         ref={expandControlButtonRef}
                         type="button"
                         onClick={toggleToursVisibility}
-                        className="card-base relative flex w-full max-h-tour-card max-w-tour-card justify-self-center flex-col overflow-hidden text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
+                        className="card-base relative flex h-full w-full max-h-tour-card max-w-tour-card justify-self-center flex-col overflow-hidden text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary"
                       >
                         <TourCardHeightGhost />
                         {activeSeasonLeadTour != null ? (

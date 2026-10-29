@@ -51,7 +51,9 @@ describe('TourCard published', () => {
   it('shows the published tour price when the schedule catalog is stale', () => {
     renderTourCard(spring3);
 
-    expect(screen.getByText(spring3.price)).toBeInTheDocument();
+    const price = screen.getByText(spring3.price);
+    expect(price).toBeInTheDocument();
+    expect(price.parentElement).toHaveClass('mt-auto', 'text-right');
     expect(
       screen.queryByText(UI.tourDetail.inDevelopmentPageAriaLabel)
     ).not.toBeInTheDocument();

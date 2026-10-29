@@ -129,12 +129,14 @@ const cardInner = (
             {UI.tourDetail.inDevelopmentPageAriaLabel}
           </p>
         ) : (
-          <div className="flex flex-col gap-2 text-sm">
-            <TourCardDuration tour={tour} />
-            <div className="w-full text-right">
+          <>
+            <div className="text-sm">
+              <TourCardDuration tour={tour} />
+            </div>
+            <div className="mt-auto w-full pt-2 text-right text-sm">
               <TourCardPrice tour={tour} />
             </div>
-          </div>
+          </>
         )}
       </div>
     </>

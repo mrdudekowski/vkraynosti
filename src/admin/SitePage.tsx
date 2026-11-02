@@ -18,6 +18,7 @@ import MediaConversionModal from './components/MediaConversionModal';
 import SiteContactsTab from './components/SiteContactsTab';
 import SiteFooterTab from './components/SiteFooterTab';
 import SiteModalTab from './components/SiteModalTab';
+import SitePoliciesTab from './components/SitePoliciesTab';
 import SiteSectionTabs from './components/SiteSectionTabs';
 import SiteTeamTab from './components/SiteTeamTab';
 import SiteSeoSection from './components/SiteSeoSection';
@@ -30,27 +31,55 @@ import type {
   ContactsContentDocument,
   FooterContentDocument,
   ModalContentDocument,
+  PolicyContentDocument,
   SiteContentDocument,
+  SiteContentDocumentKind,
+  SitePolicyKind,
   TeamContentDocument,
+} from '../cms/siteContentDocument';
+import {
+  SITE_POLICY_KINDS,
+  isPolicyContentDocument,
+  isSitePolicyDocumentId,
+  isSitePolicyKind,
+  policyDocumentIdFromKind,
+  policyKindFromDocumentId,
 } from '../cms/siteContentDocument';
 import type { SiteSeoDocument } from '../cms/siteSeoDocument';
 
-type Kind = 'team' | 'contacts' | 'footer' | 'modal' | 'seo';
+type SiteTabId = 'team' | 'contacts' | 'footer' | 'modal' | 'seo' | 'policies';
+type Kind = SiteContentDocumentKind;
 type LoadErrors = Partial<Record<Kind, string>>;
 type TabStatus = 'saved' | 'dirty' | 'saving' | 'published' | 'error';
 
-const SITE_TABS: Array<{ id: Kind; label: string }> = [
+const SITE_TABS: Array<{ id: SiteTabId; label: string }> = [
   { id: 'team', label: ADMIN_UI.siteTabTeam },
   { id: 'contacts', label: ADMIN_UI.siteTabContacts },
   { id: 'footer', label: ADMIN_UI.siteTabFooter },
   { id: 'modal', label: ADMIN_UI.siteTabModal },
   { id: 'seo', label: 'SEO страниц' },
+  { id: 'policies', label: ADMIN_UI.siteTabPolicies },
 ];
 
-const tabFromHash = (): Kind => {
+const tabFromHash = (): SiteTabId => {
   const query = location.hash.split('?')[1];
   const requested = new URLSearchParams(query).get('tab');
-  return SITE_TABS.some((item) => item.id === requested) ? (requested as Kind) : 'team';
+  return SITE_TABS.some((item) => item.id === requested) ? (requested as SiteTabId) : 'team';
+};
+
+const policyFromHash = (): SitePolicyKind => {
+  const query = location.hash.split('?')[1];
+  const requested = new URLSearchParams(query).get('policy');
+  if (requested && isSitePolicyKind(requested)) return requested;
+  if (requested && isSitePolicyDocumentId(requested)) return policyKindFromDocumentId(requested);
+  return SITE_POLICY_KINDS[0];
+};
+
+const siteHashFor = (nextTab: SiteTabId, nextPolicy: SitePolicyKind): string => {
+  if (nextTab === 'policies') {
+    return `#/site?tab=policies&policy=${policyDocumentIdFromKind(nextPolicy)}`;
+  }
+  return `#/site?tab=${nextTab}`;
 };
 
 const siteErrorMessage = (reason: unknown) => {
@@ -67,7 +96,8 @@ const siteErrorMessage = (reason: unknown) => {
 };
 
 const SitePage = () => {
-  const [tab, setTab] = useState<Kind>(tabFromHash);
+  const [tab, setTab] = useState<SiteTabId>(tabFromHash);
+  const [policyKind, setPolicyKind] = useState<SitePolicyKind>(policyFromHash);
   const [documents, setDocuments] = useState<Partial<Record<Kind, SiteContentDocument>>>({});
   const [revisions, setRevisions] = useState<Partial<Record<Kind, number>>>({});
   const [status, setStatus] = useState<Partial<Record<Kind, TabStatus>>>({});
@@ -84,14 +114,17 @@ const SitePage = () => {
   const revisionsRef = useRef(revisions);
   const statusRef = useRef(status);
   const tabRef = useRef(tab);
+  const policyKindRef = useRef(policyKind);
   documentsRef.current = documents;
   revisionsRef.current = revisions;
   statusRef.current = status;
   tabRef.current = tab;
+  policyKindRef.current = policyKind;
 
-  const document = documents[tab];
-  const isSaving = status[tab] === 'saving';
-  const isDirty = status[tab] === 'dirty';
+  const activeKind: Kind = tab === 'policies' ? policyKind : tab;
+  const document = documents[activeKind];
+  const isSaving = status[activeKind] === 'saving';
+  const isDirty = status[activeKind] === 'dirty';
 
   const loadKinds = useCallback((kinds: Kind[], force: boolean) => {
     const toLoad = kinds.filter((kind) => force || documentsRef.current[kind] == null);
@@ -134,19 +167,21 @@ const SitePage = () => {
             .filter((entry): entry is readonly [Kind, string] => entry[1] != null),
         ),
       }));
-      const currentTab = tabRef.current;
-      const primaryError = items.find((item) => item.kind === currentTab && 'error' in item)?.error;
+      const currentKind: Kind = tabRef.current === 'policies' ? policyKindRef.current : tabRef.current;
+      const primaryError = items.find((item) => item.kind === currentKind && 'error' in item)?.error;
       setError(primaryError ? siteErrorMessage(new Error(primaryError)) : null);
-      if (primaryError) setStatus((current) => ({ ...current, [currentTab]: 'error' }));
+      if (primaryError) setStatus((current) => ({ ...current, [currentKind]: 'error' }));
     });
     return () => {
       alive = false;
     };
   }, []);
 
-  const kindsForTab = (nextTab: Kind): Kind[] => (
-    nextTab === 'modal' ? ['modal', 'contacts'] : [nextTab]
-  );
+  const kindsForTab = (nextTab: SiteTabId): Kind[] => {
+    if (nextTab === 'modal') return ['modal', 'contacts'];
+    if (nextTab === 'policies') return [...SITE_POLICY_KINDS];
+    return [nextTab];
+  };
 
   const kindsToRefresh = (kinds: Kind[]): Kind[] => kinds.filter((kind) => {
     const current = statusRef.current[kind];
@@ -168,12 +203,14 @@ const SitePage = () => {
 
   useEffect(() => {
     if (reloadToken === 0) return;
-    return loadKinds([tabRef.current], true);
+    const kind: Kind = tabRef.current === 'policies' ? policyKindRef.current : tabRef.current;
+    return loadKinds([kind], true);
   }, [loadKinds, reloadToken]);
 
   const setDocument = (next: SiteContentDocument) => {
-    setDocuments((current) => ({ ...current, [tab]: next }));
-    setStatus((current) => ({ ...current, [tab]: 'dirty' }));
+    const kind = next.kind;
+    setDocuments((current) => ({ ...current, [kind]: next }));
+    setStatus((current) => ({ ...current, [kind]: 'dirty' }));
   };
 
   const persist = useCallback(async (kind: Kind, publish = false) => {
@@ -205,7 +242,7 @@ const SitePage = () => {
   useAdminAutosave({
     enabled: isDirty && !isSaving,
     snapshot: document == null ? '' : JSON.stringify(document),
-    save: () => persist(tab),
+    save: () => persist(activeKind),
   });
 
   useEffect(() => {
@@ -306,18 +343,50 @@ const SitePage = () => {
     }
   };
 
-  const selectTab = (next: Kind) => {
-    const current = tabRef.current;
-    if (statusRef.current[current] === 'dirty') {
-      void persist(current);
+  const selectTab = (next: SiteTabId) => {
+    const currentKind: Kind = tabRef.current === 'policies' ? policyKindRef.current : tabRef.current;
+    if (statusRef.current[currentKind] === 'dirty') {
+      void persist(currentKind);
     }
     setTab(next);
     setError(null);
-    const nextHash = `#/site?tab=${next}`;
+    const nextHash = siteHashFor(next, policyKindRef.current);
     if (location.hash !== nextHash) history.replaceState(null, '', nextHash);
   };
 
-  const tabStatus = status[tab];
+  const selectPolicy = (next: SitePolicyKind) => {
+    const currentKind = policyKindRef.current;
+    if (statusRef.current[currentKind] === 'dirty') {
+      void persist(currentKind);
+    }
+    setPolicyKind(next);
+    setError(null);
+    const nextHash = siteHashFor('policies', next);
+    if (location.hash !== nextHash) history.replaceState(null, '', nextHash);
+  };
+
+  const uploadPolicyPdf = async (file: File) => {
+    if (!isSiteContentPdfFile(file)) {
+      setError(ADMIN_UI.sitePdfRequired);
+      return;
+    }
+    const kind = policyKindRef.current;
+    try {
+      const result = await adminUploadSiteAsset(kind, file);
+      const current = documentsRef.current[kind];
+      if (current == null || !isPolicyContentDocument(current)) return;
+      setDocuments((value) => ({
+        ...value,
+        [kind]: { ...current, asset: result.asset },
+      }));
+      setStatus((value) => ({ ...value, [kind]: 'dirty' }));
+      setError(null);
+    } catch (reason: unknown) {
+      setError(siteErrorMessage(reason));
+    }
+  };
+
+  const tabStatus = status[activeKind];
   const statusLabel =
     tabStatus === 'published'
       ? ADMIN_UI.tourStatus.active
@@ -358,6 +427,14 @@ const SitePage = () => {
       />
     ) : tab === 'seo' ? (
       <SiteSeoSection value={document as SiteSeoDocument} onChange={setDocument} />
+    ) : tab === 'policies' ? (
+      <SitePoliciesTab
+        policyKind={policyKind}
+        value={document as PolicyContentDocument}
+        onSelectPolicy={selectPolicy}
+        onChange={setDocument}
+        onUploadPdf={uploadPolicyPdf}
+      />
     ) : (
       <SiteModalTab
         value={document as ModalContentDocument}
@@ -408,7 +485,7 @@ const SitePage = () => {
               variant="secondary"
               aria-busy={isSaving}
               disabled={document == null || isSaving}
-              onClick={() => void persist(tab)}
+              onClick={() => void persist(activeKind)}
             >
               <Save size={16} aria-hidden="true" />
               {isSaving ? ADMIN_UI.saving : ADMIN_UI.siteSaveDraft}
@@ -421,7 +498,7 @@ const SitePage = () => {
             aria-busy={isSaving}
             disabled={document == null || isSaving || isDirty}
             aria-describedby={publishHint != null ? 'admin-sticky-disabled-hint' : undefined}
-            onClick={() => void persist(tab, true)}
+            onClick={() => void persist(activeKind, true)}
           >
             <UploadCloud size={16} aria-hidden="true" />
             {isSaving ? ADMIN_UI.publishing : ADMIN_UI.sitePublish}

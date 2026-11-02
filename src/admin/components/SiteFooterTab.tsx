@@ -4,6 +4,7 @@ import type {
   FooterContentDocument,
   FooterContentRow,
 } from '../../cms/siteContentDocument';
+import { isSitePolicyDocumentId } from '../../cms/siteContentDocument';
 import { ADMIN_UI } from '../constants/ui';
 import { SITE_CONTENT_PDF_ACCEPT } from '../siteContentMediaAccept';
 import { resolveSiteContentAssetUrl } from '../siteContentAssetUrl';
@@ -246,22 +247,28 @@ const SiteFooterTab = ({ value, onChange, onUploadPdf }: SiteFooterTabProps) => 
                                 </p>
                               ) : (
                                 <p className="text-tooltip text-text-muted">
-                                  {ADMIN_UI.siteFooterPdfHint}
+                                  {isSitePolicyDocumentId(row.documentId)
+                                    ? ADMIN_UI.sitePolicyFileManaged
+                                    : ADMIN_UI.siteFooterPdfHint}
                                 </p>
                               )}
-                              <AdminMediaDropzone
-                                id={`${row.id}-pdf`}
-                                label={ADMIN_UI.siteFooterPdfHint}
-                                accept={SITE_CONTENT_PDF_ACCEPT}
-                                multiple={false}
-                                className="min-h-11 py-1"
-                                onFiles={(files) => {
-                                  const file = files[0];
-                                  if (file != null) void onUploadPdf(block.id, row.id, file);
-                                }}
-                              >
-                                {ADMIN_UI.siteFooterPdf}
-                              </AdminMediaDropzone>
+                              {isSitePolicyDocumentId(row.documentId) ? (
+                                <p className="text-tooltip text-text-muted">{ADMIN_UI.sitePolicyFileManaged}</p>
+                              ) : (
+                                <AdminMediaDropzone
+                                  id={`${row.id}-pdf`}
+                                  label={ADMIN_UI.siteFooterPdfHint}
+                                  accept={SITE_CONTENT_PDF_ACCEPT}
+                                  multiple={false}
+                                  className="min-h-11 py-1"
+                                  onFiles={(files) => {
+                                    const file = files[0];
+                                    if (file != null) void onUploadPdf(block.id, row.id, file);
+                                  }}
+                                >
+                                  {ADMIN_UI.siteFooterPdf}
+                                </AdminMediaDropzone>
+                              )}
                             </div>
                           ) : (
                             <span className="hidden admin-desktop:block" />

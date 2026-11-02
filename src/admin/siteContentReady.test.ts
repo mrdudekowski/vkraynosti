@@ -55,6 +55,18 @@ describe('siteContentBlocker', () => {
     ).toBe(ADMIN_UI.sitePdfRequired);
   });
 
+  it('blocks a policy document without a PDF', () => {
+    expect(
+      siteContentBlocker({
+        kind: 'policy-personal-data-policy',
+        schemaVersion: 1,
+        documentId: 'personal-data-policy',
+        title: 'Политика обработки персональных данных',
+        bodyHtml: '<p>Текст</p>',
+      }),
+    ).toBe(ADMIN_UI.sitePdfRequired);
+  });
+
   it('allows a complete contacts draft', () => {
     expect(
       siteContentBlocker({

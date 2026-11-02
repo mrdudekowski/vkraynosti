@@ -11,7 +11,15 @@ export type SiteContentChangesItem = {
 };
 
 export const SITE_CONTENT_KIND_LABELS: Record<SiteContentDocumentKind, string> = {
-  team: 'Команда', contacts: 'Контакты', footer: 'Подвал', modal: 'Модальная заявка', seo: 'SEO страниц сайта',
+  team: 'Команда',
+  contacts: 'Контакты',
+  footer: 'Подвал',
+  modal: 'Модальная заявка',
+  seo: 'SEO страниц сайта',
+  'policy-offer-and-safety': 'Оферта и правила безопасности',
+  'policy-payment-cancellation-refund': 'Условия оплаты, отмены и возврата',
+  'policy-personal-data-policy': 'Политика обработки персональных данных',
+  'policy-personal-data-consent': 'Согласие на обработку персональных данных',
 };
 
 const display = (value: unknown): string => {

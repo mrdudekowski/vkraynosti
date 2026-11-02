@@ -1,4 +1,4 @@
-import type { SiteContentDocument } from '../cms/siteContentDocument';
+import { isPolicyContentDocument, type SiteContentDocument } from '../cms/siteContentDocument';
 import { ADMIN_UI } from './constants/ui';
 
 const hasPhoto = (url: string) => url.trim().length > 0;
@@ -30,8 +30,16 @@ export function siteContentBlocker(document: SiteContentDocument): string | null
     return incomplete ? ADMIN_UI.siteDraftInvalid : null;
   }
 
-  if (document.contactTitle.trim().length === 0 || document.tourContactTitle.trim().length === 0) {
-    return ADMIN_UI.siteDraftInvalid;
+  if (isPolicyContentDocument(document)) {
+    return hasPdfFile(document.asset?.url) ? null : ADMIN_UI.sitePdfRequired;
   }
+
+  if (document.kind === 'modal') {
+    if (document.contactTitle.trim().length === 0 || document.tourContactTitle.trim().length === 0) {
+      return ADMIN_UI.siteDraftInvalid;
+    }
+    return null;
+  }
+
   return null;
 }

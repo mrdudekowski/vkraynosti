@@ -37,7 +37,28 @@ describe('SitePage', () => {
     window.location.hash = '#/site';
     vi.clearAllMocks();
     vi.mocked(adminGetSiteContent).mockImplementation(async (kind) => ({
-      document: kind === 'team' ? team : kind === 'contacts' ? contacts : kind === 'modal' ? modal : footer,
+      document:
+        kind === 'team'
+          ? team
+          : kind === 'contacts'
+            ? contacts
+            : kind === 'modal'
+              ? modal
+              : String(kind).startsWith('policy-')
+                ? {
+                    kind,
+                    schemaVersion: 1,
+                    documentId: String(kind).replace(/^policy-/, ''),
+                    title: 'Документ',
+                    asset: {
+                      assetId: String(kind),
+                      url: 'https://vkraynosti.ru/legal/personal-data-policy.pdf',
+                      mimeType: 'application/pdf',
+                      alt: '',
+                    },
+                    bodyHtml: kind === 'policy-personal-data-policy' ? '<h2>1. Общие положения</h2>' : '',
+                  }
+                : footer,
       meta: { rev: 1 },
     } as never));
   });
@@ -436,6 +457,34 @@ describe('SitePage', () => {
         expect.any(File),
         'Анна',
       ),
+    );
+  });
+
+  it('publishes only the selected policy document', async () => {
+    vi.mocked(adminPublishSiteContent).mockImplementation(async (kind) => ({
+      document: {
+        kind,
+        schemaVersion: 1,
+        documentId: String(kind).replace(/^policy-/, ''),
+        title: 'Документ',
+        asset: {
+          assetId: String(kind),
+          url: 'https://vkraynosti.ru/legal/x.pdf',
+          mimeType: 'application/pdf',
+          alt: '',
+        },
+        bodyHtml: '',
+      },
+      meta: { rev: 2 },
+    } as never));
+    renderSite();
+    fireEvent.click(await screen.findByRole('tab', { name: ADMIN_UI.siteTabPolicies }));
+    expect(await screen.findByRole('tabpanel', { name: ADMIN_UI.siteTabPolicies })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Политика обработки персональных данных' }));
+    expect(await screen.findByLabelText(ADMIN_UI.sitePolicyBody)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: ADMIN_UI.sitePublish }));
+    await waitFor(() =>
+      expect(adminPublishSiteContent).toHaveBeenCalledWith('policy-personal-data-policy', 1),
     );
   });
 });

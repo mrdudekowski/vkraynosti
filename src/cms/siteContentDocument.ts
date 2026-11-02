@@ -2,8 +2,51 @@ import { z } from 'zod';
 import { parseSiteSeoDocument, type SiteSeoDocument } from './siteSeoDocument';
 
 export const SITE_CONTENT_SCHEMA_VERSION = 1 as const;
-export const SITE_CONTENT_KINDS = ['team', 'contacts', 'footer', 'modal', 'seo'] as const;
+export const SITE_POLICY_DOCUMENT_IDS = [
+  'offer-and-safety',
+  'payment-cancellation-refund',
+  'personal-data-policy',
+  'personal-data-consent',
+] as const;
+export type SitePolicyDocumentId = (typeof SITE_POLICY_DOCUMENT_IDS)[number];
+export const SITE_POLICY_KINDS = [
+  'policy-offer-and-safety',
+  'policy-payment-cancellation-refund',
+  'policy-personal-data-policy',
+  'policy-personal-data-consent',
+] as const;
+export type SitePolicyKind = (typeof SITE_POLICY_KINDS)[number];
+export const SITE_CONTENT_KINDS = [
+  'team',
+  'contacts',
+  'footer',
+  'modal',
+  'seo',
+  ...SITE_POLICY_KINDS,
+] as const;
 export type SiteContentDocumentKind = (typeof SITE_CONTENT_KINDS)[number];
+
+export function isSitePolicyKind(kind: string): kind is SitePolicyKind {
+  return (SITE_POLICY_KINDS as readonly string[]).includes(kind);
+}
+
+export function isPolicyContentDocument(
+  document: SiteContentDocument,
+): document is PolicyContentDocument {
+  return isSitePolicyKind(document.kind);
+}
+
+export function isSitePolicyDocumentId(id: string): id is SitePolicyDocumentId {
+  return (SITE_POLICY_DOCUMENT_IDS as readonly string[]).includes(id);
+}
+
+export function policyKindFromDocumentId(documentId: SitePolicyDocumentId): SitePolicyKind {
+  return `policy-${documentId}` as SitePolicyKind;
+}
+
+export function policyDocumentIdFromKind(kind: SitePolicyKind): SitePolicyDocumentId {
+  return kind.slice('policy-'.length) as SitePolicyDocumentId;
+}
 
 const visibilitySchema = z.boolean().default(true);
 const orderSchema = z.number().int().min(0).default(0);
@@ -122,12 +165,23 @@ export const footerContentDocumentSchema = z.object({
 });
 export type FooterContentDocument = z.infer<typeof footerContentDocumentSchema>;
 
+export const policyContentDocumentSchema = z.object({
+  kind: z.enum(SITE_POLICY_KINDS),
+  schemaVersion: z.literal(SITE_CONTENT_SCHEMA_VERSION),
+  documentId: z.enum(SITE_POLICY_DOCUMENT_IDS),
+  title: z.string().trim().min(1),
+  asset: siteContentAssetSchema.optional(),
+  bodyHtml: z.string().default(''),
+});
+export type PolicyContentDocument = z.infer<typeof policyContentDocumentSchema>;
+
 export type SiteContentDocument =
   | TeamContentDocument
   | ContactsContentDocument
   | FooterContentDocument
   | ModalContentDocument
-  | SiteSeoDocument;
+  | SiteSeoDocument
+  | PolicyContentDocument;
 
 export function parseSiteContentDocument(
   kind: 'team',
@@ -147,6 +201,10 @@ export function parseSiteContentDocument(
 ): ModalContentDocument;
 export function parseSiteContentDocument(kind: 'seo', input: unknown): SiteSeoDocument;
 export function parseSiteContentDocument(
+  kind: SitePolicyKind,
+  input: unknown,
+): PolicyContentDocument;
+export function parseSiteContentDocument(
   kind: SiteContentDocumentKind,
   input: unknown,
 ): SiteContentDocument;
@@ -158,5 +216,14 @@ export function parseSiteContentDocument(
   if (kind === 'contacts') return contactsContentDocumentSchema.parse(input);
   if (kind === 'modal') return modalContentDocumentSchema.parse(input);
   if (kind === 'seo') return parseSiteSeoDocument(input);
+  if (isSitePolicyKind(kind)) {
+    const source = typeof input === 'object' && input != null ? input : {};
+    return policyContentDocumentSchema.parse({
+      ...source,
+      kind,
+      schemaVersion: SITE_CONTENT_SCHEMA_VERSION,
+      documentId: policyDocumentIdFromKind(kind),
+    });
+  }
   return footerContentDocumentSchema.parse(input);
 }

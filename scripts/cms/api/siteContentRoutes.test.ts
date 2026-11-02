@@ -208,6 +208,100 @@ describe('site content routes', () => {
     expect(body.document.pages.find((page) => page.key === 'home')?.title).toBe('Опубликованный заголовок');
   });
 
+  it('publishes one policy document without publishing the others', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const privacy = await app.request('/api/cms/site-content/policy-personal-data-policy');
+    expect(privacy.status).toBe(200);
+    const privacyBody = (await privacy.json()) as {
+      document: { kind: string; bodyHtml: string; title: string };
+      meta: { rev: number };
+    };
+    expect(privacyBody.document.kind).toBe('policy-personal-data-policy');
+    expect(privacyBody.document.bodyHtml).toContain('1. Общие положения');
+    expect(privacyBody.document.bodyHtml).not.toContain('40802810300005585906');
+
+    const saved = await app.request('/api/cms/site-content/policy-personal-data-policy', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        rev: privacyBody.meta.rev,
+        document: { ...privacyBody.document, bodyHtml: '<h2>1. Общие положения</h2><p>Черновик политики</p>' },
+      }),
+    });
+    expect(saved.status).toBe(200);
+    const publishPrivacy = await app.request('/api/cms/site-content/policy-personal-data-policy/publish', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: privacyBody.meta.rev + 1 }),
+    });
+    expect(publishPrivacy.status).toBe(200);
+    expect(await store.getJson('published/site-content/policy-personal-data-policy/document.json')).toMatchObject({
+      bodyHtml: '<h2>1. Общие положения</h2><p>Черновик политики</p>',
+    });
+    expect(await store.getJson('published/site-content/policy-personal-data-consent/document.json')).toBeNull();
+
+    const consent = await app.request('/api/cms/site-content/policy-personal-data-consent');
+    expect(consent.status).toBe(200);
+    const consentBody = (await consent.json()) as { document: { kind: string; bodyHtml: string } };
+    expect(consentBody.document.kind).toBe('policy-personal-data-consent');
+    expect(consentBody.document.bodyHtml).toBe('');
+  });
+
+  it('inherits a footer-uploaded policy PDF into a new policy draft', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const footer = seedSiteContentDocuments().footer;
+    const publishedFooter = {
+      ...footer,
+      blocks: footer.blocks.map((block) =>
+        block.id !== 'legal'
+          ? block
+          : {
+              ...block,
+              rows: block.rows.map((row) =>
+                row.type === 'pdf' && row.documentId === 'offer-and-safety'
+                  ? {
+                      ...row,
+                      asset: {
+                        assetId: 'footer-offer',
+                        url: 'https://ypnmfvotln.cdn.twcstorage.ru/media/site-content/footer/footer-offer.pdf',
+                        mimeType: 'application/pdf',
+                        alt: row.value,
+                      },
+                    }
+                  : row,
+              ),
+            },
+      ),
+    };
+    await store.putJson(siteContentPublishedKey('footer'), publishedFooter);
+
+    const response = await app.request('/api/cms/site-content/policy-offer-and-safety');
+    const body = (await response.json()) as { document: { asset?: { url: string } } };
+    expect(body.document.asset?.url).toBe(
+      'https://ypnmfvotln.cdn.twcstorage.ru/media/site-content/footer/footer-offer.pdf',
+    );
+  });
+
+  it('stores an uploaded policy PDF at media/site-content/policy-personal-data-policy/{id}.pdf', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const form = new FormData();
+    form.set('file', new File([new Uint8Array([37, 80, 68, 70])], 'policy.pdf', { type: 'application/pdf' }));
+    const response = await app.request('/api/cms/site-content/policy-personal-data-policy/assets', {
+      method: 'POST',
+      body: form,
+    });
+    expect(response.status).toBe(201);
+    const body = (await response.json()) as { asset: { assetId: string; url: string; mimeType: string } };
+    expect(body.asset.mimeType).toBe('application/pdf');
+    expect(body.asset.url).toBe(
+      `https://ypnmfvotln.cdn.twcstorage.ru/media/site-content/policy-personal-data-policy/${body.asset.assetId}.pdf`,
+    );
+    const stored = await store.getBytes(
+      `media/site-content/policy-personal-data-policy/${body.asset.assetId}.pdf`,
+    );
+    expect(stored?.body).toEqual(new Uint8Array([37, 80, 68, 70]));
+  });
+
   it('rejects site-content assets while storage is open', async () => {
     const app = new Hono<{ Variables: { session: CmsSession } }>();
     app.use('*', async (c, next) => {

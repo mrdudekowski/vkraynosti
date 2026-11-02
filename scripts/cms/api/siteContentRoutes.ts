@@ -3,11 +3,15 @@ import type { Context, Hono } from 'hono';
 import { randomUUID } from 'node:crypto';
 import { createCmsTourMeta, parseCmsTourMeta, type CmsTourMeta } from '../../../src/cms/cmsTourMeta.ts';
 import {
+  isPolicyContentDocument,
+  isSitePolicyKind,
   parseSiteContentDocument,
   SITE_CONTENT_KINDS,
+  type PolicyContentDocument,
   type SiteContentDocument,
   type SiteContentDocumentKind,
 } from '../../../src/cms/siteContentDocument.ts';
+import { inheritPolicyAssetFromFooter } from '../../../src/cms/inheritPolicyAssetFromFooter.ts';
 import {
   siteContentDraftKey,
   siteContentDraftMetaKey,
@@ -68,13 +72,29 @@ async function loadDraft(
   const publishedIsLive = published != null && !sameStoredJson(published, seededDocument);
   if (draft == null || (draftIsCodeSeed && publishedIsLive)) {
     const document = published ?? seededDocument;
-    await store.putJson(siteContentDraftKey(kind), document);
+    const resolved = await withInheritedPolicyAsset(store, kind, document);
+    await store.putJson(siteContentDraftKey(kind), resolved);
     if (rawMeta == null) {
       await store.putJson(siteContentDraftMetaKey(kind), meta);
     }
-    return { document, meta };
+    return { document: resolved, meta };
   }
-  return { document: draft, meta };
+  return { document: await withInheritedPolicyAsset(store, kind, draft), meta };
+}
+
+async function withInheritedPolicyAsset(
+  store: CmsJsonStore,
+  kind: SiteContentDocumentKind,
+  document: SiteContentDocument,
+): Promise<SiteContentDocument> {
+  if (!isSitePolicyKind(kind) || !isPolicyContentDocument(document) || document.kind !== kind) {
+    return document;
+  }
+  const footerRaw = await store.getJson(siteContentPublishedKey('footer'));
+  if (footerRaw == null) {
+    return document;
+  }
+  return inheritPolicyAssetFromFooter(document as PolicyContentDocument, footerRaw);
 }
 
 function invalidKind(context: SiteContentContext): Response {

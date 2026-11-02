@@ -4,12 +4,17 @@ import { LEGAL_ENTITY } from '../constants/legalEntity';
 import { UI } from '../constants/ui';
 import { TEAM } from '../data/teamData';
 import { createDefaultSiteSeoDocument } from './siteSeoDocument';
-import type {
-  ContactsContentDocument,
-  FooterContentDocument,
-  ModalContentDocument,
-  SiteContentAsset,
-  TeamContentDocument,
+import { DEFAULT_PRIVACY_BODY_HTML } from './defaultPolicyBodyHtml';
+import {
+  SITE_POLICY_KINDS,
+  policyDocumentIdFromKind,
+  type ContactsContentDocument,
+  type FooterContentDocument,
+  type ModalContentDocument,
+  type PolicyContentDocument,
+  type SiteContentAsset,
+  type SitePolicyKind,
+  type TeamContentDocument,
 } from './siteContentDocument';
 
 const seedAsset = (assetId: string, url: string, mimeType: string, alt = ''): SiteContentAsset => ({
@@ -145,6 +150,28 @@ for (const page of seo.pages) {
   }
 }
 
-export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument; seo: ReturnType<typeof createDefaultSiteSeoDocument> } {
-  return { team, contacts, footer, modal, seo };
+const policies = Object.fromEntries(
+  SITE_POLICY_KINDS.map((kind) => {
+    const documentId = policyDocumentIdFromKind(kind);
+    const document = LEGAL_DOCUMENTS[documentId];
+    const policy: PolicyContentDocument = {
+      kind,
+      schemaVersion: 1,
+      documentId,
+      title: document.title,
+      asset: seedAsset(document.id, getLegalDocumentUrl(document.id), 'application/pdf', document.title),
+      bodyHtml: documentId === 'personal-data-policy' ? DEFAULT_PRIVACY_BODY_HTML : '',
+    };
+    return [kind, policy] as const;
+  }),
+) as Record<SitePolicyKind, PolicyContentDocument>;
+
+export function seedSiteContentDocuments(): {
+  team: TeamContentDocument;
+  contacts: ContactsContentDocument;
+  footer: FooterContentDocument;
+  modal: ModalContentDocument;
+  seo: ReturnType<typeof createDefaultSiteSeoDocument>;
+} & Record<SitePolicyKind, PolicyContentDocument> {
+  return { team, contacts, footer, modal, seo, ...policies };
 }

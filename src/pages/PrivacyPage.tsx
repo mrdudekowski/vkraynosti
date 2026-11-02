@@ -7,7 +7,9 @@ import { Link } from 'react-router-dom';
 import LegalPdfLink from '../components/legal/LegalPdfLink';
 import PageMeta from '../components/shared/PageMeta';
 import ScrollScrubFade from '../components/shared/ScrollScrubFade';
-import { useSiteSeoPage } from '../context/SiteContentContext';
+import { useSitePolicy, useSiteSeoPage } from '../context/SiteContentContext';
+import { DEFAULT_PRIVACY_BODY_HTML } from '../cms/defaultPolicyBodyHtml';
+import { sanitizePolicyHtml } from '../cms/sanitizePolicyHtml';
 import { PRIVACY_POLICY_DOCUMENT_ID } from '../constants/legalDocuments';
 import { ROUTES } from '../constants/routes';
 import { scrollWindowToTopSmooth } from '../constants/smoothScroll';
@@ -18,6 +20,7 @@ const PrivacyPage = () => {
   const lenis = useLenis();
   const copy = UI.privacyPage;
   const pageSeo = useSiteSeoPage('privacy');
+  const policy = useSitePolicy(PRIVACY_POLICY_DOCUMENT_ID);
 
   useLayoutEffect(() => {
     scrollWindowToTopSmooth(lenis);
@@ -61,12 +64,12 @@ const PrivacyPage = () => {
         <ScrollScrubFade as="h1" className="section-title text-text-primary mb-4">
           {heading}
         </ScrollScrubFade>
-        <p className="text-text-muted leading-relaxed mb-8">{copy.intro}</p>
-        <div className="space-y-4 text-text-primary leading-relaxed">
-          {copy.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
+        <div
+          className="privacy-policy-body space-y-4 text-text-primary leading-relaxed [&_h2]:font-heading [&_h2]:text-xl [&_h2]:font-normal [&_h2]:text-text-primary [&_h2]:mt-8 [&_h2]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-2 [&_a]:text-brand-primary"
+          dangerouslySetInnerHTML={{
+            __html: sanitizePolicyHtml(policy.bodyHtml.trim() || DEFAULT_PRIVACY_BODY_HTML),
+          }}
+        />
       </div>
     </div>
   );

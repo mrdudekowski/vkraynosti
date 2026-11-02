@@ -31,9 +31,10 @@ export async function runDataSsg(): Promise<void> {
   const snapshot = await loadTourScheduleSnapshot(rootDir);
   const bootstrapPayload = await loadTourScheduleBootstrapPayload(rootDir);
   const tourScheduleBootstrapJson = serializeJsonForScriptTag(bootstrapPayload);
-  const [cmsTours, siteSeoDocument] = await Promise.all([
+  const [cmsTours, siteSeoDocument, privacyPolicyDocument] = await Promise.all([
     loadBuildCmsToursFile(rootDir),
     loadBuildPublishedSiteContent('seo', rootDir),
+    loadBuildPublishedSiteContent('policy-personal-data-policy', rootDir),
   ]);
   const routes = await getRenderableRoutePaths(rootDir, cmsTours?.tours);
   const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours?.tours);
@@ -47,7 +48,11 @@ export async function runDataSsg(): Promise<void> {
       routePath,
       snapshot,
       statusByPath.get(routePath),
-      { toursById, siteSeo },
+      {
+        toursById,
+        siteSeo,
+        privacyPolicy: privacyPolicyDocument?.kind === 'policy-personal-data-policy' ? privacyPolicyDocument : null,
+      },
     );
     const html = injectDataSsgIntoHtml(templateHtml, {
       bodyHtml,

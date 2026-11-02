@@ -1,6 +1,6 @@
 import type { SiteContentDocumentKind } from './siteContentDocument';
 
-export const SITE_CONTENT_KINDS = ['team', 'contacts', 'footer', 'modal', 'seo'] as const satisfies readonly SiteContentDocumentKind[];
+export { SITE_CONTENT_KINDS } from './siteContentDocument';
 
 export function siteContentDraftKey(kind: SiteContentDocumentKind): string {
   if (kind === 'seo') return 'draft/site-seo/document.json';

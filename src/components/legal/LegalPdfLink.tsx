@@ -1,5 +1,6 @@
 import type { MouseEvent, ReactNode } from 'react';
-import { getLegalDocumentUrl, type LegalDocumentId } from '../../constants/legalDocuments';
+import { getLegalDocumentUrl, resolveFooterPdfHref, type LegalDocumentId } from '../../constants/legalDocuments';
+import { useSitePolicy } from '../../context/SiteContentContext';
 
 type LegalPdfLinkProps = {
   documentId: LegalDocumentId;
@@ -14,7 +15,9 @@ type LegalPdfLinkProps = {
  * Opens a legal PDF in a new tab; `download` suggests saving the official copy.
  */
 const LegalPdfLink = ({ documentId, className, children, ariaLabel, onClick }: LegalPdfLinkProps) => {
-  const href = getLegalDocumentUrl(documentId);
+  const policy = useSitePolicy(documentId);
+  const href =
+    resolveFooterPdfHref({ documentId, asset: policy?.asset }) ?? getLegalDocumentUrl(documentId);
 
   return (
     <a

@@ -29,10 +29,14 @@ import { parseIsoDate } from '../../src/utils/tourSchedule/parseIsoDate.ts';
 import { escapeHtml } from './renderOgShellHead.ts';
 import type { TourScheduleSnapshot } from './loadTourScheduleSnapshot.ts';
 import type { SiteSeoDocument } from '../../src/cms/siteSeoDocument.ts';
+import type { PolicyContentDocument } from '../../src/cms/siteContentDocument.ts';
+import { DEFAULT_PRIVACY_BODY_HTML } from '../../src/cms/defaultPolicyBodyHtml.ts';
+import { sanitizePolicyHtml } from '../../src/cms/sanitizePolicyHtml.ts';
 
 export type DataSsgOverrides = {
   toursById?: ReadonlyMap<string, Tour>;
   siteSeo?: SiteSeoDocument | null;
+  privacyPolicy?: PolicyContentDocument | null;
 };
 
 function siteSeoPage(document: SiteSeoDocument | null | undefined, key: SiteSeoDocument['pages'][number]['key']) {
@@ -148,19 +152,21 @@ function renderSeasonBody(season: Season, snapshot: TourScheduleSnapshot, seo?: 
 </main>`;
 }
 
-function renderPrivacyBody(seo?: SiteSeoDocument | null): string {
+function renderPrivacyBody(
+  seo?: SiteSeoDocument | null,
+  privacyPolicy?: PolicyContentDocument | null,
+): string {
   const copy = UI.privacyPage;
   const page = siteSeoPage(seo, 'privacy');
-  const pdfUrl = getLegalDocumentUrl('personal-data-policy');
-  const paragraphs = copy.paragraphs.map((paragraph) => `<p>${esc(paragraph)}</p>`).join('');
+  const pdfUrl = privacyPolicy?.asset?.url?.trim() || getLegalDocumentUrl('personal-data-policy');
   const title = page?.h1?.trim() || page?.title?.trim() || copy.title;
+  const body = sanitizePolicyHtml(privacyPolicy?.bodyHtml?.trim() || DEFAULT_PRIVACY_BODY_HTML);
 
   return `<main>
   <p><a href="${esc(pdfUrl)}">${esc(copy.downloadPdfLabel)}</a></p>
   <p>${esc(copy.downloadPdfHint)}</p>
   <h1>${esc(title)}</h1>
-  <p>${esc(page?.description?.trim() || copy.intro)}</p>
-  ${paragraphs}
+  ${body}
 </main>`;
 }
 
@@ -285,7 +291,7 @@ export function resolveDataSsgForRoute(
 
   if (routePath === ROUTES.PRIVACY) {
     return {
-      bodyHtml: renderPrivacyBody(overrides.siteSeo),
+      bodyHtml: renderPrivacyBody(overrides.siteSeo, overrides.privacyPolicy),
       structuredData: [],
     };
   }

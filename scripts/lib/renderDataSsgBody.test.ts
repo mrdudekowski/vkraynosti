@@ -48,6 +48,17 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.bodyHtml).toContain('<main>');
     expect(page.bodyHtml).toContain('Политика конфиденциальности');
     expect(page.bodyHtml).toContain('personal-data-policy.pdf');
+    expect(page.bodyHtml).toContain('1. Общие положения');
+    expect(page.bodyHtml).not.toContain('40802810300005585906');
+    expect(page.bodyHtml).not.toContain('по запросу');
+    expect(page.bodyHtml).toContain('1. Общие положения');
+    expect(page.bodyHtml).toContain('11. Меры защиты персональных данных');
+    expect(page.bodyHtml).toContain('250809067912');
+    expect(page.bodyHtml).toContain('vkraynosti.prim@yandex.ru');
+    expect(page.bodyHtml).toContain('Яндекс.Метрика');
+    expect(page.bodyHtml).not.toContain('по запросу');
+    expect(page.bodyHtml).not.toContain('40802810300005585906');
+    expect(page.bodyHtml).not.toContain('Тинькофф');
     expect(page.structuredData).toEqual([]);
   });
 

@@ -2,7 +2,17 @@ import type { SiteContentDocument, SiteContentDocumentKind } from './siteContent
 
 export type SiteContentChange = { label: string; from: string; to: string };
 export type SiteContentChangesItem = { kind: SiteContentDocumentKind; title: string; author: string; timestamp: string; rev: number; changes: SiteContentChange[] };
-export const SITE_CONTENT_KIND_LABELS: Record<SiteContentDocumentKind, string> = { team: 'Команда', contacts: 'Контакты', footer: 'Подвал', modal: 'Модальная заявка', seo: 'SEO страниц сайта' };
+export const SITE_CONTENT_KIND_LABELS: Record<SiteContentDocumentKind, string> = {
+  team: 'Команда',
+  contacts: 'Контакты',
+  footer: 'Подвал',
+  modal: 'Модальная заявка',
+  seo: 'SEO страниц сайта',
+  'policy-offer-and-safety': 'Оферта и правила безопасности',
+  'policy-payment-cancellation-refund': 'Условия оплаты, отмены и возврата',
+  'policy-personal-data-policy': 'Политика обработки персональных данных',
+  'policy-personal-data-consent': 'Согласие на обработку персональных данных',
+};
 const display = (value: unknown): string => value == null || value === '' ? 'не задано' : typeof value === 'boolean' ? (value ? 'включено' : 'выключено') : String(value);
 export function siteContentChanges(kind: SiteContentDocumentKind, draft: SiteContentDocument, published: SiteContentDocument | null): SiteContentChange[] {
   if (published != null && JSON.stringify(draft) === JSON.stringify(published)) return [];

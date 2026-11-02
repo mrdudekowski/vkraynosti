@@ -8,9 +8,10 @@ export const SITE_SEO_PAGE_PATHS = {
   spring: '/tours/spring/',
   summer: '/tours/summer/',
   fall: '/tours/fall/',
+  privacy: '/privacy/',
 } as const;
 
-export const SITE_SEO_PAGE_KEYS = ['home', 'winter', 'spring', 'summer', 'fall'] as const;
+export const SITE_SEO_PAGE_KEYS = ['home', 'winter', 'spring', 'summer', 'fall', 'privacy'] as const;
 
 const siteSeoPageSchema = z.object({
   key: z.enum(SITE_SEO_PAGE_KEYS),
@@ -40,6 +41,27 @@ export type SiteSeoPage = z.infer<typeof siteSeoPageSchema>;
 export type SiteSeoDocument = z.infer<typeof siteSeoDocumentSchema>;
 
 export function parseSiteSeoDocument(input: unknown): SiteSeoDocument {
+  const defaults = createDefaultSiteSeoDocument();
+  if (typeof input === 'object' && input != null && 'pages' in input && Array.isArray((input as SiteSeoDocument).pages)) {
+    const incoming = input as SiteSeoDocument;
+    const byKey = new Map(incoming.pages.map((page) => [page.key, page] as const));
+    const pages = SITE_SEO_PAGE_KEYS.map((key) => {
+      const template = defaults.pages.find((page) => page.key === key)!;
+      const existing = byKey.get(key);
+      if (existing == null) return template;
+      return {
+        ...template,
+        ...existing,
+        key,
+        path: SITE_SEO_PAGE_PATHS[key],
+      };
+    });
+    return siteSeoDocumentSchema.parse({
+      kind: 'seo',
+      schemaVersion: SITE_SEO_SCHEMA_VERSION,
+      pages,
+    });
+  }
   return siteSeoDocumentSchema.parse(input);
 }
 

@@ -127,9 +127,10 @@ export const SEO_DEFAULTS = {
     ...finalizeSeoFields({
       title: UI.privacyPage.metaTitle,
       description: UI.privacyPage.metaDescription,
+      h1: UI.privacyPage.title,
     }),
     path: ROUTES.PRIVACY,
-    robots: 'noindex,nofollow' as RobotsDirective,
+    robots: 'index,follow' as RobotsDirective,
   } satisfies SeoEntry,
   notFound: {
     ...finalizeSeoFields({

@@ -1,3 +1,5 @@
+import { normalizeCanonicalPath } from './canonicalUrl';
+import { ROUTES } from './routes';
 import { SITE_URL } from './siteUrl';
 
 export type LegalDocumentId =
@@ -60,6 +62,17 @@ export function isLegalDocumentId(id: string): id is LegalDocumentId {
 /** Canonical public URL on vkraynosti.ru — not the current origin or localhost. */
 export const getLegalDocumentUrl = (id: LegalDocumentId): string =>
   `${SITE_URL.replace(/\/+$/, '')}/legal/${LEGAL_DOCUMENTS[id].filename}`;
+
+export const PRIVACY_POLICY_DOCUMENT_ID = 'personal-data-policy' as const satisfies LegalDocumentId;
+
+export function isPrivacyPolicyDocumentId(documentId: string): boolean {
+  return documentId === PRIVACY_POLICY_DOCUMENT_ID;
+}
+
+/** Public site page for the personal-data policy (152-ФЗ PDF is linked from there). */
+export function getPrivacyPolicyPagePath(): string {
+  return normalizeCanonicalPath(ROUTES.PRIVACY);
+}
 
 function isLocalHostname(hostname: string): boolean {
   return LOCAL_HOSTS.has(hostname);

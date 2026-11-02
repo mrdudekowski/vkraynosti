@@ -108,11 +108,11 @@ export async function loadSeoRouteSources(rootDir = process.cwd()) {
   return { routesSource, tourSlugsSource };
 }
 
-/** Routes with noindex at runtime — excluded from sitemap and indexable OG shells. */
-export const NON_INDEXABLE_ROUTE_PATHS = new Set(['/privacy']);
+/** Routes excluded from sitemap and indexable OG shells (none today — `/privacy` is indexable). */
+export const NON_INDEXABLE_ROUTE_PATHS = new Set([]);
 
-/** Noindex public pages still need physical files so direct requests do not 404. */
-export const NON_INDEXABLE_RENDERABLE_ROUTE_PATHS = new Set(['/privacy']);
+/** Former noindex routes kept renderable for direct requests. */
+export const NON_INDEXABLE_RENDERABLE_ROUTE_PATHS = new Set([]);
 
 /** Telegram Mini App — CSR-only; no data-SSG, OG shells, or sitemap. */
 export const NON_SEO_ROUTE_PREFIX = '/telegram';

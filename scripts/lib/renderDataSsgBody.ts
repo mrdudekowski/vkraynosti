@@ -12,6 +12,7 @@ import {
   WEBSITE_SCHEMA,
   getAbsoluteOgImageUrl,
 } from '../../src/constants/seo.ts';
+import { getLegalDocumentUrl } from '../../src/constants/legalDocuments.ts';
 import { UI } from '../../src/constants/ui.ts';
 import { SAFETY_OFFER_HEADER, SAFETY_OFFER_SECTIONS } from '../../src/data/safetyOfferContent.ts';
 import { findTourBySeasonAndSegment } from '../../src/data/tourLookup.ts';
@@ -147,6 +148,22 @@ function renderSeasonBody(season: Season, snapshot: TourScheduleSnapshot, seo?: 
 </main>`;
 }
 
+function renderPrivacyBody(seo?: SiteSeoDocument | null): string {
+  const copy = UI.privacyPage;
+  const page = siteSeoPage(seo, 'privacy');
+  const pdfUrl = getLegalDocumentUrl('personal-data-policy');
+  const paragraphs = copy.paragraphs.map((paragraph) => `<p>${esc(paragraph)}</p>`).join('');
+  const title = page?.h1?.trim() || page?.title?.trim() || copy.title;
+
+  return `<main>
+  <p><a href="${esc(pdfUrl)}">${esc(copy.downloadPdfLabel)}</a></p>
+  <p>${esc(copy.downloadPdfHint)}</p>
+  <h1>${esc(title)}</h1>
+  <p>${esc(page?.description?.trim() || copy.intro)}</p>
+  ${paragraphs}
+</main>`;
+}
+
 function renderSafetyBody(): string {
   const sections = SAFETY_OFFER_SECTIONS.map((section) => {
     const blocks = section.blocks.map((block) =>
@@ -268,8 +285,7 @@ export function resolveDataSsgForRoute(
 
   if (routePath === ROUTES.PRIVACY) {
     return {
-      // The legacy route redirects to the official policy PDF in the SPA.
-      bodyHtml: '',
+      bodyHtml: renderPrivacyBody(overrides.siteSeo),
       structuredData: [],
     };
   }

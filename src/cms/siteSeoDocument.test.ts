@@ -2,11 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { createDefaultSiteSeoDocument, parseSiteSeoDocument, siteSeoDocumentSchema } from './siteSeoDocument';
 
 describe('siteSeoDocumentSchema', () => {
-  it('создаёт ровно пять фиксированных публичных страниц', () => {
+  it('создаёт ровно шесть фиксированных публичных страниц', () => {
     const document = createDefaultSiteSeoDocument();
-    expect(document.pages.map((page) => page.key)).toEqual(['home', 'winter', 'spring', 'summer', 'fall']);
+    expect(document.pages.map((page) => page.key)).toEqual(['home', 'winter', 'spring', 'summer', 'fall', 'privacy']);
     expect(document.pages.every((page) => page.keywords.length === 0)).toBe(true);
     expect(parseSiteSeoDocument(document)).toEqual(document);
+  });
+
+  it('добавляет страницу privacy при чтении старого SEO-документа из пяти страниц', () => {
+    const legacy = createDefaultSiteSeoDocument();
+    legacy.pages = legacy.pages.filter((page) => page.key !== 'privacy');
+    const healed = parseSiteSeoDocument(legacy);
+    expect(healed.pages.map((page) => page.key)).toEqual(['home', 'winter', 'spring', 'summer', 'fall', 'privacy']);
+    expect(healed.pages.find((page) => page.key === 'privacy')?.path).toBe('/privacy/');
   });
 
   it('ограничивает SEO-фразы восемью на страницу', () => {

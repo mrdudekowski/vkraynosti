@@ -70,12 +70,14 @@ export const resolveOgShellMeta = (
   }
 
   if (routePath === ROUTES.PRIVACY) {
+    const page = overrides.siteSeo?.pages.find((item) => item.key === 'privacy');
     return {
-      title: normalizeMetaContent(SEO_DEFAULTS.privacy.title),
-      description: normalizeMetaContent(SEO_DEFAULTS.privacy.description),
+      title: normalizeMetaContent(page?.title?.trim() || SEO_DEFAULTS.privacy.title),
+      description: normalizeMetaContent(page?.description?.trim() || SEO_DEFAULTS.privacy.description),
       path: SEO_DEFAULTS.privacy.path,
-      robots: SEO_DEFAULTS.privacy.robots!,
+      robots: SEO_DEFAULTS.privacy.robots ?? SEO_DEFAULTS.robots,
       imagePathOrUrl: IMAGES.seasonSection.summer,
+      ...(page?.keywords?.length ? { keywords: page.keywords } : {}),
     };
   }
 

@@ -17,9 +17,9 @@ describe('verify-og-shells social metadata rules', () => {
     expect(shouldIncludeSocialMetadata('/safety')).toBe(false);
   });
 
-  it('does not treat the legacy privacy PDF redirect file as a page under test', () => {
+  it('verifies indexable legal pages alongside core routes', () => {
     const routes = getRoutesToVerify(['/', '/safety', '/privacy', '/tours/summer'], ['/og-test']);
-    expect(routes).toEqual(['/', '/safety', '/tours/summer', '/og-test']);
+    expect(routes).toEqual(['/', '/safety', '/privacy', '/tours/summer', '/og-test']);
   });
 
   it('accepts Safety core SEO tags without social tags', () => {

@@ -5,7 +5,7 @@ import { routePathToDistFile } from './lib/seoRoutes.mjs';
 const rootDir = process.cwd();
 const distDir = resolve(rootDir, 'dist');
 
-// `/privacy` is a legacy PDF redirect file, not a rendered site page.
+// `/privacy` is indexable; title, description, and H1 come from CMS site-seo with code fallbacks.
 const SAMPLE_ROUTES = ['/', '/tours/summer/summer-1'];
 
 const readHtml = async (routePath) => {

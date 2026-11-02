@@ -42,10 +42,12 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.structuredData).toEqual([]);
   });
 
-  it('keeps the legacy privacy redirect route as an empty data-SSG page', () => {
+  it('renders privacy page content for direct requests while remaining indexable', () => {
     const page = resolveDataSsgForRoute('/privacy', emptySnapshot());
 
-    expect(page.bodyHtml).toBe('');
+    expect(page.bodyHtml).toContain('<main>');
+    expect(page.bodyHtml).toContain('Политика конфиденциальности');
+    expect(page.bodyHtml).toContain('personal-data-policy.pdf');
     expect(page.structuredData).toEqual([]);
   });
 

@@ -61,9 +61,9 @@ describe('SEO_DEFAULTS paths', () => {
     expect(SEO_DEFAULTS.privacy.path).toBe(ROUTES.PRIVACY);
   });
 
-  it('makes the approved Safety page indexable and keeps Privacy noindex', () => {
+  it('makes the approved Safety and Privacy pages indexable', () => {
     expect(SEO_DEFAULTS.safety.robots).toBe('index,follow');
-    expect(SEO_DEFAULTS.privacy.robots).toBe('noindex,nofollow');
+    expect(SEO_DEFAULTS.privacy.robots).toBe('index,follow');
   });
 
   it('keeps the safety snippet in the search result band', () => {

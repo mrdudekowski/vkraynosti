@@ -1,4 +1,5 @@
 import LegalPdfLink from '../legal/LegalPdfLink';
+import PrivacyPolicyLink from '../legal/PrivacyPolicyLink';
 import { COOKIE_BANNER_ICON } from '../../constants/images';
 import { UI } from '../../constants/ui';
 import { useCookieConsent } from '../../context/useCookieConsent';
@@ -42,12 +43,9 @@ const CookieConsentBanner = () => {
               >
                 {copy.essentialOnlyLabel}
               </button>
-              <LegalPdfLink
-                documentId="personal-data-policy"
-                className="text-sm text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover underline-offset-2 hover:underline"
-              >
+              <PrivacyPolicyLink className="text-sm text-text-inverse/60 hover:text-brand-secondary transition-colors duration-hover underline-offset-2 hover:underline">
                 {copy.privacyLinkLabel}
-              </LegalPdfLink>
+              </PrivacyPolicyLink>
             </div>
           </div>
         </div>

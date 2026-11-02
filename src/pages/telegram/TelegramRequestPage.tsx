@@ -28,6 +28,7 @@ import TelegramMiniAppShell from '../../components/telegram/TelegramMiniAppShell
 import PlaceholderImage from '../../components/shared/PlaceholderImage';
 import FormCheckbox from '../../components/form/FormCheckbox';
 import LegalPdfLink from '../../components/legal/LegalPdfLink';
+import PrivacyPolicyLink from '../../components/legal/PrivacyPolicyLink';
 import { useTourDisplayDuration } from '../../hooks/useTourDisplayDuration';
 import { useTourRequestModalSteps } from '../../hooks/useTourRequestModalSteps';
 import { useTourSchedule } from '../../hooks/useTourSchedule';
@@ -394,13 +395,12 @@ const TelegramRequestPage = () => {
                     *
                   </span>{' '}
                   {UI.tourRequestModal.privacyPrefix}
-                  <LegalPdfLink
-                    documentId="personal-data-policy"
+                  <PrivacyPolicyLink
                     className="text-brand-primary underline underline-offset-2 transition-all duration-hover hover:brightness-110"
                     onClick={event => event.stopPropagation()}
                   >
                     {UI.tourRequestModal.privacyPolicyLink}
-                  </LegalPdfLink>
+                  </PrivacyPolicyLink>
                   {UI.tourRequestModal.privacyMiddle}
                   <LegalPdfLink
                     documentId="personal-data-consent"

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import LegalPdfLink from '../legal/LegalPdfLink';
+import PrivacyPolicyLink from '../legal/PrivacyPolicyLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner';
 import { faTimes } from '@fortawesome/free-solid-svg-icons/faTimes';
@@ -578,13 +579,12 @@ const TourRequestModal = ({ payload }: TourRequestModalProps) => {
                           *
                         </span>{' '}
                         {UI.tourRequestModal.privacyPrefix}
-                        <LegalPdfLink
-                          documentId="personal-data-policy"
+                        <PrivacyPolicyLink
                           className="text-brand-primary underline underline-offset-2 hover:brightness-110 transition-all duration-hover"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {UI.tourRequestModal.privacyPolicyLink}
-                        </LegalPdfLink>
+                        </PrivacyPolicyLink>
                         {UI.tourRequestModal.privacyMiddle}
                         <LegalPdfLink
                           documentId="personal-data-consent"

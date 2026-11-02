@@ -137,6 +137,13 @@ const modal: ModalContentDocument = {
 };
 
 const seo = createDefaultSiteSeoDocument();
+for (const page of seo.pages) {
+  if (page.key === 'privacy') {
+    page.title = UI.privacyPage.metaTitle;
+    page.description = UI.privacyPage.metaDescription;
+    page.h1 = UI.privacyPage.title;
+  }
+}
 
 export function seedSiteContentDocuments(): { team: TeamContentDocument; contacts: ContactsContentDocument; footer: FooterContentDocument; modal: ModalContentDocument; seo: ReturnType<typeof createDefaultSiteSeoDocument> } {
   return { team, contacts, footer, modal, seo };

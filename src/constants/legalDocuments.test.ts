@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   getLegalDocumentUrl,
+  getPrivacyPolicyPagePath,
+  isPrivacyPolicyDocumentId,
   LEGAL_DOCUMENTS,
   LEGAL_DOCUMENTS_FOOTER,
   resolveFooterPdfHref,
@@ -42,5 +44,11 @@ describe('legalDocuments', () => {
   it('marks policy and consent for tour request modal', () => {
     expect(LEGAL_DOCUMENTS['personal-data-policy'].showInTourRequestModal).toBe(true);
     expect(LEGAL_DOCUMENTS['personal-data-consent'].showInTourRequestModal).toBe(true);
+  });
+
+  it('routes privacy policy links to the site page, not the PDF URL', () => {
+    expect(getPrivacyPolicyPagePath()).toBe('/privacy/');
+    expect(isPrivacyPolicyDocumentId('personal-data-policy')).toBe(true);
+    expect(isPrivacyPolicyDocumentId('personal-data-consent')).toBe(false);
   });
 });

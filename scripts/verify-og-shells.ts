@@ -33,7 +33,7 @@ export const getRoutesToVerify = (
   renderableRoutes: readonly string[],
   ogTestRoutes: readonly string[],
 ): string[] => [
-  ...renderableRoutes.filter((routePath) => routePath !== ROUTES.PRIVACY),
+  ...renderableRoutes,
   ...ogTestRoutes,
 ];
 

@@ -17,27 +17,26 @@ describe('verify-seo-dist', () => {
     expect(errors).toContain('missing rendered HTML for sitemap route: /');
   });
 
-  it('accepts a complete indexable route and rejects noindex routes in sitemap', async () => {
-    const html = `<!doctype html><html><head>
-      <title>Вкрайности</title>
-      <meta name="description" content="Поездки по Приморью из Владивостока">
-      <meta name="robots" content="index,follow">
-      <link rel="canonical" href="https://vkraynosti.ru/">
-      <meta property="og:title" content="Вкрайности">
-      <meta property="og:description" content="Поездки по Приморью из Владивостока">
-      <meta property="og:image" content="https://vkraynosti.ru/og-cover-prod.jpg">
-      <script type="application/ld+json">{"@type":"Organization"}</script>
-    </head><body><main><h1>Вкрайности</h1></main></body></html>`;
+  it('accepts indexable privacy in sitemap when rendered HTML is indexable', async () => {
+    const html =
+      '<!doctype html><html><head><title>Privacy</title>' +
+      '<meta name="description" content="Privacy policy">' +
+      '<meta name="robots" content="index,follow">' +
+      '<link rel="canonical" href="https://vkraynosti.ru/privacy/">' +
+      '<meta property="og:title" content="Privacy">' +
+      '<meta property="og:description" content="Privacy policy">' +
+      '<meta property="og:image" content="https://vkraynosti.ru/og-cover-prod.jpg">' +
+      '</head><body><main><h1>Privacy</h1></main></body></html>';
     const errors = await collectSeoDistErrors({
       rootDir: 'E:/fixture',
       distDir: 'E:/fixture/dist',
-      sitemapXml: '<urlset><url><loc>https://vkraynosti.ru/</loc></url><url><loc>https://vkraynosti.ru/privacy/</loc></url></urlset>',
+      sitemapXml: '<urlset><url><loc>https://vkraynosti.ru/privacy/</loc></url></urlset>',
       readFile: async () => html,
-      fileExists: (filePath) => filePath.endsWith('index.html'),
-      expectedRoutes: ['/'],
-      renderableRoutes: ['/'],
+      fileExists: (filePath) => filePath.endsWith('privacy/index.html'),
+      expectedRoutes: ['/privacy/'],
+      renderableRoutes: ['/privacy/'],
     });
 
-    expect(errors).toContain('non-indexable route is present in sitemap: /privacy/');
+    expect(errors).toEqual([]);
   });
 });

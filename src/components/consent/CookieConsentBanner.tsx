@@ -1,4 +1,3 @@
-import LegalPdfLink from '../legal/LegalPdfLink';
 import PrivacyPolicyLink from '../legal/PrivacyPolicyLink';
 import { COOKIE_BANNER_ICON } from '../../constants/images';
 import { UI } from '../../constants/ui';

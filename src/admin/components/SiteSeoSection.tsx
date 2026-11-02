@@ -2,7 +2,12 @@ import type { SiteSeoDocument, SiteSeoPage } from '../../cms/siteSeoDocument';
 import { AdminFieldLabel, AdminTextArea, AdminTextInput } from './AdminFields';
 
 const PAGE_LABELS: Record<SiteSeoPage['key'], string> = {
-  home: 'Главная', winter: 'Зимние туры', spring: 'Весенние туры', summer: 'Летние туры', fall: 'Осенние туры',
+  home: 'Главная',
+  winter: 'Зимние туры',
+  spring: 'Весенние туры',
+  summer: 'Летние туры',
+  fall: 'Осенние туры',
+  privacy: 'Политика конфиденциальности',
 };
 
 type SiteSeoSectionProps = { value: SiteSeoDocument; onChange: (value: SiteSeoDocument) => void };
@@ -10,7 +15,7 @@ type SiteSeoSectionProps = { value: SiteSeoDocument; onChange: (value: SiteSeoDo
 const SiteSeoSection = ({ value, onChange }: SiteSeoSectionProps) => (
   <section className="flex flex-col gap-3">
     <div className="admin-editor-surface p-4">
-      <h2 className="text-base font-semibold">SEO главной и сезонных страниц</h2>
+      <h2 className="text-base font-semibold">SEO главной, сезонов и политики</h2>
       <p className="mt-1 text-sm text-text-muted">Редактируются только фиксированные страницы. Технические теги, адреса и индексируемость формируются автоматически.</p>
     </div>
     {value.pages.map((page) => (

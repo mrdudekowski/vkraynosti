@@ -2,10 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { createDefaultSiteSeoDocument, parseSiteSeoDocument, siteSeoDocumentSchema } from './siteSeoDocument';
 
 describe('siteSeoDocumentSchema', () => {
-  it('создаёт ровно пять фиксированных публичных страниц', () => {
+  it('создаёт ровно шесть фиксированных публичных страниц', () => {
     const document = createDefaultSiteSeoDocument();
-    expect(document.pages.map((page) => page.key)).toEqual(['home', 'winter', 'spring', 'summer', 'fall']);
+    expect(document.pages.map((page) => page.key)).toEqual(['home', 'winter', 'spring', 'summer', 'fall', 'privacy']);
     expect(parseSiteSeoDocument(document)).toEqual(document);
+  });
+
+  it('добавляет privacy при чтении legacy SEO-документа', () => {
+    const legacy = createDefaultSiteSeoDocument();
+    legacy.pages = legacy.pages.filter((page) => page.key !== 'privacy');
+    expect(parseSiteSeoDocument(legacy).pages.map((page) => page.key)).toContain('privacy');
   });
 
   it('отклоняет неизвестный или неправильный маршрут страницы', () => {

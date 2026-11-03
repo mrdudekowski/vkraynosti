@@ -122,6 +122,57 @@ describe('site content routes', () => {
     expect((await reloaded.json()).document.requestFormEnabled).toBe(false);
   });
 
+  it('keeps a saved request-form modal through reload and publish even when it matches the code seed', async () => {
+    const { app, store } = createSiteApp(session(true));
+    const initial = await app.request('/api/cms/site-content/modal');
+    const body = (await initial.json()) as {
+      document: ReturnType<typeof seedSiteContentDocuments>['modal'];
+      meta: { rev: number };
+    };
+    const contacts = await app.request('/api/cms/site-content/modal', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: body.meta.rev, document: { ...body.document, requestFormEnabled: false } }),
+    });
+    const contactsBody = (await contacts.json()) as { meta: { rev: number } };
+    const publishedContacts = await app.request('/api/cms/site-content/modal/publish', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: contactsBody.meta.rev }),
+    });
+    expect(publishedContacts.status).toBe(200);
+    const publishedContactsBody = (await publishedContacts.json()) as { meta: { rev: number } };
+
+    const requestForm = await app.request('/api/cms/site-content/modal', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        rev: publishedContactsBody.meta.rev,
+        document: { ...body.document, requestFormEnabled: true },
+      }),
+    });
+    const requestFormBody = (await requestForm.json()) as {
+      document: { requestFormEnabled: boolean };
+      meta: { rev: number };
+    };
+    expect(requestForm.status).toBe(200);
+    expect(requestFormBody.document.requestFormEnabled).toBe(true);
+
+    const afterSave = await app.request('/api/cms/site-content/modal');
+    expect((await afterSave.json()).document.requestFormEnabled).toBe(true);
+
+    const publish = await app.request('/api/cms/site-content/modal/publish', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rev: requestFormBody.meta.rev }),
+    });
+    expect(publish.status).toBe(200);
+    expect((await publish.json()).document.requestFormEnabled).toBe(true);
+    expect(await store.getJson(siteContentPublishedKey('modal'))).toMatchObject({
+      requestFormEnabled: true,
+    });
+  });
+
   it('stores an uploaded team photo at media/site-content/team/{id}.jpg on the public CMS origin', async () => {
     const { app, store } = createSiteApp(session(true));
     const form = new FormData();

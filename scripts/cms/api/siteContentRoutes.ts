@@ -70,7 +70,10 @@ async function loadDraft(
   const draft = rawDraft == null ? null : parseSiteContentDocument(kind, rawDraft);
   const draftIsCodeSeed = draft != null && sameStoredJson(draft, seededDocument);
   const publishedIsLive = published != null && !sameStoredJson(published, seededDocument);
-  if (draft == null || (draftIsCodeSeed && publishedIsLive)) {
+  // A saved draft can legally equal the code seed (modal requestFormEnabled: true).
+  // Only replace never-edited seed drafts so first load still inherits live published content.
+  const draftWasNeverSaved = rawMeta == null || (meta.rev === 1 && meta.submittedForPublishAt == null);
+  if (draft == null || (draftWasNeverSaved && draftIsCodeSeed && publishedIsLive)) {
     const document = published ?? seededDocument;
     const resolved = await withInheritedPolicyAsset(store, kind, document);
     await store.putJson(siteContentDraftKey(kind), resolved);

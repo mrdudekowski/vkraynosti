@@ -1,5 +1,5 @@
 import { parseSiteContentDocument, type SiteContentDocument, type SiteContentDocumentKind } from './siteContentDocument';
-import { resolveCmsLocalSiteContentUrl } from './cmsContentUrls';
+import { cmsPublishedSiteContentCandidates } from './cmsContentUrls';
 
 const lastValidByKind = new Map<SiteContentDocumentKind, SiteContentDocument>();
 
@@ -21,13 +21,14 @@ function parseDocument(
 export async function loadPublishedSiteContent(
   kind: SiteContentDocumentKind,
 ): Promise<SiteContentDocument | null> {
-  const url = resolveCmsLocalSiteContentUrl(kind);
-  try {
-    const document = parseDocument(kind, await fetchJson(url));
-    lastValidByKind.set(kind, document);
-    return document;
-  } catch (error) {
-    console.warn(`[cms] Failed to load ${kind} site content`, error);
-    return lastValidByKind.get(kind) ?? null;
+  for (const url of cmsPublishedSiteContentCandidates(kind)) {
+    try {
+      const document = parseDocument(kind, await fetchJson(url));
+      lastValidByKind.set(kind, document);
+      return document;
+    } catch (error) {
+      console.warn(`[cms] Failed to load ${kind} site content from`, url, error);
+    }
   }
+  return lastValidByKind.get(kind) ?? null;
 }

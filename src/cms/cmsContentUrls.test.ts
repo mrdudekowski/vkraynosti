@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildCmsPublishedScheduleUrl,
+  buildCmsPublishedSiteContentUrl,
   buildCmsPublishedToursListUrl,
   buildCmsPublishedToursUrl,
+  cmsPublishedSiteContentCandidates,
   cmsTourScheduleOverlayCandidates,
   resolveCmsContentBaseUrl,
 } from './cmsContentUrls';
@@ -60,5 +62,23 @@ describe('resolveCmsContentBaseUrl', () => {
     );
     expect(candidates.toursList[1]).toBe('/data/cms/tour-schedule/tours_list.json');
     expect(candidates.schedule[1]).toBe('/data/cms/tour-schedule/schedule.json');
+  });
+
+  it('site-content overlay: live published JSON first, bake second', () => {
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
+    vi.stubEnv('BASE_URL', '/');
+    expect(cmsPublishedSiteContentCandidates('modal')).toEqual([
+      'https://cdn.example/cms/published/site-content/modal/document.json',
+      '/data/cms/site-content/modal/document.json',
+    ]);
+    expect(buildCmsPublishedSiteContentUrl('https://cdn.example/cms/', 'modal')).toBe(
+      'https://cdn.example/cms/published/site-content/modal/document.json',
+    );
+  });
+
+  it('keeps SEO on the same-origin bake so the first HTML matches hydration', () => {
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
+    vi.stubEnv('BASE_URL', '/');
+    expect(cmsPublishedSiteContentCandidates('seo')).toEqual(['/data/cms/site-seo/document.json']);
   });
 });

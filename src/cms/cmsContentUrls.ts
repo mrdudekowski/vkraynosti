@@ -68,6 +68,16 @@ export function resolveCmsLocalSiteContentUrl(kind: SiteContentDocumentKind): st
   return `${cmsLocalDataBasePath()}/site-content/${kind}/document.json`;
 }
 
+/** Live published JSON first when CMS env is set. SEO stays bake-only so first HTML matches hydration. */
+export function cmsPublishedSiteContentCandidates(kind: SiteContentDocumentKind): string[] {
+  const bake = resolveCmsLocalSiteContentUrl(kind);
+  if (kind === 'seo') {
+    return [bake];
+  }
+  const live = resolveCmsContentBaseUrl();
+  return live != null ? [buildCmsPublishedSiteContentUrl(live, kind), bake] : [bake];
+}
+
 export function cmsTourScheduleBakeCandidates(): {
   toursList: string[];
   schedule: string[];

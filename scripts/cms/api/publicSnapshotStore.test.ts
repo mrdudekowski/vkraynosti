@@ -39,6 +39,22 @@ describe('loadPublicSnapshotRelease', () => {
     expect(release.payload.siteContent.seo).toMatchObject({ pages: expect.arrayContaining([expect.objectContaining({ key: 'privacy' })]) });
   });
 
+  it('normalizes a legacy published SEO document that predates the Privacy page', async () => {
+    const store = sourceStore();
+    const legacySeo = siteSeo();
+    legacySeo.pages = legacySeo.pages.filter((page) => page.key !== 'privacy');
+    await store.putJson(siteContentPublishedKey('seo'), legacySeo);
+
+    const release = await loadPublicSnapshotRelease(store, { sourceKind: 's3' });
+
+    expect(release.payload.siteContent.seo).toMatchObject({
+      pages: expect.arrayContaining([
+        expect.objectContaining({ key: 'privacy', path: '/privacy/', title: '', description: '', h1: '', keywords: [] }),
+      ]),
+    });
+    expect(release.payload.siteContent.seo.pages).toHaveLength(6);
+  });
+
   it('retries if a published key changes between the two snapshot reads', async () => {
     const backing = sourceStore();
     const originalGet = backing.getJson;

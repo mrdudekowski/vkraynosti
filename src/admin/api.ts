@@ -70,6 +70,19 @@ export type AdminCmsHealth = {
 };
 
 export type AdminSiteContentResponse = { document: SiteContentDocument; meta: CmsTourMeta };
+export type AdminSeoReleaseStatus = {
+  state: 'current' | 'build_required' | 'unavailable';
+  currentReleaseId: string;
+  liveReleaseId: string | null;
+  checkedAt: string;
+};
+
+export async function adminGetSeoReleaseStatus(): Promise<AdminSeoReleaseStatus> {
+  const response = await fetch('/api/cms/seo-release/status', { credentials: 'include' });
+  if (response.status === 403) throw new Error('forbidden');
+  if (!response.ok) throw new Error('seo_release_status_unavailable');
+  return readJson<AdminSeoReleaseStatus>(response);
+}
 
 export async function adminCmsHealth(): Promise<AdminCmsHealth> {
   const response = await fetch('/api/cms/health', { credentials: 'include' });

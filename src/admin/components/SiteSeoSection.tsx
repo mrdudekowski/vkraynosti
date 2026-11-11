@@ -1,5 +1,9 @@
 import type { SiteSeoDocument, SiteSeoPage } from '../../cms/siteSeoDocument';
+import type { AdminSeoReleaseStatus } from '../api';
 import { AdminFieldLabel, AdminTextArea, AdminTextInput } from './AdminFields';
+import AdminButton from './AdminButton';
+import AdminStatus from './AdminStatus';
+import { RefreshCw } from 'lucide-react';
 
 const PAGE_LABELS: Record<SiteSeoPage['key'], string> = {
   home: 'Главная',
@@ -10,10 +14,50 @@ const PAGE_LABELS: Record<SiteSeoPage['key'], string> = {
   privacy: 'Политика конфиденциальности',
 };
 
-type SiteSeoSectionProps = { value: SiteSeoDocument; onChange: (value: SiteSeoDocument) => void };
+type SiteSeoSectionProps = {
+  value: SiteSeoDocument;
+  onChange: (value: SiteSeoDocument) => void;
+  releaseStatus?: AdminSeoReleaseStatus | null;
+  releaseStatusLoading?: boolean;
+  onRefreshReleaseStatus?: () => void;
+};
 
-const SiteSeoSection = ({ value, onChange }: SiteSeoSectionProps) => (
+const SiteSeoSection = ({
+  value,
+  onChange,
+  releaseStatus,
+  releaseStatusLoading = false,
+  onRefreshReleaseStatus,
+}: SiteSeoSectionProps) => (
   <section className="flex flex-col gap-3">
+    {onRefreshReleaseStatus != null ? (
+      <div className="admin-editor-surface flex flex-wrap items-center justify-between gap-3 p-4">
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold">Публикация SEO на сайте</h2>
+          <p className="mt-1 text-sm text-text-muted">
+            SEO-изменения попадут на гостевой сайт после сборки и деплоя. Проверка сверяет текущую публикацию с опубликованной версией сайта.
+          </p>
+          <div className="mt-2">
+            {releaseStatus == null || releaseStatus.state === 'unavailable' ? (
+              <AdminStatus level="secondary" tone="warning">Статус сайта пока не проверен</AdminStatus>
+            ) : releaseStatus.state === 'current' ? (
+              <AdminStatus level="secondary" tone="success">Сайт соответствует публикации CMS</AdminStatus>
+            ) : (
+              <AdminStatus level="secondary" tone="warning">Для сайта нужна новая сборка</AdminStatus>
+            )}
+          </div>
+        </div>
+        <AdminButton
+          variant="secondary"
+          aria-busy={releaseStatusLoading}
+          disabled={releaseStatusLoading}
+          onClick={onRefreshReleaseStatus}
+        >
+          <RefreshCw size={16} aria-hidden="true" />
+          {releaseStatusLoading ? 'Проверяем…' : 'Проверить сайт'}
+        </AdminButton>
+      </div>
+    ) : null}
     <div className="admin-editor-surface p-4">
       <h2 className="text-base font-semibold">SEO главной, сезонных страниц и Privacy</h2>
       <p className="mt-1 text-sm text-text-muted">Редактируются только фиксированные страницы. Технические теги, адреса и индексируемость формируются автоматически.</p>

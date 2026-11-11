@@ -59,6 +59,7 @@ import {
 } from '../../../src/cms/cmsPackageKeys.ts';
 import { createCmsTourMeta, parseCmsTourMeta, type CmsTourMeta } from '../../../src/cms/cmsTourMeta.ts';
 import { PublicSnapshotConflictError, loadPublicSnapshotRelease } from './publicSnapshotStore.ts';
+import { getSeoReleaseDeploymentStatus } from './seoReleaseStatus.ts';
 import { isValidTourSlug } from '../../../src/constants/tourUrls.ts';
 import {
   CMS_PASSWORD_MIN_LENGTH,
@@ -231,6 +232,8 @@ export type CmsApiDeps = {
   store: CmsJsonStore;
   authRepository: AuthRepository;
   departureRepository: DepartureRepository;
+  publicSiteUrl?: string;
+  publicSiteFetch?: typeof fetch;
 };
 
 function publicAuthUsers(records: UserRecord[]): Array<{
@@ -862,6 +865,19 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       ...effectivePublishFlags(found.user),
     });
     await next();
+  });
+
+  app.get('/api/cms/seo-release/status', async (c) => {
+    try {
+      const status = await getSeoReleaseDeploymentStatus(store, {
+        siteUrl: deps.publicSiteUrl ?? env.publicSiteUrl ?? 'https://vkraynosti.ru',
+        sourceKind: env.storeKind,
+        fetchImpl: deps.publicSiteFetch,
+      });
+      return c.json(status);
+    } catch {
+      return c.json({ error: 'seo_release_status_unavailable' }, 503);
+    }
   });
 
   app.get('/api/cms/me', (c) => {

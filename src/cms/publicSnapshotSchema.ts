@@ -51,6 +51,7 @@ export const publicSnapshotManifestSchema = z.object({
   generatedAt: z.string().datetime(),
   snapshotKey: z.string().min(1),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  seoRevision: z.string().regex(/^[a-f0-9]{64}$/),
   sourceKind: z.string().min(1),
 }).strict();
 

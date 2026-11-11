@@ -48,7 +48,35 @@ describe('createPublicSnapshotRelease', () => {
     const second = await createPublicSnapshotRelease(changed, { generatedAt: '2026-11-11T00:00:00.000Z', sourceKind: 'postgres' });
 
     expect(second.manifest.releaseId).not.toBe(first.manifest.releaseId);
+    expect(second.manifest.seoRevision).not.toBe(first.manifest.seoRevision);
     expect(first.payload.toursList.tours.map((tour) => tour.id)).toEqual(['tour-b', 'tour-a']);
+  });
+
+  it('keeps SEO revision stable for operational-only schedule changes', async () => {
+    const original = input();
+    original.toursList.tours = [{ id: 'tour-a', title: 'Tour', priceRub: 1000, durationType: 'однодневный', publicationStatus: 'active' }];
+    original.schedule.events = [{ date: '2026-11-20', tourId: 'tour-a', seats: 8, status: 'open', comment: 'Набор открыт' }];
+    const changed = structuredClone(original);
+    changed.toursList.generatedAt = '2026-11-12T00:00:00.000Z';
+    changed.schedule.generatedAt = '2026-11-12T00:00:00.000Z';
+    Object.assign(changed.schedule.events[0] as object, { seats: 4, comment: 'Осталось несколько мест' });
+
+    const first = await createPublicSnapshotRelease(original, { generatedAt: '2026-11-11T00:00:00.000Z', sourceKind: 'postgres' });
+    const second = await createPublicSnapshotRelease(changed, { generatedAt: '2026-11-11T00:00:00.000Z', sourceKind: 'postgres' });
+
+    expect(second.manifest.releaseId).not.toBe(first.manifest.releaseId);
+    expect(second.manifest.seoRevision).toBe(first.manifest.seoRevision);
+  });
+
+  it('changes SEO revision when a departure date or public tour content changes', async () => {
+    const original = input();
+    original.schedule.events = [{ date: '2026-11-20', tourId: 'tour-a', seats: 8, status: 'open', comment: null }];
+    const first = await createPublicSnapshotRelease(original, { generatedAt: '2026-11-11T00:00:00.000Z', sourceKind: 'postgres' });
+    const changed = structuredClone(original);
+    Object.assign(changed.schedule.events[0] as object, { date: '2026-11-21' });
+    const second = await createPublicSnapshotRelease(changed, { generatedAt: '2026-11-11T00:00:00.000Z', sourceKind: 'postgres' });
+
+    expect(second.manifest.seoRevision).not.toBe(first.manifest.seoRevision);
   });
 
   it('rejects a malformed snapshot and returns immutable payload data', async () => {

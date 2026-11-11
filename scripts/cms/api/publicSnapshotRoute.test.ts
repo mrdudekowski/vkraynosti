@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   CMS_PUBLISHED_CATALOG_KEY,
   CMS_PUBLISHED_SCHEDULE_KEY,
@@ -13,8 +13,13 @@ import type { CmsApiEnv } from './env.ts';
 import type { AuthRepository } from './auth/authRepository.ts';
 import type { DepartureRepository } from './schedule/departureRepository.ts';
 import { createMemoryJsonStore } from './store.ts';
+import { CMS_SESSION_COOKIE, hashSessionToken } from './session.ts';
 
-function createApp(overrides: Partial<CmsApiEnv> = {}, includeRequiredData = true) {
+function createApp(
+  overrides: Partial<CmsApiEnv> = {},
+  includeRequiredData = true,
+  publicSiteFetch?: typeof fetch,
+) {
   const store = createMemoryJsonStore({
     [CMS_PUBLISHED_CATALOG_KEY]: { schemaVersion: 1, tours: [] },
     ...(includeRequiredData ? {
@@ -43,9 +48,16 @@ function createApp(overrides: Partial<CmsApiEnv> = {}, includeRequiredData = tru
   };
   const authRepository = {
     async listUsers() { return [{ login: 'test-admin' }]; },
+    async findActiveSession(token: string) {
+      if (token !== hashSessionToken('test-session-token')) return null;
+      return {
+        user: { login: 'test-admin', role: 'admin', canPublishTours: true, canPublishSchedule: true },
+        session: { expiresAt: new Date('2099-01-01T00:00:00.000Z') },
+      };
+    },
   } as unknown as AuthRepository;
   const departureRepository = {} as DepartureRepository;
-  return createCmsApiApp({ env, store, authRepository, departureRepository });
+  return createCmsApiApp({ env, store, authRepository, departureRepository, publicSiteFetch });
 }
 
 describe('internal CMS release bake endpoint', () => {
@@ -95,5 +107,30 @@ describe('internal CMS release bake endpoint', () => {
     });
 
     expect(response.status).toBe(503);
+  });
+});
+
+describe('authenticated CMS SEO release status endpoint', () => {
+  it('requires an admin session', async () => {
+    const app = createApp();
+    const response = await app.request('/api/cms/seo-release/status');
+
+    expect(response.status).toBe(401);
+  });
+
+  it('compares the published CMS snapshot with the public build marker', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      kind: 'cms', releaseId: `seo-${'a'.repeat(24)}`, sha256: 'a'.repeat(64), seoRevision: 'b'.repeat(64),
+    }), { status: 200, headers: { 'content-type': 'application/json' } }));
+    const app = createApp({}, true, fetchImpl);
+    const response = await app.request('/api/cms/seo-release/status', {
+      headers: { cookie: `${CMS_SESSION_COOKIE}=test-session-token` },
+    });
+    const body = await response.json() as { state?: string; currentReleaseId?: string; liveReleaseId?: string };
+
+    expect(response.status).toBe(200);
+    expect(body.state).toBe('build_required');
+    expect(body.currentReleaseId).toMatch(/^seo-[a-f0-9]{24}$/);
+    expect(body.liveReleaseId).toBe(`seo-${'a'.repeat(24)}`);
   });
 });

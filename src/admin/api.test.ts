@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { adminCloneTour, adminCmsHealth, adminCreateTour, adminDeleteTour } from './api';
+import { adminCloneTour, adminCmsHealth, adminCreateTour, adminDeleteTour, adminGetSeoReleaseStatus } from './api';
 
 describe('adminCloneTour', () => {
   afterEach(() => {
@@ -79,6 +79,26 @@ describe('adminCmsHealth', () => {
       storage: 'open',
     });
     expect(fetchMock).toHaveBeenCalledWith('/api/cms/health', { credentials: 'include' });
+  });
+});
+
+describe('adminGetSeoReleaseStatus', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reads the current CMS and live-site release comparison', async () => {
+    const status = {
+      state: 'build_required',
+      currentReleaseId: `seo-${'a'.repeat(24)}`,
+      liveReleaseId: `seo-${'b'.repeat(24)}`,
+      checkedAt: '2026-11-11T00:00:00.000Z',
+    };
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(status), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(adminGetSeoReleaseStatus()).resolves.toEqual(status);
+    expect(fetchMock).toHaveBeenCalledWith('/api/cms/seo-release/status', { credentials: 'include' });
   });
 });
 

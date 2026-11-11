@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Save, UploadCloud } from 'lucide-react';
 import {
   adminGetSiteContent,
+  adminGetSeoReleaseStatus,
   adminPublishSiteContent,
   adminSaveSiteContent,
   adminUploadSiteAsset,
+  type AdminSeoReleaseStatus,
 } from './api';
 import AdminAlert from './components/AdminAlert';
 import AdminButton from './components/AdminButton';
@@ -101,6 +103,8 @@ const SitePage = () => {
   const [documents, setDocuments] = useState<Partial<Record<Kind, SiteContentDocument>>>({});
   const [revisions, setRevisions] = useState<Partial<Record<Kind, number>>>({});
   const [status, setStatus] = useState<Partial<Record<Kind, TabStatus>>>({});
+  const [seoReleaseStatus, setSeoReleaseStatus] = useState<AdminSeoReleaseStatus | null>(null);
+  const [seoReleaseStatusLoading, setSeoReleaseStatusLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadErrors, setLoadErrors] = useState<LoadErrors>({});
   const [reloadToken, setReloadToken] = useState(0);
@@ -207,6 +211,26 @@ const SitePage = () => {
     return loadKinds([kind], true);
   }, [loadKinds, reloadToken]);
 
+  const refreshSeoReleaseStatus = useCallback(async () => {
+    setSeoReleaseStatusLoading(true);
+    try {
+      setSeoReleaseStatus(await adminGetSeoReleaseStatus());
+    } catch {
+      setSeoReleaseStatus({
+        state: 'unavailable',
+        currentReleaseId: '',
+        liveReleaseId: null,
+        checkedAt: new Date().toISOString(),
+      });
+    } finally {
+      setSeoReleaseStatusLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tab === 'seo') void refreshSeoReleaseStatus();
+  }, [refreshSeoReleaseStatus, tab]);
+
   const setDocument = (next: SiteContentDocument) => {
     const kind = next.kind;
     setDocuments((current) => ({ ...current, [kind]: next }));
@@ -233,11 +257,12 @@ const SitePage = () => {
       setRevisions((current) => ({ ...current, [kind]: result.meta.rev }));
       setStatus((current) => ({ ...current, [kind]: publish ? 'published' : 'saved' }));
       setError(null);
+      if (kind === 'seo' && publish) void refreshSeoReleaseStatus();
     } catch (reason: unknown) {
       setError(siteErrorMessage(reason));
       setStatus((current) => ({ ...current, [kind]: 'error' }));
     }
-  }, []);
+  }, [refreshSeoReleaseStatus]);
 
   useAdminAutosave({
     enabled: isDirty && !isSaving,
@@ -426,7 +451,13 @@ const SitePage = () => {
         onUploadPdf={uploadFooterPdf}
       />
     ) : tab === 'seo' ? (
-      <SiteSeoSection value={document as SiteSeoDocument} onChange={setDocument} />
+      <SiteSeoSection
+        value={document as SiteSeoDocument}
+        onChange={setDocument}
+        releaseStatus={seoReleaseStatus}
+        releaseStatusLoading={seoReleaseStatusLoading}
+        onRefreshReleaseStatus={() => void refreshSeoReleaseStatus()}
+      />
     ) : tab === 'policies' ? (
       <SitePoliciesTab
         policyKind={policyKind}

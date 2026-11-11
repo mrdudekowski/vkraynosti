@@ -33,6 +33,7 @@ export type CmsApiEnv = {
   storeKind: CmsStoreKind;
   localStoreDir: string;
   s3: CmsApiS3Config;
+  publicSiteUrl?: string;
 };
 
 export async function readDotEnvFile(filePath: string): Promise<Record<string, string>> {
@@ -144,5 +145,6 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
       forcePathStyle: get('S3_FORCE_PATH_STYLE') !== 'false',
       publicBaseUrl,
     },
+    publicSiteUrl: (get('CMS_PUBLIC_SITE_URL') || 'https://vkraynosti.ru').replace(/\/+$/, ''),
   };
 }

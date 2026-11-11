@@ -3,10 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ADMIN_UI } from './constants/ui';
 import { AdminToastProvider } from './components/AdminToast';
 import SitePage from './SitePage';
-import { adminGetSiteContent, adminPublishSiteContent, adminSaveSiteContent, adminUploadSiteAsset } from './api';
+import { adminGetSeoReleaseStatus, adminGetSiteContent, adminPublishSiteContent, adminSaveSiteContent, adminUploadSiteAsset } from './api';
+import { createDefaultSiteSeoDocument } from '../cms/siteSeoDocument';
 
 vi.mock('./api', () => ({
   adminGetSiteContent: vi.fn(),
+  adminGetSeoReleaseStatus: vi.fn(),
   adminPublishSiteContent: vi.fn(),
   adminSaveSiteContent: vi.fn(),
   adminUploadSiteAsset: vi.fn(),
@@ -44,7 +46,9 @@ describe('SitePage', () => {
             ? contacts
             : kind === 'modal'
               ? modal
-              : String(kind).startsWith('policy-')
+              : kind === 'seo'
+                ? createDefaultSiteSeoDocument()
+                : String(kind).startsWith('policy-')
                 ? {
                     kind,
                     schemaVersion: 1,
@@ -61,6 +65,22 @@ describe('SitePage', () => {
                 : footer,
       meta: { rev: 1 },
     } as never));
+    vi.mocked(adminGetSeoReleaseStatus).mockResolvedValue({
+      state: 'current',
+      currentReleaseId: `seo-${'a'.repeat(24)}`,
+      liveReleaseId: `seo-${'a'.repeat(24)}`,
+      checkedAt: '2026-11-11T00:00:00.000Z',
+    });
+  });
+
+  it('checks the live public release when the SEO tab opens and on request', async () => {
+    window.location.hash = '#/site?tab=seo';
+    renderSite();
+
+    expect(await screen.findByText('Сайт соответствует публикации CMS')).toBeInTheDocument();
+    expect(adminGetSeoReleaseStatus).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Проверить сайт' }));
+    await waitFor(() => expect(adminGetSeoReleaseStatus).toHaveBeenCalledTimes(2));
   });
 
   it('reloads a saved section from the server when that section is opened again', async () => {

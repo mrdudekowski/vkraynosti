@@ -110,7 +110,16 @@ export async function syncCatalog({
       cache: 'no-store',
     });
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      let apiErrorCode = null;
+      try {
+        const errorBody = await response.json();
+        if (typeof errorBody?.error === 'string' && /^[a-z0-9_-]+$/i.test(errorBody.error)) {
+          apiErrorCode = errorBody.error;
+        }
+      } catch {
+        // Keep the diagnostic limited to a safe API error code; never print a raw response body.
+      }
+      throw new Error(`CMS bake API HTTP ${response.status}${apiErrorCode ? ` (${apiErrorCode})` : ''}`);
     }
     const responseBody = typeof response.json === 'function'
       ? await response.json()

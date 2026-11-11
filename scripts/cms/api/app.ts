@@ -947,6 +947,10 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       if (error instanceof PublicSnapshotConflictError) {
         return c.json({ error: 'bake_snapshot_conflict' }, 409);
       }
+      console.error('[cms-bake] release snapshot generation failed', {
+        name: error instanceof Error ? error.name : 'UnknownError',
+        message: error instanceof Error ? error.message : 'Unknown failure',
+      });
       return c.json({ error: 'bake_snapshot_unavailable' }, 503);
     }
   });

@@ -42,9 +42,10 @@ async function createResponseSet() {
 function stubBakeResponses(responseSet: Awaited<ReturnType<typeof createResponseSet>>) {
   const fetchSpy = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);
-    const value = url.endsWith('/build-source.json') ? responseSet.marker
-      : url.endsWith('/release.json') ? responseSet.release
-        : url.endsWith('/tours.json') ? responseSet.tours
+    const pathname = new URL(url, 'https://local.invalid').pathname;
+    const value = pathname.endsWith('/build-source.json') ? responseSet.marker
+      : pathname.endsWith('/release.json') ? responseSet.release
+        : pathname.endsWith('/tours.json') ? responseSet.tours
           : null;
     return value == null
       ? { ok: false, status: 404, json: async () => null }
@@ -68,9 +69,11 @@ describe('loadCmsToursFile', () => {
     await expect(loadCmsToursFile()).resolves.toMatchObject({
       source: 'bake', file: { tours: [{ title: 'Baked title' }] },
     });
-    expect(fetchSpy.mock.calls.map(([url]) => String(url))).toEqual([
+    const urls = fetchSpy.mock.calls.map(([url]) => new URL(String(url), 'https://local.invalid'));
+    expect(urls.map(({ pathname }) => pathname)).toEqual([
       '/data/cms/build-source.json', '/data/cms/release.json', '/data/cms/tours.json',
     ]);
+    expect(urls[2].searchParams.get('releaseId')).toBe(responses.release.manifest.releaseId);
   });
 
   it('rejects a different release marker even when a CMS CDN is configured', async () => {
@@ -83,13 +86,33 @@ describe('loadCmsToursFile', () => {
     await expect(loadCmsToursFile()).resolves.toBeNull();
   });
 
-  it('rejects a baked catalog whose route differs from its release', async () => {
+  it('uses the embedded release if the baked catalog differs from that release', async () => {
     const responses = await createResponseSet();
     responses.tours = { ...bakeFile, tours: [{ ...bakedTour, slug: 'different-route' }] };
     stubBakeResponses(responses);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-    await expect(loadCmsToursFile()).resolves.toBeNull();
+    await expect(loadCmsToursFile()).resolves.toMatchObject({
+      source: 'snapshot', file: { tours: [{ title: 'Baked title' }] },
+    });
+  });
+
+  it('uses the embedded release when the published catalog cannot be fetched', async () => {
+    const responses = await createResponseSet();
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const pathname = new URL(String(input), 'https://local.invalid').pathname;
+      const value = pathname.endsWith('/build-source.json') ? responses.marker
+        : pathname.endsWith('/release.json') ? responses.release
+          : null;
+      return value == null
+        ? { ok: false, status: 503, json: async () => null }
+        : { ok: true, json: async () => value };
+    }));
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    await expect(loadCmsToursFile()).resolves.toMatchObject({
+      source: 'snapshot', file: { tours: [{ title: 'Baked title' }] },
+    });
   });
 
   it('returns null when the build marker is unavailable', async () => {

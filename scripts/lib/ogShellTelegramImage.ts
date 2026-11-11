@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { readFile, unlink } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import { promisify } from 'node:util';
@@ -57,13 +57,11 @@ export async function ensureTelegramFriendlyOgImage(
     if (!existsSync(fallbackPath)) {
       return logicalPath;
     }
-    if (sourcePath !== fallbackPath) {
-      await unlink(sourcePath).catch(() => {});
-    }
     return fallbackLogicalPath;
   };
 
   try {
+    // Keep the source file: runtime catalog entries still reference its original path.
     await execFileAsync(
       resolveFfmpegExecutable(),
       [
@@ -78,10 +76,6 @@ export async function ensureTelegramFriendlyOgImage(
       ],
       { maxBuffer: 10 * 1024 * 1024 },
     );
-
-    if (jpegPath !== sourcePath) {
-      await unlink(sourcePath);
-    }
 
     process.stdout.write(`[og-asset] jpeg ${jpegLogical} (${OG_SHELL_IMAGE_WIDTH}x${OG_SHELL_IMAGE_HEIGHT})\n`);
     return jpegLogical;

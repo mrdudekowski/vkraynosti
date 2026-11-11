@@ -49,6 +49,8 @@
     "check:seo": "node scripts/check-seo-indexing.mjs",
     "verify:seo-routes": "tsx scripts/verify-seo-route-integrity.mjs --dist dist",
 
+    "verify:cms-media": "node scripts/verify-cms-baked-media.mjs",
+
     "sync:catalog": "node --import tsx scripts/sync-catalog-from-cdn.mjs",
 
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
@@ -65,7 +67,7 @@
 
     "verify:og-shells": "tsx scripts/verify-og-shells.ts",
 
-    "build:deploy": "npm run sync:catalog && npm run generate:sitemap && npm run generate:robots && npm run build && npm run data:ssg && npm run og:shells && npm run verify:og-shells && npm run verify:seo-routes",
+    "build:deploy": "npm run sync:catalog && npm run generate:sitemap && npm run generate:robots && npm run build && npm run data:ssg && npm run og:shells && npm run verify:og-shells && npm run verify:seo-routes && npm run verify:cms-media",
 
     "generate:banner-loops": "node scripts/generate-home-season-banner-loop-videos.cjs --posters",
 

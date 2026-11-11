@@ -6,6 +6,7 @@ import {
 } from '../../../src/cms/cmsPackageKeys.ts';
 import { SITE_CONTENT_KINDS } from '../../../src/cms/siteContentDocument.ts';
 import { siteContentPublishedKey } from '../../../src/cms/siteContentPackageKeys.ts';
+import { parseSiteSeoDocument } from '../../../src/cms/siteSeoDocument.ts';
 import type { CmsTourDocument } from '../../../src/cms/cmsTourDocument.ts';
 import { createPublicSnapshotRelease, serializeCanonicalJson } from '../../../src/cms/publicSnapshotRelease.ts';
 import type { PublicSnapshotRelease } from '../../../src/cms/publicSnapshotSchema.ts';
@@ -73,8 +74,15 @@ function assembleSnapshot(keys: ReturnType<typeof snapshotKeys>, values: unknown
   }
 
   const siteContent = Object.fromEntries(
-    keys.flatMap(({ key, siteContentKind }, index) =>
-      siteContentKind == null ? [] : [[siteContentKind, values[index]]],
+    keys.flatMap(({ siteContentKind }, index) =>
+      siteContentKind == null
+        ? []
+        : [[
+            siteContentKind,
+            siteContentKind === 'seo' && values[index] != null
+              ? parseSiteSeoDocument(values[index])
+              : values[index],
+          ]],
     ),
   );
   return {

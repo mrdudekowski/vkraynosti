@@ -5,6 +5,18 @@ import { describe, expect, it } from 'vitest';
 import { resolveCatalogSource } from './lib/catalogSource.mjs';
 import { syncCatalog } from './sync-catalog-from-cdn.mjs';
 
+const siteSeoDocument = {
+  kind: 'seo',
+  schemaVersion: 1,
+  pages: ['home', 'winter', 'spring', 'summer', 'fall', 'privacy'].map((key) => ({
+    key,
+    path: key === 'home' ? '/' : key === 'privacy' ? '/privacy/' : `/tours/${key}/`,
+    title: `${key} title`,
+    description: `${key} description`,
+    h1: `${key} heading`,
+  })),
+};
+
 describe('resolveCatalogSource', () => {
   it('prefers published CMS packages when the CMS base is configured', () => {
     expect(
@@ -17,12 +29,16 @@ describe('resolveCatalogSource', () => {
       toursUrl: 'https://cdn.example.test/cms/published/tours.json',
       toursListUrl: 'https://cdn.example.test/cms/published/tour-schedule/tours_list.json',
       scheduleUrl: 'https://cdn.example.test/cms/published/tour-schedule/schedule.json',
+      siteSeoUrl: 'https://cdn.example.test/cms/published/site-seo/document.json',
     });
   });
 
   it('keeps the legacy CDN catalog when CMS is not configured', () => {
     expect(
-      resolveCatalogSource({ VITE_PUBLIC_ASSET_BASE_URL: 'https://cdn.example.test/public/' }),
+      resolveCatalogSource({
+        VITE_SITE_URL: 'https://site.example.test',
+        VITE_PUBLIC_ASSET_BASE_URL: 'https://cdn.example.test/public/',
+      }),
     ).toEqual({
       kind: 'public',
       toursListUrl: 'https://cdn.example.test/public/tour-schedule/tours_list.json',
@@ -30,8 +46,35 @@ describe('resolveCatalogSource', () => {
     });
   });
 
+  it('refuses a production build that cannot read CMS tour slugs', () => {
+    expect(() => resolveCatalogSource({
+      VITE_SITE_URL: 'https://vkraynosti.ru',
+      VITE_PUBLIC_ASSET_BASE_URL: 'https://cdn.example.test/public/',
+    })).toThrow(/VITE_CMS_S3_BASE_URL/);
+  });
+
+  it('uses the production-domain default when VITE_SITE_URL is omitted', () => {
+    expect(() => resolveCatalogSource({
+      VITE_PUBLIC_ASSET_BASE_URL: 'https://cdn.example.test/public/',
+    })).toThrow(/VITE_CMS_S3_BASE_URL/);
+  });
+
+  it('uses the CMS package for the production domain when configured', () => {
+    expect(resolveCatalogSource({
+      VITE_SITE_URL: 'https://www.vkraynosti.ru/',
+      VITE_CMS_S3_BASE_URL: 'https://cdn.example.test/cms/',
+      VITE_PUBLIC_ASSET_BASE_URL: 'https://cdn.example.test/public/',
+    })).toEqual({
+      kind: 'cms',
+      toursUrl: 'https://cdn.example.test/cms/published/tours.json',
+      toursListUrl: 'https://cdn.example.test/cms/published/tour-schedule/tours_list.json',
+      scheduleUrl: 'https://cdn.example.test/cms/published/tour-schedule/schedule.json',
+      siteSeoUrl: 'https://cdn.example.test/cms/published/site-seo/document.json',
+    });
+  });
+
   it('returns fixtures when neither source is configured', () => {
-    expect(resolveCatalogSource({})).toBeNull();
+    expect(resolveCatalogSource({ VITE_SITE_URL: 'https://site.example.test' })).toBeNull();
   });
 
   it('prefers the authenticated bake API over CDN packages', () => {
@@ -56,6 +99,7 @@ describe('syncCatalog', () => {
       ['https://cms.test/published/tours.json', { schemaVersion: 1, tours: [{ id: 'fall-1', slug: 'test', season: 'fall', status: 'active' }] }],
       ['https://cms.test/published/tour-schedule/tours_list.json', { schemaVersion: 1, tours: [{ id: 'fall-1', publicationStatus: 'active' }] }],
       ['https://cms.test/published/tour-schedule/schedule.json', { schemaVersion: 1, events: [] }],
+      ['https://cms.test/published/site-seo/document.json', siteSeoDocument],
     ]);
     const fetchImpl = async (url) => ({
       ok: true,
@@ -67,6 +111,7 @@ describe('syncCatalog', () => {
       await syncCatalog({ root, env: { VITE_CMS_S3_BASE_URL: 'https://cms.test' }, fetchImpl });
       expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/build-source.json'), 'utf8'))).toEqual({ kind: 'cms' });
       expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tours.json'), 'utf8')).tours[0].slug).toBe('test');
+      expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/site-seo/document.json'), 'utf8'))).toEqual(siteSeoDocument);
       expect(JSON.parse(await readFile(resolve(root, 'public/data/tour-schedule/tours_list.json'), 'utf8')).tours[0].id).toBe('fall-1');
       expect(JSON.parse(await readFile(resolve(root, 'public/data/tour-schedule/schedule.json'), 'utf8')).events).toEqual([]);
       expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tour-schedule/tours_list.json'), 'utf8')).tours[0].id).toBe('fall-1');
@@ -93,7 +138,7 @@ describe('syncCatalog', () => {
       tours: { schemaVersion: 1, tours: [{ id: 'fall-1', slug: 'test', season: 'fall', status: 'active', assets: [] }] },
       toursList: { schemaVersion: 1, tours: [{ id: 'fall-1', publicationStatus: 'active' }] },
       schedule: { schemaVersion: 1, events: [] },
-      siteContent: {},
+      siteContent: { seo: siteSeoDocument },
       stills: [],
     };
     const fetchImpl = async (url) => {
@@ -119,6 +164,7 @@ describe('syncCatalog', () => {
       });
       expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tours.json'), 'utf8')).tours[0].id).toBe('fall-1');
       expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/tour-schedule/tours_list.json'), 'utf8')).tours[0].id).toBe('fall-1');
+      expect(JSON.parse(await readFile(resolve(root, 'public/data/cms/site-seo/document.json'), 'utf8'))).toEqual(siteSeoDocument);
     } finally {
       await rm(root, { recursive: true, force: true });
     }

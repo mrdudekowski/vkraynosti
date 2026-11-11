@@ -81,36 +81,38 @@ export function collectTourSlugValidationIssues(
       });
     }
 
-    const owners = slugOwners.get(slug) ?? [];
+    const routeKey = `${tour.season}/${slug}`;
+    const owners = slugOwners.get(routeKey) ?? [];
     owners.push(tour.id);
-    slugOwners.set(slug, owners);
+    slugOwners.set(routeKey, owners);
 
-    const lowerKey = slug.toLowerCase();
+    const lowerKey = `${tour.season}/${slug.toLowerCase()}`;
     const lowerOwners = slugLowerOwners.get(lowerKey) ?? [];
     lowerOwners.push(tour.id);
     slugLowerOwners.set(lowerKey, lowerOwners);
   }
 
-  for (const [slug, owners] of slugOwners) {
+  for (const [routeKey, owners] of slugOwners) {
     if (owners.length > 1) {
       issues.push({
-        message: `Duplicate tour slug: "${slug}" used by ${owners.join(' and ')}`,
+        message: `Duplicate tour route slug: "${routeKey}" used by ${owners.join(' and ')}`,
       });
     }
   }
 
-  for (const [lowerKey, owners] of slugLowerOwners) {
+  for (const [routeKey, owners] of slugLowerOwners) {
+    const [, lowerSlug] = routeKey.split('/', 2);
     const distinctSlugs = new Set(
       owners.map((id) => tours.find((t) => t.id === id)?.slug?.trim()).filter(Boolean),
     );
     if (distinctSlugs.size > 1) {
       issues.push({
-        message: `Tour slugs differ only by case: ${[...distinctSlugs].join(', ')} (${owners.join(', ')})`,
+        message: `Tour slugs differ only by case in ${routeKey.split('/')[0]}: ${[...distinctSlugs].join(', ')} (${owners.join(', ')})`,
       });
     }
-    if (distinctSlugs.size === 1 && lowerKey !== [...distinctSlugs][0]) {
+    if (distinctSlugs.size === 1 && lowerSlug !== [...distinctSlugs][0]) {
       issues.push({
-        message: `Tour slug case mismatch for "${lowerKey}" (${owners.join(', ')})`,
+        message: `Tour slug case mismatch for "${routeKey}" (${owners.join(', ')})`,
       });
     }
   }

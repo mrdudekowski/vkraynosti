@@ -3,7 +3,9 @@
 Пошаговый туториал по переходу prod-сайта «Вкрайности» с технического домена TimeWeb  
 (`*.twc1.net`) на постоянный домен `**https://vkraynosti.ru**`.
 
-**Целевое состояние prod (ветка `web-vkr`, TimeWeb App):**
+> **Актуальная сверка с владельцем (2026-11-10):** публичный сайт собирается из `cms-crm-phase1-staging`, CMS admin — из `codex/admin-app`. Упоминания `web-vkr` ниже относятся к исторической конфигурации документа от 2026-06-10 и не подтверждают текущую production-ветку.
+
+**Историческое целевое состояние документа (ветка `web-vkr`, TimeWeb App):**
 
 
 | Параметр      | Значение                             |
@@ -130,6 +132,7 @@ curl.exe -sI "https://vkraynosti.ru/"
 | `VITE_BASE_PATH`                  | `/`                                     | Корневой домен         |
 | `VITE_PUBLIC_ASSET_BASE_URL`      | `https://4unja6slv5.cdn.twcstorage.ru/` | **Не менять** (CDN)    |
 | `VITE_PUBLIC_S3_BASE_URL`         | как CDN или пусто                       | JSON расписания        |
+| `VITE_CMS_S3_BASE_URL`            | корень CDN с опубликованным CMS-пакетом | обязательно для актуальных slug и SEO-маршрутов |
 | `VITE_TOUR_REQUEST_ENDPOINT_URL`  | без изменений                           | GAS `/exec`            |
 | `VITE_TOUR_SCHEDULE_ENDPOINT_URL` | без изменений                           | если используется      |
 | `VITE_YANDEX_METRIKA_ID`          | без изменений                           | счётчик                |
@@ -142,7 +145,7 @@ curl.exe -sI "https://vkraynosti.ru/"
 | ---------------- | ---------------------------- |
 | Build command    | `npm run build:deploy`       |
 | Output directory | `dist`                       |
-| Autodeploy       | **выключен** (ручной деплой) |
+| Autodeploy       | Включён: push в подключённую production-ветку запускает Docker-сборку и redeploy (подтверждено владельцем 2026-11-11) |
 
 
 `build:deploy` выполняет:
@@ -154,7 +157,9 @@ build             → Vite + prune CDN из dist
 og:shells         → статические HTML + OG JPEG на App-домене
 ```
 
-После смены env → **новый ручной Deploy** в панели TimeWeb.
+`VITE_CMS_S3_BASE_URL` должен указывать на корень, в котором доступны `/published/tours.json`, `/published/tour-schedule/` и `/published/site-seo/document.json`. Не добавляйте `/published` в значение переменной. Production-сборка для `vkraynosti.ru` завершается ошибкой, если обязательный каталог или документ SEO из CMS недоступен: legacy slug-map и старые локальные SEO-файлы не являются источником URL/метаданных для боевого сайта.
+
+После смены env или кода push в подключённую production-ветку запускает Docker-сборку и redeploy. Не отправляйте push до завершения локальных проверок и сверки нужных build-переменных.
 
 ### 4.4. Редирект со старого домена (рекомендуется)
 

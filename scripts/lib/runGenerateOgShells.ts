@@ -20,6 +20,7 @@ import { generateOgTestShell, generateTelegramOgTestShell20260610, OG_TEST_IMAGE
 import { injectOgShellIntoHtml } from './renderOgShellHead.ts';
 import { renderLegacyTourRedirectShell } from './renderLegacyTourRedirectShell.ts';
 import { renderLegacyRedirectRules } from './renderLegacyRedirectRules.ts';
+import { resolveLegacyTourRedirectTarget } from './legacyTourRedirectTarget.mjs';
 import { resolveOgShellMeta } from './resolveOgShellMeta.ts';
 import { routePathToDistFile } from './seoRoutes.mjs';
 import { OG_FALLBACK_JPEG_LOGICAL } from './ogShellTelegramImage.ts';
@@ -117,10 +118,11 @@ export async function runGenerateOgShells(): Promise<void> {
       throw new Error(`Invalid legacy tour path: ${legacyPath}`);
     }
     const [, season, segment] = match;
-    const tour = findTourBySeasonAndSegment(season as (typeof TOURS)[number]['season'], segment);
-    if (tour == null) {
+    const legacyTour = findTourBySeasonAndSegment(season as (typeof TOURS)[number]['season'], segment);
+    if (legacyTour == null) {
       throw new Error(`Unknown legacy tour path: ${legacyPath}`);
     }
+    const tour = resolveLegacyTourRedirectTarget(legacyTour, cmsTours?.tours);
     const canonicalUrl = getTourCanonicalUrl(tour);
     legacyRedirectRules.push({ from: legacyPath, to: new URL(canonicalUrl).pathname });
     const html = renderLegacyTourRedirectShell(canonicalUrl, tour.title);

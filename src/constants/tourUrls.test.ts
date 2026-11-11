@@ -99,7 +99,15 @@ describe('slug validation', () => {
       { id: 'summer-10', slug: 'same-slug', season: 'summer' },
       { id: 'summer-11', slug: 'same-slug', season: 'summer' },
     ]);
-    expect(issues.some((issue) => issue.message.includes('Duplicate tour slug'))).toBe(true);
+    expect(issues.some((issue) => issue.message.includes('Duplicate tour route slug'))).toBe(true);
+  });
+
+  it('allows the same slug in different seasons', () => {
+    const issues = collectTourSlugValidationIssues([
+      { id: 'spring-10', slug: 'same-slug', season: 'spring' },
+      { id: 'fall-10', slug: 'same-slug', season: 'fall' },
+    ]);
+    expect(issues).toEqual([]);
   });
 });
 

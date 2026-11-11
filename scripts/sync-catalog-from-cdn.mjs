@@ -51,6 +51,25 @@ const parsePackage = (text, label, arrayKey) => {
   return text;
 };
 
+const parseSiteSeoPackage = (text, label) => {
+  const value = JSON.parse(text);
+  const requiredPages = ['home', 'winter', 'spring', 'summer', 'fall', 'privacy'];
+  const pages = value?.pages;
+  const actualPages = Array.isArray(pages) ? pages.map((page) => page?.key) : [];
+  if (
+    value?.kind !== 'seo' ||
+    value?.schemaVersion !== 1 ||
+    !Array.isArray(pages) ||
+    requiredPages.some((key) => !actualPages.includes(key)) ||
+    actualPages.some((key) => !requiredPages.includes(key)) ||
+    new Set(actualPages).size !== requiredPages.length ||
+    pages.some((page) => !page || typeof page.path !== 'string' || typeof page.title !== 'string' || typeof page.description !== 'string')
+  ) {
+    throw new Error(`${label} has an invalid published CMS site SEO shape`);
+  }
+  return text;
+};
+
 export async function syncCatalog({
   root = rootDir,
   env = process.env,
@@ -84,13 +103,22 @@ export async function syncCatalog({
     const tours = payload?.tours ?? { schemaVersion: 1, tours: [] };
     const toursList = payload?.toursList ?? { schemaVersion: 1, tours: [] };
     const schedule = payload?.schedule ?? { schemaVersion: 1, events: [] };
+    const siteSeo = payload?.siteContent?.seo;
+    if (siteSeo == null) {
+      throw new Error('CMS bake response is missing its published site SEO document');
+    }
+    parseSiteSeoPackage(JSON.stringify(siteSeo), 'CMS bake site SEO document');
     const toursListText = `${JSON.stringify(toursList)}\n`;
     const scheduleText = `${JSON.stringify(schedule)}\n`;
     await mkdir(cmsDir, { recursive: true });
     const rewritten = await rewriteBakeStills({ root, tours, fetchImpl });
     const rewrittenToursText = `${JSON.stringify(rewritten)}\n`;
     const cmsScheduleDir = resolve(cmsDir, 'tour-schedule');
-    await mkdir(cmsScheduleDir, { recursive: true });
+    const cmsSiteSeoDir = resolve(cmsDir, 'site-seo');
+    await Promise.all([
+      mkdir(cmsScheduleDir, { recursive: true }),
+      mkdir(cmsSiteSeoDir, { recursive: true }),
+    ]);
     const siteContentWrites = Object.entries(payload?.siteContent ?? {}).flatMap(([kind, document]) => {
       if (document == null) {
         return [];
@@ -112,19 +140,21 @@ export async function syncCatalog({
         await writeFile(dest, body, 'utf8');
       }),
     ]);
-    process.stdout.write(`[sync:catalog] baked CMS tours and schedule (${rewritten.tours?.length ?? 0} tours)\n`);
+    process.stdout.write(`[sync:catalog] baked CMS tours, schedule and site SEO (${rewritten.tours?.length ?? 0} tours)\n`);
     return;
   }
 
   if (source.kind === 'cms') {
-    const [toursText, toursListText, scheduleText] = await Promise.all([
+    const [toursText, toursListText, scheduleText, siteSeoText] = await Promise.all([
       fetchCatalogJson(source.toursUrl, fetchImpl),
       fetchCatalogJson(source.toursListUrl, fetchImpl),
       fetchCatalogJson(source.scheduleUrl, fetchImpl),
+      fetchCatalogJson(source.siteSeoUrl, fetchImpl),
     ]);
     parsePackage(toursText, source.toursUrl, 'tours');
     parsePackage(toursListText, source.toursListUrl, 'tours');
     parsePackage(scheduleText, source.scheduleUrl, 'events');
+    parseSiteSeoPackage(siteSeoText, source.siteSeoUrl);
     await mkdir(cmsDir, { recursive: true });
     const rewritten = await rewriteBakeStills({
       root,
@@ -133,16 +163,21 @@ export async function syncCatalog({
     });
     const rewrittenToursText = `${JSON.stringify(rewritten)}\n`;
     const cmsScheduleDir = resolve(cmsDir, 'tour-schedule');
-    await mkdir(cmsScheduleDir, { recursive: true });
+    const cmsSiteSeoDir = resolve(cmsDir, 'site-seo');
+    await Promise.all([
+      mkdir(cmsScheduleDir, { recursive: true }),
+      mkdir(cmsSiteSeoDir, { recursive: true }),
+    ]);
     await Promise.all([
       writeFile(resolve(cmsDir, 'tours.json'), rewrittenToursText, 'utf8'),
+      writeFile(resolve(cmsSiteSeoDir, 'document.json'), siteSeoText, 'utf8'),
       writeFile(resolve(scheduleDir, 'tours_list.json'), toursListText, 'utf8'),
       writeFile(resolve(scheduleDir, 'schedule.json'), scheduleText, 'utf8'),
       writeFile(resolve(cmsScheduleDir, 'tours_list.json'), toursListText, 'utf8'),
       writeFile(resolve(cmsScheduleDir, 'schedule.json'), scheduleText, 'utf8'),
       writeFile(resolve(cmsDir, 'build-source.json'), '{"kind":"cms"}\n', 'utf8'),
     ]);
-    process.stdout.write(`[sync:catalog] updated published CMS tours and schedule (${JSON.parse(toursText).tours.length} tours)\n`);
+    process.stdout.write(`[sync:catalog] updated published CMS tours, schedule and site SEO (${JSON.parse(toursText).tours.length} tours)\n`);
     return;
   }
 

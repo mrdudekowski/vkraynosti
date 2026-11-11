@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   auditSeoRouteIntegrity,
+  buildCmsTourStatusByPublicPath,
   getRenderableRoutePaths,
   getSitemapRoutePaths,
   getStaticIndexableRoutePaths,
@@ -19,10 +20,15 @@ describe('catalog-aware SEO route sets', () => {
       { id: 'fall-19', season: 'fall', slug: 'magia-bryusa', status: 'draft' },
       { id: 'winter-6', season: 'winter', slug: 'new-winter-tour', status: 'in_development' },
     ];
+    const scheduleStatuses = new Map([
+      ['summer-13', 'active'],
+      ['fall-17', 'active'],
+      ['winter-6', 'in_development'],
+    ]);
 
-    const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours);
-    const sitemap = await getSitemapRoutePaths(rootDir, cmsTours);
-    const renderable = await getRenderableRoutePaths(rootDir, cmsTours);
+    const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours, scheduleStatuses);
+    const sitemap = await getSitemapRoutePaths(rootDir, cmsTours, scheduleStatuses);
+    const renderable = await getRenderableRoutePaths(rootDir, cmsTours, scheduleStatuses);
 
     expect(statusByPath.get('/tours/summer/odin-den-v-ta-chingouze')).toBe('active');
     expect(statusByPath.get('/tours/fall/odin-den-v-ta-chingouze-2')).toBe('active');
@@ -31,6 +37,19 @@ describe('catalog-aware SEO route sets', () => {
     expect(sitemap).not.toContain('/tours/winter/new-winter-tour');
     expect(renderable).not.toContain('/tours/fall/voskhozhdenie-na-goru-sestra-2');
     expect(renderable).not.toContain('/tours/fall/magia-bryusa');
+  });
+
+  it('refuses active schedule records that have no CMS document', () => {
+    expect(() => buildCmsTourStatusByPublicPath([], new Map([['summer-99', 'active']]))).toThrow(
+      /summer-99 has no published CMS document/,
+    );
+  });
+
+  it('refuses status disagreement between the published CMS and schedule packages', () => {
+    expect(() => buildCmsTourStatusByPublicPath(
+      [{ id: 'summer-1', season: 'summer', slug: 'test', status: 'active' }],
+      new Map([['summer-1', 'in_development']]),
+    )).toThrow(/status mismatch for summer-1/);
   });
 
   it('sitemap contains active tours, excludes in_development; renderable contains both', async () => {

@@ -44,6 +44,7 @@ import { tourReadiness, tourReadinessCounts } from '../../../src/cms/tourComplet
 import { vladivostokCalendarDate } from '../../../src/admin/scheduleCalendar.ts';
 import { cmsDraftIndexFile, parseCmsDraftIndex } from '../../../src/cms/cmsDraftIndex.ts';
 import { createEmptyCmsTour } from '../../../src/cms/createEmptyCmsTour.ts';
+import { getTakenCmsTourSlugKeys } from '../../../src/cms/cmsTourSlugKeys.ts';
 import { cloneCmsTourDocument } from '../../../src/cms/cloneCmsTour.ts';
 import { deleteCmsTour } from './deleteCmsTour.ts';
 import {
@@ -700,18 +701,6 @@ function sortCmsTourSummaries(tours: CmsTourDocument[]): CmsTourDocument[] {
     }
     return left.id.localeCompare(right.id);
   });
-}
-
-function takenSlugKeys(tours: CmsTourDocument[], exceptId?: string): Set<string> {
-  const taken = new Set<string>();
-  for (const tour of tours) {
-    if (tour.id === exceptId) {
-      continue;
-    }
-    taken.add(tour.slug);
-    taken.add(tour.id);
-  }
-  return taken;
 }
 
 async function appendDraftIndexId(store: CmsJsonStore, tourId: string): Promise<void> {
@@ -1596,7 +1585,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       return c.json({ error: 'invalid_body' }, 400);
     }
     const existing = await listCmsTourDocuments(store);
-    const taken = takenSlugKeys(existing);
+    const taken = getTakenCmsTourSlugKeys(existing, parsed.data.season);
     const requestedSlug = parsed.data.slug;
     let slug: string;
     if (requestedSlug != null) {
@@ -1655,7 +1644,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     );
     const slug = allocateUniqueSlug(
       slugFromTitle(source.title),
-      takenSlugKeys(existing),
+      getTakenCmsTourSlugKeys(existing, parsed.data.targetSeason),
     );
     let media: Awaited<ReturnType<typeof cloneTourMedia>> | null = null;
     try {
@@ -1812,7 +1801,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     }
 
     if (nextDocument.slug !== document.slug) {
-      const taken = takenSlugKeys(await listCmsTourDocuments(store), tourId);
+      const taken = getTakenCmsTourSlugKeys(await listCmsTourDocuments(store), document.season, tourId);
       if (taken.has(nextDocument.slug)) {
         return c.json({ error: 'slug_taken' }, 409);
       }

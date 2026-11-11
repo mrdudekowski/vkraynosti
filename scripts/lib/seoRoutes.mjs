@@ -161,41 +161,50 @@ async function loadPublishedTourStatusById(rootDir) {
  * public slug AND appear in the catalog. Hidden tours (absent from catalog) are omitted,
  * so they never reach sitemap, prerender or OG shells.
  */
-export async function getTourStatusByPublicPath(rootDir = process.cwd(), publishedCmsTours) {
+export function buildCmsTourStatusByPublicPath(cmsTours, statusById) {
+  const statusByPath = new Map();
+  const ownerByPath = new Map();
+  const cmsTourIds = new Set(cmsTours.map((tour) => tour?.id).filter(Boolean));
+
+  for (const [tourId, status] of statusById) {
+    if (!['active', 'in_development'].includes(status)) continue;
+    if (!cmsTourIds.has(tourId)) {
+      throw new Error(`Published schedule tour ${tourId} has no published CMS document; refusing static slug fallback`);
+    }
+  }
+
+  for (const tour of cmsTours) {
+    if (!['active', 'in_development'].includes(tour?.status)) continue;
+    const scheduleStatus = statusById.get(tour.id);
+    if (scheduleStatus !== tour.status) {
+      throw new Error(
+        `Published CMS/schedule status mismatch for ${tour.id}: CMS=${tour.status}, schedule=${scheduleStatus ?? 'missing'}`,
+      );
+    }
+    const path = publicPathForCmsTour(tour);
+    const owner = ownerByPath.get(path);
+    if (owner != null && owner !== tour.id) {
+      throw new Error(`Duplicate published CMS tour route ${path}: ${owner} and ${tour.id}`);
+    }
+    ownerByPath.set(path, tour.id);
+    statusByPath.set(path, tour.status);
+  }
+
+  return statusByPath;
+}
+
+export async function getTourStatusByPublicPath(
+  rootDir = process.cwd(),
+  publishedCmsTours,
+  publishedScheduleStatusById,
+) {
   const { tourSlugsSource } = await loadSeoRouteSources(rootDir);
   const slugMap = parseTourSlugMap(tourSlugsSource);
-  const statusById = await loadPublishedTourStatusById(rootDir);
+  const statusById = publishedScheduleStatusById ?? await loadPublishedTourStatusById(rootDir);
 
   const cmsTours = publishedCmsTours ?? await loadBuildCmsTourDocuments(rootDir);
   if (cmsTours != null) {
-    const statusByPath = new Map();
-    const ownerByPath = new Map();
-    const cmsTourIds = new Set(cmsTours.map((tour) => tour?.id).filter(Boolean));
-
-    // Keep legacy routes for tours not yet represented by a CMS document.
-    // CMS status and slug are authoritative for IDs that do have a document.
-    for (const [tourId, status] of statusById) {
-      if (cmsTourIds.has(tourId) || !['active', 'in_development'].includes(status)) continue;
-      const slug = slugMap.get(tourId);
-      if (slug) {
-        const path = `/tours/${seasonFromTourId(tourId)}/${slug}`;
-        statusByPath.set(path, status);
-        ownerByPath.set(path, tourId);
-      }
-    }
-
-    for (const tour of cmsTours) {
-      if (!['active', 'in_development'].includes(tour?.status)) continue;
-      const path = publicPathForCmsTour(tour);
-      const owner = ownerByPath.get(path);
-      if (owner != null && owner !== tour.id) {
-        throw new Error(`Duplicate published CMS tour route ${path}: ${owner} and ${tour.id}`);
-      }
-      ownerByPath.set(path, tour.id);
-      statusByPath.set(path, tour.status);
-    }
-
-    return statusByPath;
+    return buildCmsTourStatusByPublicPath(cmsTours, statusById);
   }
 
   const statusByPath = new Map();
@@ -212,9 +221,9 @@ export async function getTourStatusByPublicPath(rootDir = process.cwd(), publish
  * Sitemap = index-eligible URLs: static indexable routes + ONLY `active` tours.
  * `in_development` (noindex) and `hidden` tours are excluded.
  */
-export async function getSitemapRoutePaths(rootDir = process.cwd(), publishedCmsTours) {
+export async function getSitemapRoutePaths(rootDir = process.cwd(), publishedCmsTours, publishedScheduleStatusById) {
   const { routesSource } = await loadSeoRouteSources(rootDir);
-  const statusByPath = await getTourStatusByPublicPath(rootDir, publishedCmsTours);
+  const statusByPath = await getTourStatusByPublicPath(rootDir, publishedCmsTours, publishedScheduleStatusById);
   const activeTourPaths = [...statusByPath.entries()]
     .filter(([, status]) => status === 'active')
     .map(([path]) => path);
@@ -228,9 +237,9 @@ export async function getSitemapRoutePaths(rootDir = process.cwd(), publishedCms
  * Hidden tours are excluded — they render not-found at runtime and would time out the
  * prerender content gate.
  */
-export async function getRenderableRoutePaths(rootDir = process.cwd(), publishedCmsTours) {
+export async function getRenderableRoutePaths(rootDir = process.cwd(), publishedCmsTours, publishedScheduleStatusById) {
   const { routesSource } = await loadSeoRouteSources(rootDir);
-  const statusByPath = await getTourStatusByPublicPath(rootDir, publishedCmsTours);
+  const statusByPath = await getTourStatusByPublicPath(rootDir, publishedCmsTours, publishedScheduleStatusById);
   const nonIndexableStaticPaths = extractStaticRoutes(routesSource).filter((path) =>
     NON_INDEXABLE_RENDERABLE_ROUTE_PATHS.has(path),
   );

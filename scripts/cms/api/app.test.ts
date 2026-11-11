@@ -905,17 +905,30 @@ describe('CMS API', () => {
     await expect(response.json()).resolves.toEqual({ error: 'not_found' });
   });
 
-  it('не даёт занять чужой slug', async () => {
+  it('не даёт занять чужой slug в том же сезоне', async () => {
     const { app } = createApp();
     const cookie = await login(app);
     const created = await app.request('/api/cms/tours', {
       method: 'POST',
       headers: { cookie, 'content-type': 'application/json' },
-      body: JSON.stringify({ title: 'Другой тур', season: 'summer', slug: 'izubrinaya' }),
+      body: JSON.stringify({ title: 'Другой тур', season: 'winter', slug: 'izubrinaya' }),
     });
     expect(created.status).toBe(409);
     const body = (await created.json()) as { error: string };
     expect(body.error).toBe('slug_taken');
+  });
+
+  it('разрешает одинаковый slug в разных сезонах', async () => {
+    const { app } = createApp();
+    const cookie = await login(app);
+    const created = await app.request('/api/cms/tours', {
+      method: 'POST',
+      headers: { cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ title: 'Изюбриная осенью', season: 'fall', slug: 'izubrinaya' }),
+    });
+    expect(created.status).toBe(201);
+    const body = (await created.json()) as { document: CmsTourDocument };
+    expect(body.document).toMatchObject({ id: 'fall-1', season: 'fall', slug: 'izubrinaya' });
   });
 
   it('открывает тур, который есть только в published catalog overlay', async () => {

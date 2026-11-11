@@ -16,4 +16,13 @@ describe('SiteSeoSection', () => {
     fireEvent.change(screen.getByLabelText('Ключевые фразы для Яндекса', { selector: '#site-seo-keywords-home' }), { target: { value: 'туры по Приморью\nэкскурсии из Владивостока' } });
     expect(onChange).toHaveBeenLastCalledWith({ ...value, pages: value.pages.map((page) => page.key === 'home' ? { ...page, keywords: ['туры по Приморью', 'экскурсии из Владивостока'] } : page) });
   });
+
+  it('includes the Privacy page in the fixed-page SEO editor', () => {
+    const value = createDefaultSiteSeoDocument();
+    render(<SiteSeoSection value={value} onChange={vi.fn()} />);
+
+    expect(screen.getByText('Политика конфиденциальности')).toBeInTheDocument();
+    expect(screen.getByText('/privacy/')).toBeInTheDocument();
+    expect(value.pages.find((page) => page.key === 'privacy')?.path).toBe('/privacy/');
+  });
 });

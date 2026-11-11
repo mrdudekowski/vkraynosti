@@ -25,6 +25,7 @@ export type CmsApiS3Config = {
 export type CmsApiEnv = {
   port: number;
   authSecret: string;
+  deploySecret?: string;
   cookieSecure: boolean;
   cookieSameSite: CmsCookieSameSite;
   crmInboundSecret: string;
@@ -69,6 +70,7 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
   }
 
   const authSecret = get('CMS_AUTH_SECRET');
+  const deploySecret = get('CMS_DEPLOY_SECRET');
   const accessKeyId = get('AWS_ACCESS_KEY_ID');
   const secretAccessKey = get('AWS_SECRET_ACCESS_KEY');
   const s3AccessKey = get('S3_ACCESS_KEY');
@@ -122,6 +124,7 @@ export async function loadCmsApiEnv(rootDir: string): Promise<CmsApiEnv> {
   return {
     port: Number.isFinite(port) ? port : 3000,
     authSecret,
+    deploySecret,
     cookieSecure: get('CMS_COOKIE_SECURE') === 'true',
     cookieSameSite: get('CMS_COOKIE_SAME_SITE') === 'None'
       ? 'None'

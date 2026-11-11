@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import { Hono } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { cors } from 'hono/cors';
@@ -57,6 +58,7 @@ import {
   cmsPublishedDocumentKey,
 } from '../../../src/cms/cmsPackageKeys.ts';
 import { createCmsTourMeta, parseCmsTourMeta, type CmsTourMeta } from '../../../src/cms/cmsTourMeta.ts';
+import { PublicSnapshotConflictError, loadPublicSnapshotRelease } from './publicSnapshotStore.ts';
 import { isValidTourSlug } from '../../../src/constants/tourUrls.ts';
 import {
   CMS_PASSWORD_MIN_LENGTH,
@@ -165,6 +167,12 @@ const publishDeparturesBodySchema = z
   .refine((value) => value.allEligible === true || (value.ids != null && value.ids.length > 0));
 
 const isoDateSchema = z.string().refine(isValidStartsOn);
+
+function matchesDeploySecret(provided: string, configured: string): boolean {
+  const providedBytes = Buffer.from(provided, 'utf8');
+  const configuredBytes = Buffer.from(configured, 'utf8');
+  return providedBytes.length === configuredBytes.length && timingSafeEqual(providedBytes, configuredBytes);
+}
 
 const listDeparturesQuerySchema = z.object({
   from: isoDateSchema,
@@ -764,6 +772,26 @@ export function createCmsApiApp(deps: CmsApiDeps) {
 
   app.get('/api/cms/health', (c) => c.json({ ok: true }));
 
+  app.get('/api/cms/internal/bake', async (c) => {
+    if (env.deploySecret == null || env.deploySecret.length === 0) {
+      return c.json({ error: 'bake_disabled' }, 503);
+    }
+    const secret = c.req.header('x-cms-deploy-secret') ?? '';
+    if (secret.length === 0) return c.json({ error: 'unauthorized' }, 401);
+    if (!matchesDeploySecret(secret, env.deploySecret)) return c.json({ error: 'forbidden' }, 403);
+
+    try {
+      const release = await loadPublicSnapshotRelease(store, { sourceKind: env.storeKind });
+      // Keep the previous top-level fields while the public build migrates to the release envelope.
+      return c.json({ ...release.payload, payload: release.payload, manifest: release.manifest });
+    } catch (error) {
+      if (error instanceof PublicSnapshotConflictError) {
+        return c.json({ error: 'bake_snapshot_conflict' }, 409);
+      }
+      return c.json({ error: 'bake_snapshot_unavailable' }, 503);
+    }
+  });
+
   app.post('/api/cms/login', async (c) => {
     await seedPromise;
     const parsed = loginBodySchema.safeParse(await readJsonBody(c));
@@ -814,6 +842,7 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     if (
       c.req.path === '/api/cms/login' ||
       c.req.path === '/api/cms/health' ||
+      c.req.path === '/api/cms/internal/bake' ||
       c.req.path === '/api/cms/crm/inbound'
     ) {
       return next();

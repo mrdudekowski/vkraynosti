@@ -15,7 +15,7 @@ type SiteSeoSectionProps = { value: SiteSeoDocument; onChange: (value: SiteSeoDo
 const SiteSeoSection = ({ value, onChange }: SiteSeoSectionProps) => (
   <section className="flex flex-col gap-3">
     <div className="admin-editor-surface p-4">
-      <h2 className="text-base font-semibold">SEO главной, сезонов и политики</h2>
+      <h2 className="text-base font-semibold">SEO главной, сезонных страниц и Privacy</h2>
       <p className="mt-1 text-sm text-text-muted">Редактируются только фиксированные страницы. Технические теги, адреса и индексируемость формируются автоматически.</p>
     </div>
     {value.pages.map((page) => (

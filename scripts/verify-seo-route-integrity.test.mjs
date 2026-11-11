@@ -10,6 +10,25 @@ const sitemapXml = `
 `;
 
 describe('generated SEO route artifacts', () => {
+  it('uses current CMS routes instead of stale static slugs when auditing hidden links', async () => {
+    const currentPath = '/tours/fall/synthetic-test-tour';
+    const input = await buildSeoRouteIntegrityInput({
+      rootDir: process.cwd(),
+      sitemapXml: '<urlset><url><loc>https://vkraynosti.ru/</loc></url></urlset>',
+      statusByPath: new Map([[currentPath, 'active']]),
+      renderablePaths: ['/', currentPath],
+      legacyRedirectPaths: [],
+      publishedCmsTours: [{ id: 'fall-1', season: 'fall', slug: 'synthetic-test-tour', status: 'active' }],
+      generatedHtmlByPath: { '/': `<a href="${currentPath}">Current route</a>` },
+    });
+
+    expect(input.activePaths).toEqual(['/tours/fall/synthetic-test-tour/']);
+    expect(input.hiddenPaths).not.toContain('/tours/fall/osen-voskhozhdenie-na-pidan/');
+    expect(input.internalLinks).toEqual([
+      { from: '/', to: '/tours/fall/synthetic-test-tour/' },
+    ]);
+  });
+
   it('builds an audit input from catalog statuses, Sitemap and generated HTML', async () => {
     const input = await buildSeoRouteIntegrityInput({
       siteRoot: 'https://vkraynosti.ru',

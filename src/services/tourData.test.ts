@@ -15,7 +15,12 @@ describe('tourData service', () => {
   });
 
   it('loads tours_list.json', async () => {
-    vi.mocked(fetch).mockResolvedValue({
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        kind: 'legacy',
+      }),
+    } as Response).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         schemaVersion: 1,
@@ -35,13 +40,17 @@ describe('tourData service', () => {
     const payload = await loadToursList();
     expect(payload.tours).toHaveLength(1);
     expect(fetch).toHaveBeenCalledWith(
-      'https://cdn.example.test/tour-schedule/tours_list.json',
+      '/data/cms/tour-schedule/tours_list.json',
       { cache: 'no-store' },
     );
   });
 
   it('merges tours and schedule payloads', async () => {
     vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ kind: 'legacy' }),
+      } as Response)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -80,9 +89,12 @@ describe('tourData service', () => {
     expect(payload.catalogPublicationStatuses['summer-3']).toBe('active');
   });
 
-  it('при CMS env сначала читает published/tour-schedule с cms-dev', async () => {
+  it('при настроенном CDN всё равно читает только запечённый в деплой пакет', async () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://s3.example/vkraynosti-cms-dev/');
-    vi.mocked(fetch).mockResolvedValue({
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ kind: 'legacy' }),
+    } as Response).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         schemaVersion: 1,
@@ -101,9 +113,10 @@ describe('tourData service', () => {
 
     await loadToursList();
     expect(fetch).toHaveBeenCalledWith(
-      'https://s3.example/vkraynosti-cms-dev/published/tour-schedule/tours_list.json',
+      '/data/cms/build-source.json',
       { cache: 'no-store' },
     );
+    expect(fetch).toHaveBeenCalledWith('/data/cms/tour-schedule/tours_list.json', { cache: 'no-store' });
   });
 
   it('при CMS env не падает на прод-календарь, если снимок cms-dev не открылся', async () => {

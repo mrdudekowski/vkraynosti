@@ -1,4 +1,5 @@
 import { readTourCatalogFile } from './readTourCatalogFile.mjs';
+import { loadBuildPublicSnapshot } from './loadBuildPublicSnapshot.ts';
 import type { TourSchedulePayload } from '../../src/types/tourSchedule.ts';
 import { mergeTourDataToSchedulePayload } from '../../src/utils/tourData/mergeTourDataPayload.ts';
 import type { SchedulePayload, ToursListPayload } from '../../src/types/tourData.ts';
@@ -7,6 +8,13 @@ import type { SchedulePayload, ToursListPayload } from '../../src/types/tourData
 export async function loadTourScheduleBootstrapPayload(
   rootDir: string,
 ): Promise<TourSchedulePayload> {
+  const cmsSnapshot = await loadBuildPublicSnapshot(rootDir);
+  if (cmsSnapshot != null) {
+    return mergeTourDataToSchedulePayload(
+      cmsSnapshot.release.payload.toursList as ToursListPayload,
+      cmsSnapshot.release.payload.schedule as SchedulePayload,
+    );
+  }
   const [listRaw, scheduleRaw] = await Promise.all([
     readTourCatalogFile(rootDir, 'tours_list.json'),
     readTourCatalogFile(rootDir, 'schedule.json'),

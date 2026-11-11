@@ -1,4 +1,5 @@
 import { readTourCatalogFile } from './readTourCatalogFile.mjs';
+import { loadBuildPublicSnapshot } from './loadBuildPublicSnapshot.ts';
 import type {
   TourPublicationStatus,
   TourScheduleDurationType,
@@ -14,6 +15,10 @@ export interface TourScheduleSnapshot {
 
 /** Snapshot from `public/data/tour-schedule/` (same source as runtime + sitemap). */
 export async function loadTourScheduleSnapshot(rootDir: string): Promise<TourScheduleSnapshot> {
+  const cmsSnapshot = await loadBuildPublicSnapshot(rootDir);
+  if (cmsSnapshot != null) {
+    return scheduleSnapshotFromData(cmsSnapshot.release.payload.toursList, cmsSnapshot.release.payload.schedule);
+  }
   const [listRaw, scheduleRaw] = await Promise.all([
     readTourCatalogFile(rootDir, 'tours_list.json'),
     readTourCatalogFile(rootDir, 'schedule.json'),
@@ -29,6 +34,13 @@ export async function loadTourScheduleSnapshot(rootDir: string): Promise<TourSch
   };
   const schedule = JSON.parse(scheduleRaw) as { events?: TourScheduleEvent[] };
 
+  return scheduleSnapshotFromData(list, schedule);
+}
+
+function scheduleSnapshotFromData(
+  list: { tours?: Array<{ id?: string; priceRub?: number; durationType?: TourScheduleDurationType; publicationStatus?: TourPublicationStatus }> },
+  schedule: { events?: TourScheduleEvent[] },
+): TourScheduleSnapshot {
   const publicationStatuses = new Map<string, TourPublicationStatus>();
   const catalogPrices = new Map<string, number>();
   const durationTypes = new Map<string, TourScheduleDurationType>();

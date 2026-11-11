@@ -108,6 +108,31 @@ describe('resolveDataSsgForRoute', () => {
     expect(page.structuredData[0]).toMatchObject({ name: 'Поездка на полуостров Краббе' });
   });
 
+  it('renders catalogue links from current CMS slugs and includes CMS-only tours', () => {
+    const base = findTourBySeasonAndSegment('fall', 'osen-voskhozhdenie-na-pidan');
+    expect(base).toBeDefined();
+    const existingTour = { ...base!, slug: 'synthetic-test-tour' };
+    const extraTour = {
+      ...base!,
+      id: 'fall-99',
+      slug: 'cms-only-test-tour',
+      title: 'Новый маршрут из CMS',
+    };
+    const snapshot = emptySnapshot();
+    snapshot.publicationStatuses.set(existingTour.id, 'active');
+    snapshot.publicationStatuses.set(extraTour.id, 'active');
+    const toursById = new Map([[existingTour.id, existingTour], [extraTour.id, extraTour]]);
+
+    const home = resolveDataSsgForRoute('/', snapshot, undefined, { toursById });
+    const season = resolveDataSsgForRoute('/tours/fall', snapshot, undefined, { toursById });
+
+    for (const page of [home, season]) {
+      expect(page.bodyHtml).toContain('/tours/fall/synthetic-test-tour');
+      expect(page.bodyHtml).toContain('/tours/fall/cms-only-test-tour');
+      expect(page.bodyHtml).not.toContain('/tours/fall/osen-voskhozhdenie-na-pidan');
+    }
+  });
+
   it('renders an active CMS tour route that has no legacy static lookup entry', () => {
     const base = findTourBySeasonAndSegment('summer', 'poluostrov-krabbe');
     expect(base).toBeDefined();

@@ -1,5 +1,7 @@
 import { parseSiteContentDocument, type SiteContentDocument, type SiteContentDocumentKind } from './siteContentDocument';
 import { cmsPublishedSiteContentCandidates } from './cmsContentUrls';
+import { loadEmbeddedPublicSnapshot } from './loadEmbeddedPublicSnapshot';
+import { serializeCanonicalJson } from './publicSnapshotRelease';
 
 const lastValidByKind = new Map<SiteContentDocumentKind, SiteContentDocument>();
 
@@ -23,7 +25,20 @@ export async function loadPublishedSiteContent(
 ): Promise<SiteContentDocument | null> {
   for (const url of cmsPublishedSiteContentCandidates(kind)) {
     try {
+      const release = await loadEmbeddedPublicSnapshot();
+      if (release == null) {
+        lastValidByKind.delete(kind);
+        return null;
+      }
+      const expected = release.payload.siteContent[kind];
+      if (expected == null) {
+        lastValidByKind.delete(kind);
+        return null;
+      }
       const document = parseDocument(kind, await fetchJson(url));
+      if (serializeCanonicalJson(document) !== serializeCanonicalJson(expected)) {
+        throw new Error(`CMS ${kind} document does not match embedded release`);
+      }
       lastValidByKind.set(kind, document);
       return document;
     } catch (error) {

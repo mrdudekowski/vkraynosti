@@ -5,6 +5,7 @@ import type { SchedulePayload, TourDataFetchErrorCode, ToursListPayload } from '
 import { TourDataFetchError } from '../types/tourData';
 import { mergeTourDataToSchedulePayload } from '../utils/tourData/mergeTourDataPayload';
 import type { TourSchedulePayload } from '../types/tourSchedule';
+import { loadEmbeddedPublicSnapshot } from '../cms/loadEmbeddedPublicSnapshot';
 
 const tourSchema = z.object({
   id: z.string().regex(/^[a-z]+-\d+$/),
@@ -107,14 +108,41 @@ function scheduleUrls(): string[] {
   return [buildTourDataFileUrl(TOUR_DATA_S3_PATHS.schedule)];
 }
 
-export const loadToursList = async (): Promise<ToursListPayload> =>
-  parseToursList(await fetchJsonFromCandidates(toursListUrls()));
+export const loadToursList = async (): Promise<ToursListPayload> => {
+  let release;
+  try {
+    release = await loadEmbeddedPublicSnapshot();
+  } catch (error) {
+    throw new TourDataFetchError('parse', error instanceof Error ? error.message : 'CMS release is invalid');
+  }
+  if (release != null) return parseToursList(release.payload.toursList);
+  return parseToursList(await fetchJsonFromCandidates(toursListUrls()));
+};
 
-export const loadSchedule = async (): Promise<SchedulePayload> =>
-  parseSchedule(await fetchJsonFromCandidates(scheduleUrls()));
+export const loadSchedule = async (): Promise<SchedulePayload> => {
+  let release;
+  try {
+    release = await loadEmbeddedPublicSnapshot();
+  } catch (error) {
+    throw new TourDataFetchError('parse', error instanceof Error ? error.message : 'CMS release is invalid');
+  }
+  if (release != null) return parseSchedule(release.payload.schedule);
+  return parseSchedule(await fetchJsonFromCandidates(scheduleUrls()));
+};
 
 export const loadTourSchedulePayload = async (): Promise<TourSchedulePayload> => {
-  const [toursList, schedule] = await Promise.all([loadToursList(), loadSchedule()]);
+  let release;
+  try {
+    release = await loadEmbeddedPublicSnapshot();
+  } catch (error) {
+    throw new TourDataFetchError('parse', error instanceof Error ? error.message : 'CMS release is invalid');
+  }
+  const [toursList, schedule] = release != null
+    ? [parseToursList(release.payload.toursList), parseSchedule(release.payload.schedule)]
+    : await Promise.all([
+        fetchJsonFromCandidates(toursListUrls()).then(parseToursList),
+        fetchJsonFromCandidates(scheduleUrls()).then(parseSchedule),
+      ]);
   return mergeTourDataToSchedulePayload(toursList, schedule);
 };
 

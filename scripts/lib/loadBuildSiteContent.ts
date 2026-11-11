@@ -5,6 +5,7 @@ import {
   type SiteContentDocument,
   type SiteContentDocumentKind,
 } from '../../src/cms/siteContentDocument.ts';
+import { loadBuildPublicSnapshot } from './loadBuildPublicSnapshot.ts';
 
 export function bakeSiteContentRelativePath(kind: SiteContentDocumentKind): string {
   if (kind === 'seo') {
@@ -17,6 +18,11 @@ export async function loadBuildPublishedSiteContent(
   kind: SiteContentDocumentKind,
   rootDir = process.cwd(),
 ): Promise<SiteContentDocument | null> {
+  const snapshot = await loadBuildPublicSnapshot(rootDir);
+  if (snapshot != null) {
+    const value = snapshot.release.payload.siteContent[kind];
+    return value == null ? null : parseSiteContentDocument(kind, value);
+  }
   const filePath = resolve(rootDir, bakeSiteContentRelativePath(kind));
   let raw: string;
   try {

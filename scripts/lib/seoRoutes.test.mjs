@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { resolve } from 'node:path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   auditSeoRouteIntegrity,
   buildCmsTourStatusByPublicPath,
@@ -9,7 +12,23 @@ import {
   loadSeoRouteSources,
 } from './seoRoutes.mjs';
 
-const rootDir = process.cwd();
+let rootDir;
+
+beforeAll(async () => {
+  rootDir = await mkdtemp(resolve(tmpdir(), 'vkr-seo-routes-'));
+  for (const relativePath of ['src/constants/routes.ts', 'src/data/tourSlugs.ts', 'scripts/fixtures/tour-schedule/tours_list.json', 'scripts/fixtures/tour-schedule/schedule.json']) {
+    const source = resolve(process.cwd(), relativePath);
+    const destination = resolve(rootDir, relativePath);
+    await mkdir(resolve(destination, '..'), { recursive: true });
+    await copyFile(source, destination);
+  }
+  await mkdir(resolve(rootDir, 'public/data/cms'), { recursive: true });
+  await writeFile(resolve(rootDir, 'public/data/cms/build-source.json'), '{"kind":"legacy"}\n', 'utf8');
+});
+
+afterAll(async () => {
+  if (rootDir) await rm(rootDir, { recursive: true, force: true });
+});
 
 describe('catalog-aware SEO route sets', () => {
   it('uses published CMS ids and slugs for active routes, while excluding hidden and draft tours', async () => {

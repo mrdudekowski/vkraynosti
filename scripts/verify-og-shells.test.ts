@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   assertSingleTags,
+  getExpectedLegacyCanonicalPath,
   getRoutesToVerify,
   shouldIncludeSocialMetadata,
 } from './verify-og-shells.ts';
@@ -12,6 +13,12 @@ const coreTags = `
   <link rel="canonical" href="https://vkraynosti.ru/safety/" />`;
 
 describe('verify-og-shells social metadata rules', () => {
+  it('expects legacy ID shells to target the CMS-published URL', () => {
+    expect(getExpectedLegacyCanonicalPath('/tours/fall/fall-1', [
+      { id: 'fall-1', season: 'fall', slug: 'cms-current-slug', status: 'active' },
+    ])).toBe('/tours/fall/cms-current-slug/');
+  });
+
   it('does not resolve CMS-only tour slugs through the local tour catalog', () => {
     expect(shouldIncludeSocialMetadata('/tours/fall/reka-milogradovka')).toBe(true);
     expect(shouldIncludeSocialMetadata('/safety')).toBe(false);

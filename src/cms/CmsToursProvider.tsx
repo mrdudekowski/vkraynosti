@@ -3,29 +3,16 @@ import { cmsDocumentToSiteTour } from './cmsDocumentToSiteTour';
 import type { CmsToursFile } from './cmsTourDocument';
 import { CmsToursRevisionContext } from './cms-tours-revision-context';
 import { setCmsCatalogStatus } from './cmsCatalogStatus';
-import { loadCmsToursFile, loadLiveCmsToursFile } from './loadCmsToursFile';
+import { loadCmsToursFile } from './loadCmsToursFile';
 import { clearCmsTourOverlay, setCmsTourOverlay } from './cmsTourOverlay';
 import { resolveCmsContentBaseUrl } from './cmsContentUrls';
-import {
-  GUEST_STORAGE_BACKOFF_MS,
-  selectGuestCanaryUrl,
-  startGuestStorageCircuit,
-} from './storageCircuit';
+import { selectGuestCanaryUrl, startGuestStorageCircuit } from './storageCircuit';
 
 export function CmsToursProvider({ children }: { children: ReactNode }) {
   const [revision, setRevision] = useState(0);
 
   useLayoutEffect(() => {
     let cancelled = false;
-    let liveRetryTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const clearLiveRetryTimer = (): void => {
-      if (liveRetryTimer != null) {
-        clearTimeout(liveRetryTimer);
-        liveRetryTimer = null;
-      }
-    };
-
     const publishOverlayFromFile = (file: CmsToursFile): void => {
       const overlayTours = file.tours.map(cmsDocumentToSiteTour);
       setCmsTourOverlay(overlayTours);
@@ -52,40 +39,10 @@ export function CmsToursProvider({ children }: { children: ReactNode }) {
 
       publishOverlayFromFile(load.file);
 
-      if (load.source === 'bake' && resolveCmsContentBaseUrl() != null) {
-        let backoffStep = 0;
-
-        const scheduleLiveRetry = (): void => {
-          if (cancelled) {
-            return;
-          }
-          const delay =
-            GUEST_STORAGE_BACKOFF_MS[Math.min(backoffStep, GUEST_STORAGE_BACKOFF_MS.length - 1)];
-          liveRetryTimer = setTimeout(() => {
-            if (cancelled) {
-              return;
-            }
-            void loadLiveCmsToursFile().then((liveFile) => {
-              if (cancelled) {
-                return;
-              }
-              if (liveFile != null) {
-                publishOverlayFromFile(liveFile);
-                return;
-              }
-              backoffStep = Math.min(backoffStep + 1, GUEST_STORAGE_BACKOFF_MS.length - 1);
-              scheduleLiveRetry();
-            });
-          }, delay);
-        };
-
-        scheduleLiveRetry();
-      }
     });
 
     return () => {
       cancelled = true;
-      clearLiveRetryTimer();
     };
   }, []);
 

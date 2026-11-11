@@ -50,27 +50,18 @@ describe('resolveCmsContentBaseUrl', () => {
     expect(candidates.schedule[0]).toBe('/data/cms/tour-schedule/schedule.json');
   });
 
-  it('календарный overlay: live CDN JSON первым, bake вторым', () => {
+  it('календарный overlay остаётся привязан к снимку текущего деплоя', () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
     vi.stubEnv('BASE_URL', '/');
     const candidates = cmsTourScheduleOverlayCandidates();
-    expect(candidates.toursList[0]).toBe(
-      'https://cdn.example/cms/published/tour-schedule/tours_list.json',
-    );
-    expect(candidates.schedule[0]).toBe(
-      'https://cdn.example/cms/published/tour-schedule/schedule.json',
-    );
-    expect(candidates.toursList[1]).toBe('/data/cms/tour-schedule/tours_list.json');
-    expect(candidates.schedule[1]).toBe('/data/cms/tour-schedule/schedule.json');
+    expect(candidates.toursList).toEqual(['/data/cms/tour-schedule/tours_list.json']);
+    expect(candidates.schedule).toEqual(['/data/cms/tour-schedule/schedule.json']);
   });
 
-  it('site-content overlay: live published JSON first, bake second', () => {
+  it('site content remains on the release baked into this deployment', () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
     vi.stubEnv('BASE_URL', '/');
-    expect(cmsPublishedSiteContentCandidates('modal')).toEqual([
-      'https://cdn.example/cms/published/site-content/modal/document.json',
-      '/data/cms/site-content/modal/document.json',
-    ]);
+    expect(cmsPublishedSiteContentCandidates('modal')).toEqual(['/data/cms/site-content/modal/document.json']);
     expect(buildCmsPublishedSiteContentUrl('https://cdn.example/cms/', 'modal')).toBe(
       'https://cdn.example/cms/published/site-content/modal/document.json',
     );

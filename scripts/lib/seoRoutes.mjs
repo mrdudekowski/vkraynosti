@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { loadBuildPublicSnapshot } from './loadBuildPublicSnapshot.ts';
 
 const DEFAULT_SITE_URL = 'https://vkraynosti.ru';
 
@@ -51,27 +52,10 @@ export function extractTourPublicUrlsFromSlugMap(tourSlugsSource) {
 
 /** Read the catalog snapshot produced by `sync:catalog`; null means legacy mode. */
 export async function loadBuildCmsTourDocuments(rootDir = process.cwd()) {
-  const markerPath = resolve(rootDir, 'public/data/cms/build-source.json');
-  let marker;
-  try {
-    marker = JSON.parse(await readFile(markerPath, 'utf8'));
-  } catch (error) {
-    if (error?.code === 'ENOENT') return null;
-    throw new Error(`Invalid catalog build-source marker: ${markerPath}`, { cause: error });
-  }
-  if (typeof marker !== 'object' || marker == null || !('kind' in marker)) {
-    throw new Error(`Invalid catalog build-source marker: ${markerPath}`);
-  }
-  if (marker.kind === 'legacy') return null;
-  if (marker.kind !== 'cms') {
-    throw new Error(`Unknown catalog build-source kind: ${String(marker.kind)}`);
-  }
-
+  const snapshot = await loadBuildPublicSnapshot(rootDir);
+  if (snapshot == null) return null;
   const filePath = resolve(rootDir, 'public/data/cms/tours.json');
   const parsed = JSON.parse(await readFile(filePath, 'utf8'));
-  if (parsed?.schemaVersion !== 1 || !Array.isArray(parsed.tours)) {
-    throw new Error(`Published CMS tour snapshot has an invalid shape: ${filePath}`);
-  }
   return parsed.tours;
 }
 
@@ -89,6 +73,10 @@ function publicPathForCmsTour(tour) {
     throw new Error(`Invalid published CMS tour route data for id "${tour?.id ?? ''}"`);
   }
   return `/tours/${season}/${slug}`;
+}
+
+export function extractCmsTourPublicUrls(cmsTours) {
+  return cmsTours.map(publicPathForCmsTour);
 }
 
 /** Legacy id paths for tours with slug (redirect shells only). */

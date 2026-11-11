@@ -47,13 +47,13 @@
     "seo:check": "node scripts/seo-check.mjs",
 
     "check:seo": "node scripts/check-seo-indexing.mjs",
-    "verify:seo-routes": "node scripts/verify-seo-route-integrity.mjs --dist dist",
+    "verify:seo-routes": "tsx scripts/verify-seo-route-integrity.mjs --dist dist",
 
-    "sync:catalog": "node scripts/sync-catalog-from-cdn.mjs",
+    "sync:catalog": "node --import tsx scripts/sync-catalog-from-cdn.mjs",
 
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
 
-    "generate:robots": "node scripts/generate-robots.mjs",
+    "generate:robots": "tsx scripts/generate-robots.mjs",
 
     "data:ssg": "tsx scripts/generate-data-ssg.ts",
 

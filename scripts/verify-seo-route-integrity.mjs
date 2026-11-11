@@ -3,10 +3,12 @@ import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import {
   auditSeoRouteIntegrity,
+  extractCmsTourPublicUrls,
   extractTourPublicUrlsFromSlugMap,
   getRenderableRoutePaths,
   getTourLegacyRedirectPaths,
   getTourStatusByPublicPath,
+  loadBuildCmsTourDocuments,
   loadSeoRouteSources,
   routePathToDistFile,
 } from './lib/seoRoutes.mjs';
@@ -61,8 +63,14 @@ export async function buildSeoRouteIntegrityInput({
   legacyHttpRedirectPaths = legacyRedirectPaths,
   generatedHtmlByPath,
   tourPublicPaths,
+  publishedCmsTours,
 }) {
-  const allTourPaths = tourPublicPaths ?? extractTourPublicUrlsFromSlugMap((await loadSeoRouteSources(rootDir)).tourSlugsSource);
+  const cmsTours = publishedCmsTours ?? (tourPublicPaths == null
+    ? await loadBuildCmsTourDocuments(rootDir)
+    : null);
+  const allTourPaths = tourPublicPaths ?? (cmsTours == null
+    ? extractTourPublicUrlsFromSlugMap((await loadSeoRouteSources(rootDir)).tourSlugsSource)
+    : extractCmsTourPublicUrls(cmsTours));
   const normalizedTourPaths = allTourPaths.map((path) => `${path.replace(/\/+$/, '')}/`);
   const statusEntries = [...statusByPath.entries()];
   const knownCatalogPaths = new Set(statusEntries.map(([path]) => `${path.replace(/\/+$/, '')}/`));
@@ -102,8 +110,9 @@ export async function verifySeoRouteIntegrity({ rootDir = process.cwd(), distDir
   const legacyRedirectRulesPath = resolve(distDir, 'legacy-redirects.caddy');
   const sitemapXml = await readFile(sitemapPath, 'utf8');
   const legacyRedirectRules = await readHtmlIfPresent(legacyRedirectRulesPath);
-  const statusByPath = await getTourStatusByPublicPath(rootDir);
-  const expectedRenderablePaths = await getRenderableRoutePaths(rootDir);
+  const cmsTours = await loadBuildCmsTourDocuments(rootDir);
+  const statusByPath = await getTourStatusByPublicPath(rootDir, cmsTours ?? undefined);
+  const expectedRenderablePaths = await getRenderableRoutePaths(rootDir, cmsTours ?? undefined);
   const legacyRedirectPaths = await getTourLegacyRedirectPaths(rootDir);
   const generatedHtmlByPath = {};
   const actualRenderablePaths = [];
@@ -125,6 +134,8 @@ export async function verifySeoRouteIntegrity({ rootDir = process.cwd(), distDir
     siteRoot: new URL(sitemapXml.match(/<loc>\s*([^<]+)/i)?.[1] ?? 'https://vkraynosti.ru/').origin,
     sitemapXml,
     statusByPath,
+    tourPublicPaths: cmsTours == null ? undefined : extractCmsTourPublicUrls(cmsTours),
+    publishedCmsTours: cmsTours,
     renderablePaths: actualRenderablePaths,
     legacyRedirectPaths,
     legacyGeneratedPaths: actualLegacyPaths,

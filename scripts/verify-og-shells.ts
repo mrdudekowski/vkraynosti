@@ -6,8 +6,12 @@ import { resolve } from 'node:path';
 import { isNormalizedMetaContent } from '../src/constants/metaContent.ts';
 import { normalizeCanonicalPath } from '../src/constants/canonicalUrl.ts';
 import { ROUTES } from '../src/constants/routes.ts';
+import { findTourBySeasonAndSegment } from '../src/data/tourLookup.ts';
+import { getTourPublicPath } from '../src/constants/tourUrls.ts';
 import { resolveOgShellMeta } from './lib/resolveOgShellMeta.ts';
 import { getRenderableRoutePaths, getTourLegacyRedirectPaths, routePathToDistFile } from './lib/seoRoutes.mjs';
+import { resolveLegacyTourRedirectTarget } from './lib/legacyTourRedirectTarget.mjs';
+import { loadBuildCmsToursFile } from './lib/loadBuildCmsTours.ts';
 import {
   OG_SHELL_IMAGE_HEIGHT,
   OG_SHELL_IMAGE_WIDTH,
@@ -39,6 +43,16 @@ export const getRoutesToVerify = (
 
 export const shouldIncludeSocialMetadata = (routePath: string): boolean =>
   routePath !== ROUTES.SAFETY;
+
+export const getExpectedLegacyCanonicalPath = (legacyPath: string, cmsTours: readonly unknown[] = []): string => {
+  const match = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)$/.exec(legacyPath);
+  if (match == null) throw new Error(`Invalid legacy path: ${legacyPath}`);
+  const [, season, segment] = match;
+  const legacyTour = findTourBySeasonAndSegment(season as 'winter' | 'spring' | 'summer' | 'fall', segment);
+  if (legacyTour == null) throw new Error(`Tour not found for legacy path: ${legacyPath}`);
+  const target = resolveLegacyTourRedirectTarget(legacyTour, cmsTours);
+  return getTourPublicPath(target);
+};
 
 const REQUIRED_SINGLE_TAGS = [
   'property="og:title"',
@@ -366,6 +380,7 @@ export const run = async (): Promise<void> => {
   const renderableRoutes = await getRenderableRoutePaths(rootDir);
   const ogTestRoutes = [OG_TEST_ROUTE, TELEGRAM_OG_TEST_ROUTE];
   const routes = getRoutesToVerify(renderableRoutes, ogTestRoutes);
+  const cmsTours = await loadBuildCmsToursFile(rootDir);
 
   for (const routePath of routes) {
     const checkDimensions = DIMENSION_SAMPLE_ROUTES.includes(routePath);
@@ -375,21 +390,7 @@ export const run = async (): Promise<void> => {
   }
 
   for (const legacyPath of await getTourLegacyRedirectPaths(rootDir)) {
-    const match = /^\/tours\/(winter|spring|summer|fall)\/([^/]+)$/.exec(legacyPath);
-    if (match == null) {
-      throw new Error(`Invalid legacy path: ${legacyPath}`);
-    }
-    const [, season, segment] = match;
-    const { findTourBySeasonAndSegment } = await import('../src/data/tourLookup.ts');
-    const { getTourPublicPath } = await import('../src/constants/tourUrls.ts');
-    const tour = findTourBySeasonAndSegment(
-      season as 'winter' | 'spring' | 'summer' | 'fall',
-      segment,
-    );
-    if (tour == null) {
-      throw new Error(`Tour not found for legacy path: ${legacyPath}`);
-    }
-    await assertLegacyRedirectShell(legacyPath, getTourPublicPath(tour), expectedOrigin);
+    await assertLegacyRedirectShell(legacyPath, getExpectedLegacyCanonicalPath(legacyPath, cmsTours?.tours), expectedOrigin);
     process.stdout.write(`[PASS] legacy redirect shell ${legacyPath}\n`);
   }
 

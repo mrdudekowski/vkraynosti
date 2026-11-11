@@ -58,8 +58,6 @@ import { checkHideTourPublish } from '../../../src/cms/hideTourFutureDepartures.
 import { resolvePublishedTourDocument } from '../../../src/cms/publishedTourSnapshot.ts';
 import { loadCrmFile } from './crmStore.ts';
 import { allocateUniqueSlug, nextSeasonTourId, slugFromTitle } from '../../../src/cms/cmsTourSlug.ts';
-import { SITE_CONTENT_KINDS } from '../../../src/cms/siteContentDocument.ts';
-import { siteContentPublishedKey } from '../../../src/cms/siteContentPackageKeys.ts';
 import {
   CMS_DRAFT_INDEX_KEY,
   CMS_PUBLISHED_CATALOG_KEY,
@@ -93,6 +91,7 @@ import { createStorageCircuit, type StorageCircuit } from './storageCircuit.ts';
 import { getCatalogMirrorState } from './catalogMirrorState.ts';
 import { getPublishedSyncState } from './publishedSyncState.ts';
 import { comparePublishedJson } from './publishedStoreSync.ts';
+import { PublicSnapshotConflictError, loadPublicSnapshotRelease } from './publicSnapshotStore.ts';
 import { StorageUnavailableError } from './storageUnavailable.ts';
 import { CmsLastAdminError, type AuthRepository, type UserRecord } from './auth/authRepository.ts';
 import { registerCrmRoutes } from './crmRoutes.ts';
@@ -939,30 +938,17 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     if (secret !== env.deploySecret) {
       return c.json({ error: 'forbidden' }, 403);
     }
-    const tours = (await store.getJson(CMS_PUBLISHED_CATALOG_KEY)) ?? { schemaVersion: 1, tours: [] };
-    const toursList = (await store.getJson(CMS_PUBLISHED_TOURS_LIST_KEY)) ?? { schemaVersion: 1, tours: [] };
-    const schedule = (await store.getJson(CMS_PUBLISHED_SCHEDULE_KEY)) ?? { schemaVersion: 1, events: [] };
-    const siteContent: Record<string, unknown | null> = {};
-    for (const kind of SITE_CONTENT_KINDS) {
-      siteContent[kind] = await store.getJson(siteContentPublishedKey(kind));
-    }
-    const stills: Array<{ key: string; url: string }> = [];
-    const catalogTours = Array.isArray((tours as { tours?: unknown }).tours)
-      ? (tours as { tours: CmsTourDocument[] }).tours
-      : [];
-    for (const tour of catalogTours) {
-      for (const assetId of [tour.coverAssetId, tour.prefaceAssetId]) {
-        const asset = (tour.assets ?? []).find((item) => item.id === assetId);
-        if (asset?.stillUrl == null || asset.stillUrl.length === 0) {
-          continue;
-        }
-        const key = cmsMediaObjectKeyFromPublicUrl(tour.id, asset.stillUrl);
-        if (key != null) {
-          stills.push({ key, url: asset.stillUrl });
-        }
+    try {
+      const release = await loadPublicSnapshotRelease(store, { sourceKind: env.jsonStoreKind });
+      // Keep legacy top-level fields for existing consumers while adding the
+      // validated release envelope required by the public SEO build.
+      return c.json({ ...release.payload, payload: release.payload, manifest: release.manifest });
+    } catch (error) {
+      if (error instanceof PublicSnapshotConflictError) {
+        return c.json({ error: 'bake_snapshot_conflict' }, 409);
       }
+      return c.json({ error: 'bake_snapshot_unavailable' }, 503);
     }
-    return c.json({ tours, toursList, schedule, siteContent, stills });
   });
 
   app.post('/api/cms/internal/rewrite-media-origin', async (c) => {

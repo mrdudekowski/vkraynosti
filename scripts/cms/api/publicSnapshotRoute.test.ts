@@ -9,6 +9,7 @@ import { SITE_CONTENT_KINDS } from '../../../src/cms/siteContentDocument.ts';
 import { siteContentPublishedKey } from '../../../src/cms/siteContentPackageKeys.ts';
 import { createDefaultSiteSeoDocument } from '../../../src/cms/siteSeoDocument.ts';
 import { createCmsApiApp } from './app.ts';
+import type { PublicReleaseCoordinator } from './publicReleaseCoordinator.ts';
 import type { CmsApiEnv } from './env.ts';
 import type { AuthRepository } from './auth/authRepository.ts';
 import type { DepartureRepository } from './schedule/departureRepository.ts';
@@ -19,6 +20,7 @@ function createApp(
   overrides: Partial<CmsApiEnv> = {},
   includeRequiredData = true,
   publicSiteFetch?: typeof fetch,
+  publicReleaseCoordinator?: PublicReleaseCoordinator,
 ) {
   const store = createMemoryJsonStore({
     [CMS_PUBLISHED_CATALOG_KEY]: { schemaVersion: 1, tours: [] },
@@ -57,7 +59,7 @@ function createApp(
     },
   } as unknown as AuthRepository;
   const departureRepository = {} as DepartureRepository;
-  return createCmsApiApp({ env, store, authRepository, departureRepository, publicSiteFetch });
+  return createCmsApiApp({ env, store, authRepository, departureRepository, publicSiteFetch, publicReleaseCoordinator });
 }
 
 describe('internal CMS release bake endpoint', () => {
@@ -88,6 +90,37 @@ describe('internal CMS release bake endpoint', () => {
     expect(body.manifest?.sha256).toMatch(/^[a-f0-9]{64}$/);
     expect(body.payload?.siteContent?.seo?.pages?.map(({ key }) => key)).toContain('privacy');
     expect(body.tours).toBeDefined();
+  });
+
+  it('coordinates bake exports and authenticated publication endpoints through the same gate', async () => {
+    const operations: string[] = [];
+    const coordinator: PublicReleaseCoordinator = {
+      async runExclusive<T>(operation: () => Promise<T>): Promise<T> {
+        operations.push('start');
+        try {
+          return await operation();
+        } finally {
+          operations.push('end');
+        }
+      },
+    };
+    const app = createApp({}, true, undefined, coordinator);
+
+    const bake = await app.request('/api/cms/internal/bake', {
+      headers: { 'x-cms-deploy-secret': 'test-deploy-secret-16' },
+    });
+    const publish = await app.request('/api/cms/departures/publish', {
+      method: 'POST',
+      headers: {
+        cookie: `${CMS_SESSION_COOKIE}=test-session-token`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ ids: [] }),
+    });
+
+    expect(bake.status).toBe(200);
+    expect(publish.status).toBe(400);
+    expect(operations).toEqual(['start', 'end', 'start', 'end']);
   });
 
   it('returns unavailable rather than baking incomplete data', async () => {

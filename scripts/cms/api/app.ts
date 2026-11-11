@@ -59,6 +59,11 @@ import {
 } from '../../../src/cms/cmsPackageKeys.ts';
 import { createCmsTourMeta, parseCmsTourMeta, type CmsTourMeta } from '../../../src/cms/cmsTourMeta.ts';
 import { PublicSnapshotConflictError, loadPublicSnapshotRelease } from './publicSnapshotStore.ts';
+import {
+  createInMemoryPublicReleaseCoordinator,
+  isPublicReleaseConsistencyRequest,
+  type PublicReleaseCoordinator,
+} from './publicReleaseCoordinator.ts';
 import { getSeoReleaseDeploymentStatus } from './seoReleaseStatus.ts';
 import { isValidTourSlug } from '../../../src/constants/tourUrls.ts';
 import {
@@ -232,6 +237,7 @@ export type CmsApiDeps = {
   store: CmsJsonStore;
   authRepository: AuthRepository;
   departureRepository: DepartureRepository;
+  publicReleaseCoordinator?: PublicReleaseCoordinator;
   publicSiteUrl?: string;
   publicSiteFetch?: typeof fetch;
 };
@@ -661,6 +667,7 @@ function departureErrorResponse(error: unknown): {
 
 export function createCmsApiApp(deps: CmsApiDeps) {
   const { env, store, authRepository, departureRepository } = deps;
+  const publicReleaseCoordinator = deps.publicReleaseCoordinator ?? createInMemoryPublicReleaseCoordinator();
   const app = new Hono<{ Variables: AppVariables }>();
   const allowedOrigins = new Set(
     (process.env.CMS_CORS_ORIGINS ??
@@ -784,7 +791,9 @@ export function createCmsApiApp(deps: CmsApiDeps) {
     if (!matchesDeploySecret(secret, env.deploySecret)) return c.json({ error: 'forbidden' }, 403);
 
     try {
-      const release = await loadPublicSnapshotRelease(store, { sourceKind: env.storeKind });
+      const release = await publicReleaseCoordinator.runExclusive(() =>
+        loadPublicSnapshotRelease(store, { sourceKind: env.storeKind }),
+      );
       // Keep the previous top-level fields while the public build migrates to the release envelope.
       return c.json({ ...release.payload, payload: release.payload, manifest: release.manifest });
     } catch (error) {
@@ -865,6 +874,20 @@ export function createCmsApiApp(deps: CmsApiDeps) {
       ...effectivePublishFlags(found.user),
     });
     await next();
+  });
+
+  app.use('/api/cms/*', async (c, next) => {
+    if (
+      c.req.path === '/api/cms/internal/bake' ||
+      !isPublicReleaseConsistencyRequest(c.req.method, c.req.path)
+    ) {
+      return next();
+    }
+    try {
+      await publicReleaseCoordinator.runExclusive(next);
+    } catch {
+      return c.json({ error: 'public_release_lock_unavailable' }, 503);
+    }
   });
 
   app.get('/api/cms/seo-release/status', async (c) => {

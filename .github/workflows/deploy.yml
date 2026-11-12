@@ -96,6 +96,13 @@ jobs:
 
         run: npm test
 
+      - name: Validate live CMS browser access
+
+        env:
+          VITE_CMS_S3_BASE_URL: ${{ vars.VITE_CMS_S3_BASE_URL }}
+
+        run: npm run check:cms-runtime-config
+
 
 
       - name: Sync tour catalog from CMS bake

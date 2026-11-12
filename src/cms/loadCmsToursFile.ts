@@ -1,23 +1,42 @@
 import { parseCmsToursFile, type CmsToursFile } from './cmsTourDocument';
+import { cmsDocumentToSiteTour } from './cmsDocumentToSiteTour';
 import { assertPublicSnapshotToursProjection } from './publicSnapshotRelease';
-import { cmsPublishedCatalogCandidates } from './cmsContentUrls';
+import {
+  buildCmsPublishedToursUrl,
+  resolveCmsContentBaseUrl,
+  resolveCmsLocalFallbackUrl,
+} from './cmsContentUrls';
 import { loadEmbeddedPublicSnapshot } from './loadEmbeddedPublicSnapshot';
+import { fetchCmsJson } from './fetchCmsJson';
 
-export type CmsCatalogSource = 'bake' | 'snapshot';
+export type CmsCatalogSource = 'live' | 'bake' | 'snapshot';
 
 export type CmsCatalogLoad = { file: CmsToursFile; source: CmsCatalogSource };
 
-async function fetchJson(url: string, releaseId: string): Promise<unknown> {
-  const separator = url.includes('?') ? '&' : '?';
-  const versionedUrl = url + separator + 'releaseId=' + encodeURIComponent(releaseId);
-  const response = await fetch(versionedUrl, { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error('CMS tours fetch failed: ' + response.status + ' ' + versionedUrl);
+function parseRenderableCmsToursFile(input: unknown): CmsToursFile {
+  const file = parseCmsToursFile(input);
+  file.tours.forEach(cmsDocumentToSiteTour);
+  return file;
+}
+
+export async function loadLiveCmsToursFile(): Promise<CmsToursFile | null> {
+  const baseUrl = resolveCmsContentBaseUrl();
+  if (baseUrl == null) return null;
+
+  try {
+    return parseRenderableCmsToursFile(
+      await fetchCmsJson(buildCmsPublishedToursUrl(baseUrl)),
+    );
+  } catch (error) {
+    console.warn('[cms] Failed to load live tours catalog', error);
+    return null;
   }
-  return response.json() as Promise<unknown>;
 }
 
 export async function loadCmsToursFile(): Promise<CmsCatalogLoad | null> {
+  const liveFile = await loadLiveCmsToursFile();
+  if (liveFile != null) return { file: liveFile, source: 'live' };
+
   let release: Awaited<ReturnType<typeof loadEmbeddedPublicSnapshot>>;
   try {
     release = await loadEmbeddedPublicSnapshot();
@@ -27,11 +46,12 @@ export async function loadCmsToursFile(): Promise<CmsCatalogLoad | null> {
   }
   if (release == null) return null;
 
-  const snapshotFile = parseCmsToursFile(release.payload.tours);
-  for (const url of cmsPublishedCatalogCandidates()) {
+  const snapshotFile = parseRenderableCmsToursFile(release.payload.tours);
+  for (const url of [resolveCmsLocalFallbackUrl()]) {
     try {
-      const toursInput = await fetchJson(url, release.manifest.releaseId);
-      const file = parseCmsToursFile(toursInput);
+      const separator = url.includes('?') ? '&' : '?';
+      const versionedUrl = `${url}${separator}releaseId=${encodeURIComponent(release.manifest.releaseId)}`;
+      const file = parseRenderableCmsToursFile(await fetchCmsJson(versionedUrl));
       assertPublicSnapshotToursProjection(release, file);
       return { file, source: 'bake' };
     } catch (error) {

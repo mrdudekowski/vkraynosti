@@ -50,18 +50,29 @@ describe('resolveCmsContentBaseUrl', () => {
     expect(candidates.schedule[0]).toBe('/data/cms/tour-schedule/schedule.json');
   });
 
-  it('календарный overlay остаётся привязан к снимку текущего деплоя', () => {
+  it('календарный overlay читает опубликованный live JSON перед snapshot fallback', () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
     vi.stubEnv('BASE_URL', '/');
     const candidates = cmsTourScheduleOverlayCandidates();
-    expect(candidates.toursList).toEqual(['/data/cms/tour-schedule/tours_list.json']);
-    expect(candidates.schedule).toEqual(['/data/cms/tour-schedule/schedule.json']);
+    expect(candidates.toursList).toEqual([
+      'https://cdn.example/cms/published/tour-schedule/tours_list.json',
+      '/data/cms/tour-schedule/tours_list.json',
+      '/data/tour-schedule/tours_list.json',
+    ]);
+    expect(candidates.schedule).toEqual([
+      'https://cdn.example/cms/published/tour-schedule/schedule.json',
+      '/data/cms/tour-schedule/schedule.json',
+      '/data/tour-schedule/schedule.json',
+    ]);
   });
 
-  it('site content remains on the release baked into this deployment', () => {
+  it('site content reads live CMS before the local snapshot fallback', () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
     vi.stubEnv('BASE_URL', '/');
-    expect(cmsPublishedSiteContentCandidates('modal')).toEqual(['/data/cms/site-content/modal/document.json']);
+    expect(cmsPublishedSiteContentCandidates('modal')).toEqual([
+      'https://cdn.example/cms/published/site-content/modal/document.json',
+      '/data/cms/site-content/modal/document.json',
+    ]);
     expect(buildCmsPublishedSiteContentUrl('https://cdn.example/cms/', 'modal')).toBe(
       'https://cdn.example/cms/published/site-content/modal/document.json',
     );

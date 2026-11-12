@@ -42,7 +42,11 @@ async function createResponseSet() {
 function stubBakeResponses(responseSet: Awaited<ReturnType<typeof createResponseSet>>) {
   const fetchSpy = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);
-    const pathname = new URL(url, 'https://local.invalid').pathname;
+    const parsed = new URL(url, 'https://local.invalid');
+    if (parsed.origin !== 'https://local.invalid') {
+      return { ok: false, status: 503, json: async () => null };
+    }
+    const pathname = parsed.pathname;
     const value = pathname.endsWith('/build-source.json') ? responseSet.marker
       : pathname.endsWith('/release.json') ? responseSet.release
         : pathname.endsWith('/tours.json') ? responseSet.tours
@@ -61,8 +65,24 @@ describe('loadCmsToursFile', () => {
     vi.unstubAllGlobals();
   });
 
-  it('loads the embedded catalog only when its release marker and hash match', async () => {
+  it('uses a valid live catalog even when it differs from the deployed SEO release', async () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
+    const liveFile = { schemaVersion: 1, tours: [{ ...tour, title: 'Published live title' }] };
+    const fetchSpy = vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input) === 'https://cdn.example/cms/published/tours.json') {
+        return { ok: true, json: async () => liveFile };
+      }
+      return { ok: false, status: 404, json: async () => null };
+    });
+    vi.stubGlobal('fetch', fetchSpy);
+
+    await expect(loadCmsToursFile()).resolves.toMatchObject({
+      source: 'live', file: { tours: [{ title: 'Published live title' }] },
+    });
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads the embedded catalog only when its release marker and hash match', async () => {
     const responses = await createResponseSet();
     const fetchSpy = stubBakeResponses(responses);
 

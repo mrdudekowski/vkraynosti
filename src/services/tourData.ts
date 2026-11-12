@@ -1,6 +1,10 @@
 import { z } from 'zod';
-import { cmsTourScheduleOverlayCandidates } from '../cms/cmsContentUrls';
-import { TOUR_DATA_S3_PATHS, buildTourDataFileUrl } from '../constants/tourDataUrls';
+import {
+  buildCmsPublishedScheduleUrl,
+  buildCmsPublishedToursListUrl,
+  cmsTourScheduleBakeCandidates,
+  resolveCmsContentBaseUrl,
+} from '../cms/cmsContentUrls';
 import type { SchedulePayload, TourDataFetchErrorCode, ToursListPayload } from '../types/tourData';
 import { TourDataFetchError } from '../types/tourData';
 import { mergeTourDataToSchedulePayload } from '../utils/tourData/mergeTourDataPayload';
@@ -92,57 +96,84 @@ async function fetchJsonFromCandidates(urls: string[]): Promise<unknown> {
   throw lastError ?? new TourDataFetchError('network', 'No calendar JSON candidates');
 }
 
-function toursListUrls(): string[] {
-  const overlay = cmsTourScheduleOverlayCandidates().toursList;
-  if (overlay.length > 0) {
-    return overlay;
+async function loadEmbeddedScheduleSnapshot(): Promise<{ toursList: ToursListPayload; schedule: SchedulePayload } | null> {
+  let release;
+  try {
+    release = await loadEmbeddedPublicSnapshot();
+  } catch (error) {
+    throw new TourDataFetchError('parse', error instanceof Error ? error.message : 'CMS release is invalid');
   }
-  return [buildTourDataFileUrl(TOUR_DATA_S3_PATHS.toursList)];
+  if (release == null) return null;
+  return {
+    toursList: parseToursList(release.payload.toursList),
+    schedule: parseSchedule(release.payload.schedule),
+  };
 }
 
-function scheduleUrls(): string[] {
-  const overlay = cmsTourScheduleOverlayCandidates().schedule;
-  if (overlay.length > 0) {
-    return overlay;
+async function loadLiveScheduleSnapshot(): Promise<{ toursList: ToursListPayload; schedule: SchedulePayload } | null> {
+  const baseUrl = resolveCmsContentBaseUrl();
+  if (baseUrl == null) return null;
+
+  try {
+    const [toursListInput, scheduleInput] = await Promise.all([
+      fetchJson(buildCmsPublishedToursListUrl(baseUrl)),
+      fetchJson(buildCmsPublishedScheduleUrl(baseUrl)),
+    ]);
+    return {
+      toursList: parseToursList(toursListInput),
+      schedule: parseSchedule(scheduleInput),
+    };
+  } catch (error) {
+    console.warn('[tourSchedule] Live schedule failed; using deployed snapshot', error);
+    return null;
   }
-  return [buildTourDataFileUrl(TOUR_DATA_S3_PATHS.schedule)];
+}
+
+function bakedScheduleCandidates(): { toursList: string[]; schedule: string[] } {
+  const candidates = cmsTourScheduleBakeCandidates();
+  return { toursList: candidates.toursList, schedule: candidates.schedule };
 }
 
 export const loadToursList = async (): Promise<ToursListPayload> => {
-  let release;
-  try {
-    release = await loadEmbeddedPublicSnapshot();
-  } catch (error) {
-    throw new TourDataFetchError('parse', error instanceof Error ? error.message : 'CMS release is invalid');
+  const baseUrl = resolveCmsContentBaseUrl();
+  if (baseUrl != null) {
+    try {
+      return parseToursList(await fetchJson(buildCmsPublishedToursListUrl(baseUrl)));
+    } catch (error) {
+      console.warn('[tourSchedule] Live tour list failed; using deployed snapshot', error);
+    }
   }
-  if (release != null) return parseToursList(release.payload.toursList);
-  return parseToursList(await fetchJsonFromCandidates(toursListUrls()));
+  const snapshot = await loadEmbeddedScheduleSnapshot();
+  if (snapshot != null) return snapshot.toursList;
+  return parseToursList(await fetchJsonFromCandidates(bakedScheduleCandidates().toursList));
 };
 
 export const loadSchedule = async (): Promise<SchedulePayload> => {
-  let release;
-  try {
-    release = await loadEmbeddedPublicSnapshot();
-  } catch (error) {
-    throw new TourDataFetchError('parse', error instanceof Error ? error.message : 'CMS release is invalid');
+  const baseUrl = resolveCmsContentBaseUrl();
+  if (baseUrl != null) {
+    try {
+      return parseSchedule(await fetchJson(buildCmsPublishedScheduleUrl(baseUrl)));
+    } catch (error) {
+      console.warn('[tourSchedule] Live schedule failed; using deployed snapshot', error);
+    }
   }
-  if (release != null) return parseSchedule(release.payload.schedule);
-  return parseSchedule(await fetchJsonFromCandidates(scheduleUrls()));
+  const snapshot = await loadEmbeddedScheduleSnapshot();
+  if (snapshot != null) return snapshot.schedule;
+  return parseSchedule(await fetchJsonFromCandidates(bakedScheduleCandidates().schedule));
 };
 
 export const loadTourSchedulePayload = async (): Promise<TourSchedulePayload> => {
-  let release;
-  try {
-    release = await loadEmbeddedPublicSnapshot();
-  } catch (error) {
-    throw new TourDataFetchError('parse', error instanceof Error ? error.message : 'CMS release is invalid');
-  }
-  const [toursList, schedule] = release != null
-    ? [parseToursList(release.payload.toursList), parseSchedule(release.payload.schedule)]
-    : await Promise.all([
-        fetchJsonFromCandidates(toursListUrls()).then(parseToursList),
-        fetchJsonFromCandidates(scheduleUrls()).then(parseSchedule),
-      ]);
+  const live = await loadLiveScheduleSnapshot();
+  if (live != null) return mergeTourDataToSchedulePayload(live.toursList, live.schedule);
+
+  const snapshot = await loadEmbeddedScheduleSnapshot();
+  if (snapshot != null) return mergeTourDataToSchedulePayload(snapshot.toursList, snapshot.schedule);
+
+  const baked = bakedScheduleCandidates();
+  const [toursList, schedule] = await Promise.all([
+    fetchJsonFromCandidates(baked.toursList).then(parseToursList),
+    fetchJsonFromCandidates(baked.schedule).then(parseSchedule),
+  ]);
   return mergeTourDataToSchedulePayload(toursList, schedule);
 };
 

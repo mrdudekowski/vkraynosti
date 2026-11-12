@@ -68,9 +68,14 @@ export function resolveCmsLocalSiteContentUrl(kind: SiteContentDocumentKind): st
   return `${cmsLocalDataBasePath()}/site-content/${kind}/document.json`;
 }
 
-/** Live published JSON first when CMS env is set. SEO stays bake-only so first HTML matches hydration. */
+/** Runtime documents come from published CMS first; same-origin files are the outage fallback. */
 export function cmsPublishedSiteContentCandidates(kind: SiteContentDocumentKind): string[] {
-  return [resolveCmsLocalSiteContentUrl(kind)];
+  const snapshot = resolveCmsLocalSiteContentUrl(kind);
+  if (kind === 'seo') return [snapshot];
+  const live = resolveCmsContentBaseUrl();
+  return live == null
+    ? [snapshot]
+    : [buildCmsPublishedSiteContentUrl(live, kind), snapshot];
 }
 
 export function cmsTourScheduleBakeCandidates(): {
@@ -91,7 +96,9 @@ export function cmsTourScheduleBakeCandidates(): {
 }
 
 export function cmsPublishedCatalogCandidates(): string[] {
-  return [resolveCmsLocalFallbackUrl()];
+  const snapshot = resolveCmsLocalFallbackUrl();
+  const live = resolveCmsContentBaseUrl();
+  return live == null ? [snapshot] : [buildCmsPublishedToursUrl(live), snapshot];
 }
 
 /** Live published JSON first when CMS env is set, then same-origin bake. */
@@ -100,8 +107,10 @@ export function cmsTourScheduleOverlayCandidates(): {
   schedule: string[];
 } {
   const bake = cmsTourScheduleBakeCandidates();
+  const live = resolveCmsContentBaseUrl();
+  if (live == null) return bake;
   return {
-    toursList: [bake.toursList[0]],
-    schedule: [bake.schedule[0]],
+    toursList: [buildCmsPublishedToursListUrl(live), ...bake.toursList],
+    schedule: [buildCmsPublishedScheduleUrl(live), ...bake.schedule],
   };
 }

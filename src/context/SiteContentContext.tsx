@@ -17,6 +17,7 @@ import type { SiteSeoDocument } from '../cms/siteSeoDocument';
 import { loadPublishedSiteContent } from '../cms/loadSiteContent';
 import { seedSiteContentDocuments } from '../cms/siteContentSeed';
 import { TEAM_HERO_PAGES } from '../data/teamData';
+import { CMS_LIVE_REFRESH_INTERVAL_MS } from '../cms/cmsContentRefresh';
 
 type SiteContentValue = {
   team: TeamContentDocument;
@@ -48,8 +49,11 @@ const fallback: SiteContentValue = {
 };
 const SiteContentContext = createContext<SiteContentValue>(fallback);
 
-const policiesFromLoaded = (loaded: Array<Awaited<ReturnType<typeof loadPublishedSiteContent>>>) => {
-  const next = { ...fallback.policies };
+const policiesFromLoaded = (
+  loaded: Array<Awaited<ReturnType<typeof loadPublishedSiteContent>>>,
+  current: SiteContentValue['policies'] = fallback.policies,
+) => {
+  const next = { ...current };
   for (const document of loaded) {
     if (document != null && isPolicyContentDocument(document)) {
       next[document.kind] = document;
@@ -62,25 +66,46 @@ export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
   const [value, setValue] = useState<SiteContentValue>(fallback);
   useEffect(() => {
     let alive = true;
-    void Promise.all([
-      loadPublishedSiteContent('team'),
-      loadPublishedSiteContent('contacts'),
-      loadPublishedSiteContent('footer'),
-      loadPublishedSiteContent('modal'),
-      loadPublishedSiteContent('seo'),
-      ...SITE_POLICY_KINDS.map((kind) => loadPublishedSiteContent(kind)),
-    ]).then(([team, contacts, footer, modal, seo, ...policyDocuments]) => {
-      if (!alive) return;
-      setValue({
-        team: team?.kind === 'team' ? team : fallback.team,
-        contacts: contacts?.kind === 'contacts' ? contacts : fallback.contacts,
-        footer: footer?.kind === 'footer' ? footer : fallback.footer,
-        modal: modal?.kind === 'modal' ? modal : fallback.modal,
-        seo: seo?.kind === 'seo' ? seo : fallback.seo,
-        policies: policiesFromLoaded(policyDocuments),
-      });
-    }).catch(() => undefined);
-    return () => { alive = false; };
+    let refreshInFlight = false;
+
+    const refresh = async (): Promise<void> => {
+      if (!alive || refreshInFlight) return;
+      refreshInFlight = true;
+      try {
+        const [team, contacts, footer, modal, seo, ...policyDocuments] = await Promise.all([
+          loadPublishedSiteContent('team'),
+          loadPublishedSiteContent('contacts'),
+          loadPublishedSiteContent('footer'),
+          loadPublishedSiteContent('modal'),
+          loadPublishedSiteContent('seo'),
+          ...SITE_POLICY_KINDS.map((kind) => loadPublishedSiteContent(kind)),
+        ]);
+        if (!alive) return;
+        setValue((current) => ({
+          team: team?.kind === 'team' ? team : current.team,
+          contacts: contacts?.kind === 'contacts' ? contacts : current.contacts,
+          footer: footer?.kind === 'footer' ? footer : current.footer,
+          modal: modal?.kind === 'modal' ? modal : current.modal,
+          seo: seo?.kind === 'seo' ? seo : current.seo,
+          policies: policiesFromLoaded(policyDocuments, current.policies),
+        }));
+      } finally {
+        refreshInFlight = false;
+      }
+    };
+
+    const interval = window.setInterval(() => { void refresh(); }, CMS_LIVE_REFRESH_INTERVAL_MS);
+    const onVisibilityChange = (): void => {
+      if (document.visibilityState === 'visible') void refresh();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    void refresh();
+
+    return () => {
+      alive = false;
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, []);
   const stable = useMemo(() => value, [value]);
   return <SiteContentContext.Provider value={stable}>{children}</SiteContentContext.Provider>;

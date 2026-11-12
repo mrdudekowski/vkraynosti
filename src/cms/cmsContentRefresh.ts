@@ -1,0 +1,1 @@
+export const CMS_LIVE_REFRESH_INTERVAL_MS = 60_000;

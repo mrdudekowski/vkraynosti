@@ -53,6 +53,8 @@
 
     "sync:catalog": "node --import tsx scripts/sync-catalog-from-cdn.mjs",
 
+    "check:cms-runtime-config": "node scripts/check-cms-runtime-config.mjs",
+
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
 
     "generate:robots": "tsx scripts/generate-robots.mjs",

@@ -48,20 +48,20 @@ describe('loadPublishedSiteContent', () => {
     );
   });
 
-  it('loads only a site-content document that matches the deployed release', async () => {
+  it('loads live site-content without requiring a matching deployed release', async () => {
     vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://s3.example.test/cms');
     const fetchSpy = await stubRelease({ team: teamDocument }, teamDocument);
     await expect(loadPublishedSiteContent('team')).resolves.toEqual(teamDocument);
     expect(fetchSpy.mock.calls.map(([url]) => String(url))).toEqual([
-      '/data/cms/build-source.json', '/data/cms/release.json', '/data/cms/site-content/team/document.json',
+      'https://s3.example.test/cms/published/site-content/team/document.json',
     ]);
   });
 
-  it('does not apply a site-content document from another release', async () => {
+  it('applies a newly published site-content document without requiring a new SEO release', async () => {
     const differentContacts = { ...contactsDocument, sectionVisible: false };
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
     await stubRelease({ contacts: contactsDocument }, differentContacts);
-    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    await expect(loadPublishedSiteContent('contacts')).resolves.toBeNull();
+    await expect(loadPublishedSiteContent('contacts')).resolves.toEqual(differentContacts);
   });
 
   it('loads bake SEO from the release and never fetches CDN content', async () => {
@@ -74,9 +74,9 @@ describe('loadPublishedSiteContent', () => {
   });
 
   it('returns null when the released document is absent', async () => {
-    const fetchSpy = await stubRelease({ contacts: null });
-    await expect(loadPublishedSiteContent('contacts')).resolves.toBeNull();
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    const fetchSpy = await stubRelease({ footer: null });
+    await expect(loadPublishedSiteContent('footer')).resolves.toBeNull();
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
   });
 
   it('returns null for a document with the wrong kind', async () => {

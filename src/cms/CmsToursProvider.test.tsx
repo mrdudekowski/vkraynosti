@@ -2,10 +2,10 @@ import { act, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CmsToursProvider } from './CmsToursProvider';
 import { clearCmsTourOverlay, getCmsOverlayTourById } from './cmsTourOverlay';
-import { loadCmsToursFile } from './loadCmsToursFile';
+import { loadCmsToursFile, loadLiveCmsToursFile } from './loadCmsToursFile';
 import { resetStorageCircuitForTests } from './storageCircuit';
 
-vi.mock('./loadCmsToursFile', () => ({ loadCmsToursFile: vi.fn() }));
+vi.mock('./loadCmsToursFile', () => ({ loadCmsToursFile: vi.fn(), loadLiveCmsToursFile: vi.fn() }));
 
 const bakedTour = {
   id: 'fall-1',
@@ -38,6 +38,7 @@ describe('CmsToursProvider', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllEnvs();
     clearCmsTourOverlay();
     resetStorageCircuitForTests();
@@ -50,5 +51,22 @@ describe('CmsToursProvider', () => {
 
     expect(getCmsOverlayTourById('fall-1')?.title).toBe('Baked title');
     expect(loadCmsToursFile).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes a live tour edit while the page remains open', async () => {
+    const updated = { ...bakedTour, title: 'Published in CMS' };
+    vi.useFakeTimers();
+    vi.stubEnv('VITE_CMS_S3_BASE_URL', 'https://cdn.example/cms');
+    vi.mocked(loadCmsToursFile).mockResolvedValue({ file: bakeFile, source: 'live' });
+    vi.mocked(loadLiveCmsToursFile).mockResolvedValue({ schemaVersion: 1, tours: [updated] });
+
+    render(<CmsToursProvider><span /></CmsToursProvider>);
+    await act(async () => { await Promise.resolve(); });
+    expect(getCmsOverlayTourById('fall-1')?.title).toBe('Baked title');
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(60_000); });
+
+    expect(getCmsOverlayTourById('fall-1')?.title).toBe('Published in CMS');
+    expect(loadLiveCmsToursFile).toHaveBeenCalled();
   });
 });

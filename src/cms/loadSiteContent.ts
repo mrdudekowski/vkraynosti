@@ -1,16 +1,18 @@
 import { parseSiteContentDocument, type SiteContentDocument, type SiteContentDocumentKind } from './siteContentDocument';
-import { cmsPublishedSiteContentCandidates } from './cmsContentUrls';
+import {
+  buildCmsPublishedSiteContentUrl,
+  cmsPublishedSiteContentCandidates,
+  resolveCmsContentBaseUrl,
+  resolveCmsLocalSiteContentUrl,
+} from './cmsContentUrls';
 import { loadEmbeddedPublicSnapshot } from './loadEmbeddedPublicSnapshot';
 import { serializeCanonicalJson } from './publicSnapshotRelease';
+import { fetchCmsJson } from './fetchCmsJson';
 
 const lastValidByKind = new Map<SiteContentDocumentKind, SiteContentDocument>();
 
 async function fetchJson(url: string): Promise<unknown> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`CMS site content fetch failed: ${response.status} ${url}`);
-  }
-  return response.json() as Promise<unknown>;
+  return fetchCmsJson(url);
 }
 
 function parseDocument(
@@ -23,21 +25,45 @@ function parseDocument(
 export async function loadPublishedSiteContent(
   kind: SiteContentDocumentKind,
 ): Promise<SiteContentDocument | null> {
+  if (kind !== 'seo') {
+    const baseUrl = resolveCmsContentBaseUrl();
+    if (baseUrl != null) {
+      const liveUrl = buildCmsPublishedSiteContentUrl(baseUrl, kind);
+      try {
+        const document = parseDocument(kind, await fetchJson(liveUrl));
+        lastValidByKind.set(kind, document);
+        return document;
+      } catch (error) {
+        console.warn(`[cms] Failed to load live ${kind} site content`, error);
+      }
+    }
+
+    const lastValid = lastValidByKind.get(kind);
+    if (lastValid != null) return lastValid;
+
+    try {
+      const release = await loadEmbeddedPublicSnapshot();
+      const snapshotDocument = release?.payload.siteContent[kind];
+      const document = snapshotDocument == null
+        ? parseDocument(kind, await fetchJson(resolveCmsLocalSiteContentUrl(kind)))
+        : parseDocument(kind, snapshotDocument);
+      lastValidByKind.set(kind, document);
+      return document;
+    } catch (error) {
+      console.warn(`[cms] Failed to load ${kind} site content snapshot`, error);
+      return null;
+    }
+  }
+
   for (const url of cmsPublishedSiteContentCandidates(kind)) {
     try {
       const release = await loadEmbeddedPublicSnapshot();
-      if (release == null) {
-        lastValidByKind.delete(kind);
-        return null;
-      }
-      const expected = release.payload.siteContent[kind];
-      if (expected == null) {
-        lastValidByKind.delete(kind);
-        return null;
-      }
       const document = parseDocument(kind, await fetchJson(url));
-      if (serializeCanonicalJson(document) !== serializeCanonicalJson(expected)) {
-        throw new Error(`CMS ${kind} document does not match embedded release`);
+      if (kind === 'seo' && release != null) {
+        const expected = release.payload.siteContent[kind];
+        if (serializeCanonicalJson(document) !== serializeCanonicalJson(expected)) {
+          throw new Error('Baked SEO document does not match embedded release');
+        }
       }
       lastValidByKind.set(kind, document);
       return document;

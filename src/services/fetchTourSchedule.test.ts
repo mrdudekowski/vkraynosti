@@ -53,6 +53,7 @@ describe('fetchTourSchedule', () => {
 
   it('parses merged payload from tours_list and schedule', async () => {
     vi.mocked(fetch)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ kind: 'legacy' }) } as Response)
       .mockResolvedValueOnce({ ok: true, json: async () => toursList } as Response)
       .mockResolvedValueOnce({ ok: true, json: async () => schedule } as Response);
 

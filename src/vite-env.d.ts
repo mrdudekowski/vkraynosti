@@ -6,7 +6,7 @@ interface ImportMetaEnv {
   /** @deprecated Используйте VITE_PUBLIC_S3_BASE_URL */
   readonly VITE_TOUR_SCHEDULE_ENDPOINT_URL?: string;
   readonly VITE_PUBLIC_S3_BASE_URL?: string;
-  /** Публичный origin бакета CMS-dev (туры JSON + медиа). Пусто = overlay выключен. */
+  /** Публичный CORS-enabled CDN origin CMS (туры JSON + контент сайта). */
   readonly VITE_CMS_S3_BASE_URL?: string;
   /** Backend origin for CMS/CRM admin API; empty keeps same-origin `/api/cms`. */
   readonly VITE_CMS_API_BASE_URL?: string;

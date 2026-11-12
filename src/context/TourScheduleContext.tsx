@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useCmsToursRevision } from '../cms/useCmsToursRevision';
+import { CMS_LIVE_REFRESH_INTERVAL_MS } from '../cms/cmsContentRefresh';
 import { loadTourSchedulePayload } from '../services/tourData';
 import { TourDataFetchError } from '../types/tourData';
 import type {
@@ -159,7 +160,7 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
   }, [applySchedule]);
 
   useEffect(() => {
-    const onVisibilityChange = () => {
+    const refreshIfStale = () => {
       if (document.visibilityState !== 'visible' || !isClientScheduleCacheStale()) return;
       void loadSchedule(true)
         .then(applySchedule)
@@ -171,8 +172,12 @@ export const TourScheduleProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+    const intervalId = window.setInterval(refreshIfStale, CMS_LIVE_REFRESH_INTERVAL_MS);
+    document.addEventListener('visibilitychange', refreshIfStale);
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', refreshIfStale);
+    };
   }, [applySchedule]);
 
   const retry = useCallback(() => {
